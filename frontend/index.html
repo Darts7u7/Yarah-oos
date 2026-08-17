@@ -15,5 +15,13 @@
   <body style="background: #0a0a0a">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Dev-only: ⌘C copies a UI element's file/component/HTML context.
+         import.meta.env.DEV is statically false in production builds, so this
+         import is tree-shaken out and never ships. -->
+    <script type="module">
+      if (import.meta.env.DEV) {
+        import('react-grab');
+      }
+    </script>
   </body>
 </html>
