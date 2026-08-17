@@ -98,7 +98,7 @@
 .dark {
   /* natural/semantic */
   --semantic-0: 23 23 23; /* #171717 — content page (noche) */
-  --semantic-1: 27 27 27; /* #1B1B1B */
+  --semantic-1: 23 23 23; /* #171717 — content page (noche) */
   --semantic-2: 30 30 30; /* #1E1E1E — sidebar/header (noche) */
   --semantic-3: 36 36 36; /* #242424 */
   --semantic-4: 41 41 41; /* #292929 */
@@ -130,7 +130,7 @@
   --border: var(--alpha-8); /* general.border */
 
   /* special */
-  --card: var(--semantic-3); /* special.card */
+  --card: var(--semantic-2); /* #1E1E1E — containers, conjuga con el sidebar */
   --toast: var(--semantic-6); /* special.toast */
   --page: var(--semantic-0); /* special.page */
 }
