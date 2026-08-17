@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   resolve: {
     alias: {
-      '@insforge/ui': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+      '@yarahdev/ui': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
     },
   },
 });

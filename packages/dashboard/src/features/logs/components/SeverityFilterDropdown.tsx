@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   cn,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { SEVERITY_CONFIG, type SeverityType } from '#features/logs/helpers';
 
 const ORDERED_SEVERITIES: SeverityType[] = ['error', 'warning', 'informational'];

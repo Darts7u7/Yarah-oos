@@ -1,11 +1,11 @@
 services:
   postgres:
-    image: ghcr.io/insforge/postgres:v15.13.4
+    image: ghcr.io/darts7u7/postgres:v15.13.4
     command: postgres -c config_file=/etc/postgresql/postgresql.conf -c app.encryption_key='${ENCRYPTION_KEY:-${JWT_SECRET:-dev-secret-please-change-in-production}}'
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - POSTGRES_DB=${POSTGRES_DB:-insforge}
+      - POSTGRES_DB=${POSTGRES_DB:-yarah}
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./deploy/docker-init/db/db-init.sql:/docker-entrypoint-initdb.d/01-init.sql
@@ -16,7 +16,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      - insforge-network
+      - yarah-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -29,8 +29,8 @@ services:
     environment:
       # POSTGRES_USER: ${POSTGRES_USER:-postgres}
       # POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      # POSTGRES_DB: ${POSTGRES_DB:-insforge}
-      PGRST_DB_URI: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-insforge}
+      # POSTGRES_DB: ${POSTGRES_DB:-yarah}
+      PGRST_DB_URI: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-yarah}
       PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:3000
       PGRST_DB_SCHEMA: public
       PGRST_DB_ANON_ROLE: anon
@@ -48,14 +48,14 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      - insforge-network
+      - yarah-network
 
-  insforge:
+  yarah:
     build:
       context: .
       dockerfile: Dockerfile
       target: dev
-    image: insforge-dev
+    image: yarah-dev
     working_dir: /app
     depends_on:
       postgres:
@@ -88,10 +88,10 @@ services:
       # PostgreSQL connection
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
-      - POSTGRES_DB=${POSTGRES_DB:-insforge}
+      - POSTGRES_DB=${POSTGRES_DB:-yarah}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-insforge}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-yarah}
       - POSTGREST_BASE_URL=http://postgrest:3000
       - POSTGREST_MAX_SOCKETS=${POSTGREST_MAX_SOCKETS:-}
       - POSTGREST_MAX_FREE_SOCKETS=${POSTGREST_MAX_FREE_SOCKETS:-}
@@ -154,14 +154,14 @@ services:
       # Test-only: when "1", bypass the per-IP write rate limiters in
       # backend/src/api/middlewares/rate-limiters.ts so e2e suites can run
       # many writes from a single IP without hitting 429. Never set in prod.
-      - INSFORGE_DISABLE_WRITE_RATE_LIMIT=${INSFORGE_DISABLE_WRITE_RATE_LIMIT:-}
+      - YARAH_DISABLE_WRITE_RATE_LIMIT=${YARAH_DISABLE_WRITE_RATE_LIMIT:-}
       # Logs directory
-      - LOGS_DIR=/insforge-logs
-      # Anonymous telemetry (set INSFORGE_TELEMETRY_DISABLED=1 to opt out)
-      - INSFORGE_TELEMETRY_DISABLED=${INSFORGE_TELEMETRY_DISABLED:-}
-      - INSFORGE_DEPLOYMENT_METHOD=docker-compose
+      - LOGS_DIR=/yarah-logs
+      # Anonymous telemetry (set YARAH_TELEMETRY_DISABLED=1 to opt out)
+      - YARAH_TELEMETRY_DISABLED=${YARAH_TELEMETRY_DISABLED:-}
+      - YARAH_DEPLOYMENT_METHOD=docker-compose
       # Storage directory (for local file storage when S3 is not configured)
-      - STORAGE_DIR=/insforge-storage
+      - STORAGE_DIR=/yarah-storage
       # ─── Custom Compute: Docker provider (opt-in) ──────────────────────────
       # Mounting the Docker socket below is what enables it: the driver registers
       # itself when the socket is reachable, so nothing runs containers on your
@@ -205,25 +205,28 @@ services:
       - ./packages:/app/packages
       - ./docs:/app/docs
       - ./.agents:/app/.agents
+      - ./eslint.config.js:/app/eslint.config.js
+      - ./.prettierrc:/app/.prettierrc
+      - ./.prettierignore:/app/.prettierignore
       - node_modules:/app/node_modules
       - backend_node_modules:/app/backend/node_modules
       - frontend_node_modules:/app/frontend/node_modules
       - shared_schemas_node_modules:/app/packages/shared-schemas/node_modules
       - ui_node_modules:/app/packages/ui/node_modules
-      - shared-logs:/insforge-logs
-      - storage-data:/insforge-storage
+      - shared-logs:/yarah-logs
+      - storage-data:/yarah-storage
       # Uncomment to enable the Docker compute provider. The socket is
       # root-equivalent on the host, so it is opt-in rather than on by default.
       # Nothing else to set: this dev image runs as root and can reach the socket as
       # it is. (The production image runs as `node` and joins the socket's group in
       # its entrypoint — see docker-compose.prod.yml.)
       # - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:${DOCKER_SOCKET_PATH:-/var/run/docker.sock}
-    command: sh -c 'npm install && npx turbo run build --filter=@insforge/shared-schemas --filter=@insforge/ui --filter=@insforge/dashboard && cd backend && npm run migrate:up && cd .. && npx concurrently -n backend,frontend -c cyan,magenta "npm run dev:backend" "npm run dev:frontend"'
+    command: sh -c 'npm install && npx turbo run build --filter=@yarahdev/shared-schemas --filter=@yarahdev/ui --filter=@yarahdev/dashboard && cd backend && npm run migrate:up && cd .. && npx concurrently -n backend,frontend -c cyan,magenta "npm run dev:backend" "npm run dev:frontend"'
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     networks:
-      - insforge-network
+      - yarah-network
 
   # Deno serverless runtime for edge functions
   deno:
@@ -241,7 +244,7 @@ services:
       # PostgreSQL connection
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
-      - POSTGRES_DB=${POSTGRES_DB:-insforge}
+      - POSTGRES_DB=${POSTGRES_DB:-yarah}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - POSTGREST_BASE_URL=http://postgrest:3000
@@ -264,7 +267,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      - insforge-network
+      - yarah-network
 
 volumes:
   postgres-data:
@@ -287,5 +290,5 @@ volumes:
     driver: local
 
 networks:
-  insforge-network:
+  yarah-network:
     driver: bridge

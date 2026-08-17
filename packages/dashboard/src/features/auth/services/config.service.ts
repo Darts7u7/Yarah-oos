@@ -1,5 +1,5 @@
 import { apiClient } from '#lib/api/client';
-import { AuthConfigSchema, UpdateAuthConfigRequest } from '@insforge/shared-schemas';
+import { AuthConfigSchema, UpdateAuthConfigRequest } from '@yarahdev/shared-schemas';
 
 export class AuthConfigService {
   // Get authentication configuration (admin only)

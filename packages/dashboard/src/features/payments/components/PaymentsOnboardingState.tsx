@@ -1,7 +1,7 @@
 import { Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button, cn } from '@insforge/ui';
-import type { PaymentEnvironment, PaymentProvider } from '@insforge/shared-schemas';
+import { Button, cn } from '@yarahdev/ui';
+import type { PaymentEnvironment, PaymentProvider } from '@yarahdev/shared-schemas';
 import RazorpayWordmark from '#assets/logos/razorpay-wordmark.svg?react';
 import StripeWordmark from '#assets/logos/stripe-wordmark.svg?react';
 

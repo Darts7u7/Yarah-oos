@@ -1,6 +1,6 @@
 ---
 title: 函数 SDK 参考
-description: 使用 InsForge Swift SDK 从 iOS、macOS、tvOS 与 watchOS 应用调用无服务器边缘函数，发送带类型的请求并集成到 Apple 平台业务逻辑中。
+description: 使用 Yarah Swift SDK 从 iOS、macOS、tvOS 与 watchOS 应用调用无服务器边缘函数，发送带类型的请求并集成到 Apple 平台业务逻辑中。
 ---
 
 import SwiftSdkInstallation from '/snippets/swift-sdk-installation.mdx';
@@ -10,7 +10,7 @@ import SwiftSdkInstallation from '/snippets/swift-sdk-installation.mdx';
 <SwiftSdkInstallation />
 
 <Note>
-目前，InsForge 仅支持在 Deno 环境中运行的 JavaScript/TypeScript 函数。
+目前，Yarah 仅支持在 Deno 环境中运行的 JavaScript/TypeScript 函数。
 </Note>
 
 ---
@@ -61,7 +61,7 @@ struct HelloResponse: Codable {
 }
 
 // Invoke function with dictionary body
-let response: HelloResponse = try await insforge.functions.invoke(
+let response: HelloResponse = try await yarah.functions.invoke(
     "hello-world",
     body: ["name": "World", "greeting": "Hello"]
 )
@@ -85,7 +85,7 @@ struct GreetingResponse: Codable {
 
 // Invoke with typed request
 let request = GreetingRequest(name: "World", greeting: "Hello")
-let response: GreetingResponse = try await insforge.functions.invoke(
+let response: GreetingResponse = try await yarah.functions.invoke(
     "hello-world",
     body: request
 )
@@ -99,12 +99,12 @@ print(response.message)
 
 ```swift
 do {
-    let response: MyResponse = try await insforge.functions.invoke(
+    let response: MyResponse = try await yarah.functions.invoke(
         "my-function",
         body: ["key": "value"]
     )
     print("Success: \\(response)")
-} catch let error as InsForgeError {
+} catch let error as YarahError {
     switch error {
     case .httpError(let statusCode, let message):
         print("HTTP Error \\(statusCode): \\(message)")

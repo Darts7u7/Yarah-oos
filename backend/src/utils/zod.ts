@@ -1,5 +1,5 @@
 import type { z, ZodTypeAny } from 'zod';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { AppError } from '@/utils/errors.js';
 
 type ZodIssueLike = {

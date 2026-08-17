@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // The Apify connection response is small and Apify-specific, so its schema lives
-// here rather than in @insforge/shared-schemas. Shared by both providers so the
+// here rather than in @yarahdev/shared-schemas. Shared by both providers so the
 // cloud proxy and the local direct client cannot drift apart.
 export const apifyConnectionSchema = z.object({
   apifyUsername: z.string().nullable(),

@@ -3,7 +3,7 @@ import { DenoSubhostingProvider } from '../../src/providers/functions/deno-subho
 import { LogService } from '../../src/services/logs/log.service';
 import { FunctionService } from '../../src/services/functions/function.service';
 import { AppError } from '../../src/utils/errors';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 // Mock node-fetch — use vi.hoisted so the variable is available in the hoisted vi.mock factory
 const { mockFetch } = vi.hoisted(() => ({ mockFetch: vi.fn() }));
@@ -31,7 +31,7 @@ vi.mock('../../src/infra/config/app.config', () => ({
     denoSubhosting: {
       token: 'test-deno-token',
       organizationId: 'test-org-id',
-      domain: 'function2.insforge.app',
+      domain: 'function2.apps.yarah.dev',
     },
     cloud: {
       appKey: 'test-app-key',
@@ -470,7 +470,7 @@ describe('LogService.getLogsBySource with Deno Subhosting', () => {
   });
 
   it('falls back to provider for non-function-logs sources', async () => {
-    const result = await logService.getLogsBySource('insforge.logs', 100);
+    const result = await logService.getLogsBySource('yarah.logs', 100);
 
     // Should use the mocked local provider, not Deno
     expect(result.tableName).toBe('local');

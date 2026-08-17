@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
   - name: 📚 Documentation
-    url: https://docs.insforge.dev
+    url: https://docs.yarah.dev
     about: Check our documentation for common questions and setup guides
   - name: 💬 Discussions
-    url: https://github.com/InsForge/InsForge/discussions
+    url: https://github.com/Yarah/Yarah/discussions
     about: Ask questions and discuss ideas with the community
   - name: 🆘 Discord Support
-    url: https://discord.com/invite/MPxwj5xVvW
+    url: https://yarah.dev/community
     about: Get help with installation, configuration, and usage

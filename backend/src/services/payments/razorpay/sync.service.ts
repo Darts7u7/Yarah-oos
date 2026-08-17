@@ -19,7 +19,7 @@ import type {
   RazorpaySyncCounts,
   SyncRazorpayPaymentsEnvironmentResult,
   SyncRazorpayPaymentsResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const EMPTY_RAZORPAY_SYNC_COUNTS: RazorpaySyncCounts = {
   plans: 0,

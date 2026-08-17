@@ -4,10 +4,10 @@ import type {
   S3AccessKeyWithSecretSchema,
   CreateS3AccessKeyRequest,
   S3GatewayConfigSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { useTranslation } from 'react-i18next';
 import { s3AccessKeyService } from '#features/storage/services/s3-access-key.service';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 /**
  * React Query hook for the read-only S3 gateway config (endpoint + region +

@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { SmtpConfigSchema, UpsertSmtpConfigRequest } from '@insforge/shared-schemas';
+import type { SmtpConfigSchema, UpsertSmtpConfigRequest } from '@yarahdev/shared-schemas';
 import '#lib/i18n';
 import { useSmtpConfig } from '#features/auth/hooks/useSmtpConfig';
 
@@ -19,7 +19,7 @@ vi.mock('#features/auth/services/smtp-config.service', () => ({
   },
 }));
 
-vi.mock('@insforge/ui', () => ({
+vi.mock('@yarahdev/ui', () => ({
   useToast: () => ({ showToast: smtpMocks.showToast }),
 }));
 

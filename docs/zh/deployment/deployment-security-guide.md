@@ -1,11 +1,11 @@
 ---
 title: "VPS 部署与安全指南"
-description: "在通用 Linux VPS（Ubuntu、Debian、DigitalOcean、Hetzner 等）上部署并加固 InsForge 自托管：涵盖防火墙、SSH 密钥、TLS 证书、Docker Compose 覆盖文件与版本固定，以及安全的更新和回滚流程，帮助你长期稳定运维生产环境。"
+description: "在通用 Linux VPS（Ubuntu、Debian、DigitalOcean、Hetzner 等）上部署并加固 Yarah 自托管：涵盖防火墙、SSH 密钥、TLS 证书、Docker Compose 覆盖文件与版本固定，以及安全的更新和回滚流程，帮助你长期稳定运维生产环境。"
 ---
 
 # VPS 安装部署与安全指南
 
-本综合指南涵盖了在通用 VPS（虚拟专用服务器）上部署 InsForge 用于生产环境、使用安全最佳实践加固你的实例，以及通过安全的更新和回滚流程对其进行长期维护。
+本综合指南涵盖了在通用 VPS（虚拟专用服务器）上部署 Yarah 用于生产环境、使用安全最佳实践加固你的实例，以及通过安全的更新和回滚流程对其进行长期维护。
 
 > **适用范围**：本指南与云服务商无关。它适用于任何 Linux VPS——推荐使用 Ubuntu/Debian——无论提供商是 DigitalOcean、Hetzner、Linode、Vultr、OVH，还是裸机服务器。有关特定云平台的指南（AWS EC2、GCP、Azure、Render），请参阅本节中的其他指南。
 
@@ -18,7 +18,7 @@ description: "在通用 Linux VPS（Ubuntu、Debian、DigitalOcean、Hetzner 等
   - [服务器要求](#1-server-requirements)
   - [初始服务器设置](#2-initial-server-setup)
   - [安装 Docker 和 Docker Compose](#3-install-docker--docker-compose)
-  - [使用 Docker Compose 部署 InsForge](#4-deploy-insforge-with-docker-compose)
+  - [使用 Docker Compose 部署 Yarah](#4-deploy-yarah-with-docker-compose)
   - [环境变量配置](#5-environment-variable-configuration)
   - [反向代理设置](#6-reverse-proxy-setup)
   - [HTTPS / TLS 设置](#7-https--tls-setup)
@@ -31,7 +31,7 @@ description: "在通用 Linux VPS（Ubuntu、Debian、DigitalOcean、Hetzner 等
   - [密钥管理](#13-secrets-management)
 - [第三部分 — 更新与维护](#part-3--updating--maintenance)
   - [更新前备份](#14-pre-update-backup)
-  - [更新 InsForge](#15-updating-insforge)
+  - [更新 Yarah](#15-updating-yarah)
   - [回滚流程](#16-rollback-procedure)
   - [自动化备份](#17-automated-backups)
   - [监控与健康检查](#18-monitoring--health-checks)
@@ -65,13 +65,13 @@ description: "在通用 Linux VPS（Ubuntu、Debian、DigitalOcean、Hetzner 等
 
 > 💡 **提示**：对于有多用户的生产环境负载，建议从 4 GB 内存起步。使用 `docker stats` 监控使用情况，并根据需要进行垂直扩容。
 
-InsForge 由以下 **4 个协同运行的服务**组成：
+Yarah 由以下 **4 个协同运行的服务**组成：
 
 | Service       | Description                        | Internal Port |
 |---------------|------------------------------------|---------------|
 | **PostgreSQL**| Primary database                   | 5432          |
 | **PostgREST** | Auto-generated REST API layer      | 3000 (mapped to 5430) |
-| **InsForge**  | Node.js backend + dashboard        | 7130          |
+| **Yarah**  | Node.js backend + dashboard        | 7130          |
 | **Deno**      | Serverless functions runtime       | 7133          |
 
 ---
@@ -159,12 +159,12 @@ docker run hello-world
 
 ---
 
-### 4. 使用 Docker Compose 部署 InsForge
+### 4. 使用 Docker Compose 部署 Yarah
 
 #### 4.1 获取仓库
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh | sh -s ~/insforge
+curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 checkout 这个栈会读的文件，并把 `JWT_SECRET`、`ENCRYPTION_KEY`、`ROOT_ADMIN_PASSWORD`、`POSTGRES_PASSWORD` 生成到 `.env`。不启动任何东西。
@@ -172,15 +172,15 @@ checkout 这个栈会读的文件，并把 `JWT_SECRET`、`ENCRYPTION_KEY`、`RO
 > 不想把脚本管道给 shell？先读一遍再跑：
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh -o setup.sh
+> curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh -o setup.sh
 > less setup.sh
-> sh setup.sh ~/insforge
+> sh setup.sh ~/yarah
 > ```
 
-#### 4.2 启动 InsForge
+#### 4.2 启动 Yarah
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 docker compose up -d
 ```
 
@@ -194,7 +194,7 @@ docker compose ps
 
 ```text
 NAME            SERVICE     STATUS
-insforge        insforge    running
+yarah        yarah    running
 postgres        postgres    healthy
 postgrest       postgrest   healthy
 deno            deno        running
@@ -212,7 +212,7 @@ curl http://localhost:7130/api/health
 {
   "status": "ok",
   "version": "1.x.x",
-  "service": "Insforge OSS Backend",
+  "service": "Yarah OSS Backend",
   "timestamp": "2026-..."
 }
 ```
@@ -221,10 +221,10 @@ curl http://localhost:7130/api/health
 
 ### 5. 环境变量配置
 
-编辑你的 `.env` 文件，为生产环境配置 InsForge：
+编辑你的 `.env` 文件，为生产环境配置 Yarah：
 
 ```bash
-nano ~/insforge/.env
+nano ~/yarah/.env
 ```
 
 #### 5.1 必需变量
@@ -239,8 +239,8 @@ ROOT_ADMIN_USERNAME=admin
 ROOT_ADMIN_PASSWORD=<strong-unique-password>
 
 # ── Public URL (must match your domain/IP) ────────────────────
-API_BASE_URL=https://insforge.yourdomain.com
-VITE_API_BASE_URL=https://insforge.yourdomain.com
+API_BASE_URL=https://yarah.yourdomain.com
+VITE_API_BASE_URL=https://yarah.yourdomain.com
 ```
 
 直接从终端生成安全的密钥：
@@ -256,7 +256,7 @@ openssl rand -base64 24
 openssl rand -base64 18
 ```
 
-> ⚠️ **重要**：`JWT_SECRET` 和 `ENCRYPTION_KEY` 应该使用**不同**的值。如果未设置 `ENCRYPTION_KEY`，InsForge 会回退使用 `JWT_SECRET`——但之后再轮换 `JWT_SECRET` 会永久性地损坏所有已存储的密钥（API 密钥、OAuth 令牌等）。
+> ⚠️ **重要**：`JWT_SECRET` 和 `ENCRYPTION_KEY` 应该使用**不同**的值。如果未设置 `ENCRYPTION_KEY`，Yarah 会回退使用 `JWT_SECRET`——但之后再轮换 `JWT_SECRET` 会永久性地损坏所有已存储的密钥（API 密钥、OAuth 令牌等）。
 
 #### 5.2 数据库变量
 
@@ -265,12 +265,12 @@ openssl rand -base64 18
 
 ```env
 POSTGRES_USER=postgres
-POSTGRES_DB=insforge
+POSTGRES_DB=yarah
 ```
 
 #### 5.3 端口变量
 
-InsForge 使用的默认端口：
+Yarah 使用的默认端口：
 
 ```env
 POSTGRES_PORT=5432
@@ -285,14 +285,14 @@ DENO_PORT=7133
 `COMPOSE_PROJECT_NAME` 是所有容器、卷和网络的名字前缀：
 
 ```env
-COMPOSE_PROJECT_NAME=insforge
+COMPOSE_PROJECT_NAME=yarah
 ```
 
 > ⚠️ 同一台机器上的第二个实例必须改成自己的值，端口也要另设。两个 `.env` 用同一个名字时，在其中一个里跑 `docker compose up` 会接管并重建另一个的容器。
 
 #### 5.4 部署功能所需变量
 
-以下变量仅在你计划使用 InsForge 的**部署功能**（通过控制台部署项目）时才需要。如果你不需要部署功能，可以跳过本节。
+以下变量仅在你计划使用 Yarah 的**部署功能**（通过控制台部署项目）时才需要。如果你不需要部署功能，可以跳过本节。
 
 ```env
 # ── Deployments ──────────────────────────────────────────────
@@ -300,7 +300,7 @@ COMPOSE_PROJECT_NAME=insforge
 PROJECT_ID=your-project-id
 ```
 
-> ⚠️ `deploy/docker-compose/docker-compose.yml` 不会把 `PROJECT_ID` 传给 `insforge` 容器。需要用它时，请加到该服务的 `environment` 块里。
+> ⚠️ `deploy/docker-compose/docker-compose.yml` 不会把 `PROJECT_ID` 传给 `yarah` 容器。需要用它时，请加到该服务的 `environment` 块里。
 
 旧版 zip 上传接口 `POST /api/deployments` 还需要一个 S3 bucket，用 5.5 里的 `S3_*` 变量配置。
 
@@ -350,7 +350,7 @@ WORKER_TIMEOUT_MS=60000
 编辑完成后，重启服务以应用更改：
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 docker compose down
 docker compose up -d
 ```
@@ -359,7 +359,7 @@ docker compose up -d
 
 ### 6. 反向代理设置
 
-反向代理位于 InsForge 前面，负责 TLS 终止、HTTP/2，并提供不带端口号的干净 URL。
+反向代理位于 Yarah 前面，负责 TLS 终止、HTTP/2，并提供不带端口号的干净 URL。
 
 #### 方案 A：Nginx（推荐）
 
@@ -372,17 +372,17 @@ sudo apt install nginx -y
 ##### 6.2 创建站点配置
 
 ```bash
-sudo nano /etc/nginx/sites-available/insforge
+sudo nano /etc/nginx/sites-available/yarah
 ```
 
-粘贴以下配置——将 `insforge.yourdomain.com` 替换为你的实际域名：
+粘贴以下配置——将 `yarah.yourdomain.com` 替换为你的实际域名：
 
 ```nginx
-# ── InsForge Backend + Dashboard ──────────────────────────────
+# ── Yarah Backend + Dashboard ──────────────────────────────
 server {
     listen 80;
     listen [::]:80;
-    server_name insforge.yourdomain.com;
+    server_name yarah.yourdomain.com;
 
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
@@ -417,7 +417,7 @@ server {
 ##### 6.3 启用该站点
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/insforge /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/yarah /etc/nginx/sites-enabled/
 
 # Remove the default site (optional)
 sudo rm -f /etc/nginx/sites-enabled/default
@@ -448,7 +448,7 @@ sudo nano /etc/caddy/Caddyfile
 ```
 
 ```caddyfile
-insforge.yourdomain.com {
+yarah.yourdomain.com {
     reverse_proxy localhost:7130
 
     header {
@@ -485,7 +485,7 @@ sudo apt install certbot python3-certbot-nginx -y
 #### 7.2 获取 SSL 证书
 
 ```bash
-sudo certbot --nginx -d insforge.yourdomain.com
+sudo certbot --nginx -d yarah.yourdomain.com
 ```
 
 按照交互式提示操作。Certbot 将会：
@@ -506,21 +506,21 @@ sudo certbot renew --dry-run
 sudo systemctl status certbot.timer
 ```
 
-#### 7.4 为 HTTPS 更新 InsForge 环境变量
+#### 7.4 为 HTTPS 更新 Yarah 环境变量
 
 获取证书后，更新你的 `.env` 以使用 HTTPS 网址：
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 nano .env
 ```
 
 ```env
-API_BASE_URL=https://insforge.yourdomain.com
-VITE_API_BASE_URL=https://insforge.yourdomain.com
+API_BASE_URL=https://yarah.yourdomain.com
+VITE_API_BASE_URL=https://yarah.yourdomain.com
 ```
 
-重启 InsForge 以应用更改：
+重启 Yarah 以应用更改：
 
 ```bash
 docker compose down
@@ -548,8 +548,8 @@ docker compose up -d
 | Port  | Service     | Why Close It                                     |
 |-------|-------------|--------------------------------------------------|
 | 5432  | PostgreSQL  | Direct DB access — use `docker exec` instead     |
-| 5430  | PostgREST   | Internal REST layer — proxied through InsForge   |
-| 7130  | InsForge    | API + dashboard, accessed via reverse proxy on 443, not directly |
+| 5430  | PostgREST   | Internal REST layer — proxied through Yarah   |
+| 7130  | Yarah    | API + dashboard, accessed via reverse proxy on 443, not directly |
 | 7131  | (unused)    | Published by compose (`AUTH_PORT`), but no process listens on it |
 | 7133  | Deno        | Internal serverless runtime                      |
 
@@ -559,7 +559,7 @@ docker compose up -d
 > ports:
 >   - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"     # PostgreSQL
 >   - "127.0.0.1:${POSTGREST_PORT:-5430}:3000"     # PostgREST
->   - "127.0.0.1:${APP_PORT:-7130}:7130"            # InsForge (API + dashboard)
+>   - "127.0.0.1:${APP_PORT:-7130}:7130"            # Yarah (API + dashboard)
 >   - "127.0.0.1:${AUTH_PORT:-7131}:7131"           # AUTH_PORT (published by compose, unused)
 >   - "127.0.0.1:${DENO_PORT:-7133}:7133"           # Deno
 > ```
@@ -661,7 +661,7 @@ sudo ufw status
 
 ### 10. 以非 root 用户运行服务
 
-InsForge 的 Docker 镜像已经遵循了非 root 的最佳实践：
+Yarah 的 Docker 镜像已经遵循了非 root 的最佳实践：
 
 - 生产环境 Dockerfile 设置了 `USER node`（UID 1000），因此容器内的应用进程以非 root 用户运行。
 - 系统级的 Docker 操作由 `deploy` 用户（在[第 2.3 步](#23-create-a-deploy-user-non-root)中创建）管理，该用户通过 `docker` 组获得对 Docker 套接字的访问权限。
@@ -669,7 +669,7 @@ InsForge 的 Docker 镜像已经遵循了非 root 的最佳实践：
 **验证容器用户：**
 
 ```bash
-docker compose exec insforge whoami
+docker compose exec yarah whoami
 # Expected output: node
 ```
 
@@ -691,7 +691,7 @@ security_opt:
 
 ```bash
 # On your LOCAL machine — generate a key pair if you don't have one
-ssh-keygen -t ed25519 -C "deploy@insforge"
+ssh-keygen -t ed25519 -C "deploy@yarah"
 
 # Copy the public key to your server
 ssh-copy-id -i ~/.ssh/id_ed25519.pub deploy@your-server-ip
@@ -800,7 +800,7 @@ tmpfs:
 
 #### 应做 ✅
 
-- 将密钥存储在 `.env` 文件中，并设置 `chmod 600 ~/insforge/.env`
+- 将密钥存储在 `.env` 文件中，并设置 `chmod 600 ~/yarah/.env`
 - 为 `JWT_SECRET` 和 `ENCRYPTION_KEY` 使用不同的值
 - 使用 `openssl rand -base64 32` 生成密钥
 - 将你的 `.env` 文件备份到安全的离线位置
@@ -823,12 +823,12 @@ tmpfs:
 #### 14.1 备份数据库
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 source .env
 
 # Create a timestamped database backup
 docker compose exec -T postgres pg_dump \
-  -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" \
+  -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-yarah}" \
   > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Verify size is reasonable
@@ -843,7 +843,7 @@ cp .env .env.backup_$(date +%Y%m%d)
 
 # Back up Docker volumes (optional but recommended)
 docker run --rm \
-  -v insforge_postgres-data:/data \
+  -v yarah_postgres-data:/data \
   -v $(pwd):/backup \
   alpine tar czf /backup/volumes_postgres_$(date +%Y%m%d_%H%M%S).tar.gz /data
 ```
@@ -857,14 +857,14 @@ docker compose images
 
 ---
 
-### 15. 更新 InsForge
+### 15. 更新 Yarah
 
 #### 15.1 更新仓库
 
 先更新 checkout 再拉镜像：它带着 compose 文件和 Postgres 的配置。
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 
 git fetch origin main
 git diff HEAD origin/main -- deploy functions .env.example
@@ -880,7 +880,7 @@ sh deploy/setup.sh .
 #### 15.2 拉取最新镜像
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 
 # Pull the latest versions
 docker compose pull
@@ -918,7 +918,7 @@ curl http://localhost:7130/api/health
 #### 16.1 停止出问题的服务
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 docker compose down
 ```
 
@@ -928,8 +928,8 @@ docker compose down
 
    ```yaml
    services:
-     insforge:
-       image: ghcr.io/insforge/insforge-oss:v2.2.9
+     yarah:
+       image: ghcr.io/yarah/yarah-oss:v2.2.9
    ```
 
 2. 追加到 `.env` 里的 `COMPOSE_FILE`，保留已有条目：
@@ -949,7 +949,7 @@ docker compose down
 只有当此次更新包含导致问题的数据库迁移时，才需要恢复数据库：
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 source .env
 
 # Start only PostgreSQL
@@ -961,7 +961,7 @@ docker compose exec postgres pg_isready -U "${POSTGRES_USER:-postgres}"
 # Restore from backup
 cat backup_YYYYMMDD_HHMMSS.sql | \
   docker compose exec -T postgres psql \
-  -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
+  -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-yarah}"
 
 # Start remaining services
 docker compose up -d
@@ -984,22 +984,22 @@ docker compose up -d
 #### 17.1 创建备份脚本
 
 ```bash
-nano ~/insforge/backup.sh
+nano ~/yarah/backup.sh
 ```
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-# InsForge Automated Backup Script
+# Yarah Automated Backup Script
 # Run from the checkout so docker compose reads COMPOSE_FILE and
 # COMPOSE_PROJECT_NAME from .env, which also carries POSTGRES_USER / POSTGRES_DB
-cd "$HOME/insforge"
+cd "$HOME/yarah"
 set -a
 source .env
 set +a
 
-BACKUP_DIR="$HOME/insforge/backups"
+BACKUP_DIR="$HOME/yarah/backups"
 RETENTION_DAYS=14
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
@@ -1009,11 +1009,11 @@ mkdir -p "$BACKUP_DIR"
 
 # Dump the database
 docker compose exec -T postgres \
-  pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" \
+  pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-yarah}" \
   > "$BACKUP_DIR/db_$TIMESTAMP.sql"
 
 # Copy the environment file
-cp "$HOME/insforge/.env" "$BACKUP_DIR/env_$TIMESTAMP.bak"
+cp "$HOME/yarah/.env" "$BACKUP_DIR/env_$TIMESTAMP.bak"
 
 # Remove backups older than retention period
 find "$BACKUP_DIR" -name "db_*.sql" -mtime +$RETENTION_DAYS -delete
@@ -1023,7 +1023,7 @@ echo "[$(date)] Backup completed successfully: db_$TIMESTAMP.sql"
 ```
 
 ```bash
-chmod +x ~/insforge/backup.sh
+chmod +x ~/yarah/backup.sh
 ```
 
 #### 17.2 使用 Cron 设置计划任务
@@ -1035,7 +1035,7 @@ crontab -e
 添加以下这一行以每天凌晨 3:00 进行备份：
 
 ```cron
-0 3 * * * /home/deploy/insforge/backup.sh >> /home/deploy/insforge/backups/cron.log 2>&1
+0 3 * * * /home/deploy/yarah/backup.sh >> /home/deploy/yarah/backups/cron.log 2>&1
 ```
 
 #### 17.3 异地备份（推荐）
@@ -1044,10 +1044,10 @@ crontab -e
 
 ```bash
 # Example: sync backups to S3-compatible storage
-aws s3 sync ~/insforge/backups s3://your-backup-bucket/insforge/
+aws s3 sync ~/yarah/backups s3://your-backup-bucket/yarah/
 
 # Example: sync to a remote server
-rsync -avz ~/insforge/backups/ user@backup-server:/backups/insforge/
+rsync -avz ~/yarah/backups/ user@backup-server:/backups/yarah/
 ```
 
 ---
@@ -1077,7 +1077,7 @@ free -h
 docker compose logs -f --tail=100
 
 # Specific service
-docker compose logs -f insforge
+docker compose logs -f yarah
 docker compose logs -f postgres
 docker compose logs -f deno
 ```
@@ -1088,10 +1088,10 @@ docker compose logs -f deno
 
 ```bash
 # Add to crontab for monitoring
-*/5 * * * * curl -sf https://insforge.yourdomain.com/api/health > /dev/null || echo "InsForge is DOWN" | mail -s "InsForge Alert" you@example.com
+*/5 * * * * curl -sf https://yarah.yourdomain.com/api/health > /dev/null || echo "Yarah is DOWN" | mail -s "Yarah Alert" you@example.com
 ```
 
-或者使用像 [UptimeRobot](https://uptimerobot.com) 或 [Betterstack](https://betterstack.com) 这样的免费在线状态监控服务来监控 `https://insforge.yourdomain.com/api/health`。
+或者使用像 [UptimeRobot](https://uptimerobot.com) 或 [Betterstack](https://betterstack.com) 这样的免费在线状态监控服务来监控 `https://yarah.yourdomain.com/api/health`。
 
 ---
 
@@ -1109,13 +1109,13 @@ docker compose pull               # Pull latest images
 # ── Diagnostics ───────────────────────────────
 docker compose ps                 # Service status
 docker compose logs -f            # Follow all logs
-docker compose logs -f insforge   # Follow specific service
+docker compose logs -f yarah   # Follow specific service
 docker stats --no-stream          # Resource usage
 
 # ── Database (source .env first for vars) ────
-source ~/insforge/.env
-docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" > backup.sql  # Backup
-cat backup.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"  # Restore
+source ~/yarah/.env
+docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-yarah}" > backup.sql  # Backup
+cat backup.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-yarah}"  # Restore
 
 # ── Updates ───────────────────────────────────
 docker compose pull               # Pull new images
@@ -1162,7 +1162,7 @@ Docker 会直接操作 iptables。请按照[第 9.2 节](#92-docker-and-ufw-cave
 ```bash
 # Check logs for the failing service
 docker compose logs postgres
-docker compose logs insforge
+docker compose logs yarah
 
 # Verify disk space
 df -h
@@ -1208,13 +1208,13 @@ docker compose ps postgres
 docker compose logs postgres
 
 # Connect to the database directly
-docker compose exec postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
+docker compose exec postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-yarah}"
 ```
 
 ---
 
 ## 🆘 需要帮助？
 
-- **文档**：[https://docs.insforge.dev](https://docs.insforge.dev)
-- **Discord 社区**：[https://discord.com/invite/MPxwj5xVvW](https://discord.com/invite/MPxwj5xVvW)
-- **GitHub Issues**：[https://github.com/insforge/insforge/issues](https://github.com/insforge/insforge/issues)
+- **文档**：[https://docs.yarah.dev](https://docs.yarah.dev)
+- **Discord 社区**：[https://yarah.dev/community](https://yarah.dev/community)
+- **GitHub Issues**：[https://github.com/yarah/yarah/issues](https://github.com/yarah/yarah/issues)

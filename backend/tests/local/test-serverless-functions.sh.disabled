@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Fixed Test Script for InsForge Serverless Functions
+# Fixed Test Script for Yarah Serverless Functions
 
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -8,7 +8,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Source the test configuration
 source "$SCRIPT_DIR/../test-config.sh"
 
-echo "🧪 InsForge Serverless Functions Test Suite"
+echo "🧪 Yarah Serverless Functions Test Suite"
 echo "========================================"
 echo ""
 

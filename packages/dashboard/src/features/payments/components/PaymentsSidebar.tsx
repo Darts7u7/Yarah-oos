@@ -1,7 +1,7 @@
 import { Box, Rocket, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@insforge/ui';
-import type { PaymentEnvironment, PaymentProvider } from '@insforge/shared-schemas';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@yarahdev/ui';
+import type { PaymentEnvironment, PaymentProvider } from '@yarahdev/shared-schemas';
 import {
   FeatureSidebar,
   type FeatureSidebarHeaderButton,

@@ -1,16 +1,16 @@
-Add InsForge to your Swift Package Manager dependencies:
+Add Yarah to your Swift Package Manager dependencies:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/insforge/insforge-swift.git", from: "0.0.9")
+    .package(url: "https://github.com/yarah/yarah-swift.git", from: "0.0.9")
 ]
 ```
 
 ```swift
-import InsForge
+import Yarah
 
-let insforge = InsForgeClient(
-    baseURL: URL(string: "https://your-app.insforge.app")!,
+let yarah = YarahClient(
+    baseURL: URL(string: "https://your-app.apps.yarah.dev")!,
     anonKey: "your-anon-key"
 )
 ```
@@ -20,7 +20,7 @@ let insforge = InsForgeClient(
 For debugging, you can configure the SDK log level and destination:
 
 ```swift
-let options = InsForgeClientOptions(
+let options = YarahClientOptions(
     global: .init(
         logLevel: .debug,
         logDestination: .osLog,
@@ -28,8 +28,8 @@ let options = InsForgeClientOptions(
     )
 )
 
-let insforge = InsForgeClient(
-    baseURL: URL(string: "https://your-app.insforge.app")!,
+let yarah = YarahClient(
+    baseURL: URL(string: "https://your-app.apps.yarah.dev")!,
     anonKey: "your-anon-key",
     options: options
 )

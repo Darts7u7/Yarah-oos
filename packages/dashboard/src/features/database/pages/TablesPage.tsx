@@ -21,7 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
   useToast,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import {
   Alert,
   AlertDescription,

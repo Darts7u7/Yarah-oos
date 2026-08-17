@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
-# Fetch the files a self-hosted InsForge needs, and generate its secrets.
+# Fetch the files a self-hosted Yarah needs, and generate its secrets.
 #
-#   curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh | sh -s ~/insforge
+#   curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
 #   sh deploy/setup.sh .        # re-apply after `git merge`, see below
 #
 # Safe to re-run: your values are kept, only COMPOSE_FILE is added or
@@ -9,26 +9,26 @@
 # at first boot.
 #
 # Environment:
-#   INSFORGE_REF=vX.Y.Z   A tag, branch or commit instead of main.
-#   INSFORGE_NO_GIT=1     Fetch over HTTPS instead of cloning. No update path.
-#   INSFORGE_REPO=...     Clone source. INSFORGE_RAW=... for the HTTPS host.
+#   YARAH_REF=vX.Y.Z   A tag, branch or commit instead of main.
+#   YARAH_NO_GIT=1     Fetch over HTTPS instead of cloning. No update path.
+#   YARAH_REPO=...     Clone source. YARAH_RAW=... for the HTTPS host.
 set -e
 
-REPO=${INSFORGE_REPO:-https://github.com/InsForge/InsForge.git}
+REPO=${YARAH_REPO:-https://github.com/Darts7u7/Yarah-oos.git}
 # Derived from REPO, so a fork does not silently fetch the official files.
-RAW=${INSFORGE_RAW:-$(echo "$REPO" |
+RAW=${YARAH_RAW:-$(echo "$REPO" |
   sed -e 's|^git@github\.com:|https://raw.githubusercontent.com/|' \
       -e 's|^https://github\.com/|https://raw.githubusercontent.com/|' \
       -e 's|\.git$||')}
-REF=${INSFORGE_REF:-}
-TARGET=${1:-insforge}
+REF=${YARAH_REF:-}
+TARGET=${1:-yarah}
 CLONED=
 # Initialized rather than assigned only inside the branch below: an inherited
 # NO_GIT from the caller's environment would otherwise skip acquisition entirely
 # and run the rest against whatever directory invoked this.
 NO_GIT=
 
-# Move an existing checkout onto INSFORGE_REF. Without this the ref was honoured
+# Move an existing checkout onto YARAH_REF. Without this the ref was honoured
 # only by the first clone, so re-running with a different one reported success
 # and changed nothing. git refuses rather than discarding local edits, which is
 # the same protection the update path relies on.
@@ -66,7 +66,7 @@ deploy/docker-init/db/postgresql.conf'
 # No git, or asked not to use it: fetch each file straight from the ref. 34KB in
 # total, against 47MB for the repository tarball, and precise where a tar glob
 # would not be — `*/functions` also matches backend/src/.../functions.
-if [ -n "${INSFORGE_NO_GIT:-}" ] || ! command -v git >/dev/null 2>&1; then
+if [ -n "${YARAH_NO_GIT:-}" ] || ! command -v git >/dev/null 2>&1; then
   # Same guard as the git path below, and it matters more here: curl overwrites
   # tracked files in place without asking, where git at least refuses. A previous
   # self-host install is sparse, so it is not caught.
@@ -76,7 +76,7 @@ if [ -n "${INSFORGE_NO_GIT:-}" ] || ! command -v git >/dev/null 2>&1; then
      [ "$(git -C "$TARGET" config --get core.sparseCheckout 2>/dev/null)" != true ]; then
     echo "$TARGET is a git working tree. Fetching into it would overwrite files" >&2
     echo "it tracks, including uncommitted changes." >&2
-    echo "Pass a directory of its own: sh deploy/setup.sh ~/insforge" >&2
+    echo "Pass a directory of its own: sh deploy/setup.sh ~/yarah" >&2
     exit 1
   fi
   mkdir -p "$TARGET"
@@ -115,7 +115,7 @@ if [ -z "${NO_GIT:-}" ] && [ -z "$CLONED" ] &&
   echo "$ROOT is a git working tree that is not a self-host checkout." >&2
   echo "Applying a sparse checkout here would empty it of everything outside" >&2
   echo "this script's file list. Pass a directory of its own instead:" >&2
-  echo "  sh deploy/setup.sh ~/insforge" >&2
+  echo "  sh deploy/setup.sh ~/yarah" >&2
   exit 1
 fi
 
@@ -216,7 +216,7 @@ cp .env.example "$ENV_FILE"
 chmod 600 "$ENV_FILE"
 set_var COMPOSE_FILE "$COMPOSE_FILE_VALUE"
 
-# Generated as separate values on purpose. If ENCRYPTION_KEY is unset InsForge
+# Generated as separate values on purpose. If ENCRYPTION_KEY is unset Yarah
 # falls back to JWT_SECRET, and rotating JWT_SECRET afterwards makes every stored
 # secret undecryptable.
 gen_secret JWT_SECRET 32

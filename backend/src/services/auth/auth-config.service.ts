@@ -7,7 +7,7 @@ import {
   ERROR_CODES,
   type AuthConfigSchema,
   type UpdateAuthConfigRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { URL } from 'url';
 import {
   emailProviderNotConfiguredError,

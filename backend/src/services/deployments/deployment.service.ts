@@ -33,7 +33,7 @@ import {
   type AddCustomDomainResponse,
   type VerifyCustomDomainResponse,
   type DeploymentsMetadataSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export type {
   DeploymentRecord,
@@ -123,7 +123,7 @@ export class DeploymentService {
   }
 
   private isReservedHostedDomain(domain: string): boolean {
-    return domain.endsWith('.vercel.app') || domain.endsWith('.insforge.site');
+    return domain.endsWith('.vercel.app') || domain.endsWith('.yarah.site');
   }
 
   private pickPreferredARecord(config: VercelDomainConfig): string | null {
@@ -707,7 +707,7 @@ export class DeploymentService {
   private getDeploymentUrl(providerUrl: string | null): string | null {
     const appKey = process.env.APP_KEY;
     if (appKey) {
-      return `https://${appKey}.insforge.site`;
+      return `https://${appKey}.yarah.site`;
     }
     return providerUrl;
   }

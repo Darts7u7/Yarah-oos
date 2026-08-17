@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Button, CopyButton } from '@insforge/ui';
+import { Button, CopyButton } from '@yarahdev/ui';
 import { useDashboardHost, useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
 import {
   ANALYTICS_SETUP_PROMPT,

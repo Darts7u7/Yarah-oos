@@ -12,12 +12,12 @@ import {
   SeverityFilterDropdown,
 } from '#features/logs/components';
 import { formatTime } from '#lib/utils/utils';
-import { LogSchema } from '@insforge/shared-schemas';
+import { LogSchema } from '@yarahdev/shared-schemas';
 import { usePageSize } from '#lib/hooks/usePageSize';
 
 export default function LogsPage() {
   const { t } = useTranslation('chrome');
-  const { source = 'insforge.logs' } = useParams<{ source?: string }>();
+  const { source = 'yarah.logs' } = useParams<{ source?: string }>();
   const [selectedLog, setSelectedLog] = useState<LogSchema | null>(null);
   const { pageSize, pageSizeOptions, onPageSizeChange: handlePageSizeChange } = usePageSize('logs');
 

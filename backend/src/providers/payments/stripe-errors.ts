@@ -4,7 +4,7 @@ import {
   getUpstreamErrorMessage,
   getUpstreamStatus,
 } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { StripeKeyValidationError } from './stripe.provider.js';
 
 interface StripeErrorLike {

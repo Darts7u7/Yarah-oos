@@ -1,13 +1,13 @@
 ---
 title: "Sitios"
 sidebarTitle: "Overview"
-description: "Implementa aplicaciones frontend desde tu proyecto de InsForge con la potencia de Vercel: dominios personalizados, CDN global y despliegues por rama de git."
+description: "Implementa aplicaciones frontend desde tu proyecto de Yarah con la potencia de Vercel: dominios personalizados, CDN global y despliegues por rama de git."
 ---
 
-Usa InsForge Sites para publicar la aplicación orientada al navegador que pertenece a tu proyecto. El CLI de InsForge sube el código fuente de tu frontend a través de InsForge, que crea una implementación de producción en Vercel. El panel realiza el seguimiento de la URL, el estado, el historial de implementaciones, las variables de entorno y los dominios.
+Usa Yarah Sites para publicar la aplicación orientada al navegador que pertenece a tu proyecto. El CLI de Yarah sube el código fuente de tu frontend a través de Yarah, que crea una implementación de producción en Vercel. El panel realiza el seguimiento de la URL, el estado, el historial de implementaciones, las variables de entorno y los dominios.
 
 <Frame caption="Panel de Sites: estado, dominios, variables de entorno e historial de implementaciones.">
-  <img src="/images/dashboard-sites.png" alt="Panel de InsForge Sites" />
+  <img src="/images/dashboard-sites.png" alt="Panel de Yarah Sites" />
 </Frame>
 
 <Note>
@@ -16,7 +16,7 @@ Usa InsForge Sites para publicar la aplicación orientada al navegador que perte
 
 ```mermaid
 flowchart TB
-    CLI[InsForge CLI] --> API[InsForge deployment API]
+    CLI[Yarah CLI] --> API[Yarah deployment API]
     Dashboard[Dashboard] --> API
 
     API --> Source[Frontend source upload]
@@ -44,24 +44,24 @@ flowchart TB
 
 ### Implementaciones desde el CLI
 
-Implementa desde el directorio fuente de tu aplicación. El CLI sube el árbol de archivos fuente, omite los archivos exclusivamente locales como `node_modules`, `.git`, la salida de compilación y los archivos `.env`, y luego inicia la compilación en Vercel a través de InsForge.
+Implementa desde el directorio fuente de tu aplicación. El CLI sube el árbol de archivos fuente, omite los archivos exclusivamente locales como `node_modules`, `.git`, la salida de compilación y los archivos `.env`, y luego inicia la compilación en Vercel a través de Yarah.
 
 ```bash
-npx @insforge/cli deployments deploy ./frontend
+npx @yarah/cli deployments deploy ./frontend
 ```
 
 ### Compilaciones de frameworks
 
-Implementa proyectos en React, Vue, Svelte, Next.js, sitios estáticos y otros proyectos frontend. InsForge envía los archivos fuente a Vercel, donde la detección de framework y los archivos del proyecto, como `package.json` y `vercel.json`, determinan cómo se compila la aplicación.
+Implementa proyectos en React, Vue, Svelte, Next.js, sitios estáticos y otros proyectos frontend. Yarah envía los archivos fuente a Vercel, donde la detección de framework y los archivos del proyecto, como `package.json` y `vercel.json`, determinan cómo se compila la aplicación.
 
 ### Variables de entorno
 
 Gestiona las variables de entorno del proveedor desde el panel. Usa prefijos públicos como `VITE_` o `NEXT_PUBLIC_` solo para valores que sean seguros de exponer en el código del navegador.
 
 ```bash
-npx @insforge/cli deployments env list
-npx @insforge/cli deployments env set VITE_INSFORGE_URL https://your-project.region.insforge.app
-npx @insforge/cli deployments env set VITE_INSFORGE_ANON_KEY ik_xxx
+npx @yarah/cli deployments env list
+npx @yarah/cli deployments env set VITE_YARAH_URL https://your-project.region.apps.yarah.dev
+npx @yarah/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
 ```
 
 ### Historial de implementaciones
@@ -69,25 +69,25 @@ npx @insforge/cli deployments env set VITE_INSFORGE_ANON_KEY ik_xxx
 Revisa las ejecuciones anteriores, sincroniza el estado de Vercel, inspecciona los metadatos y cancela implementaciones en curso desde la página de registros de implementación.
 
 ```bash
-npx @insforge/cli deployments list
-npx @insforge/cli deployments status deployment_123 --sync
-npx @insforge/cli deployments cancel deployment_123
+npx @yarah/cli deployments list
+npx @yarah/cli deployments status deployment_123 --sync
+npx @yarah/cli deployments cancel deployment_123
 ```
 
 ### Dominios
 
-Cada implementación lista obtiene una URL predeterminada en `https://<appkey>.insforge.site`. También puedes configurar un slug gestionado por InsForge en `https://<slug>.insforge.site`. Para un dominio personalizado, agrega el dominio en el panel y configura el registro DNS que este devuelve, normalmente un CNAME para subdominios.
+Cada implementación lista obtiene una URL predeterminada en `https://<appkey>.yarah.site`. También puedes configurar un slug gestionado por Yarah en `https://<slug>.yarah.site`. Para un dominio personalizado, agrega el dominio en el panel y configura el registro DNS que este devuelve, normalmente un CNAME para subdominios.
 
 ## Impleméntalo
 
 <CardGroup cols={2}>
   <Card title="Guía rápida del CLI" icon="terminal" href="/quickstart">
-    Conecta tu proyecto y ejecuta comandos del CLI de InsForge desde el directorio de tu aplicación.
+    Conecta tu proyecto y ejecuta comandos del CLI de Yarah desde el directorio de tu aplicación.
   </Card>
 </CardGroup>
 
 ## Próximos pasos
 
 - Configura el [CLI](/quickstart) y conecta tu proyecto.
-- Agrega variables de entorno seguras para el navegador desde el panel o con `npx @insforge/cli deployments env set`.
-- Ejecuta `npx @insforge/cli deployments deploy ./frontend`.
+- Agrega variables de entorno seguras para el navegador desde el panel o con `npx @yarah/cli deployments env set`.
+- Ejecuta `npx @yarah/cli deployments deploy ./frontend`.

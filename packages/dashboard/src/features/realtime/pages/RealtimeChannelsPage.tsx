@@ -10,7 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
   Skeleton,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { TableHeader } from '#components';
 import { useConfirm } from '#lib/hooks/useConfirm';
 import { useRealtimeChannels } from '#features/realtime/hooks/useRealtimeChannels';
@@ -18,7 +18,7 @@ import { ChannelRow } from '#features/realtime/components/ChannelRow';
 import { ChannelFormDialog } from '#features/realtime/components/ChannelFormDialog';
 import RealtimeEmptyState from '#features/realtime/components/RealtimeEmptyState';
 import type { RealtimeChannel } from '#features/realtime/services/realtime.service';
-import type { CreateChannelRequest, UpdateChannelRequest } from '@insforge/shared-schemas';
+import type { CreateChannelRequest, UpdateChannelRequest } from '@yarahdev/shared-schemas';
 
 export default function RealtimeChannelsPage() {
   const { t } = useTranslation('chrome');

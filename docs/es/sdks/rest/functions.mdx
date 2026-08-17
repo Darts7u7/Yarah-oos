@@ -1,6 +1,6 @@
 ---
 title: Referencia de API de funciones
-description: Invoca funciones sin servidor edge de InsForge mediante la API REST desde cualquier cliente HTTP para ejecutar lógica de servidor, webhooks y tareas asíncronas.
+description: Invoca funciones sin servidor edge de Yarah mediante la API REST desde cualquier cliente HTTP para ejecutar lógica de servidor, webhooks y tareas asíncronas.
 ---
 
 ## Descripción general
@@ -50,7 +50,7 @@ Cualquier carga JSON que la función espere.
 ### Ejemplo
 
 ```bash
-curl -X POST "https://your-app.insforge.app/functions/hello-world" \
+curl -X POST "https://your-app.apps.yarah.dev/functions/hello-world" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John"
@@ -82,7 +82,7 @@ GET /api/functions
 ### Ejemplo
 
 ```bash
-curl "https://your-app.insforge.app/api/functions" \
+curl "https://your-app.apps.yarah.dev/api/functions" \
   -H "Authorization: Bearer admin-jwt-token-or-api-key"
 ```
 
@@ -124,7 +124,7 @@ GET /api/functions/{slug}
 ### Ejemplo
 
 ```bash
-curl "https://your-app.insforge.app/api/functions/hello-world" \
+curl "https://your-app.apps.yarah.dev/api/functions/hello-world" \
   -H "Authorization: Bearer admin-jwt-token-or-api-key"
 ```
 
@@ -149,7 +149,7 @@ curl "https://your-app.insforge.app/api/functions/hello-world" \
 ### Crear función
 
 <Note>
-Actualmente, InsForge solo admite funciones JavaScript/TypeScript que se ejecutan en un entorno Deno.
+Actualmente, Yarah solo admite funciones JavaScript/TypeScript que se ejecutan en un entorno Deno.
 </Note>
 
 ```
@@ -169,7 +169,7 @@ POST /api/functions
 ### Ejemplo
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/functions" \
+curl -X POST "https://your-app.apps.yarah.dev/api/functions" \
   -H "Authorization: Bearer admin-jwt-token-or-api-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -217,7 +217,7 @@ PUT /api/functions/{slug}
 ### Ejemplo
 
 ```bash
-curl -X PUT "https://your-app.insforge.app/api/functions/hello-world" \
+curl -X PUT "https://your-app.apps.yarah.dev/api/functions/hello-world" \
   -H "Authorization: Bearer admin-jwt-token-or-api-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -253,7 +253,7 @@ DELETE /api/functions/{slug}
 ### Ejemplo
 
 ```bash
-curl -X DELETE "https://your-app.insforge.app/api/functions/old-function" \
+curl -X DELETE "https://your-app.apps.yarah.dev/api/functions/old-function" \
   -H "Authorization: Bearer admin-jwt-token-or-api-key"
 ```
 

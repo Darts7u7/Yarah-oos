@@ -1,21 +1,21 @@
 ---
 title: Payments
-description: Choose between the Stripe or Razorpay payments helpers exposed by the InsForge TypeScript SDK for hosted checkout, subscriptions, and billing flows.
+description: Choose between the Stripe or Razorpay payments helpers exposed by the Yarah TypeScript SDK for hosted checkout, subscriptions, and billing flows.
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
 
 <Installation />
 
-InsForge Payments is provider-specific. Stripe uses hosted Checkout and Billing Portal. Razorpay uses provider-native Orders and Subscriptions plus Razorpay Checkout. The TypeScript SDK exposes separate provider modules for both.
+Yarah Payments is provider-specific. Stripe uses hosted Checkout and Billing Portal. Razorpay uses provider-native Orders and Subscriptions plus Razorpay Checkout. The TypeScript SDK exposes separate provider modules for both.
 
 <CardGroup cols={2}>
   <Card title="Stripe Payments" icon="stripe" href="/sdks/typescript/payments-stripe">
-    Create Checkout and Billing Portal sessions with `insforge.payments.stripe`.
+    Create Checkout and Billing Portal sessions with `yarah.payments.stripe`.
   </Card>
 
   <Card title="Razorpay Payments" icon="credit-card" href="/sdks/typescript/payments-razorpay">
-    Create Orders or Subscriptions with `insforge.payments.razorpay`, then open Razorpay Checkout.
+    Create Orders or Subscriptions with `yarah.payments.razorpay`, then open Razorpay Checkout.
   </Card>
 </CardGroup>
 
@@ -24,13 +24,13 @@ InsForge Payments is provider-specific. Stripe uses hosted Checkout and Billing 
 ```typescript
 import { createClient } from '@insforge/sdk';
 
-const insforge = createClient({
-  baseUrl: 'https://your-project.insforge.app',
+const yarah = createClient({
+  baseUrl: 'https://your-project.apps.yarah.dev',
   anonKey: 'your-anon-key'
 });
 ```
 
-Payment runtime calls require an InsForge user token. Guest one-time checkout can use an anonymous InsForge token. Provider secret keys must stay server-side and should be configured through Dashboard -> Payments -> Settings, the CLI, or admin APIs.
+Payment runtime calls require an Yarah user token. Guest one-time checkout can use an anonymous Yarah token. Provider secret keys must stay server-side and should be configured through Dashboard -> Payments -> Settings, the CLI, or admin APIs.
 
 ## Fulfillment
 
@@ -40,6 +40,6 @@ For both providers, create app-owned tables such as `public.orders`, `public.cre
 
 ## Next steps
 
-- Use [Stripe Payments](/sdks/typescript/payments-stripe) for `insforge.payments.stripe.createCheckoutSession(...)` and `insforge.payments.stripe.createCustomerPortalSession(...)`.
-- Use [Razorpay Payments](/sdks/typescript/payments-razorpay) for `insforge.payments.razorpay.createOrder(...)`, `createSubscription(...)`, verification, and subscription management.
+- Use [Stripe Payments](/sdks/typescript/payments-stripe) for `yarah.payments.stripe.createCheckoutSession(...)` and `yarah.payments.stripe.createCustomerPortalSession(...)`.
+- Use [Razorpay Payments](/sdks/typescript/payments-razorpay) for `yarah.payments.razorpay.createOrder(...)`, `createSubscription(...)`, verification, and subscription management.
 - Read [Payments overview](/core-concepts/payments/overview) for the shared database architecture and fulfillment model.

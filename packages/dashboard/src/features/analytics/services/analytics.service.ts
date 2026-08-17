@@ -10,7 +10,7 @@ import type {
   PosthogConfig,
   PosthogDiscoveredProject,
   PosthogRegion,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { apiClient } from '#lib/api/client';
 
 export type Breakdown = 'Page' | 'Country' | 'DeviceType';

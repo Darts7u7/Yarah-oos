@@ -20,7 +20,7 @@ import type {
   ListStripeSubscriptionsRequest,
   ListStripeSubscriptionsResponse,
   SyncStripePaymentsSubscriptionsSummary,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export interface SubscriptionProjectionResult {
   synced: boolean;

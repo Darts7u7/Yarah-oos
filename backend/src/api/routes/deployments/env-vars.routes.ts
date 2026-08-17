@@ -6,7 +6,7 @@ import { deploymentsWriteLimiter } from '@/api/middlewares/rate-limiters.js';
 import { AuditService } from '@/services/logs/audit.service.js';
 import { AppError } from '@/utils/errors.js';
 import { successResponse } from '@/utils/response.js';
-import { ERROR_CODES, upsertEnvVarsRequestSchema } from '@insforge/shared-schemas';
+import { ERROR_CODES, upsertEnvVarsRequestSchema } from '@yarahdev/shared-schemas';
 
 const router = Router();
 const deploymentService = DeploymentService.getInstance();

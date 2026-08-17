@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { ERROR_CODES, type CreateSessionResponse } from '@insforge/shared-schemas';
+import { ERROR_CODES, type CreateSessionResponse } from '@yarahdev/shared-schemas';
 import { AppError } from '@/utils/errors.js';
 import { TokenManager } from '@/infra/security/token.manager.js';
 import logger from '@/utils/logger.js';

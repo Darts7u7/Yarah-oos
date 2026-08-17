@@ -2,7 +2,7 @@ import {
   ModalitySchema,
   AIModelSchema,
   type AIOverviewMetricPoint,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 export interface ModelOption {
   id: string;
   created?: number;

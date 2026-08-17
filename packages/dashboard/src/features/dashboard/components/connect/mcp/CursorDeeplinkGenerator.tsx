@@ -20,7 +20,7 @@ export function CursorDeeplinkGenerator({
     const config = createMCPServerConfig(apiKey || '', os, getBackendUrl());
     const configString = JSON.stringify(config);
     const base64Config = btoa(configString);
-    return `cursor://anysphere.cursor-deeplink/mcp/install?name=insforge&config=${encodeURIComponent(base64Config)}`;
+    return `cursor://anysphere.cursor-deeplink/mcp/install?name=yarah&config=${encodeURIComponent(base64Config)}`;
   }, [apiKey, os]);
 
   const handleOpenInCursor = useCallback(() => {

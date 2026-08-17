@@ -4,10 +4,10 @@ import type {
   GetStripeConfigResponse,
   StripeEnvironment,
   UpsertStripeConfigRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { stripeService } from '#features/payments/services/stripe.service';
 import { stripeQueryKeys } from '#features/payments/queryKeys';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 // Every data view that depends on the configured key set; invalidated together
 // whenever a key is saved or removed.

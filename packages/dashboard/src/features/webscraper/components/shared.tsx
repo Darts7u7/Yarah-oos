@@ -1,4 +1,4 @@
-import { Badge, cn } from '@insforge/ui';
+import { Badge, cn } from '@yarahdev/ui';
 
 export const APIFY_CONSOLE_URL = 'https://console.apify.com';
 
@@ -41,4 +41,4 @@ export function RunStatusBadge({ status }: { status: string | null }) {
 
 // Entry prompt: paste into a coding agent to kick off a scrape via the skill.
 export const SCRAPE_PROMPT =
-  'Use the insforge webscraper apify skill to scrape <what you want> and return the results.';
+  'Use the yarah webscraper apify skill to scrape <what you want> and return the results.';

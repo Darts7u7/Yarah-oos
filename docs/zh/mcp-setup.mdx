@@ -1,19 +1,19 @@
 ---
 title: "为 Cursor、Claude、Windsurf 等编辑器设置 MCP"
 sidebarTitle: "MCP setup"
-description: "通过 MCP 服务器将 Cursor、Claude、Windsurf 等编辑器连接到 InsForge，让 AI 代理可以直接查询数据库、身份验证、存储、函数并执行架构迁移与配置。"
+description: "通过 MCP 服务器将 Cursor、Claude、Windsurf 等编辑器连接到 Yarah，让 AI 代理可以直接查询数据库、身份验证、存储、函数并执行架构迁移与配置。"
 ---
 
 ## 概述
 
-InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：数据库查询、模式管理、存储等。
+Yarah MCP 服务器让你的 AI 编程助手可以直接访问你的后端：数据库查询、模式管理、存储等。
 
-请按照以下针对你的 AI 客户端的说明进行操作。没有看到你的工具？浏览[智能体目录](https://insforge.dev/agents)查看完整的已测试集成列表。
+请按照以下针对你的 AI 客户端的说明进行操作。没有看到你的工具？浏览[智能体目录](https://yarah.dev/agents)查看完整的已测试集成列表。
 
 ## 前提条件
 
 - 一个 **AI 编程助手**（Cursor、Claude Code、GitHub Copilot 等）
-- 一个 **InsForge 项目** - 如果还没有，[点此创建](https://insforge.dev)
+- 一个 **Yarah 项目** - 如果还没有，[点此创建](https://yarah.dev)
 
 ## 本地 MCP 配置（推荐）
 
@@ -27,7 +27,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
 
     ![连接项目](/images/mcp-setup/connect-project.png)
 
-    或者，你也可以手动安装 InsForge MCP 服务器：
+    或者，你也可以手动安装 Yarah MCP 服务器：
 
     1. 打开 **Cursor Settings**
     2. 进入 **Tools & MCP**
@@ -43,9 +43,9 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
       />
     </Frame>
 
-    4. 粘贴来自你 InsForge 项目的 MCP JSON
+    4. 粘贴来自你 Yarah 项目的 MCP JSON
     5. 保存配置文件
-    6. 你应该会看到一个绿点，表示 InsForge 已成功安装
+    6. 你应该会看到一个绿点，表示 Yarah 已成功安装
 
     <Frame>
       <video
@@ -62,11 +62,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **Cursor** 中开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **Connected** 状态指示。
 
     <video
       controls
@@ -82,7 +82,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="Claude Code">
     ### 安装
 
-    将 InsForge MCP 服务器添加到你的 **Claude Code**：
+    将 Yarah MCP 服务器添加到你的 **Claude Code**：
 
     1. 在下拉列表中选择 **Claude Code**
     2. 复制以下安装命令并粘贴到你的终端中
@@ -106,11 +106,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **Claude Code** 中开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     <video
       controls
@@ -126,7 +126,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="GitHub Copilot">
     ### 安装
 
-    将 InsForge MCP 服务器添加到你的 **GitHub Copilot**：
+    将 Yarah MCP 服务器添加到你的 **GitHub Copilot**：
 
     1. 在下拉列表中选择 **Copilot**
     2. 打开终端，将以下安装命令粘贴到你的 **GitHub Copilot** 终端中
@@ -142,11 +142,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **Copilot** 中开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
   </Accordion>
@@ -154,7 +154,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="Google Antigravity">
     ### 安装
 
-    将 InsForge MCP 服务器添加到你的 **Antigravity**：
+    将 Yarah MCP 服务器添加到你的 **Antigravity**：
 
     1. 在下拉列表中选择 **Antigravity**
     2. 复制以下安装命令并粘贴到你的 **Antigravity** 终端中
@@ -178,11 +178,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **Antigravity** 中开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
   </Accordion>
@@ -190,7 +190,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="Kiro">
     ### 安装
 
-    将 InsForge MCP 服务器添加到你的 **Kiro**：
+    将 Yarah MCP 服务器添加到你的 **Kiro**：
 
     1. 在下拉列表中选择 **Kiro**
     2. 复制以下安装命令并粘贴到你的 **Kiro** 终端中
@@ -214,11 +214,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **Kiro** 中开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
   </Accordion>
@@ -226,7 +226,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="Codex">
     ### 安装
 
-    将 InsForge MCP 服务器添加到你的 **Codex**：
+    将 Yarah MCP 服务器添加到你的 **Codex**：
 
     1. 在下拉列表中选择 **Codex**
     2. 复制以下安装命令并粘贴到你的终端中
@@ -250,11 +250,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **Codex** 中开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
   </Accordion>
@@ -262,7 +262,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="Cline">
     ### 安装
 
-    将 InsForge MCP 服务器添加到你的 **Cline**：
+    将 Yarah MCP 服务器添加到你的 **Cline**：
 
     1. 在下拉列表中选择 **Cline**
     2. 复制以下安装命令并粘贴到你的 **Cline** 终端中
@@ -278,11 +278,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **Cline** 中开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
   </Accordion>
@@ -290,7 +290,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="Windsurf">
     ### 安装
 
-    将 InsForge MCP 服务器添加到你的 **Windsurf**：
+    将 Yarah MCP 服务器添加到你的 **Windsurf**：
 
     1. 在下拉列表中选择 **Windsurf**
     2. 复制以下安装命令并粘贴到你的 Windsurf 终端中
@@ -304,11 +304,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **Windsurf** 中开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
   </Accordion>
@@ -316,7 +316,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="Trae">
     ### 安装
 
-    将 InsForge MCP 服务器添加到你的 **Trae**：
+    将 Yarah MCP 服务器添加到你的 **Trae**：
 
     1. 在下拉列表中选择 **Trae**
     2. 复制以下安装命令并粘贴到你的 **Trae** 终端中
@@ -327,15 +327,15 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
 
     ![Trae 安装](/images/mcp-setup/trae-2.png)
 
-    另外，Trae 还提供与 InsForge 的官方原生集成，你可以直接从 Trae 的官方 MCP 市场安装 InsForge：
+    另外，Trae 还提供与 Yarah 的官方原生集成，你可以直接从 Trae 的官方 MCP 市场安装 Yarah：
 
     1. 打开 Trae 的 **Settings** → 进入 **MCP**
     2. 点击 **Add**，然后选择 **Add from Marketplace**
-    3. 搜索 "InsForge" 并从市场中添加
+    3. 搜索 "Yarah" 并从市场中添加
 
     ![Trae 市场](/images/mcp-setup/trae-3.png)
 
-    4. 所需的凭据 API_KEY 和 API_BASE_URL，可以在你的 InsForge **Settings** 中的 **Connect** 选项卡下找到
+    4. 所需的凭据 API_KEY 和 API_BASE_URL，可以在你的 Yarah **Settings** 中的 **Connect** 选项卡下找到
 
     ![Trae 凭据](/images/mcp-setup/trae-4.png)
 
@@ -344,11 +344,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **Trae** 中开始一个新的聊天，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
   </Accordion>
@@ -356,7 +356,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="Qoder">
     ### 安装
 
-    将 InsForge MCP 服务器添加到你的 **Qoder**：
+    将 Yarah MCP 服务器添加到你的 **Qoder**：
 
     1. 在下拉列表中选择 **Qoder**
     2. 复制以下安装命令并粘贴到你的 **Qoder** 终端中
@@ -370,11 +370,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **Qoder** 中开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
   </Accordion>
@@ -382,7 +382,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="Roo Code">
     ### 安装
 
-    将 InsForge MCP 服务器添加到你的 **Roo Code**：
+    将 Yarah MCP 服务器添加到你的 **Roo Code**：
 
     1. 在下拉列表中选择 **Roo Code**
     2. 复制以下安装命令并粘贴到你的 **Roo Code** 终端中
@@ -396,11 +396,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **Roo Code** 中开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
   </Accordion>
@@ -408,7 +408,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="OpenCode">
     ### 安装
 
-    将 InsForge MCP 服务器添加到你的 **OpenCode**：
+    将 Yarah MCP 服务器添加到你的 **OpenCode**：
 
     1. 在下拉列表中选择 **OpenCode**
     2. 复制以下安装命令并粘贴到你的终端中
@@ -422,11 +422,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请在 **OpenCode** 中开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
   </Accordion>
@@ -434,7 +434,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
   <Accordion title="MCP JSON">
     ### 安装
 
-    使用 MCP JSON 将 InsForge MCP 服务器添加到你的编程智能体：
+    使用 MCP JSON 将 Yarah MCP 服务器添加到你的编程智能体：
 
     1. 在下拉列表中选择 **MCP JSON**
     2. 将以下 **MCP JSON** 配置复制并粘贴到你的智能体中
@@ -446,11 +446,11 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
     要验证连接，请开始一个新的聊天会话，并向你的智能体发送以下提示词：
 
     ```
-    I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-    learn about InsForge instructions.
+    I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+    learn about Yarah instructions.
     ```
 
-    如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+    如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
     ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
   </Accordion>
@@ -463,7 +463,7 @@ InsForge MCP 服务器让你的 AI 编程助手可以直接访问你的后端：
 在你的终端中运行以下命令：
 
 ```bash
-npx add-mcp https://mcp.insforge.dev/mcp
+npx add-mcp https://mcp.yarah.dev/mcp
 ```
 
 <Note>
@@ -475,7 +475,7 @@ npx add-mcp https://mcp.insforge.dev/mcp
 
 ### 连接并绑定项目
 
-一些 MCP 客户端会在设置过程中自动提示你登录，而另一些客户端如果自动流程无法完成，则可能需要手动进行身份验证或项目绑定步骤。无论哪种方式，身份验证都会打开一个浏览器窗口，你可以在其中登录你的 InsForge 账户，并授予 MCP 客户端组织/项目访问权限。
+一些 MCP 客户端会在设置过程中自动提示你登录，而另一些客户端如果自动流程无法完成，则可能需要手动进行身份验证或项目绑定步骤。无论哪种方式，身份验证都会打开一个浏览器窗口，你可以在其中登录你的 Yarah 账户，并授予 MCP 客户端组织/项目访问权限。
 
 <AccordionGroup>
   <Accordion title="Cursor">
@@ -484,15 +484,15 @@ npx add-mcp https://mcp.insforge.dev/mcp
     ```json
     {
       "mcpServers": {
-        "insforge": {
-          "url": "https://mcp.insforge.dev/mcp"
+        "yarah": {
+          "url": "https://mcp.yarah.dev/mcp"
         }
       }
     }
     ```
 
-    在菜单 **Preferences → Cursor Settings → Tools & MCP** 中，你应该会看到 InsForge MCP 服务器已成功添加。
-    InsForge MCP 服务器状态为 "Needs authentication"，你可以点击 `connect` 按钮进行身份验证。
+    在菜单 **Preferences → Cursor Settings → Tools & MCP** 中，你应该会看到 Yarah MCP 服务器已成功添加。
+    Yarah MCP 服务器状态为 "Needs authentication"，你可以点击 `connect` 按钮进行身份验证。
   </Accordion>
 
   <Accordion title="Claude Code">
@@ -500,9 +500,9 @@ npx add-mcp https://mcp.insforge.dev/mcp
     ```json
     {
       "mcpServers": {
-        "insforge": {
+        "yarah": {
           "type": "http",
-          "url": "https://mcp.insforge.dev/mcp"
+          "url": "https://mcp.yarah.dev/mcp"
         }
       }
     }
@@ -511,7 +511,7 @@ npx add-mcp https://mcp.insforge.dev/mcp
     ```sh
     claude /mcp
     ```
-    选择 "insforge" 服务器，然后选择 "Authenticate" 开始身份验证流程。
+    选择 "yarah" 服务器，然后选择 "Authenticate" 开始身份验证流程。
 
   </Accordion>
 
@@ -520,9 +520,9 @@ npx add-mcp https://mcp.insforge.dev/mcp
     ```json
     {
       "servers": {
-        "insforge": {
+        "yarah": {
           "type": "http",
-          "url": "https://mcp.insforge.dev/mcp"
+          "url": "https://mcp.yarah.dev/mcp"
         }
       }
     }
@@ -534,8 +534,8 @@ npx add-mcp https://mcp.insforge.dev/mcp
     ```json
     {
       "mcpServers": {
-        "insforge": {
-          "serverUrl": "https://mcp.insforge.dev/mcp"
+        "yarah": {
+          "serverUrl": "https://mcp.yarah.dev/mcp"
         }
       }
     }
@@ -548,16 +548,16 @@ npx add-mcp https://mcp.insforge.dev/mcp
     ```json
     {
       "mcpServers": {
-        "insforge": {
+        "yarah": {
           "type": "http",
-          "url": "https://mcp.insforge.dev/mcp"
+          "url": "https://mcp.yarah.dev/mcp"
         }
       }
     }
     ```
     启动 Gemini CLI 并运行以下命令以对服务器进行身份验证：
     ```sh
-    /mcp auth insforge
+    /mcp auth yarah
     ```
   </Accordion>
 
@@ -571,30 +571,30 @@ npx add-mcp https://mcp.insforge.dev/mcp
     </Note>
     安装完成后，你会在 `.codex/config.toml` 中找到如下配置文件：
     ```toml
-    [mcp_servers.insforge]
+    [mcp_servers.yarah]
     type = "http"
-    url = "https://mcp.insforge.dev/mcp"
+    url = "https://mcp.yarah.dev/mcp"
     ```
     然后进行身份验证：
     ```sh
-    codex mcp login insforge
+    codex mcp login yarah
     ```
     最后，在 Codex 中运行 /mcp 以验证身份验证。
 
     或者，你也可以运行以下命令来安装 MCP 服务器：
     ```sh
-    codex mcp add insforge --url https://mcp.insforge.dev/mcp
+    codex mcp add yarah --url https://mcp.yarah.dev/mcp
     ```
   </Accordion>
 
   <Accordion title="Cline">
-    你可以在终端中运行以下命令，将 InsForge MCP 服务器安装到你的 **Cline**：
+    你可以在终端中运行以下命令，将 Yarah MCP 服务器安装到你的 **Cline**：
     ```bash
-    npx -y @smithery/cli mcp add devel/insforge --client cline
+    npx -y @smithery/cli mcp add devel/yarah --client cline
     ```
-    或者，你也可以参考官方 [Cline 文档](https://docs.cline.bot/mcp/connecting-to-a-remote-server)，通过以下参数添加 InsForge MCP 服务器：
-    - Server Name: `insforge`
-    - Server URL: `https://mcp.insforge.dev/mcp`
+    或者，你也可以参考官方 [Cline 文档](https://docs.cline.bot/mcp/connecting-to-a-remote-server)，通过以下参数添加 Yarah MCP 服务器：
+    - Server Name: `yarah`
+    - Server URL: `https://mcp.yarah.dev/mcp`
     - Transport Type: `Streamable HTTP`
 
     添加服务器后，你会看到一条要求进行身份验证的错误消息。点击出现的 "Authenticate" 按钮进行身份验证。
@@ -606,12 +606,12 @@ npx add-mcp https://mcp.insforge.dev/mcp
     ```json
     {
       "mcpServers": {
-        "insforge": {
+        "yarah": {
           "command": "npx",
           "args": [
             "-y",
             "mcp-remote",
-            "https://mcp.insforge.dev/mcp"
+            "https://mcp.yarah.dev/mcp"
           ]
         }
       }
@@ -621,9 +621,9 @@ npx add-mcp https://mcp.insforge.dev/mcp
   </Accordion>
 
   <Accordion title="Roo Code">
-    你可以在终端中运行以下命令，将 InsForge MCP 服务器安装到你的 **Roo Code**：
+    你可以在终端中运行以下命令，将 Yarah MCP 服务器安装到你的 **Roo Code**：
     ```bash
-    npx -y @smithery/cli mcp add devel/insforge --client roocode
+    npx -y @smithery/cli mcp add devel/yarah --client roocode
     ```
   </Accordion>
 
@@ -632,9 +632,9 @@ npx add-mcp https://mcp.insforge.dev/mcp
     ```json
     {
       "mcp": {
-        "insforge": {
+        "yarah": {
           "type": "remote",
-          "url": "https://mcp.insforge.dev/mcp",
+          "url": "https://mcp.yarah.dev/mcp",
           "enabled": true
         }
       }
@@ -642,7 +642,7 @@ npx add-mcp https://mcp.insforge.dev/mcp
     ```
     然后运行以下命令进行身份验证：
     ```sh
-    opencode mcp auth insforge
+    opencode mcp auth yarah
     ```
     这将打开你的浏览器以完成 OAuth 身份验证流程。
   </Accordion>
@@ -653,11 +653,11 @@ npx add-mcp https://mcp.insforge.dev/mcp
 要验证连接，请在你的 AI 编程助手中开始一个新的聊天会话，并发送以下提示词：
 
 ```
-I'm using InsForge as my backend platform, call InsForge MCP's fetch-docs tool to
-learn about InsForge instructions.
+I'm using Yarah as my backend platform, call Yarah MCP's fetch-docs tool to
+learn about Yarah instructions.
 ```
 
-如果连接成功，你会在 InsForge 控制台（右上角）看到 **MCP Connected** 状态指示。
+如果连接成功，你会在 Yarah 控制台（右上角）看到 **MCP Connected** 状态指示。
 
 ![MCP 已连接](/images/mcp-setup/mcp-connected.png)
 

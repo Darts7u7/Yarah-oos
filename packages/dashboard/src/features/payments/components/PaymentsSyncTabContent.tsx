@@ -1,7 +1,7 @@
 import { Loader2, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@insforge/ui';
-import type { PaymentProvider, RazorpayKeyConfig, StripeKeyConfig } from '@insforge/shared-schemas';
+import { Button } from '@yarahdev/ui';
+import type { PaymentProvider, RazorpayKeyConfig, StripeKeyConfig } from '@yarahdev/shared-schemas';
 
 export type PaymentKeyConfig = StripeKeyConfig | RazorpayKeyConfig;
 

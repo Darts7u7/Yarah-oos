@@ -1,13 +1,13 @@
 ---
 title: "数据库"
 sidebarTitle: "Overview"
-description: "InsForge 数据库基于完整 Postgres，通过 PostgREST 自动生成 REST API，支持行级安全（RLS）、扩展、迁移与备份，可从 SDK 或仪表板直接管理。"
+description: "Yarah 数据库基于完整 Postgres，通过 PostgREST 自动生成 REST API，支持行级安全（RLS）、扩展、迁移与备份，可从 SDK 或仪表板直接管理。"
 ---
 
-每个 InsForge 项目都配有一个完整的 [Postgres](https://www.postgresql.org/) 数据库。每个表自动成为类型化的 REST 和 SDK 端点。身份验证令牌通过行级安全范围化每个读写。相同的 Postgres 处理关系查询、通过 pgvector 的语义搜索和实时更改源。
+每个 Yarah 项目都配有一个完整的 [Postgres](https://www.postgresql.org/) 数据库。每个表自动成为类型化的 REST 和 SDK 端点。身份验证令牌通过行级安全范围化每个读写。相同的 Postgres 处理关系查询、通过 pgvector 的语义搜索和实时更改源。
 
 <Frame caption="表编辑器：类型化列、内联编辑、CSV 导入和 SQL 工作室。">
-  <img src="/images/database-table-editor.png" alt="InsForge 仪表盘表编辑器显示带有类型化列的消息表" />
+  <img src="/images/database-table-editor.png" alt="Yarah 仪表盘表编辑器显示带有类型化列的消息表" />
 </Frame>
 
 <Note>
@@ -16,8 +16,8 @@ description: "InsForge 数据库基于完整 Postgres，通过 PostgREST 自动�
 
 ```mermaid
 graph TB
-    Client[Client Application] --> SDK[InsForge SDK]
-    SDK --> API[InsForge API]
+    Client[Client Application] --> SDK[Yarah SDK]
+    SDK --> API[Yarah API]
     API --> PostgREST[PostgREST v12.2]
     PostgREST --> PG[(PostgreSQL 15)]
     API --> PG
@@ -46,7 +46,7 @@ graph TB
 
 ### 迁移
 
-跟踪和应用有序的 SQL 变更。[Migrations](/core-concepts/database/migrations) 在您的存储库中作为普通 `.sql` 文件提供，使用 `npx @insforge/cli db migrations up --all` 或通过 MCP 工具应用。
+跟踪和应用有序的 SQL 变更。[Migrations](/core-concepts/database/migrations) 在您的存储库中作为普通 `.sql` 文件提供，使用 `npx @yarah/cli db migrations up --all` 或通过 MCP 工具应用。
 
 ### 分支
 

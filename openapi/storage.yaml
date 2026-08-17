@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Insforge Storage API
+  title: Yarah Storage API
   version: 2.0.0
   description: Bucket-based storage system similar to S3
 
@@ -994,7 +994,7 @@ paths:
                     $ref: '#/components/schemas/S3GatewayConfig'
               example:
                 data:
-                  endpoint: https://proj.insforge.app/storage/v1/s3
+                  endpoint: https://proj.apps.yarah.dev/storage/v1/s3
                   region: us-east-2
                   available: true
         '401':
@@ -1445,7 +1445,7 @@ components:
         endpoint:
           type: string
           description: Full URL clients should configure as their S3 endpoint.
-          example: https://proj.insforge.app/storage/v1/s3
+          example: https://proj.apps.yarah.dev/storage/v1/s3
         region:
           type: string
           description: SigV4 signing region the gateway validates incoming requests against.

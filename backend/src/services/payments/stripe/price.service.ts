@@ -20,7 +20,7 @@ import {
   type ListStripePricesResponse,
   type MutateStripePriceResponse,
   type UpdateStripePriceRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class StripePriceService {
   private static instance: StripePriceService;

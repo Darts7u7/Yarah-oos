@@ -10,7 +10,7 @@ import {
 import logger from '@/utils/logger.js';
 import { BaseLogProvider } from './base.provider.js';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES, LogSchema, LogSourceSchema, LogStatsSchema } from '@insforge/shared-schemas';
+import { ERROR_CODES, LogSchema, LogSourceSchema, LogStatsSchema } from '@yarahdev/shared-schemas';
 
 export class CloudWatchProvider extends BaseLogProvider {
   private cwClient: CloudWatchLogsClient | null = null;
@@ -19,12 +19,11 @@ export class CloudWatchProvider extends BaseLogProvider {
 
   async initialize(): Promise<void> {
     this.cwRegion = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-east-2';
-    // Mirrors the old Vector group_name: /insforge/${PROJECT_ID}. An explicit
+    // Mirrors the old Vector group_name: /yarah/${PROJECT_ID}. An explicit
     // CLOUDWATCH_LOG_GROUP still wins so operators can point at a custom group.
     const projectId = process.env.PROJECT_ID?.trim();
     this.cwLogGroup =
-      process.env.CLOUDWATCH_LOG_GROUP ||
-      (projectId ? `/insforge/${projectId}` : '/insforge/local');
+      process.env.CLOUDWATCH_LOG_GROUP || (projectId ? `/yarah/${projectId}` : '/yarah/local');
 
     const cloudwatchOpts: {
       region: string;
@@ -54,7 +53,7 @@ export class CloudWatchProvider extends BaseLogProvider {
 
   private getSuffixMapping(): Record<string, string> {
     return {
-      'insforge.logs': process.env.CW_SUFFIX_INFORGE || 'insforge-vector',
+      'yarah.logs': process.env.CW_SUFFIX_INFORGE || 'yarah-vector',
       'postgREST.logs': process.env.CW_SUFFIX_POSTGREST || 'postgrest-vector',
       'postgres.logs': process.env.CW_SUFFIX_POSTGRES || 'postgres-vector',
       'function.logs': process.env.CW_SUFFIX_FUNCTION || 'function-vector',
@@ -496,7 +495,7 @@ export class CloudWatchProvider extends BaseLogProvider {
           ? 'postgres.logs'
           : logStream.includes('function')
             ? 'function.logs'
-            : 'insforge.logs';
+            : 'yarah.logs';
 
       const body = this.normalizeBody(msg, source);
       const eventMessage =
@@ -558,7 +557,7 @@ export class CloudWatchProvider extends BaseLogProvider {
         return obj;
       }
 
-      // Winston-style structured log from the insforge backend:
+      // Winston-style structured log from the yarah backend:
       // {"level":"error","message":"...","timestamp":"...","metadata":{...},"stack":"..."}
       const level = typeof obj.level === 'string' ? obj.level.toLowerCase() : undefined;
       const msgField =
@@ -652,7 +651,7 @@ export class CloudWatchProvider extends BaseLogProvider {
   private parseRawLine(message: string, sourceName: string): Record<string, unknown> {
     const metadata: Record<string, unknown> = {};
 
-    // Strip the [backend] prefix that the insforge container historically wrote.
+    // Strip the [backend] prefix that the yarah container historically wrote.
     const stripped = message.replace(/^\[backend\]\s*/, '');
 
     if (sourceName === 'postgres.logs') {

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { KeyRound, Trash2 } from 'lucide-react';
-import { Button, ConfirmDialog, CopyButton, Input } from '@insforge/ui';
-import type { S3AccessKeySchema } from '@insforge/shared-schemas';
+import { Button, ConfirmDialog, CopyButton, Input } from '@yarahdev/ui';
+import type { S3AccessKeySchema } from '@yarahdev/shared-schemas';
 import { useS3AccessKeys, useS3GatewayConfig } from '#features/storage/hooks/useS3AccessKeys';
 import { S3AccessKeyCreateDialog } from './S3AccessKeyCreateDialog';
 

@@ -1,5 +1,5 @@
 import { apiClient } from '#lib/api/client';
-import type { SmtpConfigSchema, UpsertSmtpConfigRequest } from '@insforge/shared-schemas';
+import type { SmtpConfigSchema, UpsertSmtpConfigRequest } from '@yarahdev/shared-schemas';
 
 export class SmtpConfigService {
   async getConfig(): Promise<SmtpConfigSchema> {

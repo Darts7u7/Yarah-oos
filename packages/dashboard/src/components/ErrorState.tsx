@@ -1,6 +1,6 @@
 import { AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button, cn } from '@insforge/ui';
+import { Button, cn } from '@yarahdev/ui';
 import { Alert, AlertTitle, AlertDescription } from './';
 
 interface ErrorStateProps {

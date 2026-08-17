@@ -112,8 +112,8 @@ WORKDIR /app
 # Default STORAGE_DIR and LOGS_DIR so every containerised deployment
 # (docker run, Compose, Zeabur, Render, etc.) writes to the well-known
 # mount points. Compose and PaaS env vars override these when set.
-ENV STORAGE_DIR=/insforge-storage
-ENV LOGS_DIR=/insforge-logs
+ENV STORAGE_DIR=/yarah-storage
+ENV LOGS_DIR=/yarah-logs
 ENV MAX_JSON_BODY_SIZE=100mb
 ENV MAX_URLENCODED_BODY_SIZE=10mb
 
@@ -125,10 +125,10 @@ ENV NODE_ENV=production
 
 # Telemetry deployment-channel default for bare `docker run`. Compose files
 # and PaaS templates override it; platform-injected vars win over both.
-ENV INSFORGE_DEPLOYMENT_METHOD=docker
+ENV YARAH_DEPLOYMENT_METHOD=docker
 
-RUN mkdir -p /data /insforge-storage /insforge-logs && \
-    chown node:node /data /insforge-storage /insforge-logs
+RUN mkdir -p /data /yarah-storage /yarah-logs && \
+    chown node:node /data /yarah-storage /yarah-logs
 
 # tsx is a devDependency but required at runtime for migrate:bootstrap
 RUN npm install -g "tsx@^4.7.1" && npm cache clean --force
@@ -172,11 +172,11 @@ COPY --from=build --chown=node:node /app/package.json ./package.json
 # the handoff and runs as root. The drop is in the entrypoint, not the image metadata.
 # This is the same shape the official postgres and redis images use for the same reason;
 # if you override the entrypoint, add `user: node` yourself.
-COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/insforge-entrypoint
+COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/yarah-entrypoint
 
 EXPOSE 7130 7131
 
-ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/insforge-entrypoint"]
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/yarah-entrypoint"]
 # Exec node directly instead of `npm start`: the npm wrapper chain
 # (npm start -> npm run start -> node) keeps two extra npm processes resident
 # (~20-40MB on a 512MB nano) and breaks direct signal delivery. cwd stays
@@ -199,8 +199,8 @@ RUN apk add --no-cache postgresql16-client
 WORKDIR /app
 
 # Default mount points (same as runner stage — see comments there)
-ENV STORAGE_DIR=/insforge-storage
-ENV LOGS_DIR=/insforge-logs
+ENV STORAGE_DIR=/yarah-storage
+ENV LOGS_DIR=/yarah-logs
 ENV MAX_JSON_BODY_SIZE=100mb
 ENV MAX_URLENCODED_BODY_SIZE=10mb
 
@@ -211,4 +211,4 @@ ENV MAX_URLENCODED_BODY_SIZE=10mb
 # npm install on root-owned bind mounts (e.g. in CI).
 RUN mkdir -p /app/node_modules /app/backend/node_modules /app/frontend/node_modules \
              /app/shared-schemas/node_modules /app/ui/node_modules \
-             /insforge-storage /insforge-logs
+             /yarah-storage /yarah-logs

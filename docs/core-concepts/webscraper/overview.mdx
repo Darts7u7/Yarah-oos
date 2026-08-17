@@ -1,19 +1,19 @@
 ---
-title: "Web Scraper overview: Apify integration for InsForge"
+title: "Web Scraper overview: Apify integration for Yarah"
 sidebarTitle: "Overview"
-description: "Connect Apify to InsForge to let your coding agent run scrapers on demand, manage actors and runs, and land scraped datasets in your app."
+description: "Connect Apify to Yarah to let your coding agent run scrapers on demand, manage actors and runs, and land scraped datasets in your app."
 ---
 
-Use InsForge Web Scraper to give your coding agent live access to external data. Connect your own Apify account once, and your agent can run scrapers (Apify calls them actors) on demand. The dashboard shows your actors, run history, and scraped datasets without leaving InsForge.
+Use Yarah Web Scraper to give your coding agent live access to external data. Connect your own Apify account once, and your agent can run scrapers (Apify calls them actors) on demand. The dashboard shows your actors, run history, and scraped datasets without leaving Yarah.
 
-Connect Apify once, then paste the scrape prompt into your coding agent. The agent authenticates with your InsForge-managed Apify token, picks the right actor for the job, and returns the results.
+Connect Apify once, then paste the scrape prompt into your coding agent. The agent authenticates with your Yarah-managed Apify token, picks the right actor for the job, and returns the results.
 
 <Frame caption="Web Scraper dashboard: connected actors with their last run and total run counts.">
-  <img src="/images/dashboard-webscraper.png" alt="InsForge Web Scraper dashboard showing the Actors tab with connected Apify actors, their last run times, and run counts" />
+  <img src="/images/dashboard-webscraper.png" alt="Yarah Web Scraper dashboard showing the Actors tab with connected Apify actors, their last run times, and run counts" />
 </Frame>
 
 <Note>
-  Apify remains the source of truth for actors, runs, and datasets. InsForge surfaces a focused subset for everyday checks, then deep-links into the Apify console for anything beyond it. The Web Scraper integration runs on InsForge Cloud and on self-hosted deployments alike; only the way you connect Apify differs.
+  Apify remains the source of truth for actors, runs, and datasets. Yarah surfaces a focused subset for everyday checks, then deep-links into the Apify console for anything beyond it. The Web Scraper integration runs on Yarah Cloud and on self-hosted deployments alike; only the way you connect Apify differs.
 </Note>
 
 ```mermaid
@@ -47,11 +47,11 @@ flowchart TB
 
 ### Apify connection
 
-Connect Apify from the Web Scraper page in the dashboard. What happens next depends on where InsForge runs.
+Connect Apify from the Web Scraper page in the dashboard. What happens next depends on where Yarah runs.
 
-On InsForge Cloud it is one click: InsForge walks you through the Apify OAuth flow, stores the credentials server-side, and keeps the access token refreshed for you.
+On Yarah Cloud it is one click: Yarah walks you through the Apify OAuth flow, stores the credentials server-side, and keeps the access token refreshed for you.
 
-Self-hosted deployments have no OAuth broker in front of them, so you bring your own credential instead. Create an API token in the Apify console under **Settings → Integrations**, paste it into the Web Scraper page, and InsForge stores it encrypted in your own backend's secret store. `insforge webscraper apify connect --token <token>` does the same from the CLI.
+Self-hosted deployments have no OAuth broker in front of them, so you bring your own credential instead. Create an API token in the Apify console under **Settings → Integrations**, paste it into the Web Scraper page, and Yarah stores it encrypted in your own backend's secret store. `yarah webscraper apify connect --token <token>` does the same from the CLI.
 
 Either way the token stays out of your repo and your app bundle; agents and functions fetch a live one from the backend when they need it.
 
@@ -59,7 +59,7 @@ Either way the token stays out of your repo and your app bundle; agents and func
   Self-hosted: mint a narrowly scoped Apify token rather than a full-account
   one. `GET /api/webscraper/apify/token` returns the stored token verbatim to
   admin callers — that is what lets the agent path log the Apify CLI in — so
-  whatever the token can do in Apify is what an InsForge admin key can do.
+  whatever the token can do in Apify is what an Yarah admin key can do.
 </Warning>
 
 ### Scrape via your coding agent
@@ -67,10 +67,10 @@ Either way the token stays out of your repo and your app bundle; agents and func
 After connecting, the empty state ships a scrape prompt you can paste into your coding agent:
 
 ```
-Use the insforge webscraper apify skill to scrape <what you want> and return the results.
+Use the yarah webscraper apify skill to scrape <what you want> and return the results.
 ```
 
-Behind the prompt, `npx @insforge/cli webscraper apify login` fetches your InsForge-managed Apify token, authenticates the local Apify CLI headlessly (no browser OAuth), and installs the Apify agent skills. From there the agent picks an actor from the Apify Store, starts runs, and reads the results back.
+Behind the prompt, `npx @yarah/cli webscraper apify login` fetches your Yarah-managed Apify token, authenticates the local Apify CLI headlessly (no browser OAuth), and installs the Apify agent skills. From there the agent picks an actor from the Apify Store, starts runs, and reads the results back.
 
 ### Actors
 
@@ -90,7 +90,7 @@ Scraped results live in Apify datasets by default; nothing is written to your pr
 
 ### Settings and disconnect
 
-The Web Scraper Config dialog (the gear icon in the sidebar) shows the connected Apify account, plan, and data retention, links into the Apify console, and lets admins disconnect. Disconnecting only stops InsForge from using your Apify credentials — self-hosted, it deletes the stored API token from your secret store outright. Your Apify account, actors, and datasets stay intact, and you can reconnect anytime.
+The Web Scraper Config dialog (the gear icon in the sidebar) shows the connected Apify account, plan, and data retention, links into the Apify console, and lets admins disconnect. Disconnecting only stops Yarah from using your Apify credentials — self-hosted, it deletes the stored API token from your secret store outright. Your Apify account, actors, and datasets stay intact, and you can reconnect anytime.
 
 ## Concepts
 
@@ -107,8 +107,8 @@ The Web Scraper Config dialog (the gear icon in the sidebar) shows the connected
 ## Build with it
 
 <CardGroup cols={2}>
-  <Card title="InsForge CLI" icon="terminal" href="/quickstart">
-    `npx @insforge/cli webscraper apify connect` links your project to Apify, then logs your local agent in.
+  <Card title="Yarah CLI" icon="terminal" href="/quickstart">
+    `npx @yarah/cli webscraper apify connect` links your project to Apify, then logs your local agent in.
   </Card>
 
   <Card title="Apify Store" icon="store" href="https://apify.com/store">

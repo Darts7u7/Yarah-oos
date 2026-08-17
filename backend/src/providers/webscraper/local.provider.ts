@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { z } from 'zod';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import type { ApifyConnection, WebscraperProvider } from '@/providers/webscraper/base.provider.js';
 import { ApifyConfigService } from '@/services/webscraper/apify-config.service.js';
 

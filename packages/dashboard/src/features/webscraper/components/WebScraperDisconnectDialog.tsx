@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   useToast,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { webscraperQueryKeys } from '#features/webscraper/hooks/useWebscraper';
 import { webscraperService } from '#features/webscraper/services/webscraper.service';
 
@@ -58,7 +58,7 @@ export function WebScraperDisconnectDialog({
           <p className="text-sm text-foreground">
             {t('webscraper.disconnectApifyBody', {
               defaultValue:
-                'Insforge will stop using your Apify credentials. Your Apify account itself will not be deleted; you can reconnect anytime.',
+                'Yarah will stop using your Apify credentials. Your Apify account itself will not be deleted; you can reconnect anytime.',
             })}
           </p>
         </DialogBody>

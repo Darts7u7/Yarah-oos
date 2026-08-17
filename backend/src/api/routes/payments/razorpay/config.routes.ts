@@ -10,7 +10,7 @@ import {
   ERROR_CODES,
   razorpayEnvironmentParamsSchema,
   upsertRazorpayConfigBodySchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const router = Router({ mergeParams: true });
 const configService = RazorpayConfigService.getInstance();

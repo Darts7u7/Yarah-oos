@@ -5,7 +5,7 @@ import type {
   DatabaseIndexesResponse,
   DatabasePoliciesResponse,
   DatabaseTriggersResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { DEFAULT_DATABASE_SCHEMA } from './helpers.js';
 
 export class DatabaseService {

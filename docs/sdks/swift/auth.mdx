@@ -1,6 +1,6 @@
 ---
 title: Swift authentication SDK reference
-description: Sign up, sign in, verify email, manage sessions, and configure OAuth URL schemes for iOS, macOS, tvOS, and watchOS with the InsForge Swift SDK.
+description: Sign up, sign in, verify email, manage sessions, and configure OAuth URL schemes for iOS, macOS, tvOS, and watchOS with the Yarah Swift SDK.
 ---
 
 import SwiftSdkInstallation from '/snippets/swift-sdk-installation.mdx';
@@ -50,7 +50,7 @@ public struct SignUpResponse: Codable, Sendable {
 ```swift
 func handleSignUp(email: String, password: String, name: String?) async {
     do {
-        let result = try await insforge.auth.signUp(
+        let result = try await yarah.auth.signUp(
             email: email,
             password: password,
             name: name
@@ -72,7 +72,7 @@ func handleSignUp(email: String, password: String, name: String?) async {
 // Called when user enters the verification code
 func handleVerifyEmail(email: String, code: String) async {
     do {
-        try await insforge.auth.verifyEmail(email: email, code: code)
+        try await yarah.auth.verifyEmail(email: email, code: code)
         // Verification successful, user can now sign in
         navigateToSignIn()
     } catch {
@@ -83,7 +83,7 @@ func handleVerifyEmail(email: String, code: String) async {
 // Called when user requests a new verification email
 func handleResendCode(email: String) async {
     do {
-        try await insforge.auth.resendVerificationEmail(email: email)
+        try await yarah.auth.resendVerificationEmail(email: email)
         showMessage("Verification email sent to \(email)")
     } catch {
         showError("Failed to resend verification email")
@@ -93,11 +93,11 @@ func handleResendCode(email: String) async {
 
 ### Email verification
 
-For users who register with email, the InsForge backend provides three options:
+For users who register with email, the Yarah backend provides three options:
 
 1. **No email verification** - Users can sign in immediately after registration. `SignUpResponse` will have `hasSession = true`.
 2. **Link-based verification** - Users must open their email and click the verification link before they can sign in.
-3. **Code-based verification** - The InsForge backend sends a 6-digit verification code to the user's email. The client app needs to display a verification screen where users can enter the code, then call `verifyEmail(email:code:)` to complete verification. Only after this can users sign in with email + password.
+3. **Code-based verification** - The Yarah backend sends a 6-digit verification code to the user's email. The client app needs to display a verification screen where users can enter the code, then call `verifyEmail(email:code:)` to complete verification. Only after this can users sign in with email + password.
 
 When `requireEmailVerification` is `true`, the response will have:
 - `accessToken = nil`
@@ -128,7 +128,7 @@ Sign in an existing user with email and password.
 
 ```swift
 do {
-    let result = try await insforge.auth.signIn(
+    let result = try await yarah.auth.signIn(
         email: "user@example.com",
         password: "secure_password123"
     )
@@ -159,7 +159,7 @@ Sign out the current user.
 
 ```swift
 do {
-    try await insforge.auth.signOut()
+    try await yarah.auth.signOut()
     print("User signed out")
 } catch {
     print("Sign out failed: \(error)")
@@ -176,7 +176,7 @@ Get authenticated user with profile data.
 
 ```swift
 do {
-    if let user = try await insforge.auth.getCurrentUser() {
+    if let user = try await yarah.auth.getCurrentUser() {
         print("Email: \(user.email)")
         print("Name: \(user.profile?.name ?? "N/A")")
     } else {
@@ -197,7 +197,7 @@ Update current user's profile.
 
 ```swift
 do {
-    let result = try await insforge.auth.setProfile([
+    let result = try await yarah.auth.setProfile([
         "name": "JohnDev",
         "bio": "iOS Developer",
         "avatar_url": "https://example.com/avatar.jpg"
@@ -212,7 +212,7 @@ do {
 
 ## Password reset
 
-InsForge supports two password reset methods, configured in the backend:
+Yarah supports two password reset methods, configured in the backend:
 
 - **Code method**: User receives a 6-digit code via email, verifies it to get a reset token, then resets password
 - **Link method**: User receives a magic link via email containing the reset token, then resets password directly
@@ -229,7 +229,7 @@ Send a password reset email to the user. The email will contain either a 6-digit
 
 ```swift
 do {
-    try await insforge.auth.sendPasswordReset(email: "user@example.com")
+    try await yarah.auth.sendPasswordReset(email: "user@example.com")
     // Show message to check email
     showMessage("If your email is registered, you will receive a password reset email.")
 } catch {
@@ -269,7 +269,7 @@ public struct ResetPasswordTokenResponse: Codable, Sendable {
 
 ```swift
 do {
-    let response = try await insforge.auth.exchangeResetPasswordToken(
+    let response = try await yarah.auth.exchangeResetPasswordToken(
         email: "user@example.com",
         code: "123456"
     )
@@ -296,7 +296,7 @@ Reset the user's password using a reset token.
 
 ```swift
 do {
-    try await insforge.auth.resetPassword(
+    try await yarah.auth.resetPassword(
         otp: resetToken,
         newPassword: "newSecurePassword123"
     )
@@ -337,7 +337,7 @@ public enum OAuthProvider: String, Sendable {
 ### Parameters
 
 - `provider` (`OAuthProvider`) - The OAuth provider to authenticate with
-- `redirectTo` (`String`) - Callback URL where InsForge will redirect after authentication
+- `redirectTo` (`String`) - Callback URL where Yarah will redirect after authentication
 
 ### Returns
 
@@ -351,7 +351,7 @@ Returns `AuthResponse` containing the authenticated user and session tokens.
 
 ```
 1. App calls signInWithOAuthView(provider:redirectTo:)
-2. SDK fetches the OAuth authorization URL from InsForge
+2. SDK fetches the OAuth authorization URL from Yarah
 3. SDK opens in-app authentication browser (ASWebAuthenticationSession)
 4. User authenticates with the provider (Google, GitHub, etc.)
 5. SDK automatically handles callback and creates session
@@ -362,10 +362,10 @@ Returns `AuthResponse` containing the authenticated user and session tokens.
 
 ```swift
 import SwiftUI
-import InsForge
+import Yarah
 
 struct LoginView: View {
-    let client: InsForgeClient
+    let client: YarahClient
     @State private var currentUser: User?
     @State private var errorMessage: String?
 
@@ -417,11 +417,11 @@ Register a callback URL for your app, pass that exact value to `redirectTo`, and
 
 ```swift
 do {
-    let result = try await insforge.auth.signIn(
+    let result = try await yarah.auth.signIn(
         email: email,
         password: password
     )
-} catch let error as InsForgeAuthError {
+} catch let error as YarahAuthError {
     switch error {
     case .invalidCredentials:
         print("Invalid email or password")

@@ -100,7 +100,7 @@ export class AppleOAuthProvider implements OAuthProvider {
         throw new Error('State parameter is required for shared Apple OAuth');
       }
       // Use shared keys if configured
-      const cloudBaseUrl = process.env.CLOUD_API_HOST || 'https://api.insforge.dev';
+      const cloudBaseUrl = process.env.CLOUD_API_HOST || 'https://api.yarah.dev';
       const redirectUri = `${selfBaseUrl}/api/auth/oauth/shared/callback/${state}`;
       const response = await axios.get(
         `${cloudBaseUrl}/auth/v1/shared/apple?redirect_uri=${encodeURIComponent(redirectUri)}`,

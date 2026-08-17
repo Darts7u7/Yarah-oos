@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { SEVERITY_CONFIG, type SeverityType } from '#features/logs/helpers';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 
 interface SeverityBadgeProps {
   severity: SeverityType;

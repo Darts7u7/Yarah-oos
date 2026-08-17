@@ -4,7 +4,7 @@ import type {
   CreateCustomOAuthConfigRequest,
   UpdateCustomOAuthConfigRequest,
   ListCustomOAuthConfigsResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class CustomOAuthConfigService {
   async getAllConfigs(): Promise<ListCustomOAuthConfigsResponse> {

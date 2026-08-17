@@ -1,17 +1,17 @@
 ---
 title: "付款"
 sidebarTitle: "Overview"
-description: "为 InsForge 项目选择 Stripe 或 Razorpay 支付集成，涵盖 Checkout、订阅、账单门户与 Webhook 履约，通过统一 SDK 处理订单和用户账单。"
+description: "为 Yarah 项目选择 Stripe 或 Razorpay 支付集成，涵盖 Checkout、订阅、账单门户与 Webhook 履约，通过统一 SDK 处理订单和用户账单。"
 ---
 
-InsForge Payments 让您的应用使用您自己的 Stripe 或 Razorpay 账户收取费用。两个提供商使用不同的支付模型，所以文档按提供商拆分，而不是描述一个通用支付流。
+Yarah Payments 让您的应用使用您自己的 Stripe 或 Razorpay 账户收取费用。两个提供商使用不同的支付模型，所以文档按提供商拆分，而不是描述一个通用支付流。
 
 <Frame caption="支付仪表盘：提供商连接、目录、订阅和交易。">
-  <img src="/images/dashboard-payments.png" alt="InsForge 付款仪表板" />
+  <img src="/images/dashboard-payments.png" alt="Yarah 付款仪表板" />
 </Frame>
 
 <Note>
-  Stripe 或 Razorpay 仍然是费用、发票、退款、争议、税款和账户级财务操作的真实来源。InsForge 不是支付处理器或商户，不替代提供商仪表板。
+  Stripe 或 Razorpay 仍然是费用、发票、退款、争议、税款和账户级财务操作的真实来源。Yarah 不是支付处理器或商户，不替代提供商仪表板。
 </Note>
 
 ## 选择提供商
@@ -43,7 +43,7 @@ InsForge Payments 让您的应用使用您自己的 Stripe 或 Razorpay 账户�
 | `payments.customer_mappings` | 应用计费主体到提供商客户 ID 映射。 |
 | `payments.customers` | 仪表板可见性的管理员/客户镜像。 |
 | `payments.webhook_events` | 已验证的提供商 webhook 事件账本。用于持久履行触发器。 |
-| `payments.transactions` | InsForge 仪表板/报告投影，用于成功、失败和退款的支付活动。 |
+| `payments.transactions` | Yarah 仪表板/报告投影，用于成功、失败和退款的支付活动。 |
 
 `payments.transactions` 不是履行契约。它是从提供商事件和同步构建的投影。对于业务逻辑，创建应用拥有的表，如 `public.orders`、`public.credit_ledger` 或 `public.team_entitlements`，然后从 `payments.webhook_events` 中的已验证行填充它们。
 

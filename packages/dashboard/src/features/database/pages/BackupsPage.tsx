@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   useToast,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { CreateBackupDialog } from '#features/database/components/CreateBackupDialog';
 import { ConfirmRestoreDialog } from '#features/database/components/ConfirmRestoreDialog';
 import { DatabaseEmptyState } from '#features/database/components/DatabaseEmptyState';

@@ -1,6 +1,6 @@
-# InsForge SDK Documentation - Overview
+# Yarah SDK Documentation - Overview
 
-## What is InsForge?
+## What is Yarah?
 
 Backend-as-a-service (BaaS) platform providing:
 
@@ -13,7 +13,7 @@ Backend-as-a-service (BaaS) platform providing:
 
 ## Installation
 
-The following is a step-by-step guide to installing and using the InsForge TypeScript SDK for Web applications. If you are building other types of applications, please refer to:
+The following is a step-by-step guide to installing and using the Yarah TypeScript SDK for Web applications. If you are building other types of applications, please refer to:
 - [Swift SDK documentation](/sdks/swift/overview) for iOS, macOS, tvOS, and watchOS applications.
 - [Kotlin SDK documentation](/sdks/kotlin/overview) for Android applications.
 - [REST API documentation](/sdks/rest/overview) for direct HTTP API access.
@@ -38,28 +38,28 @@ You must create a client instance using `createClient()` with your base URL and 
 import { createClient } from '@insforge/sdk';
 
 const client = createClient({
-  baseUrl: 'https://your-app.region.insforge.app',  // Your InsForge backend URL
+  baseUrl: 'https://your-app.apps.yarah.dev',  // Your Yarah backend URL
   anonKey: 'your-anon-key-here'       // Get this from backend metadata
 });
 
 ```
 
-**API BASE URL**: Your API base URL is `https://your-app.region.insforge.app`.
+**API BASE URL**: Your API base URL is `https://your-app.apps.yarah.dev`.
 
 ## Getting Detailed Documentation
 
 ### 🚨 CRITICAL: Always Fetch Documentation Before Writing Code
 
-InsForge provides official SDKs and REST APIs, use them to interact with InsForge services from your application code.
+Yarah provides official SDKs and REST APIs, use them to interact with Yarah services from your application code.
 
 - [TypeScript SDK](/sdks/typescript/overview) - JavaScript/TypeScript
 - [Swift SDK](/sdks/swift/overview) - iOS, macOS, tvOS, and watchOS
 - [Kotlin SDK](/sdks/kotlin/overview) - Android and Kotlin Multiplatform
 - [REST API](/sdks/rest/overview) - Direct HTTP API access
 
-Before writing or editing any InsForge integration code, you **MUST** call the `fetch-docs` or `fetch-sdk-docs` MCP tool to get the latest SDK documentation. This ensures you have accurate, up-to-date implementation patterns.
+Before writing or editing any Yarah integration code, you **MUST** call the `fetch-docs` or `fetch-sdk-docs` MCP tool to get the latest SDK documentation. This ensures you have accurate, up-to-date implementation patterns.
 
-### Use the InsForge `fetch-docs` MCP tool to get specific SDK documentation:
+### Use the Yarah `fetch-docs` MCP tool to get specific SDK documentation:
 
 Available documentation types:
 
@@ -79,7 +79,7 @@ Available documentation types:
 
 These docs are mostly for the TypeScript SDK. For other languages, you can also use the `fetch-sdk-docs` MCP tool to get specific documentation.
 
-### Use the InsForge `fetch-sdk-docs` MCP tool to get specific SDK documentation
+### Use the Yarah `fetch-sdk-docs` MCP tool to get specific SDK documentation
 
 You can fetch SDK documentation using the `fetch-sdk-docs` MCP tool with a specific feature type and language.
 
@@ -113,12 +113,12 @@ Payments currently has TypeScript SDK docs only. Use the Payments API reference 
 
 ### Use MCP Tools for Infrastructure:
 
-- Project scaffolding (`download-template`) - Download starter templates with InsForge integration
+- Project scaffolding (`download-template`) - Download starter templates with Yarah integration
 - Backend setup and metadata (`get-backend-metadata`)
 - Database schema management (`run-raw-sql`, `get-table-schema`)
 - Storage bucket creation (`create-bucket`, `list-buckets`, `delete-bucket`)
 - Serverless function deployment (`create-function`, `update-function`, `delete-function`)
-- Frontend deployment (`create-deployment`) - Deploy frontend apps to InsForge hosting
+- Frontend deployment (`create-deployment`) - Deploy frontend apps to Yarah hosting
 
 ## Important Notes
 

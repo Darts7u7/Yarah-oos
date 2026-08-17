@@ -1,6 +1,6 @@
 import './styles.css';
 
-export { InsForgeDashboard } from './app/InsforgeDashboard';
+export { YarahDashboard } from './app/YarahDashboard';
 export {
   dashboardDeploymentsMenuItem,
   dashboardSettingsMenuItem,
@@ -16,7 +16,7 @@ export type {
   DashboardProjectInfo,
   DashboardProps,
   DashboardUserInfo,
-  InsForgeDashboardProps,
+  YarahDashboardProps,
   SelfHostingDashboardProps,
   DashboardMetricsRange,
   DashboardMetricName,

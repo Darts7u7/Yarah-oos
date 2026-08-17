@@ -1,4 +1,4 @@
-import { InsForgeDashboard } from '@insforge/dashboard';
+import { YarahDashboard } from '@yarahdev/dashboard';
 import { isInIframe } from '../helpers';
 import { useCloudHosting } from './useCloudHosting';
 
@@ -32,7 +32,7 @@ export function CloudHostingDashboard() {
   } = useCloudHosting();
 
   return (
-    <InsForgeDashboard
+    <YarahDashboard
       mode="cloud-hosting"
       showNavbar={!isInIframe()}
       getAuthorizationCode={getAuthorizationCode}

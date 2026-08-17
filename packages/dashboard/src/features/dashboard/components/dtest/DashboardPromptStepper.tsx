@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Button, CopyButton } from '@insforge/ui';
+import { Button, CopyButton } from '@yarahdev/ui';
 import { Database, Globe } from 'lucide-react';
 import StepUserIcon from '#assets/icons/step_user.svg?react';
 import StepUploadIcon from '#assets/icons/step_upload.svg?react';
@@ -32,7 +32,7 @@ const PROMPT_STEPS: PromptStep[] = [
     key: 'database',
     category: 'Database',
     title: 'Add sample data',
-    prompt: 'Use InsForge Skills to create a table in InsForge backend and add some sample data.',
+    prompt: 'Use Yarah Skills to create a table in Yarah backend and add some sample data.',
     icon: <Database className="size-12 text-[rgb(var(--disabled))]" />,
     navigateTo: { label: 'Go to Database', path: '/dashboard/database/tables' },
   },
@@ -42,7 +42,7 @@ const PROMPT_STEPS: PromptStep[] = [
     category: 'Authentication',
     title: 'Sign up your first user',
     prompt:
-      'Use InsForge Skills to add user authentication to this app using InsForge Auth.\n\nUsers should be able to:\n1. Sign up / Sign in with Email\n2. Add Google OAuth\n3. Sign out\n\nAlso update the database and access control so each record belongs to a user:\n1. Add a `user_id` column to the relevant table(s)\n2. Set `user_id` automatically when a new record is created\n3. Restrict reads and writes so users can only access their own data\n4. Add the required row level security policies for this\n\nUpdate the app UI and backend logic so authentication is fully wired up and only signed in users can create and view their own records.',
+      'Use Yarah Skills to add user authentication to this app using Yarah Auth.\n\nUsers should be able to:\n1. Sign up / Sign in with Email\n2. Add Google OAuth\n3. Sign out\n\nAlso update the database and access control so each record belongs to a user:\n1. Add a `user_id` column to the relevant table(s)\n2. Set `user_id` automatically when a new record is created\n3. Restrict reads and writes so users can only access their own data\n4. Add the required row level security policies for this\n\nUpdate the app UI and backend logic so authentication is fully wired up and only signed in users can create and view their own records.',
     icon: <StepUserIcon className="size-12 text-[rgb(var(--disabled))]" />,
     navigateTo: { label: 'Go to User', path: '/dashboard/authentication/users' },
   },
@@ -52,7 +52,7 @@ const PROMPT_STEPS: PromptStep[] = [
     category: 'Storage',
     title: 'Upload a file',
     prompt:
-      'Use InsForge Skills to add file upload to this app.\nUsers should be able to upload a file and attach it to a record.\nShow the uploaded file in the UI.\nUse InsForge Storage for file uploads.',
+      'Use Yarah Skills to add file upload to this app.\nUsers should be able to upload a file and attach it to a record.\nShow the uploaded file in the UI.\nUse Yarah Storage for file uploads.',
     icon: <StepUploadIcon className="size-12 text-[rgb(var(--disabled))]" />,
     navigateTo: { label: 'Go to Storage', path: '/dashboard/storage' },
   },
@@ -61,18 +61,17 @@ const PROMPT_STEPS: PromptStep[] = [
     key: 'deployment',
     category: 'Sites',
     title: 'Deploy your site',
-    prompt:
-      'Use InsForge Skills to deploy this app on InsForge, after deploying, share the live URL.',
+    prompt: 'Use Yarah Skills to deploy this app on Yarah, after deploying, share the live URL.',
     icon: <Globe className="size-12 text-[rgb(var(--disabled))]" />,
     navigateTo: { label: 'Go to Sites', path: '/dashboard/deployments' },
   },
 ];
 
 const getStepperDismissKey = (projectId?: string) =>
-  `insforge-prompt-stepper-dismissed-${projectId || 'default'}`;
+  `yarah-prompt-stepper-dismissed-${projectId || 'default'}`;
 
 const getStepDoneKey = (projectId: string | null | undefined, stepKey: StepKey) =>
-  `insforge-ctest-step-${stepKey}-done-${projectId || 'default'}`;
+  `yarah-ctest-step-${stepKey}-done-${projectId || 'default'}`;
 
 // --- Prompt display ---
 

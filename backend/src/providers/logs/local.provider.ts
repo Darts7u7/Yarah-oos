@@ -1,7 +1,7 @@
 import { promises as fs, createReadStream } from 'fs';
 import { createInterface } from 'readline';
 import path from 'path';
-import { LogSchema, LogSourceSchema, LogStatsSchema } from '@insforge/shared-schemas';
+import { LogSchema, LogSourceSchema, LogStatsSchema } from '@yarahdev/shared-schemas';
 import { BaseLogProvider } from './base.provider.js';
 import { appConfig } from '@/infra/config/app.config.js';
 import logger from '@/utils/logger.js';
@@ -9,7 +9,7 @@ import logger from '@/utils/logger.js';
 export class LocalFileProvider extends BaseLogProvider {
   private logsDir: string = '';
   private logFiles = new Map<string, string>([
-    ['insforge.logs', 'insforge.logs.jsonl'],
+    ['yarah.logs', 'yarah.logs.jsonl'],
     ['postgres.logs', 'postgres.logs.jsonl'],
     ['postgREST.logs', 'postgrest.logs.jsonl'],
     ['function.logs', 'function.logs.jsonl'],

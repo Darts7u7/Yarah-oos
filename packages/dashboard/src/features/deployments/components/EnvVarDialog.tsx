@@ -9,8 +9,8 @@ import {
   DialogTitle,
   Input,
   useToast,
-} from '@insforge/ui';
-import type { DeploymentEnvVar } from '@insforge/shared-schemas';
+} from '@yarahdev/ui';
+import type { DeploymentEnvVar } from '@yarahdev/shared-schemas';
 import {
   createEnvVarDraft,
   normalizeEnvVarDrafts,

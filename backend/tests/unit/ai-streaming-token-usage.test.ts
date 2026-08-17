@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type OpenAI from 'openai';
-import type { ChatMessageSchema } from '@insforge/shared-schemas';
+import type { ChatMessageSchema } from '@yarahdev/shared-schemas';
 
 // Shared mock for the OpenRouter provider's sendRequest. Hoisted so the vi.mock
 // factory (itself hoisted above the imports) can close over it.

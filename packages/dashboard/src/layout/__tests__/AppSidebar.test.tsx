@@ -20,7 +20,7 @@ vi.mock('#lib/config/DashboardHostContext', () => ({
 
 vi.mock('#lib/utils/utils', async (importOriginal) => ({
   ...(await importOriginal<typeof import('#lib/utils/utils')>()),
-  isInsForgeCloudProject: () => true,
+  isYarahCloudProject: () => true,
 }));
 
 vi.mock('#lib/analytics/posthog', () => ({

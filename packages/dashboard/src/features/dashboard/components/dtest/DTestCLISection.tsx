@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CopyButton, cn } from '@insforge/ui';
+import { CopyButton, cn } from '@yarahdev/ui';
 import { useProjectId } from '#lib/hooks/useMetadata';
 import { useDashboardHost } from '#lib/config/DashboardHostContext';
 
@@ -11,17 +11,17 @@ interface DTestCLISectionProps {
 
 function buildCliPrompt(projectId: string | null | undefined, apiKey: string | null) {
   const id = projectId || '<project id>';
-  const loginLine = apiKey ? `npx @insforge/cli login --user-api-key ${apiKey}` : '<placeholder>';
+  const loginLine = apiKey ? `npx @yarah/cli login --user-api-key ${apiKey}` : '<placeholder>';
   return [
-    "I'm using InsForge as my backend. Login through:",
+    "I'm using Yarah as my backend. Login through:",
     '',
     loginLine,
     '',
-    'Then install the InsForge CLI and skills for this project, and link it with:',
+    'Then install the Yarah CLI and skills for this project, and link it with:',
     '',
-    `npx @insforge/cli link --project-id ${id}`,
+    `npx @yarah/cli link --project-id ${id}`,
     '',
-    'Use the InsForge CLI and skills for backend tasks.',
+    'Use the Yarah CLI and skills for backend tasks.',
   ].join('\n');
 }
 
@@ -88,7 +88,7 @@ export function DTestCLISection({ className, agentName }: DTestCLISectionProps) 
         <p className="text-sm leading-5 text-muted-foreground">
           {t('overview.pasteSetupPrompt', {
             agent: agentName || t('overview.yourAgent', { defaultValue: 'your agent' }),
-            defaultValue: 'Paste this into {{agent}} to install InsForge CLI and skills.',
+            defaultValue: 'Paste this into {{agent}} to install Yarah CLI and skills.',
           })}
         </p>
       </div>

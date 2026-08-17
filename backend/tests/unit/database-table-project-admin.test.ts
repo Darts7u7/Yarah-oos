@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ColumnType } from '@insforge/shared-schemas';
+import { ColumnType } from '@yarahdev/shared-schemas';
 import { DatabaseTableService } from '../../src/services/database/database-table.service';
 
 const queryMock = vi.fn();

@@ -8,7 +8,7 @@ import {
   ERROR_CODES,
   listMessagesRequestSchema,
   messageStatsRequestSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const router = Router();
 const messageService = RealtimeMessageService.getInstance();

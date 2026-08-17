@@ -8,7 +8,7 @@ export async function handle(_req: S3AuthenticatedRequest, res: Response): Promi
   const xml = toXml({
     ListAllMyBucketsResult: {
       $: { xmlns: 'http://s3.amazonaws.com/doc/2006-03-01/' },
-      Owner: { ID: 'insforge', DisplayName: 'insforge' },
+      Owner: { ID: 'yarah', DisplayName: 'yarah' },
       Buckets: {
         Bucket: buckets.map((b) => ({
           Name: b.name,

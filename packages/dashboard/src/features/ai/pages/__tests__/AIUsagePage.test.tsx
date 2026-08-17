@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AIOverview } from '@insforge/shared-schemas';
+import type { AIOverview } from '@yarahdev/shared-schemas';
 
 const hookMock = vi.hoisted(() => ({
   result: {

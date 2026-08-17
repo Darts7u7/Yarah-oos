@@ -10,7 +10,7 @@ import {
   adminTableRecordsDeleteRequestSchema,
   adminTableRecordsListQuerySchema,
   type AdminTableRecordsSortClause,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { AdminRecordService } from '@/services/database/admin-record.service.js';
 import {
   buildQualifiedTableKey,

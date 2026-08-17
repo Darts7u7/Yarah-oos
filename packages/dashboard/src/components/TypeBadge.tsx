@@ -1,4 +1,4 @@
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 
 interface TypeBadgeProps {
   type: string;

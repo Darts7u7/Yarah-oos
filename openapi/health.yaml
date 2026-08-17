@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Insforge Health API
+  title: Yarah Health API
   version: 1.0.0
 
 paths:
@@ -23,7 +23,7 @@ paths:
                     example: ok
                   service:
                     type: string
-                    example: Insforge Backend
+                    example: Yarah Backend
                   timestamp:
                     type: string
                     format: date-time

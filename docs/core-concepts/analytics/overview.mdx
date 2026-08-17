@@ -1,19 +1,19 @@
 ---
 title: "Analytics"
 sidebarTitle: "Overview"
-description: "Wire PostHog to your InsForge project to see traffic, retention, and session replay dashboards for your app without leaving the InsForge dashboard."
+description: "Wire PostHog to your Yarah project to see traffic, retention, and session replay dashboards for your app without leaving the Yarah dashboard."
 ---
 
-Use InsForge Analytics to understand how people actually use your app: page traffic, retention, and session replays, all wired up by connecting a PostHog project to your InsForge backend. Once connected, the dashboard renders Traffic, User Retention, and Session Replay pages on top of your PostHog data without leaving InsForge.
+Use Yarah Analytics to understand how people actually use your app: page traffic, retention, and session replays, all wired up by connecting a PostHog project to your Yarah backend. Once connected, the dashboard renders Traffic, User Retention, and Session Replay pages on top of your PostHog data without leaving Yarah.
 
 Connect PostHog once with one click, drop the setup prompt into your coding agent so it runs the PostHog wizard and installs the PostHog SDK on your frontend, and the Analytics pages start filling in.
 
 <Frame caption="Analytics dashboard: KPIs over time plus breakdowns by page, country, and device.">
-  <img src="/images/dashboard-analytics.png" alt="InsForge Analytics dashboard showing visitor KPIs, a visitor trend chart, and top pages, countries, and devices breakdowns" />
+  <img src="/images/dashboard-analytics.png" alt="Yarah Analytics dashboard showing visitor KPIs, a visitor trend chart, and top pages, countries, and devices breakdowns" />
 </Frame>
 
 <Note>
-  PostHog remains the source of truth for events, dashboards, insights, and recordings. InsForge surfaces a focused subset for everyday checks, then deep-links into PostHog for anything beyond it.
+  PostHog remains the source of truth for events, dashboards, insights, and recordings. Yarah surfaces a focused subset for everyday checks, then deep-links into PostHog for anything beyond it.
 </Note>
 
 ```mermaid
@@ -46,17 +46,17 @@ flowchart TB
 
 ### One-click PostHog connection
 
-Connect PostHog from the Analytics page in the dashboard. InsForge provisions or links a PostHog project for you, stores credentials server-side, and unlocks the Traffic, Retention, and Session Replay pages once the connection succeeds.
+Connect PostHog from the Analytics page in the dashboard. Yarah provisions or links a PostHog project for you, stores credentials server-side, and unlocks the Traffic, Retention, and Session Replay pages once the connection succeeds.
 
 ### SDK setup via PostHog wizard
 
 After connecting, the empty state ships a setup prompt you can paste into your coding agent:
 
 ```
-I want to add product analytics to this project. Read the current directory and use the InsForge skill to set up PostHog analytics by running `npx @insforge/cli posthog setup`.
+I want to add product analytics to this project. Read the current directory and use the Yarah skill to set up PostHog analytics by running `npx @yarah/cli posthog setup`.
 ```
 
-`@insforge/cli posthog setup` links your InsForge project to PostHog, then prints the official [PostHog wizard](https://posthog.com/docs/libraries/wizard) command (`npx -y @posthog/wizard@latest`) for you (or your agent) to run next. The wizard detects your framework, installs the right PostHog SDK, and drops in initialization code so pageviews, autocapture events, and session recordings start flowing.
+`@yarah/cli posthog setup` links your Yarah project to PostHog, then prints the official [PostHog wizard](https://posthog.com/docs/libraries/wizard) command (`npx -y @posthog/wizard@latest`) for you (or your agent) to run next. The wizard detects your framework, installs the right PostHog SDK, and drops in initialization code so pageviews, autocapture events, and session recordings start flowing.
 
 ### Traffic
 
@@ -72,7 +72,7 @@ A paginated list of recent session recordings with duration, person, and a deep-
 
 ### Settings and disconnect
 
-The Analytics Config dialog (the gear icon in the sidebar) lets admins review the linked PostHog project, jump straight into PostHog, and disconnect when needed. Disconnecting only severs the InsForge ↔ PostHog link; your PostHog project, events, and recordings stay intact.
+The Analytics Config dialog (the gear icon in the sidebar) lets admins review the linked PostHog project, jump straight into PostHog, and disconnect when needed. Disconnecting only severs the Yarah ↔ PostHog link; your PostHog project, events, and recordings stay intact.
 
 ## Concepts
 
@@ -97,8 +97,8 @@ The Analytics Config dialog (the gear icon in the sidebar) lets admins review th
     Capture custom events on top of what the wizard sets up.
   </Card>
 
-  <Card title="InsForge CLI" icon="terminal" href="/quickstart">
-    `npx @insforge/cli posthog setup` links your InsForge project to PostHog, then prints the wizard command.
+  <Card title="Yarah CLI" icon="terminal" href="/quickstart">
+    `npx @yarah/cli posthog setup` links your Yarah project to PostHog, then prints the wizard command.
   </Card>
 </CardGroup>
 

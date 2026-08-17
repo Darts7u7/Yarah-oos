@@ -5,7 +5,7 @@ test('signs in with mocked self-hosting admin credentials', async ({ page }) => 
   await mockSelfHostingDashboardApi(page);
 
   await page.goto('/dashboard/login');
-  await expect(page.getByRole('heading', { name: 'Insforge Admin' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Yarah Admin' })).toBeVisible();
 
   await page.locator('input[name="username"]').fill('admin');
   await page.locator('input[type="password"]').fill('test-admin-password-for-ci');
@@ -27,6 +27,6 @@ test('redirects unauthenticated dashboard visitors to the self-hosting login pag
   await page.goto('/dashboard');
 
   await expect(page).toHaveURL(/\/dashboard\/login$/);
-  await expect(page.getByRole('heading', { name: 'Insforge Admin' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Yarah Admin' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
 });

@@ -34,7 +34,7 @@ import {
   type GetStripeConfigResponse,
   type GetStripeStatusResponse,
   type StripeConnection,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export interface ManagedStripeWebhookSetup {
   endpointId: string;
@@ -661,9 +661,9 @@ export class StripeConfigService {
       enabledEvents: [...STRIPE_MANAGED_WEBHOOK_EVENTS],
       metadata: {
         ...STRIPE_MANAGED_WEBHOOK_METADATA,
-        insforge_environment: environment,
-        insforge_endpoint_path: `/api/webhooks/stripe/${environment}`,
-        insforge_endpoint_url: endpointUrl,
+        yarah_environment: environment,
+        yarah_endpoint_path: `/api/webhooks/stripe/${environment}`,
+        yarah_endpoint_url: endpointUrl,
       },
     });
 
@@ -695,7 +695,7 @@ export class StripeConfigService {
       try {
         await provider.deleteWebhookEndpoint(endpoint.id);
       } catch (error) {
-        logger.warn('Failed to delete existing InsForge-managed Stripe webhook endpoint', {
+        logger.warn('Failed to delete existing Yarah-managed Stripe webhook endpoint', {
           environment,
           webhookEndpointId: endpoint.id,
           error: error instanceof Error ? error.message : String(error),
@@ -710,8 +710,8 @@ export class StripeConfigService {
   ): boolean {
     return (
       endpoint.metadata?.managed_by === STRIPE_MANAGED_WEBHOOK_METADATA.managed_by &&
-      endpoint.metadata?.insforge_webhook === STRIPE_MANAGED_WEBHOOK_METADATA.insforge_webhook &&
-      endpoint.metadata?.insforge_environment === environment
+      endpoint.metadata?.yarah_webhook === STRIPE_MANAGED_WEBHOOK_METADATA.yarah_webhook &&
+      endpoint.metadata?.yarah_environment === environment
     );
   }
 

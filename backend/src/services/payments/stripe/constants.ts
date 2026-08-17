@@ -18,8 +18,8 @@ export function getStripeWebhookSecretName(environment: StripeEnvironment): stri
   return STRIPE_WEBHOOK_SECRET_BY_ENVIRONMENT[environment];
 }
 
-export const STRIPE_CHECKOUT_MODE_METADATA_KEY = 'insforge_checkout_mode';
-export const STRIPE_CHECKOUT_SESSION_METADATA_KEY = 'insforge_checkout_session_id';
+export const STRIPE_CHECKOUT_MODE_METADATA_KEY = 'yarah_checkout_mode';
+export const STRIPE_CHECKOUT_SESSION_METADATA_KEY = 'yarah_checkout_session_id';
 
 export const STRIPE_MANAGED_WEBHOOK_EVENTS = [
   'customer.created',
@@ -45,6 +45,6 @@ export const STRIPE_MANAGED_WEBHOOK_EVENTS = [
 ] as const;
 
 export const STRIPE_MANAGED_WEBHOOK_METADATA = {
-  managed_by: 'insforge',
-  insforge_webhook: 'stripe_payments',
+  managed_by: 'yarah',
+  yarah_webhook: 'stripe_payments',
 } as const;

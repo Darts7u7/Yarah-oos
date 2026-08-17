@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   useToast,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { analyticsQueryKeys } from '#features/analytics/hooks/useAnalytics';
 import { analyticsService } from '#features/analytics/services/analytics.service';
 
@@ -51,7 +51,7 @@ export function DisconnectDialog({ open, onClose }: { open: boolean; onClose: ()
           <p className="text-sm text-foreground">
             {t('analytics.disconnectBody', {
               defaultValue:
-                'Insforge will stop using your PostHog credentials. Your PostHog project itself will not be deleted; you can reconnect anytime.',
+                'Yarah will stop using your PostHog credentials. Your PostHog project itself will not be deleted; you can reconnect anytime.',
             })}
           </p>
         </DialogBody>

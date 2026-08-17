@@ -13,14 +13,14 @@ import {
   DialogTitle,
   TooltipProvider,
   cn,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { MCPSection } from './MCPSection';
 import { APIKeysSection } from './APIKeysSection';
 import { ConnectionStringSection } from './ConnectionStringSection';
 import { CLISection } from './CLISection';
 import { useApiKey, useAnonKey } from '#lib/hooks/useMetadata';
 import { useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
-import { getBackendUrl, isInsForgeCloudProject } from '#lib/utils/utils';
+import { getBackendUrl, isYarahCloudProject } from '#lib/utils/utils';
 import { JoinDiscordCta } from '#features/dashboard/components/JoinDiscordCta';
 
 type ConnectTabId = 'cli' | 'mcp' | 'connection-string' | 'api-keys';
@@ -47,7 +47,7 @@ interface ConnectDialogProps {
 export function ConnectDialog({ open, onOpenChange }: ConnectDialogProps) {
   const { t } = useTranslation('chrome');
   const isCloudHostingMode = useIsCloudHostingMode();
-  const isCloudProject = isInsForgeCloudProject();
+  const isCloudProject = isYarahCloudProject();
   const canShowCli = isCloudProject && isCloudHostingMode;
   const [activeTab, setActiveTab] = useState<ConnectTabId>(canShowCli ? 'cli' : 'mcp');
 
@@ -93,7 +93,7 @@ export function ConnectDialog({ open, onOpenChange }: ConnectDialogProps) {
                 </DialogTitle>
                 <DialogDescription className="sr-only">
                   {t('overview.connectProjectDescription', {
-                    defaultValue: 'Connect your project to the InsForge platform',
+                    defaultValue: 'Connect your project to the Yarah platform',
                   })}
                 </DialogDescription>
                 <div className="mt-3 flex items-start gap-6 overflow-x-auto">

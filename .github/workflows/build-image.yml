@@ -14,8 +14,8 @@ on:
 env:
   GHCR_REGISTRY: ghcr.io
   DOCKERHUB_REGISTRY: docker.io
-  DOCKERHUB_NAMESPACE: insforge
-  IMAGE_NAME: insforge-oss
+  DOCKERHUB_NAMESPACE: yarah
+  IMAGE_NAME: yarah-oss
 
 jobs:
   build-amd64:

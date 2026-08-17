@@ -1,6 +1,6 @@
 ---
 title: 实时 API 参考
-description: 使用 InsForge 实时 REST API 管理频道、查询消息历史，并通过原始 Socket.IO 端点执行发布与订阅，涵盖状态呈现与数据库变更事件的完整参考。
+description: 使用 Yarah 实时 REST API 管理频道、查询消息历史，并通过原始 Socket.IO 端点执行发布与订阅，涵盖状态呈现与数据库变更事件的完整参考。
 ---
 
 ## 概述
@@ -32,7 +32,7 @@ X-API-Key: <ik_api_key>
 Socket.IO 连接通过 Socket.IO `auth` 对象进行身份验证：
 
 ```javascript
-const socket = io('https://your-app.insforge.app', {
+const socket = io('https://your-app.apps.yarah.dev', {
   auth: {
     token: '<user-jwt-or-anon-token>'
   }
@@ -42,7 +42,7 @@ const socket = io('https://your-app.insforge.app', {
 服务器/管理员客户端可以传递 API 密钥：
 
 ```javascript
-const socket = io('https://your-app.insforge.app', {
+const socket = io('https://your-app.apps.yarah.dev', {
   auth: {
     apiKey: '<ik_api_key>'
   }
@@ -51,7 +51,7 @@ const socket = io('https://your-app.insforge.app', {
 
 ## Socket.IO 发布/订阅
 
-当您没有使用 InsForge SDK 时，请安装 Socket.IO 客户端：
+当您没有使用 Yarah SDK 时，请安装 Socket.IO 客户端：
 
 ```bash
 npm install socket.io-client
@@ -62,7 +62,7 @@ npm install socket.io-client
 ```javascript
 import { io } from 'socket.io-client';
 
-const socket = io('https://your-app.insforge.app', {
+const socket = io('https://your-app.apps.yarah.dev', {
   auth: {
     token: '<user-jwt-or-anon-token>'
   }
@@ -156,7 +156,7 @@ GET /api/realtime/channels
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/realtime/channels" \
+curl "https://your-app.apps.yarah.dev/api/realtime/channels" \
   -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>"
 ```
 
@@ -192,7 +192,7 @@ POST /api/realtime/channels
 | `enabled` | `boolean` | 否 | 默认为`true`。禁用的通道无法加入或交付到。 |
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/realtime/channels" \
+curl -X POST "https://your-app.apps.yarah.dev/api/realtime/channels" \
   -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -216,7 +216,7 @@ PUT /api/realtime/channels/{id}
 ```
 
 ```bash
-curl -X PUT "https://your-app.insforge.app/api/realtime/channels/550e8400-e29b-41d4-a716-446655440000" \
+curl -X PUT "https://your-app.apps.yarah.dev/api/realtime/channels/550e8400-e29b-41d4-a716-446655440000" \
   -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -257,7 +257,7 @@ GET /api/realtime/messages
 | `offset` | `integer` | 默认为0。 |
 
 ```bash
-curl "https://your-app.insforge.app/api/realtime/messages?eventName=status_changed&limit=50" \
+curl "https://your-app.apps.yarah.dev/api/realtime/messages?eventName=status_changed&limit=50" \
   -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>"
 ```
 
@@ -365,7 +365,7 @@ PATCH /api/realtime/config
 ```
 
 ```bash
-curl -X PATCH "https://your-app.insforge.app/api/realtime/config" \
+curl -X PATCH "https://your-app.apps.yarah.dev/api/realtime/config" \
   -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -383,8 +383,8 @@ curl -X PATCH "https://your-app.insforge.app/api/realtime/config" \
 
 | 标头 | 值 |
 |--------|-------|
-| `X-InsForge-Event` | 事件名称 |
-| `X-InsForge-Channel` | 已解决的通道名称 |
-| `X-InsForge-Message-Id` | 消息UUID |
+| `X-Yarah-Event` | 事件名称 |
+| `X-Yarah-Channel` | 已解决的通道名称 |
+| `X-Yarah-Message-Id` | 消息UUID |
 
 交付尝试反映在消息历史中的`whAudienceCount`和`whDeliveredCount`中。

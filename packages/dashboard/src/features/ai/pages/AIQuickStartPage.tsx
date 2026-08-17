@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, CopyButton, Tab, Tabs, cn } from '@insforge/ui';
+import { Button, CopyButton, Tab, Tabs, cn } from '@yarahdev/ui';
 import { CodeEditor } from '#components';
 import { useOpenRouterKey } from '#features/ai/hooks/useOpenRouterKey';
 import {

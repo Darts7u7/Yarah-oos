@@ -1,21 +1,21 @@
 ---
 title: Vue
-description: Create an InsForge project and build a full-stack Vue app with the CLI and MCP, using AI editors like Cursor for schemas, queries, and deploys.
+description: Create an Yarah project and build a full-stack Vue app with the CLI and MCP, using AI editors like Cursor for schemas, queries, and deploys.
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
 
-Learn how to create an InsForge project and build a Vue app using AI tools like Cursor.
+Learn how to create an Yarah project and build a Vue app using AI tools like Cursor.
 
-## 1. Create an InsForge project
+## 1. Create an Yarah project
 
-Create a new InsForge project at [insforge.dev](https://insforge.dev).
+Create a new Yarah project at [yarah.dev](https://yarah.dev).
 
-## 2. Connect InsForge
+## 2. Connect Yarah
 
 Two pieces:
 
-- **CLI link** — see the [Quickstart](/quickstart) to run `npx @insforge/cli link --project-id <your-project-id>` so the agent can read your project ID and keys.
+- **CLI link** — see the [Quickstart](/quickstart) to run `npx @yarah/cli link --project-id <your-project-id>` so the agent can read your project ID and keys.
 - **MCP setup** — see [MCP Setup](/mcp-setup) for the per-editor config (Cursor, Claude Code, Windsurf, Codex, VS Code).
 
 With both wired up the agent can read schemas, run queries, and deploy code from your editor.
@@ -27,9 +27,9 @@ In Cursor or your AI assistant, use this prompt:
 ```
 Create a new Vue app with TypeScript and Vite.
 Add Tailwind CSS 3.4 for styling.
-Install the InsForge SDK and set up the client configuration.
+Install the Yarah SDK and set up the client configuration.
 
-In my InsForge database, create a sports table with id and name columns.
+In my Yarah database, create a sports table with id and name columns.
 Add sample data: basketball, soccer, and tennis. Make it publicly readable.
 
 Create a component that fetches and displays all sports from the database.
@@ -41,13 +41,13 @@ Your AI will generate the complete application including database setup and UI. 
 
 Your AI assistant will automatically create files like these. You don't need to touch them manually.
 
-**InsForge client** at `src/lib/insforge.ts`:
+**Yarah client** at `src/lib/yarah.ts`:
 
-```typescript src/lib/insforge.ts
+```typescript src/lib/yarah.ts
 import { createClient } from '@insforge/sdk';
 
-export const insforge = createClient({
-  baseUrl: 'https://your-project.us-east.insforge.app',
+export const yarah = createClient({
+  baseUrl: 'https://your-project.us-east.apps.yarah.dev',
   anonKey: 'your-anon-key'
 });
 ```
@@ -86,7 +86,7 @@ export const insforge = createClient({
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { insforge } from '../lib/insforge';
+import { yarah } from '../lib/yarah';
 
 interface Sport {
   id: string;
@@ -103,7 +103,7 @@ const fetchSports = async () => {
     loading.value = true;
     error.value = null;
 
-    const { data, error: fetchError } = await insforge.database
+    const { data, error: fetchError } = await yarah.database
       .from('sports')
       .select();
 
@@ -154,11 +154,11 @@ Store favorites in a user_favorites table with user_id and sport_id.
 ```
 
 ```
-Add images to each sport using InsForge Storage.
+Add images to each sport using Yarah Storage.
 Allow users to upload sport images and display them in the grid.
 ```
 
 ```
 Add an AI chat feature that can answer questions about sports.
-Use InsForge AI with streaming responses.
+Use Yarah AI with streaming responses.
 ```

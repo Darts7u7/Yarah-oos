@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import type { AppError } from '@/utils/errors.js';
 
 // --- Mocks ---
@@ -30,7 +30,7 @@ vi.mock('@/infra/config/app.config.js', () => {
       org: 'test-org',
       domain: 'fly.dev',
     },
-    docker: { socketPath: '/nonexistent/insforge-test-docker.sock' },
+    docker: { socketPath: '/nonexistent/yarah-test-docker.sock' },
     cloud: {
       projectId: '',
       apiHost: '',
@@ -432,7 +432,7 @@ describe('ComputeServicesService', () => {
             memory: 512,
             region: 'local',
             provider: 'docker',
-            provider_app_id: 'insforge-local-worker',
+            provider_app_id: 'yarah-local-worker',
             provider_instance_id: 'container-abc',
             status: 'running',
             endpoint_url: null,
@@ -610,7 +610,7 @@ describe('ComputeServicesService', () => {
       };
       const build = vi
         .fn()
-        .mockResolvedValue({ imageTag: 'insforge-x/api:abc', logs: ['Step 1/2'] });
+        .mockResolvedValue({ imageTag: 'yarah-x/api:abc', logs: ['Step 1/2'] });
       const prune = vi.fn().mockResolvedValue({ removed: 1 });
       (mockFlyInstance as Record<string, unknown>).buildFromContext = build;
       (mockFlyInstance as Record<string, unknown>).pruneServiceImages = prune;
@@ -620,7 +620,7 @@ describe('ComputeServicesService', () => {
       mockQuery.mockResolvedValueOnce({ rows: [{ env_vars_encrypted: null }] });
       mockUpdateMachine.mockResolvedValue({});
       mockQuery.mockResolvedValueOnce({
-        rows: [{ ...serviceRow(), image_url: 'insforge-x/api:abc' }],
+        rows: [{ ...serviceRow(), image_url: 'yarah-x/api:abc' }],
       });
 
       const result = await service.buildAndDeploy('svc-b1', Buffer.from('tar-bytes'), {
@@ -630,10 +630,10 @@ describe('ComputeServicesService', () => {
       expect(build).toHaveBeenCalledWith(
         expect.objectContaining({ serviceName: 'api', dockerfile: 'Dockerfile.prod' })
       );
-      expect(result.imageTag).toBe('insforge-x/api:abc');
+      expect(result.imageTag).toBe('yarah-x/api:abc');
       // Deployment goes through updateService, so the tested recreate/instance-id
       // bookkeeping applies rather than a second copy of it.
-      expect(mockUpdateMachine.mock.calls[0][0].image).toBe('insforge-x/api:abc');
+      expect(mockUpdateMachine.mock.calls[0][0].image).toBe('yarah-x/api:abc');
       expect(prune).toHaveBeenCalledWith('api');
 
       delete (mockFlyInstance as Record<string, unknown>).buildFromContext;
@@ -670,7 +670,7 @@ describe('ComputeServicesService', () => {
       const prune = vi.fn().mockResolvedValue({ removed: 1 });
       (mockFlyInstance as Record<string, unknown>).buildFromContext = vi
         .fn()
-        .mockResolvedValue({ imageTag: 'insforge-x/api:abc', logs: [] });
+        .mockResolvedValue({ imageTag: 'yarah-x/api:abc', logs: [] });
       (mockFlyInstance as Record<string, unknown>).pruneServiceImages = prune;
 
       mockQuery.mockResolvedValueOnce({ rows: [serviceRow()] }); // getService in buildAndDeploy
@@ -2340,7 +2340,7 @@ describe('selectComputeProvider factory', () => {
     vi.doMock('@/infra/config/app.config.js', () => {
       const c = {
         fly: { apiToken: 'tok', org: 'o', enabled: true, domain: 'd' },
-        docker: { socketPath: '/nonexistent/insforge-test-docker.sock' },
+        docker: { socketPath: '/nonexistent/yarah-test-docker.sock' },
         cloud: { projectId: 'local', apiHost: '' },
         app: { jwtSecret: 'x' },
       };
@@ -2359,7 +2359,7 @@ describe('selectComputeProvider factory', () => {
     vi.doMock('@/infra/config/app.config.js', () => {
       const c = {
         fly: { apiToken: '', org: '', enabled: false, domain: '' },
-        docker: { socketPath: '/nonexistent/insforge-test-docker.sock' },
+        docker: { socketPath: '/nonexistent/yarah-test-docker.sock' },
         cloud: { projectId: 'p', apiHost: 'https://x' },
         app: { jwtSecret: 'x' },
       };
@@ -2377,7 +2377,7 @@ describe('selectComputeProvider factory', () => {
     vi.doMock('@/infra/config/app.config.js', () => {
       const c = {
         fly: { apiToken: '', org: '', enabled: false, domain: '' },
-        docker: { socketPath: '/nonexistent/insforge-test-docker.sock' },
+        docker: { socketPath: '/nonexistent/yarah-test-docker.sock' },
         cloud: { projectId: 'local', apiHost: '' },
         app: { jwtSecret: 'x' },
       };
@@ -2396,7 +2396,7 @@ describe('buildComputeRegistry', () => {
     vi.doMock('@/infra/config/app.config.js', () => {
       const c = {
         fly: { apiToken: 'tok', org: 'o', enabled: true, domain: 'd' },
-        docker: { socketPath: '/nonexistent/insforge-test-docker.sock' },
+        docker: { socketPath: '/nonexistent/yarah-test-docker.sock' },
         cloud: { projectId: 'p', apiHost: 'https://x' },
         app: { jwtSecret: 'x' },
       };
@@ -2409,7 +2409,7 @@ describe('buildComputeRegistry', () => {
     vi.doMock('@/infra/config/app.config.js', () => {
       const c = {
         fly: { apiToken: 'tok', org: 'o', enabled: true, domain: 'd' },
-        docker: { socketPath: '/nonexistent/insforge-test-docker.sock' },
+        docker: { socketPath: '/nonexistent/yarah-test-docker.sock' },
         cloud: { projectId: 'local', apiHost: '' },
         app: { jwtSecret: 'x' },
       };
@@ -2476,7 +2476,7 @@ describe('buildComputeRegistry', () => {
     vi.doMock('@/infra/config/app.config.js', () => {
       const c = {
         fly: { apiToken: '', org: '', enabled: false, domain: '' },
-        docker: { socketPath: '/nonexistent/insforge-test-docker.sock' },
+        docker: { socketPath: '/nonexistent/yarah-test-docker.sock' },
         cloud: { projectId: 'local', apiHost: '' },
         app: { jwtSecret: 'x' },
       };
@@ -2494,7 +2494,7 @@ describe('buildComputeRegistry', () => {
     const next = (thrown as { nextActions?: string }).nextActions ?? '';
     expect(next).toMatch(/Docker socket/);
     expect(next).toMatch(/uncomment the Docker socket volume/i);
-    expect(next).toMatch(/insforge-test-docker\.sock/);
+    expect(next).toMatch(/yarah-test-docker\.sock/);
     expect(next).toMatch(/FLY_API_TOKEN/);
     // Docker first: it is the option a self-hoster can act on without signing up.
     expect(next.indexOf('Docker socket')).toBeLessThan(next.indexOf('FLY_API_TOKEN'));
@@ -2509,13 +2509,13 @@ describe('buildComputeRegistry', () => {
     process.env.COMPUTE_PROVIDER = 'docker';
     const { buildComputeRegistry } = await import('@/services/compute/services.service.js');
     expect(() => buildComputeRegistry()).toThrow(
-      /no Docker socket at .*insforge-test-docker\.sock/
+      /no Docker socket at .*yarah-test-docker\.sock/
     );
   });
 
   // The Docker driver's safety argument is that the operator and the developer
   // deploying containers are the same principal. On a cloud-managed project they
-  // are not — the operator is InsForge and the developer is a customer — so a
+  // are not — the operator is Yarah and the developer is a customer — so a
   // customer creating containers on shared infrastructure is a tenant escape.
   // Fail closed, and say the real reason rather than blaming a missing socket.
   // A PaaS-supplied PROJECT_ID used to satisfy CloudComputeProvider.isConfigured(),
@@ -2524,8 +2524,8 @@ describe('buildComputeRegistry', () => {
     vi.doMock('@/infra/config/app.config.js', () => {
       const c = {
         fly: { apiToken: '', org: '', enabled: false, domain: '' },
-        docker: { socketPath: '/nonexistent/insforge-test-docker.sock' },
-        cloud: { projectId: 'zeabur-project-1', apiHost: 'https://api.insforge.dev' },
+        docker: { socketPath: '/nonexistent/yarah-test-docker.sock' },
+        cloud: { projectId: 'zeabur-project-1', apiHost: 'https://api.yarah.dev' },
         app: { jwtSecret: 'x' },
       };
       return { config: c, appConfig: c };
@@ -2562,7 +2562,7 @@ describe('buildComputeRegistry', () => {
     vi.doMock('@/infra/config/app.config.js', () => {
       const c = {
         fly: { apiToken: '', org: '', enabled: false, domain: '' },
-        docker: { socketPath: '/nonexistent/insforge-test-docker.sock' },
+        docker: { socketPath: '/nonexistent/yarah-test-docker.sock' },
         cloud: { projectId: 'local', apiHost: '' },
         app: { jwtSecret: 'x' },
       };
@@ -2584,7 +2584,7 @@ describe('buildComputeRegistry', () => {
     vi.doMock('@/infra/config/app.config.js', () => {
       const c = {
         fly: { apiToken: '', org: '', enabled: false, domain: '' },
-        docker: { socketPath: '/nonexistent/insforge-test-docker.sock' },
+        docker: { socketPath: '/nonexistent/yarah-test-docker.sock' },
         cloud: { projectId: 'p', apiHost: 'https://x' },
         app: { jwtSecret: 'x' },
       };

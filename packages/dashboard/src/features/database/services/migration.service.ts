@@ -1,5 +1,5 @@
 import { apiClient } from '#lib/api/client';
-import type { DatabaseMigrationsResponse } from '@insforge/shared-schemas';
+import type { DatabaseMigrationsResponse } from '@yarahdev/shared-schemas';
 
 export class MigrationService {
   async listMigrations(): Promise<DatabaseMigrationsResponse> {

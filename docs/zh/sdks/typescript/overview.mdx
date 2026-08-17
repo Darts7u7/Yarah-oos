@@ -1,9 +1,9 @@
 ---
-title: InsForge TypeScript 和 JavaScript SDK
-description: 在 Node、浏览器和边缘运行时中安装和初始化官方 InsForge TypeScript SDK，以使用身份验证、数据库、存储和实时功能。
+title: Yarah TypeScript 和 JavaScript SDK
+description: 在 Node、浏览器和边缘运行时中安装和初始化官方 Yarah TypeScript SDK，以使用身份验证、数据库、存储和实时功能。
 ---
 
-InsForge TypeScript SDK 为 JavaScript 和 TypeScript 应用程序提供了一个类型安全的客户端，用于与 InsForge 服务交互。
+Yarah TypeScript SDK 为 JavaScript 和 TypeScript 应用程序提供了一个类型安全的客户端，用于与 Yarah 服务交互。
 
 ## 安装
 
@@ -16,8 +16,8 @@ import Installation from '/snippets/sdk-installation.mdx';
 ```typescript
 import { createClient } from '@insforge/sdk';
 
-const insforge = createClient({
-  baseUrl: 'https://your-app.insforge.app',
+const yarah = createClient({
+  baseUrl: 'https://your-app.apps.yarah.dev',
   anonKey: 'your-anon-key'  // Optional: for public/unauthenticated requests
 });
 ```

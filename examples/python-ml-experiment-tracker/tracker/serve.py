@@ -19,7 +19,7 @@ _STATIC_DIR = pathlib.Path(__file__).parent / "static"
 def make_proxy_handler(server_url: str, token_lock: threading.Lock) -> type:
     """Build and return a BaseHTTPRequestHandler subclass bound to *server_url* and *token_lock*."""
     class ProxyHandler(http.server.BaseHTTPRequestHandler):
-        """HTTP handler that serves the dashboard UI and proxies /api/* calls to InsForge."""
+        """HTTP handler that serves the dashboard UI and proxies /api/* calls to Yarah."""
 
         _server_url = server_url
         _lock = token_lock
@@ -49,7 +49,7 @@ def make_proxy_handler(server_url: str, token_lock: threading.Lock) -> type:
             self.wfile.write(data)
 
         def _proxy_api(self) -> None:
-            """Forward an /api/* request to InsForge, handling auth and transparent token refresh."""
+            """Forward an /api/* request to Yarah, handling auth and transparent token refresh."""
             cfg = load_config()
             if not cfg.access_token:
                 self._send_json_error(
@@ -67,11 +67,11 @@ def make_proxy_handler(server_url: str, token_lock: threading.Lock) -> type:
             except httpx.ConnectError:
                 self._send_json_error(
                     502, "UPSTREAM_UNAVAILABLE",
-                    f"Cannot connect to InsForge at {self._server_url}"
+                    f"Cannot connect to Yarah at {self._server_url}"
                 )
                 return
             except httpx.TimeoutException:
-                self._send_json_error(504, "UPSTREAM_TIMEOUT", "InsForge request timed out.")
+                self._send_json_error(504, "UPSTREAM_TIMEOUT", "Yarah request timed out.")
                 return
 
             if resp.status_code == 401:
@@ -84,7 +84,7 @@ def make_proxy_handler(server_url: str, token_lock: threading.Lock) -> type:
                 try:
                     resp = self._attempt_upstream(upstream, new_token)
                 except (httpx.ConnectError, httpx.TimeoutException):
-                    self._send_json_error(502, "UPSTREAM_UNAVAILABLE", "InsForge unreachable.")
+                    self._send_json_error(502, "UPSTREAM_UNAVAILABLE", "Yarah unreachable.")
                     return
 
             body = resp.content
@@ -97,7 +97,7 @@ def make_proxy_handler(server_url: str, token_lock: threading.Lock) -> type:
             self.wfile.write(body)
 
         def _attempt_upstream(self, url: str, access_token: str) -> httpx.Response:
-            """Make a single authenticated GET request to the InsForge upstream URL."""
+            """Make a single authenticated GET request to the Yarah upstream URL."""
             with httpx.Client(timeout=15.0) as client:
                 return client.get(url, headers={"Authorization": f"Bearer {access_token}"})
 
@@ -151,7 +151,7 @@ def make_proxy_handler(server_url: str, token_lock: threading.Lock) -> type:
 @click.option("--port", default=8765, show_default=True, help="Port to listen on.")
 @click.option("--no-browser", is_flag=True, default=False, help="Do not open the browser automatically.")
 def cmd_serve(port: int, no_browser: bool) -> None:
-    """Start the local web dashboard (proxies API calls to InsForge)."""
+    """Start the local web dashboard (proxies API calls to Yarah)."""
     from rich.console import Console
     from rich.panel import Panel
 

@@ -1,26 +1,26 @@
 ---
 title: "訊息傳遞概覽"
 sidebarTitle: "Overview"
-description: "透過 InsForge 託管寄件服務或自訂 SMTP 寄送交易性電子郵件，未來 SMS 與推送通知將共用相同 API 介面。"
+description: "透過 Yarah 託管寄件服務或自訂 SMTP 寄送交易性電子郵件，未來 SMS 與推送通知將共用相同 API 介面。"
 ---
 
-InsForge Messaging 從您的專案傳送交易性通知：收據、摘要、密碼重設代碼、通知匯總、任何您本來會為其接入 SendGrid、Postmark 或 Twilio 的東西。電子郵件是第一個通道；SMS 和推送在路線圖上，將共享相同的 API 表面。
+Yarah Messaging 從您的專案傳送交易性通知：收據、摘要、密碼重設代碼、通知匯總、任何您本來會為其接入 SendGrid、Postmark 或 Twilio 的東西。電子郵件是第一個通道；SMS 和推送在路線圖上，將共享相同的 API 表面。
 
 <Note>
   **只是傳送驗證電子郵件？** 魔法連結、驗證代碼和密碼重設已內建在 [Authentication](/core-concepts/authentication/overview) 中。您只需要這個產品用於驗證之外的交易性訊息。
 </Note>
 
 <Warning>
-  **自託管？** 託管的 InsForge Cloud 寄件服務僅對已連接雲端的專案可用。在自託管實例上，必須先設定 [Custom SMTP](/core-concepts/messaging/custom-smtp)，任何電子郵件才能發出，包括驗證郵件。郵件提供方可用前，InsForge 會拒絕開啟強制電子郵件驗證；驗證仍為強制狀態時，也無法關閉唯一的 SMTP 提供方。如果註冊時驗證郵件傳送失敗，API 會傳回錯誤，並提示透過 `POST /api/auth/email/send-verification` 重試。
+  **自託管？** 託管的 Yarah Cloud 寄件服務僅對已連接雲端的專案可用。在自託管實例上，必須先設定 [Custom SMTP](/core-concepts/messaging/custom-smtp)，任何電子郵件才能發出，包括驗證郵件。郵件提供方可用前，Yarah 會拒絕開啟強制電子郵件驗證；驗證仍為強制狀態時，也無法關閉唯一的 SMTP 提供方。如果註冊時驗證郵件傳送失敗，API 會傳回錯誤，並提示透過 `POST /api/auth/email/send-verification` 重試。
 </Warning>
 
 ```mermaid
 graph TB
-    Client[Client Application] --> SDK[InsForge SDK]
+    Client[Client Application] --> SDK[Yarah SDK]
     SDK --> API[Email API]
     API --> Service[EmailService]
     Service --> Decision{SMTP enabled?}
-    Decision -->|No| Cloud[InsForge Cloud]
+    Decision -->|No| Cloud[Yarah Cloud]
     Cloud --> SES[AWS SES]
     Decision -->|Yes| SMTP[Your SMTP server]
     SES --> Inbox[Recipient Inbox]
@@ -61,11 +61,11 @@ graph TB
 
 ### 託管交付或使用您自己的
 
-透過 InsForge Cloud（今天用於電子郵件的 AWS SES）傳送以獲得零設定，或在您需要控制交付能力和寄件人聲譽時插入您自己的提供商。請參閱 [Custom SMTP](/core-concepts/messaging/custom-smtp)。
+透過 Yarah Cloud（今天用於電子郵件的 AWS SES）傳送以獲得零設定，或在您需要控制交付能力和寄件人聲譽時插入您自己的提供商。請參閱 [Custom SMTP](/core-concepts/messaging/custom-smtp)。
 
 ### 範本
 
-按名稱選擇範本，傳遞變數，InsForge 呈現並傳送。範本可編輯每個專案；四個驗證範本 (`email-verification-*`、`reset-password-*`) 帶有合理的預設值。
+按名稱選擇範本，傳遞變數，Yarah 呈現並傳送。範本可編輯每個專案；四個驗證範本 (`email-verification-*`、`reset-password-*`) 帶有合理的預設值。
 
 ### 交付追蹤
 

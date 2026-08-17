@@ -5,7 +5,7 @@ import {
   ERROR_CODES,
   type ImageGenerationRequest,
   type ImageGenerationResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 import { OpenRouterImageMessage } from '@/types/ai.js';
 import { AppError } from '@/utils/errors.js';

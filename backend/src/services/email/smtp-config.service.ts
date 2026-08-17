@@ -9,7 +9,7 @@ import {
   ERROR_CODES,
   type SmtpConfigSchema,
   type UpsertSmtpConfigRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 import { isCloudEnvironment } from '@/utils/environment.js';
 import {

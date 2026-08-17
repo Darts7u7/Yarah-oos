@@ -3,7 +3,7 @@ import {
   updateDatabaseConfigRequestSchema,
   type GetDatabaseConfigResponse,
   type UpdateDatabaseConfigResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { verifyAdmin, AuthRequest } from '@/api/middlewares/auth.js';
 import { parseZodSchema } from '@/utils/zod.js';
 import { DatabaseBackupService } from '@/services/database/database-backup.service.js';

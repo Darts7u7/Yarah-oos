@@ -1,5 +1,5 @@
 import { AppError, UpstreamError } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { appConfig } from '@/infra/config/app.config.js';
 import logger from '@/utils/logger.js';
 import { z } from 'zod';
@@ -15,11 +15,11 @@ const execFileAsync = promisify(execFile);
 
 // Ambient declaration for the Deno isolate IPC dispatch binding.
 // This global is intentionally set on globalThis inside each generated
-// Deno router script so the InsForge host can reach into the isolate
+// Deno router script so the Yarah host can reach into the isolate
 // for in-process function invocation. Typing it here prevents any
 // TypeScript code in this module from resorting to `(globalThis as any)`.
 declare global {
-  var __insforge_dispatch__: ((req: Request) => Promise<Response>) | undefined;
+  var __yarah_dispatch__: ((req: Request) => Promise<Response>) | undefined;
 }
 
 const DENO_SUBHOSTING_API_BASE = 'https://api.deno.com/v2';
@@ -326,8 +326,8 @@ export class DenoSubhostingProvider {
   /**
    * Ensure the Deno app exists, creating it if not.
    *
-   * The app slug = APP_KEY. Combined with our org slug (`insforge`), Deno serves
-   * the app at `{slug}.insforge.deno.net`; the public function URL is the
+   * The app slug = APP_KEY. Combined with our org slug (`yarah`), Deno serves
+   * the app at `{slug}.yarah.deno.net`; the public function URL is the
    * CloudFront proxy in front of that (see docs/deno-subhosting.md §4.1).
    */
   private async ensureApp(slug: string): Promise<void> {
@@ -386,8 +386,8 @@ export class DenoSubhostingProvider {
 
   /**
    * Build the public function URL for an app slug. Points at the CloudFront
-   * proxy domain (appConfig.denoSubhosting.domain, e.g. `function2.insforge.app`),
-   * which forwards to `{slug}.insforge.deno.net`.
+   * proxy domain (appConfig.denoSubhosting.domain, e.g. `function2.apps.yarah.dev`),
+   * which forwards to `{slug}.yarah.deno.net`.
    */
   private getFunctionUrl(slug: string): string {
     return `https://${slug}.${appConfig.denoSubhosting.domain}`;
@@ -426,7 +426,7 @@ export class DenoSubhostingProvider {
       );
     }
 
-    const tempDir = await mkdtemp(join(tmpdir(), 'insforge-deno-check-'));
+    const tempDir = await mkdtemp(join(tmpdir(), 'yarah-deno-check-'));
 
     try {
       await writeFile(
@@ -979,7 +979,7 @@ export class DenoSubhostingProvider {
 import { createClient } from 'npm:@insforge/sdk';
 
 declare global {
-  var __insforge_dispatch__: (req: Request) => Promise<Response>;
+  var __yarah_dispatch__: (req: Request) => Promise<Response>;
 }
 
 const _legacyModule: { exports: unknown } = { exports: {} };
@@ -989,7 +989,7 @@ ${userCode}
 
 export default _legacyModule.exports as (req: Request) => Promise<Response>;
 
-globalThis.__insforge_dispatch__ = (req: Request) => (_legacyModule.exports as (req: Request) => Promise<Response>)(req);
+globalThis.__yarah_dispatch__ = (req: Request) => (_legacyModule.exports as (req: Request) => Promise<Response>)(req);
 `;
   }
 
@@ -1002,7 +1002,7 @@ globalThis.__insforge_dispatch__ = (req: Request) => (_legacyModule.exports as (
       return `
 // Auto-generated router (no functions)
 declare global {
-  var __insforge_dispatch__: (req: Request) => Promise<Response>;
+  var __yarah_dispatch__: (req: Request) => Promise<Response>;
 }
 export {};
 
@@ -1013,7 +1013,7 @@ const dispatch = async (req: Request): Promise<Response> => {
   if (pathname === "/health" || pathname === "/") {
     return new Response(JSON.stringify({
       status: "ok",
-      type: "insforge-functions",
+      type: "yarah-functions",
       functions: [],
       timestamp: new Date().toISOString(),
     }), {
@@ -1029,7 +1029,7 @@ const dispatch = async (req: Request): Promise<Response> => {
   });
 };
 
-globalThis.__insforge_dispatch__ = dispatch;
+globalThis.__yarah_dispatch__ = dispatch;
 
 Deno.serve(dispatch);
 `;
@@ -1047,7 +1047,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 ${imports}
 
 declare global {
-  var __insforge_dispatch__: (req: Request) => Promise<Response>;
+  var __yarah_dispatch__: (req: Request) => Promise<Response>;
 }
 
 const routes: Record<string, (req: Request) => Promise<Response>> = {
@@ -1079,7 +1079,7 @@ const dispatch = async (req: Request): Promise<Response> => {
     if (pathname === "/health" || pathname === "/") {
       return new Response(JSON.stringify({
         status: "ok",
-        type: "insforge-functions",
+        type: "yarah-functions",
         functions: Object.keys(routes),
         timestamp: new Date().toISOString(),
       }), {
@@ -1118,7 +1118,7 @@ const dispatch = async (req: Request): Promise<Response> => {
       const response = await handler(funcReq);
       const duration = Date.now() - startTime;
 
-      // Structured JSON log — matches InsForge backend log format:
+      // Structured JSON log — matches Yarah backend log format:
       // { timestamp, slug, method, status, duration }. Captured by the
       // Deno Deploy platform from stdout and surfaced as app logs.
       console.log(JSON.stringify({
@@ -1143,8 +1143,8 @@ const dispatch = async (req: Request): Promise<Response> => {
   });
 };
 
-// __insforge_dispatch__ bridges the isolate boundary for in-process dispatch.
-globalThis.__insforge_dispatch__ = dispatch;
+// __yarah_dispatch__ bridges the isolate boundary for in-process dispatch.
+globalThis.__yarah_dispatch__ = dispatch;
 
 Deno.serve(dispatch);
 `;

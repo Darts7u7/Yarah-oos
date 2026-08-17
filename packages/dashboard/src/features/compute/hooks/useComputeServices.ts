@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { computeServicesApi } from '#features/compute/services/compute.service';
-import type { CreateServiceRequestInput, UpdateServiceRequest } from '@insforge/shared-schemas';
-import { useToast } from '@insforge/ui';
+import type { CreateServiceRequestInput, UpdateServiceRequest } from '@yarahdev/shared-schemas';
+import { useToast } from '@yarahdev/ui';
 import { deriveHealth, type ServiceHealth } from '#features/compute/lib/health';
 
 /**

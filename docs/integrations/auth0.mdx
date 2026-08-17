@@ -1,19 +1,19 @@
 ---
 title: "Auth0 Authentication"
 sidebarTitle: "Auth0"
-description: "Add Auth0 enterprise authentication and SSO to your InsForge backend. Step-by-step setup for JWT validation, RLS policies, and user sync."
+description: "Add Auth0 enterprise authentication and SSO to your Yarah backend. Step-by-step setup for JWT validation, RLS policies, and user sync."
 ---
 
 ## Overview
 
-[Auth0](https://auth0.com) is an authentication and authorization platform that supports social logins, enterprise federation, and passwordless authentication. This guide shows how to integrate Auth0 with InsForge in a Next.js application. Auth0 handles authentication, while InsForge manages data authorization through Row Level Security (RLS) policies. On each server request, the app signs a fresh InsForge JWT from the Auth0 session using your InsForge secret, so InsForge accepts it natively.
+[Auth0](https://auth0.com) is an authentication and authorization platform that supports social logins, enterprise federation, and passwordless authentication. This guide shows how to integrate Auth0 with Yarah in a Next.js application. Auth0 handles authentication, while Yarah manages data authorization through Row Level Security (RLS) policies. On each server request, the app signs a fresh Yarah JWT from the Auth0 session using your Yarah secret, so Yarah accepts it natively.
 
-- [Live Demo](https://auth0auth.insforge.site) — A sample app using Auth0 authentication with InsForge
-- [Source Code](https://github.com/InsForge/insforge-integration/tree/main/auth/auth0) — GitHub repository for the sample app
+- [Live Demo](https://auth0auth.yarah.site) — A sample app using Auth0 authentication with Yarah
+- [Source Code](https://github.com/Yarah/yarah-integration/tree/main/auth/auth0) — GitHub repository for the sample app
 
 ## Prerequisites
 
-- An InsForge project (self-hosted or cloud)
+- An Yarah project (self-hosted or cloud)
 - An [Auth0](https://auth0.com) account and tenant
 - A Next.js application (or any framework — adjust the client code accordingly)
 
@@ -27,26 +27,26 @@ description: "Add Auth0 enterprise authentication and SSO to your InsForge backe
    - **Allowed Logout URLs**: `http://localhost:3000`
 5. Note down the **Domain**, **Client ID**, and **Client Secret**
 
-## Step 2: Set Up Your InsForge Project
+## Step 2: Set Up Your Yarah Project
 
 Create a new project or link an existing one:
 
 ```bash
 # Create a new project
-npx @insforge/cli create
+npx @yarah/cli create
 
 # Or link an existing project
-npx @insforge/cli link --project-id <your-project-id>
+npx @yarah/cli link --project-id <your-project-id>
 ```
 
 Then get your project credentials:
 
 ```bash
 # Get the JWT Secret
-npx @insforge/cli secrets get JWT_SECRET
+npx @yarah/cli secrets get JWT_SECRET
 ```
 
-Note down the **URL** and **Anon Key** from the InsForge dashboard. You'll use the JWT Secret from the CLI output in a later step to sign tokens for InsForge.
+Note down the **URL** and **Anon Key** from the Yarah dashboard. You'll use the JWT Secret from the CLI output in a later step to sign tokens for Yarah.
 
 ## Step 3: Set Up Your Application
 
@@ -67,13 +67,13 @@ AUTH0_DOMAIN='YOUR_AUTH0_DOMAIN'
 AUTH0_CLIENT_ID='YOUR_CLIENT_ID'
 AUTH0_CLIENT_SECRET='YOUR_CLIENT_SECRET'
 
-# InsForge
-NEXT_PUBLIC_INSFORGE_URL='YOUR_INSFORGE_URL'
-NEXT_PUBLIC_INSFORGE_ANON_KEY='YOUR_INSFORGE_ANON_KEY'
-INSFORGE_JWT_SECRET='YOUR_INSFORGE_JWT_SECRET'
+# Yarah
+NEXT_PUBLIC_YARAH_URL='YOUR_YARAH_URL'
+NEXT_PUBLIC_YARAH_ANON_KEY='YOUR_YARAH_ANON_KEY'
+YARAH_JWT_SECRET='YOUR_YARAH_JWT_SECRET'
 ```
 
-## Step 4: Set Up InsForge Integration
+## Step 4: Set Up Yarah Integration
 
 Ask your agent to complete the following steps:
 
@@ -85,13 +85,13 @@ Set up Auth0 for my Next.js app — Auth0 client, middleware, and provider.
 
 This creates the Auth0 client (`lib/auth0.ts`), middleware (`middleware.ts`), and Auth0Provider wrapper (`app/layout.tsx`).
 
-### 2. Create the InsForge client utility
+### 2. Create the Yarah client utility
 
 ```text
-Create the InsForge client utility that uses the Auth0 session to sign a JWT for InsForge.
+Create the Yarah client utility that uses the Auth0 session to sign a JWT for Yarah.
 ```
 
-This creates a server-side utility (`lib/insforge.ts`) that gets the Auth0 user via `auth0.getSession()`, signs a JWT with the InsForge secret, and passes it as `edgeFunctionToken`.
+This creates a server-side utility (`lib/yarah.ts`) that gets the Auth0 user via `auth0.getSession()`, signs a JWT with the Yarah secret, and passes it as `edgeFunctionToken`.
 
 ### 3. Create the database schema
 
@@ -107,7 +107,7 @@ This creates the `requesting_user_id()` helper function (since Auth0 user IDs ar
 Build a todo list page with full CRUD — create, read, update, and delete todos.
 ```
 
-This creates a page that uses the InsForge client to manage todos. RLS ensures users only see their own data.
+This creates a page that uses the Yarah client to manage todos. RLS ensures users only see their own data.
 
 ## Step 5: Run Your Application
 
@@ -121,7 +121,7 @@ npm run dev
 Open `http://localhost:3000` and sign up with a new user through Auth0.
 
 <Note>
-Since authentication is handled entirely by Auth0, you will **not** see any users in the InsForge dashboard under **Auth > Users**. User records are managed in the [Auth0 Dashboard](https://manage.auth0.com) — check **User Management > Users** there to confirm the sign-up was successful.
+Since authentication is handled entirely by Auth0, you will **not** see any users in the Yarah dashboard under **Auth > Users**. User records are managed in the [Auth0 Dashboard](https://manage.auth0.com) — check **User Management > Users** there to confirm the sign-up was successful.
 </Note>
 
-![InsForge Auth Users — empty because Auth0 manages users](/images/integrations/insforge-no-users.webp)
+![Yarah Auth Users — empty because Auth0 manages users](/images/integrations/yarah-no-users.webp)

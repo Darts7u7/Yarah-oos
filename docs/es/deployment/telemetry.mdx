@@ -1,24 +1,24 @@
 ---
 title: "Telemetría anónima auto-alojada"
-description: "Descubre qué datos anónimos envían los despliegues autoalojados de InsForge, qué nunca se recopila y cómo desactivarlos con INSFORGE_TELEMETRY_DISABLED."
+description: "Descubre qué datos anónimos envían los despliegues autoalojados de Yarah, qué nunca se recopila y cómo desactivarlos con YARAH_TELEMETRY_DISABLED."
 ---
 
-InsForge recopila telemetría anónima de despliegues auto-alojados para comprender instalaciones activas, adopción de versiones, métodos de implementación y qué servicios opcionales están configurados. Esto ayuda a los mantenedores a priorizar correcciones, avisos de seguridad y trabajo de implementación para el proyecto de código abierto.
+Yarah recopila telemetría anónima de despliegues auto-alojados para comprender instalaciones activas, adopción de versiones, métodos de implementación y qué servicios opcionales están configurados. Esto ayuda a los mantenedores a priorizar correcciones, avisos de seguridad y trabajo de implementación para el proyecto de código abierto.
 
 La telemetría es opcional. Puede deshabilitarla en cualquier momento.
-InsForge no envía esta telemetría desde InsForge Cloud.
+Yarah no envía esta telemetría desde Yarah Cloud.
 Los eventos auto-alojados incluyen una etiqueta de tiempo de ejecución aproximada, como producción, desarrollo, prueba, ci o desconocido, para que los mantenedores puedan separar las ejecuciones locales y automatizadas de los despliegues de producción.
 
-## Lo que envía InsForge
+## Lo que envía Yarah
 
-InsForge envía un evento `oss_instance_started` cuando se inicia el backend y un evento `oss_heartbeat` aproximadamente una vez cada 24 horas mientras se ejecuta el backend.
-Los eventos se envían a través del proxy PostHog de InsForge en `https://b.insforge.dev/capture/` utilizando el formato de API de captura de PostHog.
+Yarah envía un evento `oss_instance_started` cuando se inicia el backend y un evento `oss_heartbeat` aproximadamente una vez cada 24 horas mientras se ejecuta el backend.
+Los eventos se envían a través del proxy PostHog de Yarah en `https://b.yarah.dev/capture/` utilizando el formato de API de captura de PostHog.
 
 Cada evento contiene:
 
 - Nombre del evento PostHog: `oss_instance_started` u `oss_heartbeat`
-- ID de instalación anónima almacenado localmente en `LOGS_DIR/.insforge-installation-id`, usado como `distinct_id` de PostHog
-- Versión de InsForge
+- ID de instalación anónima almacenado localmente en `LOGS_DIR/.yarah-installation-id`, usado como `distinct_id` de PostHog
+- Versión de Yarah
 - Marca de tiempo del evento
 - Modo de alojamiento, como `self-hosted` o `cloud`
 - Método de implementación aproximado, como Docker Compose, Railway, Zeabur, Sealos, Dokploy, Kubernetes o desconocido
@@ -26,7 +26,7 @@ Cada evento contiene:
 - Categoría de backend de almacenamiento: sistema de archivos local, S3 o compatible con S3
 - Banderas booleanas para si las características opcionales están configuradas: despliegues de sitios, funciones, computación y OpenRouter
 
-## Lo que InsForge nunca envía
+## Lo que Yarah nunca envía
 
 La telemetría no incluye:
 
@@ -38,11 +38,11 @@ La telemetría no incluye:
 
 ## Deshabilitar telemetría
 
-Establezca `INSFORGE_TELEMETRY_DISABLED=1` en su entorno y reinicie el backend.
+Establezca `YARAH_TELEMETRY_DISABLED=1` en su entorno y reinicie el backend.
 Para despliegues de Docker Compose, agregue la misma línea a su archivo `.env`:
 
 ```bash
-INSFORGE_TELEMETRY_DISABLED=1
+YARAH_TELEMETRY_DISABLED=1
 ```
 
 Los fallos de red se registran e ignoran para que la telemetría nunca bloquee el inicio o las solicitudes normales.

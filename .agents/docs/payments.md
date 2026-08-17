@@ -1,4 +1,4 @@
-# InsForge Payments - Agent Documentation
+# Yarah Payments - Agent Documentation
 
 Use a provider-specific guide before coding. Stripe and Razorpay have different payment models, runtime APIs, table names, and webhook setup requirements.
 

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ToastProvider, useToast, useUploadToast } from '@insforge/ui';
+import { ToastProvider, useToast, useUploadToast } from '@yarahdev/ui';
 
 function ToastControls() {
   const { showToast, toast } = useToast();

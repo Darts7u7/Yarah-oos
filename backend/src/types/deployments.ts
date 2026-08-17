@@ -5,7 +5,7 @@
  * WAITING -> UPLOADING -> (Vercel statuses: QUEUED/BUILDING/READY/ERROR/CANCELED)
  */
 export const DeploymentStatus = {
-  // InsForge internal statuses
+  // Yarah internal statuses
   WAITING: 'WAITING', // Record created, waiting for source zip upload or direct file registration/content
   UPLOADING: 'UPLOADING', // File uploads or Vercel deployment creation are in progress
   // Vercel statuses (stored directly)

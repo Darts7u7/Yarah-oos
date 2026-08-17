@@ -119,7 +119,7 @@ describe('/api/compute/services/config', () => {
     expect(configMock.updateConfig).not.toHaveBeenCalled();
   });
 
-  // On cloud, compute runs through InsForge's own Fly account. A project admin storing
+  // On cloud, compute runs through Yarah's own Fly account. A project admin storing
   // their own token would move their containers off the control plane that bills and
   // quotas them, so the UI hides this — and the API has to agree, or the gate is
   // decoration. The signal is the AWS instance profile, which cloud provisioning always

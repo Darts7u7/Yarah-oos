@@ -14,7 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
   useToast,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { CodeEditor } from '#components';
 import { AIActivityChartCard } from '#features/ai/components/AIActivityChartCard';
 import { formatUsd, sumMetricPoints } from '#features/ai/helpers';

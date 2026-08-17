@@ -1,6 +1,6 @@
 ---
 title: Referencia de API de almacenamiento
-description: Almacena archivos, gestiona cubos y genera URLs firmadas a través de la API REST de InsForge desde cualquier cliente HTTP con autenticación JWT y S3.
+description: Almacena archivos, gestiona cubos y genera URLs firmadas a través de la API REST de Yarah desde cualquier cliente HTTP con autenticación JWT y S3.
 ---
 
 ## Descripción general
@@ -25,7 +25,7 @@ Content-Type: application/json
 
 ## Cargar objeto con estrategia de carga
 
-InsForge admite dos tipos de backend de almacenamiento:
+Yarah admite dos tipos de backend de almacenamiento:
 1. **Almacenamiento local**: Los archivos se almacenan en el sistema de archivos local. Usar para desarrollo o producción de bajo volumen.
 2. **Compatible con S3**: Los archivos se almacenan en almacenamiento de objetos compatible con S3. Usar para producción de alto volumen.
 
@@ -40,7 +40,7 @@ Los pasos para cargar un archivo son:
 
 Obtén la estrategia de carga óptima (URL directo o presignado) según el backend de almacenamiento.
 La API de estrategia de carga devuelve el método de carga óptimo según el backend de almacenamiento:
-- **Almacenamiento local**: Carga directa a la API de InsForge
+- **Almacenamiento local**: Carga directa a la API de Yarah
 - **Compatible con S3**: URL presignada para carga directa a S3
 
 ```
@@ -60,7 +60,7 @@ Cargar en una clave de objeto existente reemplaza el objeto actual en su lugar.
 #### Ejemplo
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/storage/buckets/avatars/upload-strategy" \
+curl -X POST "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/upload-strategy" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -129,7 +129,7 @@ POST /api/storage/buckets/{bucketName}/objects/{objectKey}/confirm-upload
 #### Ejemplo
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/storage/buckets/avatars/objects/profile-photo.jpg/confirm-upload" \
+curl -X POST "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects/profile-photo.jpg/confirm-upload" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -175,7 +175,7 @@ PUT /api/storage/buckets/{bucketName}/objects/{objectKey}
 ### Ejemplo
 
 ```bash
-curl -X PUT "https://your-app.insforge.app/api/storage/buckets/avatars/objects/users/profile.jpg" \
+curl -X PUT "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects/users/profile.jpg" \
   -H "Authorization: Bearer your-jwt-token" \
   -F "file=@/path/to/image.jpg"
 ```
@@ -206,7 +206,7 @@ POST /api/storage/buckets/{bucketName}/objects
 ### Ejemplo
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/storage/buckets/uploads/objects" \
+curl -X POST "https://your-app.apps.yarah.dev/api/storage/buckets/uploads/objects" \
   -H "Authorization: Bearer your-jwt-token" \
   -F "file=@/path/to/document.pdf"
 ```
@@ -228,7 +228,7 @@ curl -X POST "https://your-app.insforge.app/api/storage/buckets/uploads/objects"
 
 ## Descargar objeto con estrategia de descarga
 
-InsForge admite dos tipos de backend de almacenamiento:
+Yarah admite dos tipos de backend de almacenamiento:
 1. **Almacenamiento local**: Los archivos se almacenan en el sistema de archivos local. Usar para desarrollo o producción de bajo volumen.
 2. **Compatible con S3**: Los archivos se almacenan en almacenamiento de objetos compatible con S3. Usar para producción de alto volumen.
 
@@ -241,7 +241,7 @@ Los pasos para descargar un archivo son:
 Obtén la estrategia de descarga óptima (URL directo o presignado) según el backend de almacenamiento y la visibilidad del cubo.
 
 La API de estrategia de descarga devuelve el método de descarga óptimo según el backend de almacenamiento y la visibilidad del cubo:
-- **Almacenamiento local**: Descarga directa de la API de InsForge
+- **Almacenamiento local**: Descarga directa de la API de Yarah
 - **Compatible con S3**: URL presignada para S3.
 
 ```
@@ -261,7 +261,7 @@ GET /api/storage/buckets/{bucketName}/download-strategy/objects/{objectKey}
 #### Ejemplo
 
 ```bash
-curl "https://your-app.insforge.app/api/storage/buckets/avatars/download-strategy/objects/profile.jpg" \
+curl "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/download-strategy/objects/profile.jpg" \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
@@ -301,7 +301,7 @@ GET /api/storage/buckets/{bucketName}/objects/{objectKey}
 ### Ejemplo
 
 ```bash
-curl "https://your-app.insforge.app/api/storage/buckets/avatars/objects/users/profile.jpg" \
+curl "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects/users/profile.jpg" \
   -H "Authorization: Bearer your-jwt-token" \
   -o profile.jpg
 ```
@@ -323,7 +323,7 @@ DELETE /api/storage/buckets/{bucketName}/objects/{objectKey}
 ### Ejemplo
 
 ```bash
-curl -X DELETE "https://your-app.insforge.app/api/storage/buckets/avatars/objects/users/profile.jpg" \
+curl -X DELETE "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects/users/profile.jpg" \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
@@ -358,11 +358,11 @@ GET /api/storage/buckets/{bucketName}/objects
 
 ```bash
 # Filter by prefix
-curl "https://your-app.insforge.app/api/storage/buckets/avatars/objects?prefix=users/&limit=50" \
+curl "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects?prefix=users/&limit=50" \
   -H "Authorization: Bearer your-jwt-token"
 
 # Search by key
-curl "https://your-app.insforge.app/api/storage/buckets/avatars/objects?search=profile" \
+curl "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects?search=profile" \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
@@ -409,7 +409,7 @@ GET /api/storage/buckets
 ### Ejemplo
 
 ```bash
-curl "https://your-app.insforge.app/api/storage/buckets" \
+curl "https://your-app.apps.yarah.dev/api/storage/buckets" \
   -H "Authorization: Bearer admin-jwt-token"
 ```
 
@@ -437,7 +437,7 @@ POST /api/storage/buckets
 ### Ejemplo
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/storage/buckets" \
+curl -X POST "https://your-app.apps.yarah.dev/api/storage/buckets" \
   -H "Authorization: Bearer admin-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -470,7 +470,7 @@ PATCH /api/storage/buckets/{bucketName}
 ### Ejemplo
 
 ```bash
-curl -X PATCH "https://your-app.insforge.app/api/storage/buckets/user-uploads" \
+curl -X PATCH "https://your-app.apps.yarah.dev/api/storage/buckets/user-uploads" \
   -H "Authorization: Bearer admin-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{"isPublic": true}'
@@ -495,7 +495,7 @@ DELETE /api/storage/buckets/{bucketName}
 ### Ejemplo
 
 ```bash
-curl -X DELETE "https://your-app.insforge.app/api/storage/buckets/old-uploads" \
+curl -X DELETE "https://your-app.apps.yarah.dev/api/storage/buckets/old-uploads" \
   -H "Authorization: Bearer admin-jwt-token"
 ```
 

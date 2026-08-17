@@ -1,4 +1,4 @@
-import type { ModelGatewayConfig, UpdateModelGatewayConfig } from '@insforge/shared-schemas';
+import type { ModelGatewayConfig, UpdateModelGatewayConfig } from '@yarahdev/shared-schemas';
 import { SecretService } from '@/services/secrets/secret.service.js';
 import logger from '@/utils/logger.js';
 

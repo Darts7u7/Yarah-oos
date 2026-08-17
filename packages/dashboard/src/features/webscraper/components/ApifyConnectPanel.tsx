@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, CopyButton } from '@insforge/ui';
+import { Button, CopyButton } from '@yarahdev/ui';
 import { useDashboardHost } from '#lib/config/DashboardHostContext';
 import { ApifyTokenForm } from './ApifyTokenForm';
 import { SCRAPE_PROMPT } from './shared';

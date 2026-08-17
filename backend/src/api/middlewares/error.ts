@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { DatabaseError } from 'pg';
 import { errorResponse } from '@/utils/response.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 import { AppError, getDatabaseErrorDetails, isErrorObject } from '@/utils/errors.js';
 

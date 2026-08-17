@@ -74,7 +74,7 @@ export interface PosthogProjectSummary {
 /**
  * Thin PostHog REST client. Ported from cloud-backend's PosthogApiService so
  * self-hosting talks to PostHog directly instead of proxying through
- * InsForge Cloud. Auth is always `Bearer <personal API key>`.
+ * Yarah Cloud. Auth is always `Bearer <personal API key>`.
  */
 export class PostHogApiService {
   private static instance: PostHogApiService;

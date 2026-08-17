@@ -1,4 +1,4 @@
-import type { PaymentEnvironment } from '@insforge/shared-schemas';
+import type { PaymentEnvironment } from '@yarahdev/shared-schemas';
 import type { CatalogPrice } from '#features/payments/types/catalog';
 
 export const ENVIRONMENTS: PaymentEnvironment[] = ['test', 'live'];

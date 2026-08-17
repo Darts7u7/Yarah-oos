@@ -2,7 +2,7 @@
 
 # End-to-end test for the schedules router.
 #
-# Covers the sub-minute cadence support added in InsForge#1159:
+# Covers the sub-minute cadence support added in Yarah#1159:
 #   - POST /api/schedules accepts pg_cron interval syntax ("30 seconds")
 #   - POST /api/schedules accepts the existing 5-field cron format
 #   - POST /api/schedules rejects malformed values ("2 days", "2.5 seconds")

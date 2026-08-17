@@ -1,4 +1,4 @@
-import { Badge } from '@insforge/ui';
+import { Badge } from '@yarahdev/ui';
 import { useTranslation } from 'react-i18next';
 import type { DashboardAdvisorCategory } from '#types';
 

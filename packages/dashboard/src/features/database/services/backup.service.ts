@@ -12,7 +12,7 @@ import type {
   UpdateDatabaseConfigRequest,
   UpdateDatabaseConfigResponse,
   UpdateDatabaseBackupResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class BackupService {
   async listBackups(): Promise<DatabaseBackupsResponse> {

@@ -1,6 +1,6 @@
 ---
 title: Stripe 支付 SDK
-description: 使用 InsForge TypeScript SDK 创建 Stripe Checkout 与账单门户会话，同步产品目录、处理 Webhook 并将订阅状态写入 Postgres。
+description: 使用 Yarah TypeScript SDK 创建 Stripe Checkout 与账单门户会话，同步产品目录、处理 Webhook 并将订阅状态写入 Postgres。
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
@@ -11,25 +11,25 @@ import Installation from '/snippets/sdk-installation.mdx';
 
 TypeScript SDK 为生成的应用前端公开 Stripe 运行时助手：
 
-- `insforge.payments.stripe.createCheckoutSession(...)`
-- `insforge.payments.stripe.createCustomerPortalSession(...)`
+- `yarah.payments.stripe.createCheckoutSession(...)`
+- `yarah.payments.stripe.createCustomerPortalSession(...)`
 
 Stripe 密钥、目录管理、webhook 设置和付款监控是管理操作。在使用 SDK 之前，从仪表板或 CLI 配置它们。
 
 ```bash
-npx @insforge/cli payments stripe status
-npx @insforge/cli payments stripe catalog --environment test
+npx @yarah/cli payments stripe status
+npx @yarah/cli payments stripe catalog --environment test
 ```
 
 <Note>
   有关设置、数据库表、webhook 投影和履行模式，请参见 [Stripe 支付](/core-concepts/payments/stripe)。
 </Note>
 
-SDK 方法需要当前 InsForge 用户令牌。匿名 InsForge 令牌可用于来宾一次性结账，但 InsForge API 密钥不能替代，因为后端需要用户上下文来处理本地会话行。
+SDK 方法需要当前 Yarah 用户令牌。匿名 Yarah 令牌可用于来宾一次性结账，但 Yarah API 密钥不能替代，因为后端需要用户上下文来处理本地会话行。
 
 ## createCheckoutSession()
 
-通过 InsForge 后端创建 Stripe Checkout 会话。
+通过 Yarah 后端创建 Stripe Checkout 会话。
 
 ### 参数
 
@@ -46,7 +46,7 @@ SDK 方法需要当前 InsForge 用户令牌。匿名 InsForge 令牌可用于�
 | `idempotencyKey` | `string` | 否 | 用于重试安全的 Checkout 创建的稳定密钥 |
 
 <Warning>
-  以 `insforge_` 开头的元数据键是保留的。
+  以 `yarah_` 开头的元数据键是保留的。
 </Warning>
 
 ### 返回
@@ -80,7 +80,7 @@ SDK 方法需要当前 InsForge 用户令牌。匿名 InsForge 令牌可用于�
 ### 一次性结账
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'payment',
   lineItems: [{ priceId: 'price_123', quantity: 1 }],
   successUrl: `${window.location.origin}/checkout/success`,
@@ -102,12 +102,12 @@ if (data?.checkoutSession.url) {
 
 对于匿名一次性购买，省略 `subject` 并在可用时传递 `customerEmail`。
 
-如果一次性结账包含 `subject` 且还没有现有的 Stripe 客户映射，InsForge 让 Stripe 在 Checkout 期间创建客户，并从完成 webhook 回填主体映射。
+如果一次性结账包含 `subject` 且还没有现有的 Stripe 客户映射，Yarah 让 Stripe 在 Checkout 期间创建客户，并从完成 webhook 回填主体映射。
 
 ### 订阅结账
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'subscription',
   subject: { type: 'team', id: teamId },
   lineItems: [{ priceId: 'price_monthly_123', quantity: 1 }],
@@ -169,7 +169,7 @@ if (data?.checkoutSession.url) {
 ### 示例
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCustomerPortalSession('test', {
+const { data, error } = await yarah.payments.stripe.createCustomerPortalSession('test', {
   subject: { type: 'team', id: teamId },
   returnUrl: `${window.location.origin}/billing`
 });
@@ -191,7 +191,7 @@ if (data?.customerPortalSession.url) {
 
 ## 授权和 RLS
 
-SDK 方法使用当前 InsForge 令牌调用运行时路由。后端使用调用者上下文插入本地会话行：
+SDK 方法使用当前 Yarah 令牌调用运行时路由。后端使用调用者上下文插入本地会话行：
 
 - `payments.stripe_checkout_sessions` 用于 Checkout 尝试
 - `payments.stripe_customer_portal_sessions` 用于计费门户尝试
@@ -222,5 +222,5 @@ PostgreSQL 将 `SELECT` 策略应用于 `INSERT ... RETURNING` 返回的行和�
 在开发时将 `'test'` 作为第一个 SDK 参数传递。仅在开发者明确批准生产 Stripe 更改并配置了生产价格后才切换到 `'live'`。
 
 <Warning>
-  永远不要将 Stripe 密钥放在前端代码或公共部署环境变量中。通过 InsForge 仪表板或 CLI 配置 Stripe 密钥。
+  永远不要将 Stripe 密钥放在前端代码或公共部署环境变量中。通过 Yarah 仪表板或 CLI 配置 Stripe 密钥。
 </Warning>

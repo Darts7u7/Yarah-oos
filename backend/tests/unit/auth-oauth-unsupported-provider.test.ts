@@ -5,7 +5,7 @@
  * Issue #1405 — Phase 2: OAuth Error Standardization.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 // ---------------------------------------------------------------------------
 // Minimal mocks for all AuthService dependencies

@@ -1,4 +1,4 @@
-import type { ScheduleSchema } from '@insforge/shared-schemas';
+import type { ScheduleSchema } from '@yarahdev/shared-schemas';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
@@ -10,7 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   Switch,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { ListRow, ListRowCell } from '#components';
 
 interface ScheduleRowProps {

@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Insforge Functions API
+  title: Yarah Functions API
   version: 1.0.0
   description: Serverless functions running in Deno runtime
 

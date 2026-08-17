@@ -20,7 +20,7 @@ export default defineConfig({
   // a normal external. Bundling it inlined its transitive `debug` (via
   // `@tokenizer/inflate`), whose `require('tty')` breaks under esbuild's ESM
   // `__require` shim — keep it external and let Node load it natively.
-  noExternal: [/@insforge\/shared-schemas/, 'lru-cache'],
+  noExternal: [/@yarah\/shared-schemas/, 'lru-cache'],
   esbuildOptions(options) {
     options.alias = {
       '@': './src',

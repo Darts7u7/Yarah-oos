@@ -1,12 +1,12 @@
 -- Migration: 036 - Storage support for third-party auth via RLS
 --
--- Two changes that together let any auth provider (native InsForge,
+-- Two changes that together let any auth provider (native Yarah,
 -- Better Auth, Clerk, Auth0, WorkOS, Stytch, Kinde) own storage objects
 -- with per-project RLS policies.
 --
 -- Background
 -- ----------
--- Native InsForge identity is a UUID, but every third-party auth provider
+-- Native Yarah identity is a UUID, but every third-party auth provider
 -- uses non-UUID `sub` claims. The current `storage.objects.uploaded_by uuid`
 -- column rejects them at INSERT time with
 --   `invalid input syntax for type uuid: "user_2nQk..."`,
@@ -71,7 +71,7 @@ $$;
 
 -- 4. auth.jwt() helper.
 --
--- The existing auth.uid() returns uuid, which works for native InsForge
+-- The existing auth.uid() returns uuid, which works for native Yarah
 -- callers but errors on non-UUID subs from third-party providers. Ship
 -- a jsonb helper alongside so policies can extract any claim as text:
 -- `auth.jwt() ->> 'sub'` for ownership, `->> 'role'` for role checks,

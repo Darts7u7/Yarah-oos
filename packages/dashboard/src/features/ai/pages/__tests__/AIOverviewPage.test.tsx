@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AIOverview } from '@insforge/shared-schemas';
+import type { AIOverview } from '@yarahdev/shared-schemas';
 
 const hookMocks = vi.hoisted(() => ({
   showUpgradeDialog: vi.fn(),

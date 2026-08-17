@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Insforge Tables API
+  title: Yarah Tables API
   version: 1.0.0
 
 paths:

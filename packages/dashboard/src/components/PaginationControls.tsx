@@ -1,4 +1,4 @@
-import { Pagination } from '@insforge/ui';
+import { Pagination } from '@yarahdev/ui';
 import { useTranslation } from 'react-i18next';
 
 export interface PaginationControlsProps {

@@ -52,7 +52,7 @@ if [ -z "$API_KEY" ]; then
   fi
 fi
 if [ -z "$API_KEY" ] && command -v docker >/dev/null 2>&1; then
-  API_KEY=$(docker logs ba-sdk-test-insforge-1 2>&1 | grep -oE 'ik_[a-f0-9]+' | tail -1 || true)
+  API_KEY=$(docker logs ba-sdk-test-yarah-1 2>&1 | grep -oE 'ik_[a-f0-9]+' | tail -1 || true)
 fi
 if [ -z "$API_KEY" ]; then
   print_fail "Could not get API key (set TEST_API_KEY or ACCESS_API_KEY)"
@@ -318,7 +318,7 @@ print_blue "
 # Forge a BA-shaped JWT signed with the project's JWT_SECRET so we don't
 # need a running BA app to prove the storage path accepts text subs.
 # Order: env var (CI), then psql lookup (locally encrypted secret).
-JWT_SECRET_FOR_TEST="${JWT_SECRET:-${INSFORGE_JWT_SECRET:-}}"
+JWT_SECRET_FOR_TEST="${JWT_SECRET:-${YARAH_JWT_SECRET:-}}"
 if [ -z "$JWT_SECRET_FOR_TEST" ]; then
   JWT_SECRET_FOR_TEST=$(psql "$DATABASE_URL" -t -A -c \
     "SELECT system.decrypt_secret(value_ciphertext) FROM system.secrets WHERE key='JWT_SECRET' LIMIT 1;" 2>/dev/null || true)
@@ -335,7 +335,7 @@ if [ -n "$JWT_SECRET_FOR_TEST" ] && command -v node >/dev/null 2>&1; then
     const payload = b64u(JSON.stringify({
       sub: process.env.BA_SUB,
       role: "authenticated",
-      aud: "insforge-api",
+      aud: "yarah-api",
       email: "ba@example.com",
       iat: now, exp: now + 300,
     }));

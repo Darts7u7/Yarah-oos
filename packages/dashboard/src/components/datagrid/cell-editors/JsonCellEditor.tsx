@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileJson, AlertCircle, CheckCircle } from 'lucide-react';
-import { Badge, Button, ConfirmDialog, cn } from '@insforge/ui';
+import { Badge, Button, ConfirmDialog, cn } from '@yarahdev/ui';
 import { Popover, PopoverContent, PopoverTrigger } from '#components';
 import type { JsonCellEditorProps } from './types';
 

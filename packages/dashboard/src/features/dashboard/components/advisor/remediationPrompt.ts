@@ -13,7 +13,7 @@ function formatIssueBody(issue: DashboardAdvisorIssue): string[] {
 }
 
 export function formatRemediationPrompt(issue: DashboardAdvisorIssue): string {
-  const header = `InsForge Backend Advisor flagged a [${issue.severity} ${issue.category}] issue:`;
+  const header = `Yarah Backend Advisor flagged a [${issue.severity} ${issue.category}] issue:`;
   return [header, '', ...formatIssueBody(issue)].join('\n');
 }
 
@@ -25,7 +25,7 @@ export function formatRemediationPromptBatch(issues: DashboardAdvisorIssue[]): s
     return formatRemediationPrompt(issues[0]);
   }
 
-  const header = `InsForge Backend Advisor flagged ${issues.length} issues that need attention.`;
+  const header = `Yarah Backend Advisor flagged ${issues.length} issues that need attention.`;
   const blocks = issues.map((issue, i) => {
     const counter = `Issue ${i + 1} of ${issues.length} — [${issue.severity} ${issue.category}]`;
     return [counter, '', ...formatIssueBody(issue)].join('\n');

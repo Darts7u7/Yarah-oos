@@ -4,7 +4,7 @@ import {
   createServiceSchema,
   updateServiceSchema,
   listServicesResponseSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 describe('serviceStatusEnum', () => {
   it('accepts valid statuses', () => {

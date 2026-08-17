@@ -1,5 +1,5 @@
 import { Readable } from 'stream';
-import { UploadStrategyResponse, DownloadStrategyResponse } from '@insforge/shared-schemas';
+import { UploadStrategyResponse, DownloadStrategyResponse } from '@yarahdev/shared-schemas';
 
 export interface ObjectMetadata {
   size: number;

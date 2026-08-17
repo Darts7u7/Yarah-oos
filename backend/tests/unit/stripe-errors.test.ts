@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { AppError } from '../../src/utils/errors';
 import { StripeKeyValidationError } from '../../src/providers/payments/stripe.provider';
 import { normalizeStripeError } from '../../src/providers/payments/stripe-errors';

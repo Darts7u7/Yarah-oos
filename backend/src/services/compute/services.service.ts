@@ -23,7 +23,7 @@ import {
   type ComputeProviderName,
   type IngressMode,
   type ComputeMetadataSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { NEXT_ACTIONS } from '../../utils/next-actions.js';
 
 export interface CreateServiceInput {
@@ -313,7 +313,7 @@ export function buildComputeRegistry(): ComputeRegistry {
   }
   if (requested === 'cloud' && !cloud.isConfigured()) {
     throw new AppError(
-      'COMPUTE_PROVIDER=cloud is only available on InsForge Cloud projects.',
+      'COMPUTE_PROVIDER=cloud is only available on Yarah Cloud projects.',
       503,
       ERROR_CODES.COMPUTE_NOT_CONFIGURED
     );
@@ -332,7 +332,7 @@ export function buildComputeRegistry(): ComputeRegistry {
   }
 
   // Docker registers itself when the socket is present — mounting it into the
-  // InsForge container *is* the operator's opt-in. Nobody discovers their host is
+  // Yarah container *is* the operator's opt-in. Nobody discovers their host is
   // running arbitrary containers because a default flipped.
   //
   // Registration is gated on isConfigured() alone, never on having been
@@ -360,7 +360,7 @@ export function buildComputeRegistry(): ComputeRegistry {
       `COMPUTE_PROVIDER=docker but no Docker socket at ${dockerConfig().socketPath}.`,
       503,
       ERROR_CODES.COMPUTE_NOT_CONFIGURED,
-      'Mount the Docker socket into the InsForge container (or set DOCKER_SOCKET_PATH), then restart.'
+      'Mount the Docker socket into the Yarah container (or set DOCKER_SOCKET_PATH), then restart.'
     );
   }
 
@@ -376,7 +376,7 @@ export function buildComputeRegistry(): ComputeRegistry {
       'Pick a provider and restart the container:\n' +
         `• Your own Docker host — uncomment the Docker socket volume in your compose file and restart. Currently looking for a socket at ${dockerConfig().socketPath}.\n` +
         '• Fly.io — set FLY_API_TOKEN and FLY_ORG in your .env.\n' +
-        'See https://docs.insforge.dev/core-concepts/compute/overview for both.'
+        'See https://docs.yarah.dev/core-concepts/compute/overview for both.'
     );
   }
 
@@ -456,7 +456,7 @@ export function selectComputeProvider(): ComputeProvider {
 /**
  * Warn once, at startup, about a Fly token with no org.
  *
- * FLY_ORG used to default to "insforge" — our internal org — so operators who copied
+ * FLY_ORG used to default to "yarah" — our internal org — so operators who copied
  * .env.example verbatim got opaque "unauthorized" errors from Fly. This says so in
  * terms they can act on.
  *
@@ -631,7 +631,7 @@ export class ComputeServicesService {
         503,
         ERROR_CODES.COMPUTE_NOT_CONFIGURED,
         provider === 'docker'
-          ? 'Mount the Docker socket into the InsForge container and restart it.'
+          ? 'Mount the Docker socket into the Yarah container and restart it.'
           : 'Set FLY_API_TOKEN and FLY_ORG (or the cloud PROJECT_ID/CLOUD_API_HOST pair), then restart.'
       );
     }

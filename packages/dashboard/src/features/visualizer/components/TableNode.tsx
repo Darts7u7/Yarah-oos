@@ -2,7 +2,7 @@ import type { MouseEvent } from 'react';
 import { Database, Circle, Key, ExternalLink } from 'lucide-react';
 import { Handle, Position } from '@xyflow/react';
 import { useNavigate } from 'react-router-dom';
-import { TableSchema } from '@insforge/shared-schemas';
+import { TableSchema } from '@yarahdev/shared-schemas';
 import { getForeignKeyByColumn } from '#features/database/helpers';
 
 interface TableNodeProps {

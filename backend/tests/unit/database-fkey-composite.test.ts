@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ForeignKeySchema } from '@insforge/shared-schemas';
+import type { ForeignKeySchema } from '@yarahdev/shared-schemas';
 import { AppError } from '../../src/utils/errors';
 
 // ---------------------------------------------------------------------------

@@ -50,7 +50,7 @@ public struct SignUpResponse: Codable, Sendable {
 ```swift
 func handleSignUp(email: String, password: String, name: String?) async {
     do {
-        let result = try await insforge.auth.signUp(
+        let result = try await yarah.auth.signUp(
             email: email,
             password: password,
             name: name
@@ -72,7 +72,7 @@ func handleSignUp(email: String, password: String, name: String?) async {
 // Called when user enters the verification code
 func handleVerifyEmail(email: String, code: String) async {
     do {
-        try await insforge.auth.verifyEmail(email: email, code: code)
+        try await yarah.auth.verifyEmail(email: email, code: code)
         // Verification successful, user can now sign in
         navigateToSignIn()
     } catch {
@@ -83,7 +83,7 @@ func handleVerifyEmail(email: String, code: String) async {
 // Called when user requests a new verification email
 func handleResendCode(email: String) async {
     do {
-        try await insforge.auth.resendVerificationEmail(email: email)
+        try await yarah.auth.resendVerificationEmail(email: email)
         showMessage("Verification email sent to \\(email)")
     } catch {
         showError("Failed to resend verification email")
@@ -93,11 +93,11 @@ func handleResendCode(email: String) async {
 
 ### Verificación de correo electrónico
 
-Para usuarios que se registran con correo electrónico, el backend de InsForge ofrece tres opciones:
+Para usuarios que se registran con correo electrónico, el backend de Yarah ofrece tres opciones:
 
 1. **Sin verificación de correo electrónico** - Los usuarios pueden iniciar sesión inmediatamente después del registro. `SignUpResponse` tendrá `hasSession = true`.
 2. **Verificación basada en enlace** - Los usuarios deben abrir su correo electrónico y hacer clic en el enlace de verificación antes de poder iniciar sesión.
-3. **Verificación basada en código** - El backend de InsForge envía un código de verificación de 6 dígitos al correo electrónico del usuario. La aplicación cliente necesita mostrar una pantalla de verificación donde los usuarios puedan ingresar el código y luego llamar a `verifyEmail(email:code:)` para completar la verificación. Solo después de esto los usuarios pueden iniciar sesión con correo electrónico y contraseña.
+3. **Verificación basada en código** - El backend de Yarah envía un código de verificación de 6 dígitos al correo electrónico del usuario. La aplicación cliente necesita mostrar una pantalla de verificación donde los usuarios puedan ingresar el código y luego llamar a `verifyEmail(email:code:)` para completar la verificación. Solo después de esto los usuarios pueden iniciar sesión con correo electrónico y contraseña.
 
 Cuando `requireEmailVerification` es `true`, la respuesta tendrá:
 - `accessToken = nil`
@@ -128,7 +128,7 @@ Inicie sesión con un usuario existente con correo electrónico y contraseña.
 
 ```swift
 do {
-    let result = try await insforge.auth.signIn(
+    let result = try await yarah.auth.signIn(
         email: "user@example.com",
         password: "secure_password123"
     )
@@ -159,7 +159,7 @@ Cierre la sesión del usuario actual.
 
 ```swift
 do {
-    try await insforge.auth.signOut()
+    try await yarah.auth.signOut()
     print("User signed out")
 } catch {
     print("Sign out failed: \\(error)")
@@ -176,7 +176,7 @@ Obtener usuario autenticado con datos de perfil.
 
 ```swift
 do {
-    if let user = try await insforge.auth.getCurrentUser() {
+    if let user = try await yarah.auth.getCurrentUser() {
         print("Email: \\(user.email)")
         print("Name: \\(user.profile?.name ?? "N/A")")
     } else {
@@ -197,7 +197,7 @@ Actualizar el perfil del usuario actual.
 
 ```swift
 do {
-    let result = try await insforge.auth.setProfile([
+    let result = try await yarah.auth.setProfile([
         "name": "JohnDev",
         "bio": "iOS Developer",
         "avatar_url": "https://example.com/avatar.jpg"
@@ -212,7 +212,7 @@ do {
 
 ## Restablecimiento de contraseña
 
-InsForge admite dos métodos de restablecimiento de contraseña, configurados en el backend:
+Yarah admite dos métodos de restablecimiento de contraseña, configurados en el backend:
 
 - **Método de código**: El usuario recibe un código de 6 dígitos por correo electrónico, lo verifica para obtener un token de restablecimiento y luego restablece la contraseña
 - **Método de enlace**: El usuario recibe un enlace mágico por correo electrónico que contiene el token de restablecimiento y luego restablece la contraseña directamente
@@ -229,7 +229,7 @@ Envíe un correo electrónico de restablecimiento de contraseña al usuario. El 
 
 ```swift
 do {
-    try await insforge.auth.sendPasswordReset(email: "user@example.com")
+    try await yarah.auth.sendPasswordReset(email: "user@example.com")
     // Show message to check email
     showMessage("If your email is registered, you will receive a password reset email.")
 } catch {
@@ -269,7 +269,7 @@ public struct ResetPasswordTokenResponse: Codable, Sendable {
 
 ```swift
 do {
-    let response = try await insforge.auth.exchangeResetPasswordToken(
+    let response = try await yarah.auth.exchangeResetPasswordToken(
         email: "user@example.com",
         code: "123456"
     )
@@ -296,7 +296,7 @@ Restablezca la contraseña del usuario usando un token de restablecimiento.
 
 ```swift
 do {
-    try await insforge.auth.resetPassword(
+    try await yarah.auth.resetPassword(
         otp: resetToken,
         newPassword: "newSecurePassword123"
     )
@@ -337,7 +337,7 @@ public enum OAuthProvider: String, Sendable {
 ### Parámetros
 
 - `provider` (`OAuthProvider`) - El proveedor OAuth con el que autenticarse
-- `redirectTo` (`String`) - URL de devolución de llamada donde InsForge redirigirá después de la autenticación
+- `redirectTo` (`String`) - URL de devolución de llamada donde Yarah redirigirá después de la autenticación
 
 ### Devoluciones
 
@@ -351,7 +351,7 @@ Devuelve `AuthResponse` que contiene el usuario autenticado y los tokens de sesi
 
 ```
 1. App calls signInWithOAuthView(provider:redirectTo:)
-2. SDK fetches the OAuth authorization URL from InsForge
+2. SDK fetches the OAuth authorization URL from Yarah
 3. SDK opens in-app authentication browser (ASWebAuthenticationSession)
 4. User authenticates with the provider (Google, GitHub, etc.)
 5. SDK automatically handles callback and creates session
@@ -362,10 +362,10 @@ Devuelve `AuthResponse` que contiene el usuario autenticado y los tokens de sesi
 
 ```swift
 import SwiftUI
-import InsForge
+import Yarah
 
 struct LoginView: View {
-    let client: InsForgeClient
+    let client: YarahClient
     @State private var currentUser: User?
     @State private var errorMessage: String?
 
@@ -417,11 +417,11 @@ Registre una URL de devolución de llamada para su aplicación, pase ese valor e
 
 ```swift
 do {
-    let result = try await insforge.auth.signIn(
+    let result = try await yarah.auth.signIn(
         email: email,
         password: password
     )
-} catch let error as InsForgeAuthError {
+} catch let error as YarahAuthError {
     switch error {
     case .invalidCredentials:
         print("Invalid email or password")

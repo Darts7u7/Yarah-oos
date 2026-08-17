@@ -1,21 +1,21 @@
 ---
 title: Pagos
-description: Elige los asistentes de pagos de Stripe o Razorpay para aplicaciones TypeScript de InsForge, con webhooks, suscripciones y sincronización de catálogo.
+description: Elige los asistentes de pagos de Stripe o Razorpay para aplicaciones TypeScript de Yarah, con webhooks, suscripciones y sincronización de catálogo.
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
 
 <Installation />
 
-Los Pagos de InsForge son específicos del proveedor. Stripe usa Checkout alojado y Portal de Facturación. Razorpay usa órdenes y suscripciones nativas del proveedor más Razorpay Checkout. El SDK de TypeScript expone módulos de proveedor separados para ambos.
+Los Pagos de Yarah son específicos del proveedor. Stripe usa Checkout alojado y Portal de Facturación. Razorpay usa órdenes y suscripciones nativas del proveedor más Razorpay Checkout. El SDK de TypeScript expone módulos de proveedor separados para ambos.
 
 <CardGroup cols={2}>
   <Card title="Pagos con Stripe" icon="stripe" href="/sdks/typescript/payments-stripe">
-    Crea sesiones de Checkout y Portal de Facturación con `insforge.payments.stripe`.
+    Crea sesiones de Checkout y Portal de Facturación con `yarah.payments.stripe`.
   </Card>
 
   <Card title="Pagos con Razorpay" icon="credit-card" href="/sdks/typescript/payments-razorpay">
-    Crea órdenes o suscripciones con `insforge.payments.razorpay`, luego abre Razorpay Checkout.
+    Crea órdenes o suscripciones con `yarah.payments.razorpay`, luego abre Razorpay Checkout.
   </Card>
 </CardGroup>
 
@@ -24,13 +24,13 @@ Los Pagos de InsForge son específicos del proveedor. Stripe usa Checkout alojad
 ```typescript
 import { createClient } from '@insforge/sdk';
 
-const insforge = createClient({
-  baseUrl: 'https://your-project.insforge.app',
+const yarah = createClient({
+  baseUrl: 'https://your-project.apps.yarah.dev',
   anonKey: 'your-anon-key'
 });
 ```
 
-Las llamadas de tiempo de ejecución de pagos requieren un token de usuario de InsForge. El pago único anónimo puede usar un token anónimo de InsForge. Las claves secretas del proveedor deben mantenerse en el lado del servidor y configurarse a través de Panel -> Pagos -> Configuración, CLI o API de administración.
+Las llamadas de tiempo de ejecución de pagos requieren un token de usuario de Yarah. El pago único anónimo puede usar un token anónimo de Yarah. Las claves secretas del proveedor deben mantenerse en el lado del servidor y configurarse a través de Panel -> Pagos -> Configuración, CLI o API de administración.
 
 ## Cumplimiento
 
@@ -40,6 +40,6 @@ Para ambos proveedores, crea tablas propiedad de la aplicación como `public.ord
 
 ## Próximos Pasos
 
-- Usa [Pagos con Stripe](/sdks/typescript/payments-stripe) para `insforge.payments.stripe.createCheckoutSession(...)` y `insforge.payments.stripe.createCustomerPortalSession(...)`.
-- Usa [Pagos con Razorpay](/sdks/typescript/payments-razorpay) para `insforge.payments.razorpay.createOrder(...)`, `createSubscription(...)`, verificación y gestión de suscripciones.
+- Usa [Pagos con Stripe](/sdks/typescript/payments-stripe) para `yarah.payments.stripe.createCheckoutSession(...)` y `yarah.payments.stripe.createCustomerPortalSession(...)`.
+- Usa [Pagos con Razorpay](/sdks/typescript/payments-razorpay) para `yarah.payments.razorpay.createOrder(...)`, `createSubscription(...)`, verificación y gestión de suscripciones.
 - Lee [Descripción general de pagos](/core-concepts/payments/overview) para la arquitectura de base de datos compartida y el modelo de cumplimiento.

@@ -2,8 +2,8 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { realtimeService } from '#features/realtime/services/realtime.service';
-import type { ListMessagesRequest } from '@insforge/shared-schemas';
-import { useToast } from '@insforge/ui';
+import type { ListMessagesRequest } from '@yarahdev/shared-schemas';
+import { useToast } from '@yarahdev/ui';
 
 export function useRealtimeMessages() {
   const { t } = useTranslation('chrome');

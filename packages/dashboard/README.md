@@ -1,10 +1,10 @@
-# @insforge/dashboard
+# @yarahdev/dashboard
 
-The shared React administration dashboard interface for the **InsForge** Backend-as-a-Service (BaaS) platform.
+The shared React administration dashboard interface for the **Yarah** Backend-as-a-Service (BaaS) platform.
 
 This package is the single source of truth for the project administration interface, shared and consumed by:
 1. The local self-hosting app in `/frontend` of this repository.
-2. The enterprise `insforge-cloud` cloud-hosted dashboard.
+2. The enterprise `yarah-cloud` cloud-hosted dashboard.
 
 ---
 
@@ -42,15 +42,15 @@ This package leverages the following frontend stack:
 
 ## Monorepo Wiring
 
-In this Turborepo workspace, `@insforge/dashboard` is built as an independent, fully-typed NPM package.
+In this Turborepo workspace, `@yarahdev/dashboard` is built as an independent, fully-typed NPM package.
 
 ```
-insforge/
+yarah/
 ├── frontend/             ← Mounts and serves the dashboard
 │   ├── src/
 │   │   ├── App.tsx       ← Thin router selecting cloud vs self-host mode
-│   │   └── self-hosting/ ← Delegates full routing to @insforge/dashboard
-│   └── package.json      ← Declares dependency on "@insforge/dashboard": "*"
+│   │   └── self-hosting/ ← Delegates full routing to @yarahdev/dashboard
+│   └── package.json      ← Declares dependency on "@yarahdev/dashboard": "*"
 │
 └── packages/
     └── dashboard/        ← THIS PACKAGE
@@ -64,18 +64,18 @@ insforge/
 
 ## Dependency Boundaries
 
-To maintain package isolation and clean separation of concerns, the `@insforge/dashboard` package adheres to the following dependency boundaries:
+To maintain package isolation and clean separation of concerns, the `@yarahdev/dashboard` package adheres to the following dependency boundaries:
 
-* **Internal Packages:** Depends strictly on `@insforge/shared-schemas` for data validation/contracts and `@insforge/ui` for shared UI primitives and components.
+* **Internal Packages:** Depends strictly on `@yarahdev/shared-schemas` for data validation/contracts and `@yarahdev/ui` for shared UI primitives and components.
 * **No Parent Dependencies:** Does not import or depend on the parent hosting shells (`frontend/` or enterprise cloud hosts). Configuration is passed down from the parent host at runtime via context providers.
-* **Service Isolation:** Interacts with the `insforge-backend` server exclusively via HTTP REST endpoints and Socket.io WebSocket connections. No direct database or server-side internal modules are imported.
+* **Service Isolation:** Interacts with the `yarah-backend` server exclusively via HTTP REST endpoints and Socket.io WebSocket connections. No direct database or server-side internal modules are imported.
 
 ---
 
 ## Release Expectations
 
 Build output: Vite + tsc produce ESM under dist/, with dist/index.js and dist/styles.css declared via exports in package.json.
-Distribution: Currently consumed only via the monorepo workspace ("@insforge/dashboard": "*" in frontend/package.json). The package is not yet published to a public registry; the 0.0.0-dev.* versions track internal iterations.
+Distribution: Currently consumed only via the monorepo workspace ("@yarahdev/dashboard": "*" in frontend/package.json). The package is not yet published to a public registry; the 0.0.0-dev.* versions track internal iterations.
 Versioning: Will adopt SemVer once the package is published externally. Until then, treat any change as potentially breaking for host shells.
 
 ---

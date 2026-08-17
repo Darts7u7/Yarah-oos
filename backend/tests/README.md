@@ -1,6 +1,6 @@
-# Insforge Backend Tests
+# Yarah Backend Tests
 
-This directory contains all test scripts for the Insforge backend.
+This directory contains all test scripts for the Yarah backend.
 
 ## Prerequisites
 

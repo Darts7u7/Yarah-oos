@@ -1,13 +1,13 @@
 ---
 title: Model Gateway
-description: Call chat, streaming, and embedding models from Swift with the OpenRouter API key provisioned by the InsForge Model Gateway, from trusted server code.
+description: Call chat, streaming, and embedding models from Swift with the OpenRouter API key provisioned by the Yarah Model Gateway, from trusted server code.
 ---
 
 ## Overview
 
-InsForge provisions an OpenRouter API key for Model Gateway projects. New Swift applications should call OpenRouter directly from trusted server-side code, a backend API, or another secure boundary. Do not embed the OpenRouter key in an iOS, macOS, tvOS, or watchOS app binary.
+Yarah provisions an OpenRouter API key for Model Gateway projects. New Swift applications should call OpenRouter directly from trusted server-side code, a backend API, or another secure boundary. Do not embed the OpenRouter key in an iOS, macOS, tvOS, or watchOS app binary.
 
-The previous InsForge Swift AI SDK methods are deprecated compatibility wrappers. Use the InsForge SDK for database, auth, storage, functions, and realtime; use OpenRouter for model calls.
+The previous Yarah Swift AI SDK methods are deprecated compatibility wrappers. Use the Yarah SDK for database, auth, storage, functions, and realtime; use OpenRouter for model calls.
 
 ## Recommended Architecture
 
@@ -72,13 +72,13 @@ func sendPrompt(_ prompt: String, sessionToken: String) async throws -> ChatResp
 
 Use an app session token or another user-scoped credential for your backend route. Never send the OpenRouter key from a Swift client.
 
-## Legacy InsForge AI Methods
+## Legacy Yarah AI Methods
 
 These Swift SDK methods are deprecated for new AI integrations:
 
-- `insforge.ai.chatCompletion(...)`
-- `insforge.ai.generateEmbeddings(...)`
-- `insforge.ai.generateImage(...)`
-- `insforge.ai.listModels()`
+- `yarah.ai.chatCompletion(...)`
+- `yarah.ai.generateEmbeddings(...)`
+- `yarah.ai.generateImage(...)`
+- `yarah.ai.listModels()`
 
-They target the deprecated InsForge AI proxy. New integrations should use the OpenRouter key from the dashboard and follow OpenRouter's current API docs for model parameters and capabilities.
+They target the deprecated Yarah AI proxy. New integrations should use the OpenRouter key from the dashboard and follow OpenRouter's current API docs for model parameters and capabilities.

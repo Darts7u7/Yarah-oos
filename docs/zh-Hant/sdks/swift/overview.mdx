@@ -1,11 +1,11 @@
 ---
 title: iOS、macOS、tvOS、watchOS 用 Swift SDK
-description: "透過 Swift Package Manager 安裝並初始化官方 InsForge Swift SDK，於 Apple 平台使用驗證、資料庫、儲存與即時功能。"
+description: "透過 Swift Package Manager 安裝並初始化官方 Yarah Swift SDK，於 Apple 平台使用驗證、資料庫、儲存與即時功能。"
 ---
 
 import SwiftSdkInstallation from '/snippets/swift-sdk-installation.mdx';
 
-InsForge Swift SDK 為從 iOS、macOS、tvOS 和 watchOS 應用與 InsForge 服務互動提供了原生 Swift 用戶端。
+Yarah Swift SDK 為從 iOS、macOS、tvOS 和 watchOS 應用與 Yarah 服務互動提供了原生 Swift 用戶端。
 
 ## 安裝
 
@@ -15,21 +15,21 @@ InsForge Swift SDK 為從 iOS、macOS、tvOS 和 watchOS 應用與 InsForge 服�
 
 或透過 Xcode 新增：
 1. File → Add Packages...
-2. 輸入：`https://github.com/insforge/insforge-swift.git`
+2. 輸入：`https://github.com/yarah/yarah-swift.git`
 
 ### CocoaPods（即將推出）
 
 ```ruby
-pod 'InsForge', '~> 1.0'
+pod 'Yarah', '~> 1.0'
 ```
 
 ## 快速入門
 
 ```swift
-import InsForge
+import Yarah
 
-let insforge = InsForgeClient(
-    baseUrl: "https://your-app.insforge.app",
+let yarah = YarahClient(
+    baseUrl: "https://your-app.apps.yarah.dev",
     anonKey: "your-anon-key"
 )
 ```

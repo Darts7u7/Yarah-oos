@@ -10,7 +10,7 @@ import { RealtimeChannelService } from '@/services/realtime/realtime-channel.ser
 import { getComputeMetadata } from '@/services/compute/services.service.js';
 import { DeploymentService } from '@/services/deployments/deployment.service.js';
 import { DatabaseManager } from '@/infra/database/database.manager.js';
-import type { AppMetadataSchema } from '@insforge/shared-schemas';
+import type { AppMetadataSchema } from '@yarahdev/shared-schemas';
 
 export class MetadataService {
   private static instance: MetadataService;

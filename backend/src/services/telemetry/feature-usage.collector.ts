@@ -173,7 +173,7 @@ export class FeatureUsageCollector {
           this.used.add(feature);
         }
       } catch (error) {
-        logger.warn('InsForge feature usage tracking skipped', {
+        logger.warn('Yarah feature usage tracking skipped', {
           error: error instanceof Error ? error.message : String(error),
         });
       }

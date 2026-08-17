@@ -76,7 +76,7 @@ describe('POST /api/compute/services/:id/build', () => {
     });
     computeServiceMock.buildAndDeploy.mockResolvedValue({
       service: { id: 'svc-1', name: 'api' },
-      imageTag: 'insforge-x/api:abc',
+      imageTag: 'yarah-x/api:abc',
       logs: ['Step 1/2'],
     });
   });

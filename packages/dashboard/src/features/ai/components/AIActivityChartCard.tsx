@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { AIOverviewMetricPoint } from '@insforge/shared-schemas';
+import type { AIOverviewMetricPoint } from '@yarahdev/shared-schemas';
 import { formatCompactNumber } from '#features/ai/helpers';
 
 function parseBucketLabel(label: string): Date | null {

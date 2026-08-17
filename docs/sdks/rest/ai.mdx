@@ -1,11 +1,11 @@
 ---
 title: AI REST Reference
-description: Call OpenRouter over HTTP with the key provisioned by InsForge, plus reference the legacy Model Gateway proxy endpoints for chat, images, and embeddings.
+description: Call OpenRouter over HTTP with the key provisioned by Yarah, plus reference the legacy Model Gateway proxy endpoints for chat, images, and embeddings.
 ---
 
 ## Overview
 
-New AI integrations should call OpenRouter directly with the OpenRouter key provisioned by InsForge. The InsForge AI proxy routes for chat, image generation, and embeddings are deprecated compatibility endpoints.
+New AI integrations should call OpenRouter directly with the OpenRouter key provisioned by Yarah. The Yarah AI proxy routes for chat, image generation, and embeddings are deprecated compatibility endpoints.
 
 Use the dashboard to copy the active OpenRouter key into a server-only `OPENROUTER_API_KEY` environment variable.
 
@@ -69,11 +69,11 @@ curl "https://openrouter.ai/api/v1/models?output_modalities=all"
 OpenRouter owns the current request and response shape for AI model calls. Check OpenRouter's API docs for model-specific parameters, supported modalities, plugins, and video generation endpoints.
 </Note>
 
-## InsForge Admin Helper Endpoints
+## Yarah Admin Helper Endpoints
 
 These endpoints help the dashboard display the active Model Gateway key, model catalog, and usage overview. They require admin authentication.
 
-Use either an admin JWT bearer token or an InsForge API key bearer token in the `Authorization` header.
+Use either an admin JWT bearer token or an Yarah API key bearer token in the `Authorization` header.
 
 ### Get Available Models
 
@@ -82,13 +82,13 @@ GET /api/ai/models
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/models" \
+curl "https://your-app.apps.yarah.dev/api/ai/models" \
   -H "Authorization: Bearer <ADMIN_JWT_TOKEN>"
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/models" \
-  -H "Authorization: Bearer <INSFORGE_API_KEY>"
+curl "https://your-app.apps.yarah.dev/api/ai/models" \
+  -H "Authorization: Bearer <YARAH_API_KEY>"
 ```
 
 <Warning>
@@ -120,13 +120,13 @@ GET /api/ai/openrouter/api-key
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/openrouter/api-key" \
+curl "https://your-app.apps.yarah.dev/api/ai/openrouter/api-key" \
   -H "Authorization: Bearer <ADMIN_JWT_TOKEN>"
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/openrouter/api-key" \
-  -H "Authorization: Bearer <INSFORGE_API_KEY>"
+curl "https://your-app.apps.yarah.dev/api/ai/openrouter/api-key" \
+  -H "Authorization: Bearer <YARAH_API_KEY>"
 ```
 
 ```json
@@ -147,18 +147,18 @@ GET /api/ai/overview
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/overview" \
+curl "https://your-app.apps.yarah.dev/api/ai/overview" \
   -H "Authorization: Bearer <ADMIN_JWT_TOKEN>"
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/overview" \
-  -H "Authorization: Bearer <INSFORGE_API_KEY>"
+curl "https://your-app.apps.yarah.dev/api/ai/overview" \
+  -H "Authorization: Bearer <YARAH_API_KEY>"
 ```
 
 Returns key-level OpenRouter usage and activity time series when the active key has activity access.
 
-## Deprecated InsForge Proxy Routes
+## Deprecated Yarah Proxy Routes
 
 The following routes still exist for existing applications, but new code should use OpenRouter directly.
 
@@ -174,7 +174,7 @@ The following routes still exist for existing applications, but new code should 
 POST /api/ai/chat/completion
 ```
 
-This route validates an InsForge-shaped request, forwards it to OpenRouter, and returns an InsForge-shaped response. It does not expose the complete OpenRouter API surface.
+This route validates an Yarah-shaped request, forwards it to OpenRouter, and returns an Yarah-shaped response. It does not expose the complete OpenRouter API surface.
 
 ### Legacy Image Proxy
 
@@ -182,7 +182,7 @@ This route validates an InsForge-shaped request, forwards it to OpenRouter, and 
 POST /api/ai/image/generation
 ```
 
-This route forwards an InsForge-shaped image request to OpenRouter chat completions with image output. It is retained for compatibility only.
+This route forwards an Yarah-shaped image request to OpenRouter chat completions with image output. It is retained for compatibility only.
 
 ### Legacy Embeddings Proxy
 
@@ -190,4 +190,4 @@ This route forwards an InsForge-shaped image request to OpenRouter chat completi
 POST /api/ai/embeddings
 ```
 
-This route forwards an InsForge-shaped embeddings request to OpenRouter. Prefer the direct OpenRouter embeddings endpoint for new code.
+This route forwards an Yarah-shaped embeddings request to OpenRouter. Prefer the direct OpenRouter embeddings endpoint for new code.

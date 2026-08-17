@@ -1,6 +1,6 @@
 ---
 title: "Schedules: cron-triggered functions"
-description: "Trigger InsForge edge functions on a cron schedule with pg_cron: secret-aware headers, encrypted keys, job logs, retry guidance, and keep-alive tips."
+description: "Trigger Yarah edge functions on a cron schedule with pg_cron: secret-aware headers, encrypted keys, job logs, retry guidance, and keep-alive tips."
 ---
 
 Schedules invoke functions on a recurring cron expression. [pg_cron](https://github.com/citusdata/pg_cron) fires an HTTP request to the function URL at each tick and logs the result.
@@ -27,7 +27,7 @@ Create via dashboard or SQL:
 select schedules.create_job(
   name       => 'daily-cleanup',
   schedule   => '0 0 * * *',
-  url        => 'https://myapp.functions.insforge.app/cleanup',
+  url        => 'https://myapp.functions.apps.yarah.dev/cleanup',
   headers    => jsonb_build_object('Authorization', 'Bearer ${{secrets.CRON_TOKEN}}')
 );
 ```

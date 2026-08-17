@@ -1,49 +1,49 @@
 ---
 title: "VS Code extension"
-description: "Sign in to InsForge from VS Code, pick an org and project, and install the InsForge MCP server into your AI coding assistant with one click."
+description: "Sign in to Yarah from VS Code, pick an org and project, and install the Yarah MCP server into your AI coding assistant with one click."
 ---
 
 ## Overview
 
-The InsForge VS Code extension:
+The Yarah VS Code extension:
 
-- Logs you in to InsForge (OAuth + PKCE)
+- Logs you in to Yarah (OAuth + PKCE)
 - Lets you pick an org/project
-- Installs InsForge MCP for your AI client
+- Installs Yarah MCP for your AI client
 
-It launches the MCP installer (`npx @insforge/install`) with your project’s API key and API base URL.
+It launches the MCP installer (`npx @yarah/install`) with your project’s API key and API base URL.
 
 ## Links
 
-- [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=InsForge.insforge)
-- [Open VSX](https://open-vsx.org/extension/InsForge/insforge)
+- [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Yarah.yarah)
+- [Open VSX](https://open-vsx.org/extension/Yarah/yarah)
 
 ## Install
 
 1. Open VS Code
 2. Go to **Extensions**
-3. Search for **InsForge**
-4. Install the extension published by **insforge**
+3. Search for **Yarah**
+4. Install the extension published by **yarah**
 
 ## Use the extension
 
 <Steps>
-  <Step title="Open the InsForge panel">
-    Click the **InsForge** icon in the Activity Bar (left sidebar).
+  <Step title="Open the Yarah panel">
+    Click the **Yarah** icon in the Activity Bar (left sidebar).
   </Step>
 
   <Step title="Login">
-    Click **Login with InsForge** and complete the login flow in your browser.
+    Click **Login with Yarah** and complete the login flow in your browser.
 
     <Note>The callback is <code>http://127.0.0.1:54321/callback</code>.</Note>
   </Step>
 
   <Step title="Select a project">
-    Pick an organization and project from the InsForge tree view, or run <code>InsForge: Select Project</code> from the Command Palette.
+    Pick an organization and project from the Yarah tree view, or run <code>Yarah: Select Project</code> from the Command Palette.
   </Step>
 
   <Step title="Install MCP">
-    Run <code>InsForge: Install MCP</code> (or right-click a project and choose **Install MCP**), then pick the AI client you want to configure.
+    Run <code>Yarah: Install MCP</code> (or right-click a project and choose **Install MCP**), then pick the AI client you want to configure.
 
     The installer runs in a VS Code terminal.
   </Step>
@@ -51,7 +51,7 @@ It launches the MCP installer (`npx @insforge/install`) with your project’s AP
 
 ## Supported AI clients
 
-The extension supports the following MCP “clients” (the value passed to `@insforge/install`):
+The extension supports the following MCP “clients” (the value passed to `@yarah/install`):
 
 | Client | Typical config location |
 |---|---|

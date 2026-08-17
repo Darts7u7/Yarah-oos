@@ -1,9 +1,9 @@
 ---
 title: "数据库迁移"
-description: "在 git 中跟踪 Postgres 架构变更，使用 InsForge CLI 应用版本化 SQL 迁移，运行记录写入 system.custom_migrations。"
+description: "在 git 中跟踪 Postgres 架构变更，使用 Yarah CLI 应用版本化 SQL 迁移，运行记录写入 system.custom_migrations。"
 ---
 
-迁移是 `migrations/` 中应用于 `@insforge/cli` 的版本化 SQL 文件。每次成功运行都记录在 `system.custom_migrations` 中。工作流是仅向前的。
+迁移是 `migrations/` 中应用于 `@yarah/cli` 的版本化 SQL 文件。每次成功运行都记录在 `system.custom_migrations` 中。工作流是仅向前的。
 
 ## 概念
 
@@ -14,9 +14,9 @@ description: "在 git 中跟踪 Postgres 架构变更，使用 InsForge CLI 应�
 链接后端，然后创建文件。
 
 ```bash
-npx @insforge/cli login
-npx @insforge/cli link
-npx @insforge/cli db migrations new create-employees-table
+npx @yarah/cli login
+npx @yarah/cli link
+npx @yarah/cli db migrations new create-employees-table
 ```
 
 编写 SQL。
@@ -33,8 +33,8 @@ create table if not exists public.employees (
 应用待处理的迁移并检查历史。
 
 ```bash
-npx @insforge/cli db migrations up --all
-npx @insforge/cli db migrations list
+npx @yarah/cli db migrations up --all
+npx @yarah/cli db migrations list
 ```
 
 使用 `up <version>` 针对单个文件，或使用 `up --to <version>` 应用到目标为止的所有待处理项。

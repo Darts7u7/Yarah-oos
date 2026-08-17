@@ -1,13 +1,13 @@
 ---
 title: "Tiempo real"
 sidebarTitle: "Overview"
-description: "Envía cambios de base de datos, difusiones, presencia y distribución a webhooks a través de canales en tiempo real con Socket.IO en tu proyecto InsForge."
+description: "Envía cambios de base de datos, difusiones, presencia y distribución a webhooks a través de canales en tiempo real con Socket.IO en tu proyecto Yarah."
 ---
 
-Usa InsForge Realtime cuando tu aplicación necesite actualizarse sin recargar la página. Los clientes se suscriben a canales como `order:123` o `chat:room-1`, y luego reciben cambios de base de datos, difusiones y actualizaciones de presencia a través de WebSockets. Los canales también pueden distribuir los mismos mensajes a URLs de webhook cuando otro servicio deba recibir el evento.
+Usa Yarah Realtime cuando tu aplicación necesite actualizarse sin recargar la página. Los clientes se suscriben a canales como `order:123` o `chat:room-1`, y luego reciben cambios de base de datos, difusiones y actualizaciones de presencia a través de WebSockets. Los canales también pueden distribuir los mismos mensajes a URLs de webhook cuando otro servicio deba recibir el evento.
 
 <Frame caption="Panel de Realtime: patrones de canal, historial de mensajes, permisos y configuración de retención.">
-  <img src="/images/dashboard-realtime.png" alt="Panel de InsForge Realtime" />
+  <img src="/images/dashboard-realtime.png" alt="Panel de Yarah Realtime" />
 </Frame>
 
 <Note>
@@ -16,7 +16,7 @@ Usa InsForge Realtime cuando tu aplicación necesite actualizarse sin recargar l
 
 ```mermaid
 graph TB
-    App[Client application] --> SDK[InsForge SDK]
+    App[Client application] --> SDK[Yarah SDK]
     SDK --> Channel[Realtime channel]
 
     Database[(Postgres)] --> Trigger[Database trigger]
@@ -83,14 +83,14 @@ Luego suscríbete desde la aplicación con el SDK:
 ```typescript
 const channel = `order:${orderId}`;
 
-await insforge.realtime.connect();
+await yarah.realtime.connect();
 
-const subscription = await insforge.realtime.subscribe(channel);
+const subscription = await yarah.realtime.subscribe(channel);
 if (!subscription.ok) {
   throw new Error(subscription.error.message);
 }
 
-insforge.realtime.on('status_changed', (message) => {
+yarah.realtime.on('status_changed', (message) => {
   renderOrderStatus(message.status);
 });
 ```
@@ -100,7 +100,7 @@ insforge.realtime.on('status_changed', (message) => {
 Los clientes pueden publicar mensajes en canales a los que ya se han unido. Úsalo para chat, indicadores de escritura, cursores, señales de edición colaborativa y otras actualizaciones de usuario a usuario que no necesiten originarse en una escritura de base de datos.
 
 ```typescript
-await insforge.realtime.publish(`chat:${roomId}`, 'typing', {
+await yarah.realtime.publish(`chat:${roomId}`, 'typing', {
   userId,
   isTyping: true
 });
@@ -108,24 +108,24 @@ await insforge.realtime.publish(`chat:${roomId}`, 'typing', {
 
 ### Webhooks
 
-Adjunta URLs de webhook a un canal cuando otro servicio deba recibir cada mensaje. InsForge publica el payload del evento en cada URL configurada, incluye encabezados con el nombre del evento, el canal y el ID del mensaje, reintenta los fallos transitorios de red y registra los conteos de entrega de webhooks en el historial de mensajes.
+Adjunta URLs de webhook a un canal cuando otro servicio deba recibir cada mensaje. Yarah publica el payload del evento en cada URL configurada, incluye encabezados con el nombre del evento, el canal y el ID del mensaje, reintenta los fallos transitorios de red y registra los conteos de entrega de webhooks en el historial de mensajes.
 
 ### Presencia
 
 La presencia rastrea quién está en línea en un canal. Los clientes reciben una instantánea de los miembros actuales al suscribirse, y luego los eventos `presence:join` y `presence:leave` a medida que los miembros entran y salen. Guarda la membresía duradera de la sala, los roles y los permisos en tus propias tablas; la presencia solo ofrece el estado en línea.
 
 ```typescript
-const response = await insforge.realtime.subscribe(`chat:${roomId}`);
+const response = await yarah.realtime.subscribe(`chat:${roomId}`);
 
 if (response.ok) {
   renderOnlineMembers(response.presence.members);
 }
 
-insforge.realtime.on('presence:join', (message) => {
+yarah.realtime.on('presence:join', (message) => {
   addOnlineMember(message.member);
 });
 
-insforge.realtime.on('presence:leave', (message) => {
+yarah.realtime.on('presence:leave', (message) => {
   removeOnlineMember(message.member.presenceId);
 });
 ```

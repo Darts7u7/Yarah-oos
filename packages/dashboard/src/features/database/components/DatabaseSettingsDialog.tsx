@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DatabaseBackup } from 'lucide-react';
-import type { UpdateDatabaseBackupConfig } from '@insforge/shared-schemas';
+import type { UpdateDatabaseBackupConfig } from '@yarahdev/shared-schemas';
 import {
   Button,
   cn,
@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { useBackupConfig } from '#features/database/hooks/useBackupConfig';
 import { formatUtcTimestamp } from '#features/database/utils';
 

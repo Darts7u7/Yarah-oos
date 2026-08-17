@@ -8,7 +8,7 @@ import {
   LogStatsSchema,
   getBuildLogsResponseSchema,
   type GetBuildLogsResponseSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { isCloudEnvironment } from '@/utils/environment.js';
 import {
   DenoSubhostingProvider,

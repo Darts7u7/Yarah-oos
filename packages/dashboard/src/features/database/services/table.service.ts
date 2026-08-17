@@ -7,7 +7,7 @@ import {
   GetTableSchemaResponse,
   UpdateTableSchemaRequest,
   UpdateTableSchemaResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class TableService {
   async listTables(

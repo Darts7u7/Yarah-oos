@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Insforge Deployments API
+  title: Yarah Deployments API
   version: 1.0.0
   description: Frontend deployment sessions, source uploads, environment variables, and custom domains.
 
@@ -120,8 +120,8 @@ paths:
 
   /api/deployments/slug:
     put:
-      summary: Update InsForge-hosted slug
-      description: Updates the Cloud project slug used for the `.insforge.site` domain. Pass `null` to clear the slug.
+      summary: Update Yarah-hosted slug
+      description: Updates the Cloud project slug used for the `.yarah.site` domain. Pass `null` to clear the slug.
       tags:
         - Admin
       security:
@@ -450,7 +450,7 @@ paths:
   /api/deployments/{id}/files/{fileId}/content:
     put:
       summary: Upload direct deployment file content
-      description: Streams one registered file through InsForge to the provider. The request body must match the manifest size and SHA-1 digest.
+      description: Streams one registered file through Yarah to the provider. The request body must match the manifest size and SHA-1 digest.
       tags:
         - Admin
       security:
@@ -1048,7 +1048,7 @@ components:
           type: string
           pattern: '^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$'
           example: app.example.com
-          description: User-owned domain. Domains ending in `.insforge.site` are reserved.
+          description: User-owned domain. Domains ending in `.yarah.site` are reserved.
 
     ListCustomDomainsResponse:
       type: object

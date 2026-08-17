@@ -25,8 +25,8 @@ import {
   MenuDialogCloseButton,
   cn,
   useToast,
-} from '@insforge/ui';
-import type { InstanceInfoEvent } from '@insforge/shared-schemas';
+} from '@yarahdev/ui';
+import type { InstanceInfoEvent } from '@yarahdev/shared-schemas';
 import { useApiKey } from '#lib/hooks/useMetadata';
 import { useDashboardHost, useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
 import { useHealth } from '#lib/hooks/useHealth';
@@ -36,7 +36,7 @@ import {
   type CloudProjectInfo,
 } from '#lib/hooks/useCloudProjectInfo';
 import { useConfirm } from '#lib/hooks/useConfirm';
-import { compareVersions, getBackendUrl, isInsForgeCloudProject } from '#lib/utils/utils';
+import { compareVersions, getBackendUrl, isYarahCloudProject } from '#lib/utils/utils';
 import { MCPSection, CLISection, ConnectionStringSection } from './connect';
 import { metadataService } from '#lib/services/metadata.service';
 
@@ -81,7 +81,7 @@ export default function ProjectSettingsMenuDialog({
   const { showToast } = useToast();
   const queryClient = useQueryClient();
 
-  const isCloud = isInsForgeCloudProject();
+  const isCloud = isYarahCloudProject();
   const canUseCloudHost = isCloud && isCloudHostingMode;
   const projectUrl = useMemo(() => `${getBackendUrl().replace(/\/$/, '')}/`, []);
 
@@ -682,7 +682,7 @@ export default function ProjectSettingsMenuDialog({
                           <p className="pb-2 text-[13px] leading-[18px] text-muted-foreground">
                             {t('settings.cliDescription', {
                               defaultValue:
-                                'Link this cloud project with InsForge CLI and verify the connection.',
+                                'Link this cloud project with Yarah CLI and verify the connection.',
                             })}
                           </p>
                         </div>

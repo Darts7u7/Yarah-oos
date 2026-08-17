@@ -4,7 +4,7 @@ import type { TFunction } from 'i18next';
 import { SortColumn } from 'react-data-grid';
 import { AlertCircle, Mail } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
-import type { PaymentCustomerListItem } from '@insforge/shared-schemas';
+import type { PaymentCustomerListItem } from '@yarahdev/shared-schemas';
 import MastercardLogo from '#assets/logos/mastercard.svg?react';
 import VisaLogo from '#assets/logos/visa.svg?react';
 import {
@@ -23,7 +23,7 @@ import { PaymentsOnboardingState } from '#features/payments/components/PaymentsO
 import type { PaymentsOutletContext } from '#features/payments/components/PaymentsLayout';
 import { usePaymentClientPagination } from '#features/payments/hooks/usePaymentClientPagination';
 import { usePaymentCustomers } from '#features/payments/hooks/usePaymentCustomers';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 import { formatCurrencyAmount } from '#features/payments/helpers';
 
 type CustomerBadgeVariant = 'deleted' | 'guest' | null;

@@ -12,8 +12,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
   cn,
-} from '@insforge/ui';
-import type { DeploymentEnvVar } from '@insforge/shared-schemas';
+} from '@yarahdev/ui';
+import type { DeploymentEnvVar } from '@yarahdev/shared-schemas';
 import { formatTime } from '#lib/utils/utils';
 import { useCopyToClipboard } from '#lib/hooks/useCopyToClipboard';
 import { deploymentsService } from '#features/deployments/services/deployments.service';

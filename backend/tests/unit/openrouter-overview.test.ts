@@ -29,7 +29,7 @@ vi.mock('../../src/services/ai/model-gateway-config.service.js', () => ({
 }));
 
 import { OpenRouterProvider } from '../../src/providers/ai/openrouter.provider.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 type ProviderState = OpenRouterProvider & {
   cloudCredentials?: unknown;

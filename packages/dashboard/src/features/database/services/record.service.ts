@@ -1,7 +1,7 @@
 import { ConvertedValue } from '#components/datagrid/datagridTypes';
 import { DEFAULT_DATABASE_SCHEMA, type RecordPrimaryKey } from '#features/database/helpers';
 import { apiClient } from '#lib/api/client';
-import { BulkUpsertResponse } from '@insforge/shared-schemas';
+import { BulkUpsertResponse } from '@yarahdev/shared-schemas';
 import { convertToCSV, getExportFilename } from '#lib/utils/data-export';
 
 interface AdminRecordListResponse {

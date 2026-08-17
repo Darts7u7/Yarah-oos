@@ -2,7 +2,7 @@ import type {
   RazorpaySubscription,
   RazorpaySubscriptionStatus,
   StripeSubscription,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export type PaymentSubscriptionStatus =
   | 'incomplete'

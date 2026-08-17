@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
   Skeleton,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import RefreshIcon from '#assets/icons/refresh.svg?react';

@@ -1,6 +1,6 @@
 ---
 title: Referencia de SDK de funciones
-description: Invoca funciones sin servidor de InsForge desde Kotlin con el SDK oficial para ejecutar lógica de servidor, webhooks y tareas asíncronas en tu app Android.
+description: Invoca funciones sin servidor de Yarah desde Kotlin con el SDK oficial para ejecutar lógica de servidor, webhooks y tareas asíncronas en tu app Android.
 ---
 
 import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
@@ -99,8 +99,8 @@ Estos métodos requieren que el cliente se inicialice con una **clave de rol de 
 
 ```kotlin
 // Initialize client with service role key for admin operations
-val adminClient = createInsforgeClient(
-    baseUrl = "https://your-app.insforge.app",
+val adminClient = createYarahClient(
+    baseUrl = "https://your-app.apps.yarah.dev",
     anonKey = "your-service-role-key"  // Use service role key or api key, not anon key
 ) {
     install(Functions)
@@ -136,7 +136,7 @@ println("Code: ${details.code}")
 ### createFunction()
 
 <Note>
-Actualmente, InsForge solo admite funciones JavaScript/TypeScript que se ejecutan en un entorno Deno.
+Actualmente, Yarah solo admite funciones JavaScript/TypeScript que se ejecutan en un entorno Deno.
 </Note>
 
 Crear una nueva función.
@@ -199,12 +199,12 @@ client.functions.deleteFunction("old-function")
 ## Manejo de errores
 
 ```kotlin
-import dev.insforge.exceptions.InsforgeHttpException
+import dev.yarah.exceptions.YarahHttpException
 
 try {
     val response = client.functions.invoke<MyResponse>("my-function")
     println("Success: $response")
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     println("HTTP Error ${e.statusCode}: ${e.message}")
     println("Error code: ${e.error}")
     e.nextActions?.let { actions ->

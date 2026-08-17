@@ -6,21 +6,21 @@
       "inputs": ["src/**", "tsconfig*.json", "package.json", "vite.config.*", "tsup.config.*"],
       "env": ["VITE_*"]
     },
-    "@insforge/backend#build": {
+    "yarah-backend#build": {
       "outputs": ["../dist/server.js", "../dist/server.js.map"]
     },
-    "frontend#build": {
+    "yarah-shell#build": {
       "dependsOn": [],
       "outputs": ["../dist/frontend/**"]
     },
-    "@insforge/ui#build": {
+    "@yarahdev/ui#build": {
       "outputs": ["dist/**"]
     },
-    "@insforge/dashboard#build": {
+    "@yarahdev/dashboard#build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
-    "@insforge/shared-schemas#build": {
+    "@yarahdev/shared-schemas#build": {
       "outputs": ["dist/**"]
     },
     "typecheck": {

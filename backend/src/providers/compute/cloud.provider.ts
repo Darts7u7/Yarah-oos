@@ -2,7 +2,7 @@ import { appConfig } from '@/infra/config/app.config.js';
 import { isCloudEnvironment } from '@/utils/environment.js';
 import { TokenManager } from '@/infra/security/token.manager.js';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import {
   MachineGoneError,
   translateMachineGone,

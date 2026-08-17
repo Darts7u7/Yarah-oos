@@ -10,7 +10,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from tracker.client import APIError, AuthError, InsForgeClient
+from tracker.client import APIError, AuthError, YarahClient
 from tracker.config import load_config, save_config, update_tokens
 
 console = Console()
@@ -18,7 +18,7 @@ err_console = Console(stderr=True)
 
 REQUIRED_TABLES = ["experiments", "runs"]
 
-# SQL for admins to run once via the InsForge dashboard or migration API
+# SQL for admins to run once via the Yarah dashboard or migration API
 ADMIN_SETUP_SQL = """\
 CREATE TABLE IF NOT EXISTS experiments (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -59,7 +59,7 @@ def handle_errors(fn):
         except httpx.ConnectError:
             cfg = load_config()
             err_console.print(
-                f"[bold red]Connection refused.[/] Is InsForge running at {cfg.server_url}?"
+                f"[bold red]Connection refused.[/] Is Yarah running at {cfg.server_url}?"
             )
             raise SystemExit(1)
         except httpx.TimeoutException:
@@ -108,7 +108,7 @@ def now_iso() -> str:
 @click.group()
 @click.version_option(version="0.1.0", prog_name="tracker")
 def cli() -> None:
-    """ML Experiment Tracker — powered by InsForge BaaS."""
+    """ML Experiment Tracker — powered by Yarah BaaS."""
 
 
 from tracker.serve import cmd_serve  # noqa: E402
@@ -126,15 +126,15 @@ cli.add_command(cmd_serve)
     confirmation_prompt=True,
     help="Account password",
 )
-@click.option("--server", default=None, help="InsForge server URL")
+@click.option("--server", default=None, help="Yarah server URL")
 @handle_errors
 def cmd_register(email: str, password: str, server: str | None) -> None:
-    """Register a new InsForge user account."""
+    """Register a new Yarah user account."""
     cfg = load_config()
     if server:
         cfg.server_url = server
         save_config(cfg)
-    with InsForgeClient(cfg) as client:
+    with YarahClient(cfg) as client:
         client.register(email, password)
     console.print(Panel(f"[green]Registered[/] {email}\nRun [bold]tracker login[/] to authenticate."))
 
@@ -144,7 +144,7 @@ def cmd_register(email: str, password: str, server: str | None) -> None:
 @cli.command("login")
 @click.option("--email", prompt="Email", help="User email address")
 @click.option("--password", prompt="Password", hide_input=True, help="Account password")
-@click.option("--server", default=None, help="InsForge server URL")
+@click.option("--server", default=None, help="Yarah server URL")
 @handle_errors
 def cmd_login(email: str, password: str, server: str | None) -> None:
     """Authenticate and save credentials to ~/.config/ml-tracker/config.json."""
@@ -152,7 +152,7 @@ def cmd_login(email: str, password: str, server: str | None) -> None:
     if server:
         cfg.server_url = server
         save_config(cfg)
-    with InsForgeClient(cfg) as client:
+    with YarahClient(cfg) as client:
         access_token, refresh_token = client.login(email, password)
     cfg.access_token = access_token
     cfg.refresh_token = refresh_token
@@ -166,8 +166,8 @@ def cmd_login(email: str, password: str, server: str | None) -> None:
 @cli.command("init")
 @handle_errors
 def cmd_init() -> None:
-    """Verify that the required InsForge tables exist and are accessible."""
-    with InsForgeClient() as client:
+    """Verify that the required Yarah tables exist and are accessible."""
+    with YarahClient() as client:
         missing = [t for t in REQUIRED_TABLES if not client.table_exists(t)]
 
     if not missing:
@@ -179,8 +179,8 @@ def cmd_init() -> None:
     missing_list = ", ".join(f"[bold]{t}[/]" for t in missing)
     err_console.print(Panel(
         f"[yellow]Missing tables:[/] {missing_list}\n\n"
-        "InsForge table creation requires admin access. Ask your project admin to run "
-        "the following migration via the InsForge dashboard or admin API:\n\n"
+        "Yarah table creation requires admin access. Ask your project admin to run "
+        "the following migration via the Yarah dashboard or admin API:\n\n"
         f"[dim]{ADMIN_SETUP_SQL}[/]",
         title="Setup required",
         border_style="yellow",
@@ -215,7 +215,7 @@ def cmd_log(
     started_at = started_at or ts
     finished_at = finished_at or ts
 
-    with InsForgeClient() as client:
+    with YarahClient() as client:
         exp = client.get_or_create_experiment(experiment)
         run = client.create_run(
             experiment_id=exp.id,
@@ -245,7 +245,7 @@ def runs_group() -> None:
 @handle_errors
 def cmd_runs_list(experiment: str | None, limit: int, offset: int) -> None:
     """List recent runs, optionally filtered by experiment."""
-    with InsForgeClient() as client:
+    with YarahClient() as client:
         runs = client.list_runs(experiment_name=experiment, limit=limit, offset=offset)
 
     if not runs:
@@ -280,7 +280,7 @@ def cmd_runs_list(experiment: str | None, limit: int, offset: int) -> None:
 @handle_errors
 def cmd_runs_get(run_id: str) -> None:
     """Show full details for a specific run."""
-    with InsForgeClient() as client:
+    with YarahClient() as client:
         run = client.get_run(run_id)
     _print_run_panel(run)
 
@@ -297,7 +297,7 @@ def experiments_group() -> None:
 @handle_errors
 def cmd_experiments_list(limit: int) -> None:
     """List all experiments."""
-    with InsForgeClient() as client:
+    with YarahClient() as client:
         exps = client.list_experiments(limit=limit)
 
     if not exps:

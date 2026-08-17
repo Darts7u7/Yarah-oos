@@ -4,7 +4,7 @@ import { isCloudEnvironment } from '@/utils/environment.js';
 import { AppError, UpstreamError } from '@/utils/errors.js';
 import { TokenManager } from '@/infra/security/token.manager.js';
 import { appConfig } from '@/infra/config/app.config.js';
-import { ERROR_CODES, type AIOverview } from '@insforge/shared-schemas';
+import { ERROR_CODES, type AIOverview } from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 import { ModelGatewayConfigService } from '@/services/ai/model-gateway-config.service.js';
 
@@ -129,15 +129,15 @@ export class OpenRouterProvider {
       baseURL: 'https://openrouter.ai/api/v1',
       apiKey,
       defaultHeaders: {
-        'HTTP-Referer': 'https://insforge.dev',
-        'X-Title': 'InsForge',
+        'HTTP-Referer': 'https://yarah.dev',
+        'X-Title': 'Yarah',
       },
     });
   }
 
   /**
    * Resolve the API key and its source in one call.
-   * Cloud projects use InsForge Cloud-managed credentials; self-hosting prefers the encrypted
+   * Cloud projects use Yarah Cloud-managed credentials; self-hosting prefers the encrypted
    * Model Gateway secret store and falls back to OPENROUTER_API_KEY for upgrade resilience.
    * Use this instead of getApiKey() when downstream logic depends on the source.
    */
@@ -163,7 +163,7 @@ export class OpenRouterProvider {
 
   /**
    * Get OpenRouter API key with priority order:
-   * 1. InsForge Cloud-managed key (cloud environment only)
+   * 1. Yarah Cloud-managed key (cloud environment only)
    * 2. Model Gateway secret store (self-hosted)
    */
   async getApiKey(): Promise<string> {
@@ -204,7 +204,7 @@ export class OpenRouterProvider {
   async rotateManagedApiKey(): Promise<{ apiKey: string; maskedKey: string }> {
     if (!isCloudEnvironment()) {
       throw new AppError(
-        'OpenRouter API key rotation is only available for InsForge Cloud-managed keys.',
+        'OpenRouter API key rotation is only available for Yarah Cloud-managed keys.',
         400,
         ERROR_CODES.INVALID_INPUT,
         'For self-hosted projects, update the key in Model Gateway settings.'
@@ -399,7 +399,7 @@ export class OpenRouterProvider {
     }
 
     const url = new URL(
-      `${process.env.CLOUD_API_HOST || 'https://api.insforge.dev'}/ai/v1/activity/${projectId}`
+      `${process.env.CLOUD_API_HOST || 'https://api.yarah.dev'}/ai/v1/activity/${projectId}`
     );
     url.searchParams.set('sign', token);
 
@@ -657,7 +657,7 @@ export class OpenRouterProvider {
 
         // Fetch API key from cloud service with sign token as query parameter
         const response = await fetch(
-          `${process.env.CLOUD_API_HOST || 'https://api.insforge.dev'}/ai/v1/credentials/${projectId}?sign=${token}`
+          `${process.env.CLOUD_API_HOST || 'https://api.yarah.dev'}/ai/v1/credentials/${projectId}?sign=${token}`
         );
 
         if (!response.ok) {
@@ -713,7 +713,7 @@ export class OpenRouterProvider {
         const token = TokenManager.getInstance().signCloudToken('The cloud AI gateway');
 
         const response = await fetch(
-          `${process.env.CLOUD_API_HOST || 'https://api.insforge.dev'}/ai/v1/credentials/${projectId}/rotate`,
+          `${process.env.CLOUD_API_HOST || 'https://api.yarah.dev'}/ai/v1/credentials/${projectId}/rotate`,
           {
             method: 'POST',
             headers: {

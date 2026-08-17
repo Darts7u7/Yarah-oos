@@ -131,9 +131,9 @@ describe('RazorpayOrderService', () => {
         currency: 'INR',
         receipt: 'receipt_123',
         notes: expect.objectContaining({
-          insforge_subject_type: 'team',
-          insforge_subject_id: 'team_123',
-          insforge_order_id: expect.any(String),
+          yarah_subject_type: 'team',
+          yarah_subject_id: 'team_123',
+          yarah_order_id: expect.any(String),
         }),
       })
     );

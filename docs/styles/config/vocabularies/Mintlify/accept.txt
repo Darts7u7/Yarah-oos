@@ -66,7 +66,7 @@ hostname
 Hostname
 httpOnly
 idempotency
-insforge
+yarah
 IPs
 iptables
 IVFFlat

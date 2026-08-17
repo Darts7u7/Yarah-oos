@@ -1,10 +1,10 @@
 ---
 title: "自訂運算"
 sidebarTitle: "Overview"
-description: "在 InsForge 專案旁執行長期常駐容器，用於佇列工作者、AI 推理、websocket 伺服器或網頁爬蟲。"
+description: "在 Yarah 專案旁執行長期常駐容器，用於佇列工作者、AI 推理、websocket 伺服器或網頁爬蟲。"
 ---
 
-使用 InsForge 自訂運算在您的專案旁執行長期容器：佇列工作者、背景處理器、AI 推理迴圈、websocket 伺服器、網頁爬蟲，任何需要保持執行的程序。
+使用 Yarah 自訂運算在您的專案旁執行長期容器：佇列工作者、背景處理器、AI 推理迴圈、websocket 伺服器、網頁爬蟲，任何需要保持執行的程序。
 
 <Note>
   **只需要處理一個請求？** 請求/回應的工作與短任務請使用 [Edge Functions](/core-concepts/functions/overview)。自訂運算適用於需要持續執行的程序。
@@ -12,8 +12,8 @@ description: "在 InsForge 專案旁執行長期常駐容器，用於佇列工�
 
 ```mermaid
 graph TB
-    Dashboard[InsForge Dashboard] --> Service[Compute Service]
-    CLI[InsForge CLI] --> Service
+    Dashboard[Yarah Dashboard] --> Service[Compute Service]
+    CLI[Yarah CLI] --> Service
 
     Service --> Container[Long-lived Container]
 
@@ -34,11 +34,11 @@ graph TB
 
 ### 容器部署
 
-把任何 Docker 映像交給 InsForge 就能執行。可以指向 registry 上已建置好的映像，也可以上傳建置內容，讓 InsForge 依您的 `Dockerfile` 建置。不需要學習額外的建置流程。
+把任何 Docker 映像交給 Yarah 就能執行。可以指向 registry 上已建置好的映像，也可以上傳建置內容，讓 Yarah 依您的 `Dockerfile` 建置。不需要學習額外的建置流程。
 
 ### 存取您的專案
 
-容器需要的認證由您以服務的環境變數設定——專案 URL、API key、S3 認證，取決於這個工作負載會用到什麼。InsForge 不會替您注入任何內容，因此容器能存取什麼完全由您決定。
+容器需要的認證由您以服務的環境變數設定——專案 URL、API key、S3 認證，取決於這個工作負載會用到什麼。Yarah 不會替您注入任何內容，因此容器能存取什麼完全由您決定。
 
 自行託管時，compute 容器預設會加入專案自己的網路，因此在容器內 `postgres:5432` 與 `postgrest:3000` 可以直接以名稱解析，與 edge functions 完全相同——不需要繞經公開網路。
 
@@ -60,17 +60,17 @@ graph TB
 
 ## 自行託管：啟用 compute
 
-在 InsForge Cloud 上 compute 完全代管，您無需設定。自行託管時，由您決定容器在哪裡執行。目前提供兩種 provider，在其中一種設定完成之前，compute 端點都會回傳 `503 COMPUTE_NOT_CONFIGURED`。
+在 Yarah Cloud 上 compute 完全代管，您無需設定。自行託管時，由您決定容器在哪裡執行。目前提供兩種 provider，在其中一種設定完成之前，compute 端點都會回傳 `503 COMPUTE_NOT_CONFIGURED`。
 
 <Tabs>
   <Tab title="Docker（您自己的主機）">
-    容器執行在與 InsForge 相同的 Docker daemon 上，與 InsForge 容器互為同層容器。不需要註冊任何服務，也沒有按容器計費。
+    容器執行在與 Yarah 相同的 Docker daemon 上，與 Yarah 容器互為同層容器。不需要註冊任何服務，也沒有按容器計費。
 
-    啟用方式是一個明確的動作：把 Docker socket 掛載進 InsForge 容器。compose 檔案裡已經為此準備好一行，取消註解即可：
+    啟用方式是一個明確的動作：把 Docker socket 掛載進 Yarah 容器。compose 檔案裡已經為此準備好一行，取消註解即可：
 
     ```yaml
     services:
-      insforge:
+      yarah:
         volumes:
           - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:${DOCKER_SOCKET_PATH:-/var/run/docker.sock}
     ```
@@ -80,7 +80,7 @@ graph TB
     重新啟動整個 stack。socket 可連線時驅動會自行註冊，並輸出 `Compute provider "docker" ready`。
 
     <Warning>
-      **Docker socket 在主機上等同於 root。** 能存取它的人都可以啟動一個讀取整個檔案系統的容器，因此掛載它應當是一個有意識的決定。InsForge 自行建構每個容器的 spec，從不轉送呼叫方提供的選項，因此即使 InsForge API key 外洩，攻擊者也無法要求特權容器或主機 bind mount——但 socket 本身的權限，仍等同於擁有它的帳號。
+      **Docker socket 在主機上等同於 root。** 能存取它的人都可以啟動一個讀取整個檔案系統的容器，因此掛載它應當是一個有意識的決定。Yarah 自行建構每個容器的 spec，從不轉送呼叫方提供的選項，因此即使 Yarah API key 外洩，攻擊者也無法要求特權容器或主機 bind mount——但 socket 本身的權限，仍等同於擁有它的帳號。
     </Warning>
 
     選用設定：
@@ -96,7 +96,7 @@ graph TB
   <Tab title="Fly.io">
     容器執行在您自己的 [Fly.io](https://fly.io) 帳號下。在 `.env` 中用兩個環境變數啟用：
 
-    - `FLY_API_TOKEN`：Fly.io API token，用 `fly tokens create org -o <your-org>` 產生。把 CLI 印出的整行都貼進來，`FlyV1` 前綴會自動處理。InsForge 用它來建立和管理您的 compute 容器。
+    - `FLY_API_TOKEN`：Fly.io API token，用 `fly tokens create org -o <your-org>` 產生。把 CLI 印出的整行都貼進來，`FlyV1` 前綴會自動處理。Yarah 用它來建立和管理您的 compute 容器。
     - `FLY_ORG`：您的 Fly organization slug，用 `fly orgs list` 查看。容器會建立在此 org 之下。
 
     兩者都必填。只有 token 而沒有 org，就沒有可認證的對象；只有 org 而沒有 token，則無法呼叫。設定完成後重新啟動容器。
@@ -112,29 +112,29 @@ graph TB
 | 模式 | 行為 |
 | --- | --- |
 | `none` | 僅能在專案內部網路存取。不發佈主機連接埠，也不公告 URL。 |
-| `port` | 發佈在 daemon 指派的主機連接埠上。設定 `COMPUTE_PUBLIC_HOST` 後 InsForge 才會公告 URL；留空則不回傳 URL，而不是給出一個可能無法解析的位址。 |
+| `port` | 發佈在 daemon 指派的主機連接埠上。設定 `COMPUTE_PUBLIC_HOST` 後 Yarah 才會公告 URL；留空則不回傳 URL，而不是給出一個可能無法解析的位址。 |
 | `host` | 透過您自行路由的主機名稱存取。將 `COMPUTE_DOMAIN` 設為基礎網域。 |
 
 發佈的連接埠預設繫結到 `127.0.0.1`。用 `COMPUTE_BIND_ADDRESS` 變更——Docker 自身的預設會繫結所有介面（含 IPv6），在可從外部連線的主機上，這等於把容器直接暴露到網際網路。
 
-用 `COMPUTE_DEFAULT_INGRESS` 設定整個部署的預設值。`host` 模式下 InsForge 只公告主機名稱，不負責 TLS 終止與流量路由——請像您已經為 dashboard 所做的那樣，在前面自行執行一個閘道（Caddy、Traefik、nginx）。
+用 `COMPUTE_DEFAULT_INGRESS` 設定整個部署的預設值。`host` 模式下 Yarah 只公告主機名稱，不負責 TLS 終止與流量路由——請像您已經為 dashboard 所做的那樣，在前面自行執行一個閘道（Caddy、Traefik、nginx）。
 
 ### 從原始碼建置
 
 部署已建置好的映像不需要額外步驟：以映像位址建立服務，它就會被拉取並啟動。
 
-若要讓 InsForge 建置您的 `Dockerfile`，先保留服務，再將建置內容以 tar 上傳：
+若要讓 Yarah 建置您的 `Dockerfile`，先保留服務，再將建置內容以 tar 上傳：
 
 ```bash
 # 1. 保留服務名稱（此時還沒有映像），並保存回傳的 id
-ID=$(curl -sX POST "$INSFORGE_URL/api/compute/services/deploy" \
-  -H "x-api-key: $INSFORGE_API_KEY" -H 'Content-Type: application/json' \
+ID=$(curl -sX POST "$YARAH_URL/api/compute/services/deploy" \
+  -H "x-api-key: $YARAH_API_KEY" -H 'Content-Type: application/json' \
   -d '{"name":"worker","port":8080,"memory":512}' | jq -r .id)
 
 # 2. 上傳建置內容；回應中包含建置日誌與已部署的映像 tag
 tar --no-xattrs -cf context.tar -C ./worker .
-curl -X POST "$INSFORGE_URL/api/compute/services/$ID/build" \
-  -H "x-api-key: $INSFORGE_API_KEY" -H 'Content-Type: application/x-tar' \
+curl -X POST "$YARAH_URL/api/compute/services/$ID/build" \
+  -H "x-api-key: $YARAH_API_KEY" -H 'Content-Type: application/x-tar' \
   --data-binary @context.tar
 ```
 
@@ -157,7 +157,7 @@ curl -X POST "$INSFORGE_URL/api/compute/services/$ID/build" \
 | 區域 | 單一主機 | 可選擇 |
 | 縮減至零 | 不支援 | 支援 |
 | Ingress 模式 | `none`、`port`、`host` | 主機名稱 |
-| 原始碼建置 | 向 InsForge 上傳建置內容 | 由 CLI 使用 `flyctl` 建置 |
+| 原始碼建置 | 向 Yarah 上傳建置內容 | 由 CLI 使用 `flyctl` 建置 |
 
 ## 下一步
 

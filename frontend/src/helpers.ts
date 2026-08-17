@@ -3,7 +3,7 @@ export function isCloudHosting(): boolean {
     return false;
   }
 
-  return window.location.origin.endsWith('.insforge.app');
+  return window.location.origin.endsWith('.apps.yarah.dev');
 }
 
 export function isInIframe(): boolean {

@@ -1,17 +1,17 @@
 ---
 title: SMTP personalizado
-description: Configure su propio servidor SMTP para enviar correos de autenticación y transaccionales de InsForge, con verificación y enlaces mágicos.
+description: Configure su propio servidor SMTP para enviar correos de autenticación y transaccionales de Yarah, con verificación y enlaces mágicos.
 ---
 
 Cuando está habilitado, cada correo electrónico (flujos de autenticación y llamadas `emails.send()`) se enruta a través de su servidor SMTP. Apáguelo para revertir; las credenciales se conservan. Una instancia autohospedada no puede desactivar SMTP mientras la verificación obligatoria de correo dependa de él.
 
 <Note>
-  **Las instancias autohospedadas necesitan esto para poder enviar cualquier correo electrónico.** El remitente gestionado sin configuración se enruta a través de InsForge Cloud y solo está disponible para proyectos vinculados a la nube. Una instancia autohospedada sin SMTP configurado no puede entregar correos de autenticación, por lo que la verificación de correo electrónico, los enlaces mágicos y los restablecimientos de contraseña no se entregarán hasta que complete la configuración a continuación.
+  **Las instancias autohospedadas necesitan esto para poder enviar cualquier correo electrónico.** El remitente gestionado sin configuración se enruta a través de Yarah Cloud y solo está disponible para proyectos vinculados a la nube. Una instancia autohospedada sin SMTP configurado no puede entregar correos de autenticación, por lo que la verificación de correo electrónico, los enlaces mágicos y los restablecimientos de contraseña no se entregarán hasta que complete la configuración a continuación.
 </Note>
 
 ## Conceptos
 
-El proveedor se resuelve en cada envío, por lo que los cambios surten efecto en la siguiente solicitud. InsForge ejecuta `transporter.verify()` antes de guardar, por lo que una configuración persistente siempre funciona. Las contraseñas se cifran en reposo con AES-256-GCM y nunca las devuelve la API.
+El proveedor se resuelve en cada envío, por lo que los cambios surten efecto en la siguiente solicitud. Yarah ejecuta `transporter.verify()` antes de guardar, por lo que una configuración persistente siempre funciona. Las contraseñas se cifran en reposo con AES-256-GCM y nunca las devuelve la API.
 
 ## Uso
 
@@ -25,7 +25,7 @@ Configure SMTP en **Authentication → Email**.
     Host, puerto (`25`, `465`, `587`, `2525`), nombre de usuario, contraseña, correo electrónico del remitente, nombre del remitente. Las direcciones IP privadas y los certificados autofirmados se rechazan.
   </Step>
   <Step title="Guardar">
-    InsForge ejecuta un apretón de manos SMTP antes de persistir. Las malas credenciales fallan rápidamente.
+    Yarah ejecuta un apretón de manos SMTP antes de persistir. Las malas credenciales fallan rápidamente.
   </Step>
   <Step title="Editar plantillas (opcional)">
     La tarjeta **Email Templates** desbloquea las cuatro plantillas de autenticación.

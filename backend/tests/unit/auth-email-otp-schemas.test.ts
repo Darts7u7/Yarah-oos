@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createSessionRequestSchema, sendOTPRequestSchema } from '@insforge/shared-schemas';
+import { createSessionRequestSchema, sendOTPRequestSchema } from '@yarahdev/shared-schemas';
 
 describe('email OTP sign-in schemas', () => {
   it('normalizes email addresses for OTP requests', () => {

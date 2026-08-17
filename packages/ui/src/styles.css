@@ -1,8 +1,8 @@
 /*
- * InsForge UI — Styles
+ * Yarah UI — Styles
  *
  * Import this once in your app's entry CSS:
- *   @import '@insforge/ui/styles.css';
+ *   @import '@yarahdev/ui/styles.css';
  *
  * Token layers:
  *   1. Primitives       — static colors (Tailwind palette)
@@ -21,7 +21,7 @@
    ============================================================ */
 
 :root {
-  --insforge-font:
+  --yarah-font:
     'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -31,20 +31,20 @@
    ============================================================ */
 
 :root {
-  --insforge-white: 255 255 255;
-  --insforge-black: 0 0 0;
-  --insforge-neutral-400: 163 163 163;
-  --insforge-neutral-600: 82 82 82;
-  --insforge-emerald-300: 110 231 183;
-  --insforge-emerald-600: 5 150 105;
-  --insforge-red-500: 239 68 68;
-  --insforge-red-600: 220 38 38;
-  --insforge-green-500: 34 197 94;
-  --insforge-green-600: 22 163 74;
-  --insforge-amber-500: 245 158 11;
-  --insforge-amber-600: 217 119 6;
-  --insforge-sky-500: 14 165 233;
-  --insforge-sky-600: 2 132 199;
+  --yarah-white: 255 255 255;
+  --yarah-black: 0 0 0;
+  --yarah-neutral-400: 163 163 163;
+  --yarah-neutral-600: 82 82 82;
+  --yarah-emerald-300: 110 231 183;
+  --yarah-emerald-600: 5 150 105;
+  --yarah-red-500: 239 68 68;
+  --yarah-red-600: 220 38 38;
+  --yarah-green-500: 34 197 94;
+  --yarah-green-600: 22 163 74;
+  --yarah-amber-500: 245 158 11;
+  --yarah-amber-600: 217 119 6;
+  --yarah-sky-500: 14 165 233;
+  --yarah-sky-600: 2 132 199;
 }
 
 /* ============================================================
@@ -74,20 +74,20 @@
   --alpha-inverse-16: rgba(255, 255, 255, 0.16);
 
   /* general */
-  --foreground: var(--insforge-black); /* general.default */
-  --muted-foreground: var(--insforge-neutral-600); /* general.weak */
-  --disabled: var(--insforge-neutral-400); /* general.disabled */
-  --inverse: var(--insforge-white); /* general.inverse */
-  --primary: var(--insforge-emerald-600); /* general.primary */
-  --success: var(--insforge-green-600); /* general.success */
-  --destructive: var(--insforge-red-600); /* general.alert */
-  --warning: var(--insforge-amber-600); /* general.warning */
-  --info: var(--insforge-sky-600); /* general.info */
+  --foreground: var(--yarah-black); /* general.default */
+  --muted-foreground: var(--yarah-neutral-600); /* general.weak */
+  --disabled: var(--yarah-neutral-400); /* general.disabled */
+  --inverse: var(--yarah-white); /* general.inverse */
+  --primary: var(--yarah-emerald-600); /* general.primary */
+  --success: var(--yarah-green-600); /* general.success */
+  --destructive: var(--yarah-red-600); /* general.alert */
+  --warning: var(--yarah-amber-600); /* general.warning */
+  --info: var(--yarah-sky-600); /* general.info */
   --border: var(--alpha-8); /* general.border */
 
   /* special */
-  --card: var(--insforge-white); /* special.card */
-  --toast: var(--insforge-white); /* special.toast */
+  --card: var(--yarah-white); /* special.card */
+  --toast: var(--yarah-white); /* special.toast */
   --page: var(--semantic-1); /* special.page */
 }
 
@@ -118,15 +118,15 @@
   --alpha-inverse-16: rgba(0, 0, 0, 0.16);
 
   /* general */
-  --foreground: var(--insforge-white); /* general.default */
-  --muted-foreground: var(--insforge-neutral-400); /* general.weak */
-  --disabled: var(--insforge-neutral-600); /* general.disabled */
-  --inverse: var(--insforge-black); /* general.inverse */
-  --primary: var(--insforge-emerald-300); /* general.primary */
-  --success: var(--insforge-green-500); /* general.success */
-  --destructive: var(--insforge-red-500); /* general.alert */
-  --warning: var(--insforge-amber-500); /* general.warning */
-  --info: var(--insforge-sky-500); /* general.info */
+  --foreground: var(--yarah-white); /* general.default */
+  --muted-foreground: var(--yarah-neutral-400); /* general.weak */
+  --disabled: var(--yarah-neutral-600); /* general.disabled */
+  --inverse: var(--yarah-black); /* general.inverse */
+  --primary: var(--yarah-emerald-300); /* general.primary */
+  --success: var(--yarah-green-500); /* general.success */
+  --destructive: var(--yarah-red-500); /* general.alert */
+  --warning: var(--yarah-amber-500); /* general.warning */
+  --info: var(--yarah-sky-500); /* general.info */
   --border: var(--alpha-8); /* general.border */
 
   /* special */

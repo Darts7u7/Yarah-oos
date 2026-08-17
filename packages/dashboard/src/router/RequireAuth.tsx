@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '#lib/contexts/AuthContext';
 import { useDashboardHost } from '#lib/config/DashboardHostContext';
-import { LoadingState } from '@insforge/ui';
+import { LoadingState } from '@yarahdev/ui';
 
 interface RequireAuthProps {
   children: ReactNode;

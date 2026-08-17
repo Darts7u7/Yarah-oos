@@ -1,10 +1,10 @@
 ---
 title: "Edge Functions"
 sidebarTitle: "Overview"
-description: "在 InsForge Edge Functions 上部署由 Deno 驅動的無伺服器 TypeScript 函式，支援 HTTP 按需呼叫、cron 定時任務、資料庫觸發器串接呼叫、加密密鑰與環境變數管理，以及串流回應、ESM 匯入和本機開發與雲端部署工作流程。"
+description: "在 Yarah Edge Functions 上部署由 Deno 驅動的無伺服器 TypeScript 函式，支援 HTTP 按需呼叫、cron 定時任務、資料庫觸發器串接呼叫、加密密鑰與環境變數管理，以及串流回應、ESM 匯入和本機開發與雲端部署工作流程。"
 ---
 
-使用 InsForge Edge Functions 在 [Deno](https://deno.com) 上執行 TypeScript，部署在接近您的使用者的地方以實現低延遲。函式可以從任何用戶端按需呼叫、從資料庫觸發器連結，或排程在 cron 運算式上執行。執行時開箱即用地提供標準 fetch、串流回應和 ESM 匯入。
+使用 Yarah Edge Functions 在 [Deno](https://deno.com) 上執行 TypeScript，部署在接近您的使用者的地方以實現低延遲。函式可以從任何用戶端按需呼叫、從資料庫觸發器連結，或排程在 cron 運算式上執行。執行時開箱即用地提供標準 fetch、串流回應和 ESM 匯入。
 
 <Note>
   **需要一個保持執行的流程？** 使用 [Compute](/core-concepts/compute/overview) 以獲取佇列背景工作、AI 推理迴圈和任何具狀態的東西。Edge Functions 用於請求/回應和短期工作。
@@ -16,7 +16,7 @@ graph TB
     Schedule[Cron Schedule] --> Fn
     Trigger[Database Trigger] --> Fn
 
-    Fn --> SDK[InsForge SDK]
+    Fn --> SDK[Yarah SDK]
     SDK --> DB[(Database)]
     SDK --> Storage[Storage]
     SDK --> Gateway[Model Gateway]
@@ -35,11 +35,11 @@ graph TB
 
 ### HTTP 觸發器
 
-每個函式都可在 `https://<project>.insforge.dev/functions/<name>` 上存取。標準 fetch 輸入，標準 `Response` 輸出。串流、JSON、重新導向和 websocket 都可以運作。
+每個函式都可在 `https://<project>.yarah.dev/functions/<name>` 上存取。標準 fetch 輸入，標準 `Response` 輸出。串流、JSON、重新導向和 websocket 都可以運作。
 
 ### 排程
 
-將 cron 運算式附加到函式，InsForge 會按時呼叫它，失敗時重試。有關 cron 語法和執行模型，請查看 [Schedules](/core-concepts/functions/schedules)。
+將 cron 運算式附加到函式，Yarah 會按時呼叫它，失敗時重試。有關 cron 語法和執行模型，請查看 [Schedules](/core-concepts/functions/schedules)。
 
 ### 資料庫觸發器
 
@@ -53,14 +53,14 @@ graph TB
 
 ```bash
 # 帶到期時間的受保護祕密
-npx @insforge/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
+npx @yarah/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
 # 讀回解密後的值
-npx @insforge/cli secrets get STRIPE_SECRET_KEY
+npx @yarah/cli secrets get STRIPE_SECRET_KEY
 ```
 
 ### 日誌
 
-每次呼叫都會擷取結構化日誌，可按狀態、持續時間和函式名稱查詢。InsForge MCP `get-function-logs` 工具允許您的代理在不離開編輯器的情況下診斷失敗。
+每次呼叫都會擷取結構化日誌，可按狀態、持續時間和函式名稱查詢。Yarah MCP `get-function-logs` 工具允許您的代理在不離開編輯器的情況下診斷失敗。
 
 ### Deno 標準程式庫
 

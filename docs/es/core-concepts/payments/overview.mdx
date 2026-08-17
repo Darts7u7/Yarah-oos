@@ -1,17 +1,17 @@
 ---
 title: "Pagos"
 sidebarTitle: "Overview"
-description: "Elige una integración de pagos específica para Stripe o Razorpay en InsForge, con webhooks, sincronización de catálogo y facturación de suscripciones."
+description: "Elige una integración de pagos específica para Stripe o Razorpay en Yarah, con webhooks, sincronización de catálogo y facturación de suscripciones."
 ---
 
-InsForge Payments permite que su aplicación recaude dinero con su propia cuenta de Stripe o Razorpay. Los dos proveedores utilizan diferentes modelos de pago, por lo que los documentos se dividen por proveedor en lugar de describir un flujo de pago genérico.
+Yarah Payments permite que su aplicación recaude dinero con su propia cuenta de Stripe o Razorpay. Los dos proveedores utilizan diferentes modelos de pago, por lo que los documentos se dividen por proveedor en lugar de describir un flujo de pago genérico.
 
 <Frame caption="Panel de pagos: conexión de proveedor, catálogo, suscripciones y transacciones.">
-  <img src="/images/dashboard-payments.png" alt="Panel de pagos de InsForge" />
+  <img src="/images/dashboard-payments.png" alt="Panel de pagos de Yarah" />
 </Frame>
 
 <Note>
-  Stripe o Razorpay sigue siendo la fuente de verdad para cargos, facturas, reembolsos, disputas, impuestos y operaciones financieras a nivel de cuenta. InsForge no es un procesador de pagos ni comerciante registrado, y no reemplaza el panel del proveedor.
+  Stripe o Razorpay sigue siendo la fuente de verdad para cargos, facturas, reembolsos, disputas, impuestos y operaciones financieras a nivel de cuenta. Yarah no es un procesador de pagos ni comerciante registrado, y no reemplaza el panel del proveedor.
 </Note>
 
 ## Elija un proveedor
@@ -43,7 +43,7 @@ Las tablas compartidas solo se usan cuando la forma duradera es útil en los pro
 | `payments.customer_mappings` | Asignación de sujeto de facturación de la aplicación a ID de cliente del proveedor. |
 | `payments.customers` | Espejo administrador/cliente para visibilidad del panel. |
 | `payments.webhook_events` | Libro mayor de eventos webhook del proveedor verificado. Úselo para activadores de cumplimiento duradero. |
-| `payments.transactions` | Proyección de panel/informe de InsForge para actividad de pago exitosa, fallida y reembolsada. |
+| `payments.transactions` | Proyección de panel/informe de Yarah para actividad de pago exitosa, fallida y reembolsada. |
 
 `payments.transactions` no es el contrato de cumplimiento. Es una proyección construida a partir de eventos y sincronización del proveedor. Para la lógica empresarial, cree tablas propiedad de la aplicación como `public.orders`, `public.credit_ledger` o `public.team_entitlements`, y luego rellénelas desde filas verificadas en `payments.webhook_events`.
 

@@ -22,7 +22,7 @@ import type {
   AddCustomDomainRequest,
   ListCustomDomainsResponse,
   VerifyCustomDomainResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export type {
   DeploymentSchema,
@@ -172,7 +172,7 @@ export class DeploymentsService {
   // Custom Slug/Domain
   // ============================================================================
 
-  /** Updates the custom insforge.site slug (subdomain) for the deployment. */
+  /** Updates the custom yarah.site slug (subdomain) for the deployment. */
   async updateSlug(slug: string | null): Promise<UpdateSlugResponse> {
     return apiClient.request('/deployments/slug', {
       method: 'PUT',

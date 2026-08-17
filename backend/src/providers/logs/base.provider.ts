@@ -1,4 +1,4 @@
-import { LogSchema, LogSourceSchema, LogStatsSchema } from '@insforge/shared-schemas';
+import { LogSchema, LogSourceSchema, LogStatsSchema } from '@yarahdev/shared-schemas';
 
 export interface LogProvider {
   initialize(): Promise<void>;
@@ -34,7 +34,7 @@ export interface LogProvider {
 export abstract class BaseLogProvider implements LogProvider {
   // Source name mapping for user-friendly display
   protected sourceNameMap: Record<string, string> = {
-    'cloudflare.logs.prod': 'insforge.logs',
+    'cloudflare.logs.prod': 'yarah.logs',
     'deno-relay-logs': 'function.logs',
     'postgREST.logs.prod': 'postgREST.logs',
     'postgres.logs': 'postgres.logs',
@@ -42,7 +42,7 @@ export abstract class BaseLogProvider implements LogProvider {
 
   // Reverse mapping for API calls
   protected reverseSourceNameMap: Record<string, string> = {
-    'insforge.logs': 'cloudflare.logs.prod',
+    'yarah.logs': 'cloudflare.logs.prod',
     'function.logs': 'deno-relay-logs',
     'postgREST.logs': 'postgREST.logs.prod',
     'postgres.logs': 'postgres.logs',

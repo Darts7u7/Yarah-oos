@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { hostname } from 'node:os';
-import { cpuTierToCores } from '@insforge/shared-schemas';
+import { cpuTierToCores } from '@yarahdev/shared-schemas';
 import { isCloudEnvironment } from '@/utils/environment.js';
 import logger from '@/utils/logger.js';
 import {
@@ -31,12 +31,12 @@ import {
  * stopping Postgres. Measured on a real host: from inside a container with the
  * socket mounted, an unfiltered `docker ps` lists the whole stack, including the
  * backend itself. */
-const LABEL_MANAGED = 'insforge.managed';
-const LABEL_PROJECT = 'insforge.project';
-const LABEL_SERVICE = 'insforge.service';
+const LABEL_MANAGED = 'yarah.managed';
+const LABEL_PROJECT = 'yarah.project';
+const LABEL_SERVICE = 'yarah.service';
 // Hash of the immutable part of the spec, so an update can tell an in-place
 // resize from a change that requires recreating the container.
-const LABEL_SPEC = 'insforge.spec';
+const LABEL_SPEC = 'yarah.spec';
 
 type ContainerInspect = {
   Id: string;
@@ -62,7 +62,7 @@ function escapeRegExp(value: string): string {
  *
  * Both signals are checked because they answer slightly different questions and
  * either one being true is disqualifying: `isCloudEnvironment()` asks "am I
- * running on InsForge Cloud infrastructure", while a configured cloud compute
+ * running on Yarah Cloud infrastructure", while a configured cloud compute
  * pair asks "is this project's control plane elsewhere". A guard that protects
  * tenant isolation should fail closed on either.
  */
@@ -110,7 +110,7 @@ export class DockerProvider implements ComputeProvider {
    * **Self-host only, enforced here rather than assumed.** This driver's entire
    * safety argument is that the operator and the developer deploying containers
    * are the same principal — whoever runs the box could already SSH into it. On a
-   * cloud-managed project that is false: the operator is InsForge and the
+   * cloud-managed project that is false: the operator is Yarah and the
    * developer is a customer, so letting a customer create containers on the host
    * is a tenant escape, and even an unprivileged container consumes shared
    * capacity and can reach the internal network.
@@ -158,11 +158,11 @@ export class DockerProvider implements ComputeProvider {
 
   /**
    * Container name. Namespaced by APP_KEY because one host commonly runs several
-   * InsForge projects (the docs describe exactly that), and two projects both
+   * Yarah projects (the docs describe exactly that), and two projects both
    * deploying a service called `api` would otherwise collide on one daemon.
    */
   resolveAppName(params: { name: string; projectId: string }): string {
-    return `insforge-${this.projectKey()}-${params.name}`;
+    return `yarah-${this.projectKey()}-${params.name}`;
   }
 
   /**
@@ -222,7 +222,7 @@ export class DockerProvider implements ComputeProvider {
    * The project's own compose network, discovered by inspecting our own
    * container.
    *
-   * Compose namespaces networks per project (`myproj_insforge-network`), so the
+   * Compose namespaces networks per project (`myproj_yarah-network`), so the
    * name cannot be guessed. Docker sets the container hostname to the short
    * container id by default, which gives us a handle on ourselves.
    *
@@ -693,7 +693,7 @@ export class DockerProvider implements ComputeProvider {
     // layer cache is what makes an unchanged rebuild fast, and distinct tags keep
     // consecutive deploys distinguishable.
     const digest = createHash('sha256').update(params.context).digest('hex').slice(0, 12);
-    const imageTag = `insforge-${this.projectKey()}/${params.serviceName}:${digest}`;
+    const imageTag = `yarah-${this.projectKey()}/${params.serviceName}:${digest}`;
 
     DockerProvider.activeBuilds++;
     try {
@@ -749,7 +749,7 @@ export class DockerProvider implements ComputeProvider {
    * a rollback to the previous tag should keep working.
    */
   async pruneServiceImages(serviceName: string, keep = 2): Promise<{ removed: number }> {
-    const prefix = `insforge-${this.projectKey()}/${serviceName}:`;
+    const prefix = `yarah-${this.projectKey()}/${serviceName}:`;
     const images =
       (await dockerRequest<{ Id: string; RepoTags: string[] | null; Created: number }[]>(
         'GET',

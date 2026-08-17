@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Input, Tabs, Tab } from '@insforge/ui';
+import { Button, Input, Tabs, Tab } from '@yarahdev/ui';
 import { ChevronRight } from 'lucide-react';
-import type { EmailTemplateSchema, UpdateEmailTemplateRequest } from '@insforge/shared-schemas';
+import type { EmailTemplateSchema, UpdateEmailTemplateRequest } from '@yarahdev/shared-schemas';
 
 interface EmailTemplateCardProps {
   templates: EmailTemplateSchema[];

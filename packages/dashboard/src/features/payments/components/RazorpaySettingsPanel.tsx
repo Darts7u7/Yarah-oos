@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { Button, ConfirmDialog, CopyButton } from '@insforge/ui';
-import type { PaymentEnvironment, RazorpayKeyConfig } from '@insforge/shared-schemas';
+import { Button, ConfirmDialog, CopyButton } from '@yarahdev/ui';
+import type { PaymentEnvironment, RazorpayKeyConfig } from '@yarahdev/shared-schemas';
 import { useRazorpayConfig } from '#features/payments/hooks/useRazorpayConfig';
 import { useRazorpaySync } from '#features/payments/hooks/useRazorpaySync';
 import {

@@ -13,7 +13,7 @@ import type {
   SyncStripePaymentsResponse,
   StripeEnvironment,
   UpsertStripeConfigRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { apiClient } from '#lib/api/client';
 
 export class StripeService {

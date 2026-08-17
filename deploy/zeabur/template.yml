@@ -2,16 +2,16 @@
 apiVersion: zeabur.com/v1
 kind: Template
 metadata:
-    name: InsForge
+    name: Yarah
 spec:
-    description: InsForge is the Agent-Native Supabase Alternative, enabling AI agents to build and manage full-stack applications autonomously.
-    coverImage: https://cdn.zeabur.com/insforge.png
+    description: Yarah is the Agent-Native Supabase Alternative, enabling AI agents to build and manage full-stack applications autonomously.
+    coverImage: https://cdn.zeabur.com/yarah.png
     icon: https://avatars.githubusercontent.com/u/198419463?s=96&v=4
     variables:
         - key: PUBLIC_DOMAIN
           type: DOMAIN
-          name: InsForge Domain
-          description: The domain for accessing your InsForge application.
+          name: Yarah Domain
+          description: The domain for accessing your Yarah application.
         - key: ROOT_ADMIN_USERNAME
           type: STRING
           name: Root Admin Username
@@ -38,9 +38,9 @@ spec:
         - API
         - Platform
     readme: |-
-        # InsForge
+        # Yarah
 
-        InsForge is the Agent-Native Supabase Alternative, enabling AI agents to build and manage full-stack applications autonomously.
+        Yarah is the Agent-Native Supabase Alternative, enabling AI agents to build and manage full-stack applications autonomously.
 
         ## Features
 
@@ -53,7 +53,7 @@ spec:
 
         ## Quick Start
 
-        This template provides **one-click deployment** of the complete InsForge platform:
+        This template provides **one-click deployment** of the complete Yarah platform:
 
         1. **Deploy** - Click deploy and bind a domain
         2. **Login** - Use your admin credentials to access the dashboard
@@ -71,9 +71,9 @@ spec:
 
         ## Community
 
-        - [Discord](https://discord.gg/MPxwj5xVvW) - Join our community
-        - [GitHub](https://github.com/InsForge/InsForge) - Contribute to the project
-        - Email: info@insforge.dev
+        - [Discord](https://yarah.dev/community) - Join our community
+        - [GitHub](https://github.com/Yarah/Yarah) - Contribute to the project
+        - Email: info@yarah.dev
 
     services:
         - name: postgres
@@ -81,7 +81,7 @@ spec:
           template: PREBUILT_V2
           spec:
             source:
-                image: ghcr.io/insforge/postgres:v15.13.4
+                image: ghcr.io/darts7u7/postgres:v15.13.4
                 command:
                     - docker-entrypoint.sh
                     - postgres
@@ -96,15 +96,15 @@ spec:
                   dir: /var/lib/postgresql/data
             instructions:
                 - title: Connection String
-                  content: postgres://postgres:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/insforge
+                  content: postgres://postgres:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/yarah
                 - title: PostgreSQL Connect Command
-                  content: psql "postgres://postgres:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/insforge"
+                  content: psql "postgres://postgres:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/yarah"
                 - title: PostgreSQL username
                   content: postgres
                 - title: PostgresSQL password
                   content: ${POSTGRES_PASSWORD}
                 - title: PostgresSQL database
-                  content: insforge
+                  content: yarah
                 - title: PostgreSQL host
                   content: ${PORT_FORWARDED_HOSTNAME}
                 - title: PostgreSQL port
@@ -113,13 +113,13 @@ spec:
                 PGDATA:
                     default: /var/lib/postgresql/data/pgdata
                 POSTGRES_CONNECTION_STRING:
-                    default: postgres://postgres:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/insforge
+                    default: postgres://postgres:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/yarah
                     expose: true
                 POSTGRES_DATABASE:
-                    default: insforge
+                    default: yarah
                     expose: true
                 POSTGRES_DB:
-                    default: insforge
+                    default: yarah
                 POSTGRES_HOST:
                     default: ${CONTAINER_HOSTNAME}
                     expose: true
@@ -147,7 +147,7 @@ spec:
             configs:
                 - path: /etc/postgresql/postgresql.conf
                   template: |
-                    # PostgreSQL configuration for InsForge
+                    # PostgreSQL configuration for Yarah
 
                     # Listen on all interfaces to allow container connections
                     listen_addresses = '*'
@@ -158,14 +158,14 @@ spec:
                     max_replication_slots = 10
                     max_wal_senders = 10
 
-                    shared_preload_libraries = 'pg_cron,http,pgcrypto,insforge_pg_utils'
-                    # Both default to 'project_admin' inside insforge_pg_utils. Pinned here so the
+                    shared_preload_libraries = 'pg_cron,http,pgcrypto,yarah_pg_utils'
+                    # Both default to 'project_admin' inside yarah_pg_utils. Pinned here so the
                     # value is visible and can't shift when the extension is rebuilt.
-                    insforge.policy_grant_role = 'project_admin'
-                    insforge.extension_grant_role = 'project_admin'
-                    insforge.policy_grant_tables = 'storage.objects,realtime.channels,realtime.messages,payments.stripe_checkout_sessions,payments.stripe_customer_portal_sessions,payments.razorpay_orders,payments.razorpay_subscriptions'
-                    insforge.internal_schemas = 'ai,auth,compute,deployments,email,functions,memory,payments,realtime,schedules,storage,system'
-                    cron.database_name = 'insforge'
+                    yarah.policy_grant_role = 'project_admin'
+                    yarah.extension_grant_role = 'project_admin'
+                    yarah.policy_grant_tables = 'storage.objects,realtime.channels,realtime.messages,payments.stripe_checkout_sessions,payments.stripe_customer_portal_sessions,payments.razorpay_orders,payments.razorpay_subscriptions'
+                    yarah.internal_schemas = 'ai,auth,compute,deployments,email,functions,memory,payments,realtime,schedules,storage,system'
+                    cron.database_name = 'yarah'
                 - path: /docker-entrypoint-initdb.d/01-init.sql
                   template: |
                     -- init.sql
@@ -271,8 +271,8 @@ spec:
                     \set jwt_secret `echo "$JWT_SECRET"`
                     \set jwt_exp `echo "$JWT_EXP"`
 
-                    ALTER DATABASE insforge SET "app.settings.jwt_secret" TO :'jwt_secret';
-                    ALTER DATABASE insforge SET "app.settings.jwt_exp" TO :'jwt_exp';
+                    ALTER DATABASE yarah SET "app.settings.jwt_secret" TO :'jwt_secret';
+                    ALTER DATABASE yarah SET "app.settings.jwt_exp" TO :'jwt_exp';
             healthCheck:
                 type: TCP
                 port: database
@@ -295,7 +295,7 @@ spec:
                 PGPORT:
                     default: "5432"
                 PGDATABASE:
-                    default: insforge
+                    default: yarah
                 PGUSER:
                     default: postgres
                 PGPASSWORD:
@@ -358,7 +358,7 @@ spec:
                 POSTGRES_PORT:
                     default: "5432"
                 POSTGRES_DB:
-                    default: insforge
+                    default: yarah
                 POSTGRES_USER:
                     default: postgres
                 POSTGRES_PASSWORD:
@@ -439,7 +439,7 @@ spec:
                     const dbConfig = {
                       user: Deno.env.get('POSTGRES_USER') || 'postgres',
                       password: Deno.env.get('POSTGRES_PASSWORD') || 'postgres',
-                      database: Deno.env.get('POSTGRES_DB') || 'insforge',
+                      database: Deno.env.get('POSTGRES_DB') || 'yarah',
                       hostname: Deno.env.get('POSTGRES_HOST') || 'postgres',
                       port: parseInt(Deno.env.get('POSTGRES_PORT') || '5432', 10),
                     };
@@ -768,7 +768,7 @@ spec:
                          * Here we create a wrapper function that will execute the user's code.
                          * The user's function expects to have access to:
                          * - module.exports (to export their function)
-                         * - createClient (the Insforge SDK)
+                         * - createClient (the Yarah SDK)
                          * - Deno (for Deno.env.get() etc.)
                          * - encodeBase64, decodeBase64 (base64 encoding utilities)
                          *
@@ -861,7 +861,7 @@ spec:
                 http:
                     path: /health
 
-        - name: insforge
+        - name: yarah
           icon: https://avatars.githubusercontent.com/u/198419463?s=96&v=4
           dependencies:
             - postgres
@@ -870,7 +870,7 @@ spec:
           template: PREBUILT_V2
           spec:
             source:
-                image: ghcr.io/insforge/insforge-oss:latest
+                image: ghcr.io/yarah/yarah-oss:latest
             ports:
                 - id: web
                   port: 7130
@@ -899,13 +899,13 @@ spec:
                 POSTGRES_PORT:
                     default: "5432"
                 POSTGRES_DB:
-                    default: insforge
+                    default: yarah
                 POSTGRES_USER:
                     default: postgres
                 POSTGRESDB_PASSWORD:
                     default: ${PGPASSWORD}
                 DATABASE_URL:
-                    default: postgres://postgres:${PGPASSWORD}@postgres:5432/insforge
+                    default: postgres://postgres:${PGPASSWORD}@postgres:5432/yarah
                 POSTGREST_BASE_URL:
                     default: http://postgrest:3000
                 # Deno Runtime URL for serverless functions
@@ -950,11 +950,11 @@ spec:
 
 localization:
     zh-CN:
-        description: InsForge 是 Agent-Native 的 Supabase 替代方案，让 AI 智能体能够自主构建和管理全栈应用程序。
+        description: Yarah 是 Agent-Native 的 Supabase 替代方案，让 AI 智能体能够自主构建和管理全栈应用程序。
         readme: |
-            # InsForge
+            # Yarah
 
-            InsForge 是 Agent-Native 的 Supabase 替代方案，让 AI 智能体能够自主构建和管理全栈应用程序。
+            Yarah 是 Agent-Native 的 Supabase 替代方案，让 AI 智能体能够自主构建和管理全栈应用程序。
 
             ## 功能特性
 
@@ -967,7 +967,7 @@ localization:
 
             ## 快速开始
 
-            此模板提供 InsForge 平台的**一键部署**：
+            此模板提供 Yarah 平台的**一键部署**：
 
             1. **部署** - 点击部署并绑定域名
             2. **登录** - 使用管理员凭据访问控制台
@@ -984,11 +984,11 @@ localization:
             - **快速原型设计** - 使用自然语言构建全栈应用程序
 
     zh-TW:
-        description: InsForge 是 Agent-Native 的 Supabase 替代方案，讓 AI 智慧體能夠自主建構和管理全端應用程式。
+        description: Yarah 是 Agent-Native 的 Supabase 替代方案，讓 AI 智慧體能夠自主建構和管理全端應用程式。
         readme: |
-            # InsForge
+            # Yarah
 
-            InsForge 是 Agent-Native 的 Supabase 替代方案，讓 AI 智慧體能夠自主建構和管理全端應用程式。
+            Yarah 是 Agent-Native 的 Supabase 替代方案，讓 AI 智慧體能夠自主建構和管理全端應用程式。
 
             ## 功能特色
 
@@ -1001,7 +1001,7 @@ localization:
 
             ## 快速開始
 
-            此模版提供 InsForge 平台的**一鍵部署**：
+            此模版提供 Yarah 平台的**一鍵部署**：
 
             1. **部署** - 點擊部署並綁定網域
             2. **登入** - 使用管理員憑證存取控制台

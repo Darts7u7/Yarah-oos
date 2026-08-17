@@ -35,7 +35,7 @@ import {
   type CreateCheckoutSessionResponse,
   type CreateCheckoutSessionRequest,
   type RoleSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const CHECKOUT_SESSION_COLUMNS = `
   id,
@@ -393,10 +393,10 @@ export class StripeCheckoutService {
     subject: BillingSubject | undefined,
     checkoutMode?: 'payment' | 'subscription'
   ): Record<string, string> {
-    const reservedKey = Object.keys(metadata ?? {}).find((key) => key.startsWith('insforge_'));
+    const reservedKey = Object.keys(metadata ?? {}).find((key) => key.startsWith('yarah_'));
     if (reservedKey) {
       throw new AppError(
-        `Metadata key ${reservedKey} is reserved for InsForge`,
+        `Metadata key ${reservedKey} is reserved for Yarah`,
         400,
         ERROR_CODES.INVALID_INPUT
       );

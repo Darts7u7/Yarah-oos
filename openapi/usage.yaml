@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Insforge Usage API
+  title: Yarah Usage API
   version: 1.0.0
   description: MCP usage tracking and usage statistics for the backend usage module.
 
@@ -229,7 +229,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Bearer token issued by InsForge Cloud and verified by the backend cloud token verifier.
+      description: Bearer token issued by Yarah Cloud and verified by the backend cloud token verifier.
   schemas:
     RecordMcpUsageRequest:
       type: object

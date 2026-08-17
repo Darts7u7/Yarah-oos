@@ -1,4 +1,4 @@
-import type { PaymentEnvironment } from '@insforge/shared-schemas';
+import type { PaymentEnvironment } from '@yarahdev/shared-schemas';
 
 export const stripeQueryKeys = {
   all: ['payments', 'stripe'] as const,

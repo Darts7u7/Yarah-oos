@@ -6,12 +6,12 @@ sources:
   docker_host:
     type: docker_logs
     exclude_containers:
-      - insforge-vector
+      - yarah-vector
     include_containers:
-      - insforge
-      - insforge-deno
-      - insforge-postgrest
-      - insforge-postgres
+      - yarah
+      - yarah-deno
+      - yarah-postgrest
+      - yarah-postgres
 
 transforms:
   project_logs:
@@ -42,11 +42,11 @@ transforms:
     inputs:
       - project_logs
     route:
-      insforge: '.appname == "insforge"'
-      deno: '.appname == "insforge-deno"'
-      rest: '.appname == "insforge-postgrest"'
-      db: '.appname == "insforge-postgres"'
-      realtime: '.appname == "insforge-realtime"'
+      yarah: '.appname == "yarah"'
+      deno: '.appname == "yarah-deno"'
+      rest: '.appname == "yarah-postgrest"'
+      db: '.appname == "yarah-postgres"'
+      realtime: '.appname == "yarah-realtime"'
   # PostgREST logs with proper parsing
   rest_logs:
     type: remap
@@ -64,11 +64,11 @@ transforms:
           # If parsing fails, keep original message
           .metadata.level = "info"
       }
-  # InsForge logs are structured JSON, parse and handle both request logs and application logs
-  insforge_logs:
+  # Yarah logs are structured JSON, parse and handle both request logs and application logs
+  yarah_logs:
     type: remap
     inputs:
-      - router.insforge
+      - router.yarah
     source: |-
       # Remove the [backend] prefix if present
       .event_message = replace!(.event_message, r'^\[backend\] ', "")
@@ -160,43 +160,43 @@ transforms:
 
 sinks:
   # File sinks - JSONL format for FileProvider (always enabled)
-  file_insforge:
+  file_yarah:
     type: 'file'
     inputs:
-      - insforge_logs
-    path: '/insforge-logs/insforge.logs.jsonl'
+      - yarah_logs
+    path: '/yarah-logs/yarah.logs.jsonl'
     encoding:
       codec: 'json'
   file_deno:
     type: 'file'
     inputs:
       - deno_logs
-    path: '/insforge-logs/function.logs.jsonl'
+    path: '/yarah-logs/function.logs.jsonl'
     encoding:
       codec: 'json'
   file_rest:
     type: 'file'
     inputs:
       - rest_logs
-    path: '/insforge-logs/postgrest.logs.jsonl'
+    path: '/yarah-logs/postgrest.logs.jsonl'
     encoding:
       codec: 'json'
   file_db:
     type: 'file'
     inputs:
       - db_logs
-    path: '/insforge-logs/postgres.logs.jsonl'
+    path: '/yarah-logs/postgres.logs.jsonl'
     encoding:
       codec: 'json'
 
   # CloudWatch sinks (ignored if AWS_REGION not set)
-  cw_insforge:
+  cw_yarah:
     type: aws_cloudwatch_logs
     inputs:
-      - insforge_logs
+      - yarah_logs
     region: ${AWS_REGION:-skip}
-    group_name: /insforge/local
-    stream_name: ${HOSTNAME_OVERRIDE:-local}-insforge-vector
+    group_name: /yarah/local
+    stream_name: ${HOSTNAME_OVERRIDE:-local}-yarah-vector
     encoding:
       codec: json
     healthcheck:
@@ -206,7 +206,7 @@ sinks:
     inputs:
       - rest_logs
     region: ${AWS_REGION:-skip}
-    group_name: /insforge/local
+    group_name: /yarah/local
     stream_name: ${HOSTNAME_OVERRIDE:-local}-postgrest-vector
     encoding:
       codec: json
@@ -217,7 +217,7 @@ sinks:
     inputs:
       - deno_logs
     region: ${AWS_REGION:-skip}
-    group_name: /insforge/local
+    group_name: /yarah/local
     stream_name: ${HOSTNAME_OVERRIDE:-local}-function-vector
     encoding:
       codec: json
@@ -228,7 +228,7 @@ sinks:
     inputs:
       - db_logs
     region: ${AWS_REGION:-skip}
-    group_name: /insforge/local
+    group_name: /yarah/local
     stream_name: ${HOSTNAME_OVERRIDE:-local}-postgres-vector
     encoding:
       codec: json

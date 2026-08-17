@@ -1,4 +1,4 @@
-import { ColumnType } from '@insforge/shared-schemas';
+import { ColumnType } from '@yarahdev/shared-schemas';
 import { z } from 'zod';
 import { format, parse, isValid, parseISO } from 'date-fns';
 import {
@@ -150,9 +150,9 @@ export function isEmptyValue(value: unknown): boolean {
   return value === null || value === undefined;
 }
 
-export const isInsForgeCloudProject = () => {
+export const isYarahCloudProject = () => {
   try {
-    return new URL(getDashboardBackendUrl()).hostname.endsWith('.insforge.app');
+    return new URL(getDashboardBackendUrl()).hostname.endsWith('.apps.yarah.dev');
   } catch {
     return false;
   }

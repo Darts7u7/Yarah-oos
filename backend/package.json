@@ -1,7 +1,7 @@
 {
-  "name": "insforge-backend",
+  "name": "yarah-backend",
   "version": "1.0.0",
-  "author": "Insforge",
+  "author": "Yarah",
   "description": "Open source backend-as-a-service with PostgreSQL and MCP integration",
   "type": "module",
   "main": "../dist/server.js",

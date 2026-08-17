@@ -5,8 +5,8 @@ import {
   deploymentsService,
   type DeploymentSchema,
 } from '#features/deployments/services/deployments.service';
-import { useToast } from '@insforge/ui';
-import type { StartDeploymentRequest } from '@insforge/shared-schemas';
+import { useToast } from '@yarahdev/ui';
+import type { StartDeploymentRequest } from '@yarahdev/shared-schemas';
 
 export function useDeployments() {
   const { t } = useTranslation('chrome');

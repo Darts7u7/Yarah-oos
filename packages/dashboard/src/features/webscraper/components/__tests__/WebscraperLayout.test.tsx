@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ToastProvider } from '@insforge/ui';
+import { ToastProvider } from '@yarahdev/ui';
 import WebscraperLayout from '#features/webscraper/components/WebscraperLayout';
 
 vi.mock('#assets/icons/terminal.svg?react', () => ({

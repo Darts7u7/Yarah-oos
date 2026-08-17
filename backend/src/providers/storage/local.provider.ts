@@ -13,7 +13,7 @@ import {
   ERROR_CODES,
   DownloadStrategyResponse,
   UploadStrategyResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 
 const DELETE_OBJECTS_CONCURRENCY = 25;

@@ -1,8 +1,8 @@
 {
-  "name": "@insforge/shared-schemas",
-  "version": "1.2.0",
-  "author": "Insforge",
-  "description": "Shared TypeScript schemas for InsForge frontend and backend",
+  "name": "@yarahdev/shared-schemas",
+  "version": "1.2.1",
+  "author": "Yarah",
+  "description": "Shared TypeScript schemas for Yarah frontend and backend",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -20,8 +20,6 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run build",
     "lint": "eslint ."
   },
   "dependencies": {

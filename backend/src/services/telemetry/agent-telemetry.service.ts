@@ -2,7 +2,7 @@ import {
   AgentSessionMetrics,
   AgentTelemetryStatsResponse,
   RecordAgentToolCallRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 interface ToolCallRecord {
   sessionId: string;

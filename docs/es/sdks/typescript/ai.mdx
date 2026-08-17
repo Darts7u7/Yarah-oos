@@ -1,13 +1,13 @@
 ---
 title: Puerta de Enlace de Modelos
-description: Construye funciones de IA con el SDK de OpenAI y la clave de OpenRouter aprovisionada por InsForge, con cuotas por proyecto y facturación unificada.
+description: Construye funciones de IA con el SDK de OpenAI y la clave de OpenRouter aprovisionada por Yarah, con cuotas por proyecto y facturación unificada.
 ---
 
 ## Descripción general
 
-InsForge provisiona una clave de API de OpenRouter para proyectos de Model Gateway. Para nuevas funcionalidades de IA, usa esa clave directamente con la API compatible con OpenAI de OpenRouter en lugar de los métodos de proxy de IA de InsForge ya deprecados.
+Yarah provisiona una clave de API de OpenRouter para proyectos de Model Gateway. Para nuevas funcionalidades de IA, usa esa clave directamente con la API compatible con OpenAI de OpenRouter en lugar de los métodos de proxy de IA de Yarah ya deprecados.
 
-Usa el panel de InsForge para copiar la clave activa de OpenRouter, almacénala en `OPENROUTER_API_KEY`, e invoca OpenRouter desde código del lado del servidor confiable.
+Usa el panel de Yarah para copiar la clave activa de OpenRouter, almacénala en `OPENROUTER_API_KEY`, e invoca OpenRouter desde código del lado del servidor confiable.
 
 <Warning>
 No expongas `OPENROUTER_API_KEY` en paquetes del navegador. En React, Next.js, Vue, Svelte y aplicaciones similares, coloca las llamadas a OpenRouter detrás de una ruta de backend, acción de servidor, función u otro límite solo de servidor.
@@ -247,17 +247,17 @@ export async function POST(request: Request) {
 }
 ```
 
-## Usar Datos de InsForge con IA
+## Usar Datos de Yarah con IA
 
-Usa el SDK de InsForge para base de datos, autenticación, almacenamiento, funciones y tiempo real. Usa OpenRouter directamente para llamadas de modelo.
+Usa el SDK de Yarah para base de datos, autenticación, almacenamiento, funciones y tiempo real. Usa OpenRouter directamente para llamadas de modelo.
 
 ```typescript
 import { createClient } from '@insforge/sdk';
 import OpenAI from 'openai';
 
-const insforge = createClient({
-  baseUrl: process.env.INSFORGE_BASE_URL!,
-  anonKey: process.env.INSFORGE_ANON_KEY!,
+const yarah = createClient({
+  baseUrl: process.env.YARAH_BASE_URL!,
+  anonKey: process.env.YARAH_ANON_KEY!,
 });
 
 const openai = new OpenAI({
@@ -265,7 +265,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
-const { data: documents } = await insforge.database
+const { data: documents } = await yarah.database
   .from('documents')
   .select()
   .limit(5);
@@ -283,16 +283,16 @@ const completion = await openai.chat.completions.create({
 console.log(completion.choices[0]?.message?.content);
 ```
 
-## Proxy de IA de InsForge Heredado
+## Proxy de IA de Yarah Heredado
 
-Los métodos anteriores del SDK de IA de InsForge están deprecados:
+Los métodos anteriores del SDK de IA de Yarah están deprecados:
 
-- `insforge.ai.chat.completions.create()`
-- `insforge.ai.images.generate()`
-- `insforge.ai.embeddings.create()`
+- `yarah.ai.chat.completions.create()`
+- `yarah.ai.images.generate()`
+- `yarah.ai.embeddings.create()`
 
-Mapean a rutas de proxy de backend que aún existen para compatibilidad, pero nuevas integraciones deben usar OpenRouter directamente. La ruta directa proporciona acceso a la superficie de API completa y en evolución de OpenRouter sin esperar a actualizaciones del wrapper del SDK de InsForge.
+Mapean a rutas de proxy de backend que aún existen para compatibilidad, pero nuevas integraciones deben usar OpenRouter directamente. La ruta directa proporciona acceso a la superficie de API completa y en evolución de OpenRouter sin esperar a actualizaciones del wrapper del SDK de Yarah.
 
 ## Catálogo de Modelos
 
-Usa el panel de InsForge o el catálogo de modelos de OpenRouter para elegir un modelo. Los IDs de modelo usan el formato `provider/model`, como `openai/gpt-4o`, `anthropic/claude-3.5-haiku` y `google/gemini-2.5-flash-image`.
+Usa el panel de Yarah o el catálogo de modelos de OpenRouter para elegir un modelo. Los IDs de modelo usan el formato `provider/model`, como `openai/gpt-4o`, `anthropic/claude-3.5-haiku` y `google/gemini-2.5-flash-image`.

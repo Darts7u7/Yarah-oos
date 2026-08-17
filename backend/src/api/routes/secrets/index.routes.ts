@@ -10,7 +10,7 @@ import {
   rotateApiKeyRequestSchema,
   type RotateAnonKeyResponse,
   type RotateApiKeyResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { successResponse } from '@/utils/response.js';
 
 const router = Router();

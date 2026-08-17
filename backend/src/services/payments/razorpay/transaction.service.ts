@@ -7,7 +7,7 @@ import type {
   RazorpayRefund,
 } from '@/providers/payments/razorpay.provider.js';
 import type { RazorpayEnvironment } from '@/types/payments.js';
-import type { BillingSubject } from '@insforge/shared-schemas';
+import type { BillingSubject } from '@yarahdev/shared-schemas';
 
 export type RazorpayTransactionStatus =
   | 'pending'

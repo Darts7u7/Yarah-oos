@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CopyButton, cn } from '@insforge/ui';
+import { CopyButton, cn } from '@yarahdev/ui';
 import { ShowPasswordButton } from './ShowPasswordButton';
 import { useDatabaseConnectionString, useDatabasePassword } from '#lib/hooks/useMetadata';
 

@@ -13,7 +13,7 @@ import {
   type UnsubscribeChannelPayload,
   type PresenceMember,
   type PresenceMemberEvent,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { NEXT_ACTIONS } from '../../utils/next-actions.js';
 import { AppError } from '@/utils/errors.js';
 import { RealtimeAuthService } from '@/services/realtime/realtime-auth.service.js';

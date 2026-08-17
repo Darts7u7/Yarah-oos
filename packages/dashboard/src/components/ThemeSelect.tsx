@@ -1,7 +1,7 @@
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '#lib/contexts/ThemeContext';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@insforge/ui';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@yarahdev/ui';
 
 export function ThemeSelect() {
   const { t } = useTranslation('chrome');

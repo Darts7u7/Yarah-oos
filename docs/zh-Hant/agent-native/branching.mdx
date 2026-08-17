@@ -1,10 +1,10 @@
 ---
 title: "後端分支"
 sidebarTitle: "Branching"
-description: "建立 InsForge 後端的隔離分支複本，安全測試 Postgres 結構描述、設定與遷移變更後再合併回主環境，適合代理協作。"
+description: "建立 Yarah 後端的隔離分支複本，安全測試 Postgres 結構描述、設定與遷移變更後再合併回主環境，適合代理協作。"
 ---
 
-分支是一個子專案，具有自己的 Postgres、身份驗證設定、儲存體、邊界函數、電子郵件範本、即時通道和排程。在準備好時合併回去或重設並重試。可在 InsForge OSS 2.1.0+ 上使用。
+分支是一個子專案，具有自己的 Postgres、身份驗證設定、儲存體、邊界函數、電子郵件範本、即時通道和排程。在準備好時合併回去或重設並重試。可在 Yarah OSS 2.1.0+ 上使用。
 
 ## 概念
 
@@ -15,22 +15,22 @@ description: "建立 InsForge 後端的隔離分支複本，安全測試 Postgre
 使用 `full`（結構描述 + 資料）或 `schema-only`（更快，使用者表為空）建立分支。
 
 ```bash
-npx @insforge/cli branch create feat-billing --mode full
-npx @insforge/cli branch list
+npx @yarah/cli branch create feat-billing --mode full
+npx @yarah/cli branch list
 ```
 
 在套用前預覽合併 SQL。
 
 ```bash
-npx @insforge/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
-npx @insforge/cli branch merge feat-billing
+npx @yarah/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
+npx @yarah/cli branch merge feat-billing
 ```
 
 回復到建立時快照或刪除分支。
 
 ```bash
-npx @insforge/cli branch reset feat-billing
-npx @insforge/cli branch delete feat-billing
+npx @yarah/cli branch reset feat-billing
+npx @yarah/cli branch delete feat-billing
 ```
 
 ## 特定用途案例
@@ -43,4 +43,4 @@ npx @insforge/cli branch delete feat-billing
 
 - [資料庫移轉](/core-concepts/database/migrations)用於純前向 SQL 檔案。
 - [資料庫概覽](/core-concepts/database/overview)了解每個分支下執行什麼。
-- [CLI 參考](https://github.com/InsForge/InsForge)用於完整的 `branch` 旗標集。
+- [CLI 參考](https://github.com/Yarah/Yarah)用於完整的 `branch` 旗標集。

@@ -1,5 +1,5 @@
 import type { RawOpenRouterModel } from '@/types/ai.js';
-import { ERROR_CODES, type AIModelSchema } from '@insforge/shared-schemas';
+import { ERROR_CODES, type AIModelSchema } from '@yarahdev/shared-schemas';
 import { calculateTokenPrices, normalizeModalities, getProviderOrder } from './helpers.js';
 import { AppError } from '@/utils/errors.js';
 import { logger } from '@/utils/logger.js';

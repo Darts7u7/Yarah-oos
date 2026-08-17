@@ -1,6 +1,6 @@
 ---
 title: Kotlin 实时 SDK 参考
-description: 通过 Socket.IO 连接，订阅频道，发布事件，跟踪在线状态，并使用 InsForge Kotlin 实时客户端处理重新连接。
+description: 通过 Socket.IO 连接，订阅频道，发布事件，跟踪在线状态，并使用 Yarah Kotlin 实时客户端处理重新连接。
 ---
 
 import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
@@ -11,14 +11,14 @@ import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
 
 ## 心智模型
 
-Kotlin SDK 通过 Socket.IO 连接到 InsForge 实时系统。订阅频道名称（如 `order:123` 或 `chat:room-1`），然后监听发布到这些频道的事件名称。
+Kotlin SDK 通过 Socket.IO 连接到 Yarah 实时系统。订阅频道名称（如 `order:123` 或 `chat:room-1`），然后监听发布到这些频道的事件名称。
 
 事件由数据库触发器发布，这些触发器调用 `realtime.publish(...)` 或由已加入频道的客户端发布。有关频道和 RLS 模型，请参阅[实时概述](/core-concepts/realtime/overview)。
 
 ## 快速开始
 
 ```kotlin
-import dev.insforge.realtime.models.SocketMessage
+import dev.yarah.realtime.models.SocketMessage
 
 client.realtime.connect()
 

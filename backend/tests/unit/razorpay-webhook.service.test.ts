@@ -328,8 +328,8 @@ describe('RazorpayWebhookService', () => {
             currency: 'INR',
             short_url: null,
             notes: {
-              insforge_subject_type: 'team',
-              insforge_subject_id: 'team_123',
+              yarah_subject_type: 'team',
+              yarah_subject_id: 'team_123',
             },
             line_items: [
               {
@@ -406,8 +406,8 @@ describe('RazorpayWebhookService', () => {
             currency: 'INR',
             short_url: null,
             notes: {
-              insforge_subject_type: 'team',
-              insforge_subject_id: 'team_123',
+              yarah_subject_type: 'team',
+              yarah_subject_id: 'team_123',
             },
             line_items: [
               {
@@ -712,8 +712,8 @@ describe('RazorpayWebhookService', () => {
             contact: null,
             customer_id: 'cust_123',
             notes: {
-              insforge_subject_type: 'team',
-              insforge_subject_id: 'team_123',
+              yarah_subject_type: 'team',
+              yarah_subject_id: 'team_123',
             },
             fee: null,
             tax: null,

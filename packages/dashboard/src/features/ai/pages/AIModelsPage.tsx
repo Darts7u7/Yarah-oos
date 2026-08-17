@@ -11,7 +11,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { ErrorState } from '#components';
 import {
   generateProviderTabs,

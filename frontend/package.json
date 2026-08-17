@@ -1,8 +1,8 @@
 {
-  "name": "insforge-dashboard",
+  "name": "yarah-shell",
   "version": "1.0.0",
-  "author": "Insforge",
-  "description": "Self-hosting host app for the shared InsForge dashboard package",
+  "author": "Yarah",
+  "description": "Self-hosting host app for the shared Yarah dashboard package",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@insforge/dashboard": "*",
+    "@yarahdev/dashboard": "*",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
   },

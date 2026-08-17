@@ -15,7 +15,7 @@ import type {
   StripePaymentIntent,
   StripeRefund,
 } from '@/types/payments.js';
-import type { BillingSubject } from '@insforge/shared-schemas';
+import type { BillingSubject } from '@yarahdev/shared-schemas';
 
 type StripeTransactionStatus =
   | 'pending'

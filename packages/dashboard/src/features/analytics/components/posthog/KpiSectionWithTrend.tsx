@@ -10,7 +10,7 @@ import {
   YAxis,
 } from 'recharts';
 import { EmptyState, ErrorState, LoadingState } from '#components';
-import type { PosthogWebOverviewItem } from '@insforge/shared-schemas';
+import type { PosthogWebOverviewItem } from '@yarahdev/shared-schemas';
 import { useTimeframe } from '#features/analytics/context/TimeRangeContext';
 import { useWebOverview, useTrend } from '#features/analytics/hooks/useAnalytics';
 import type { TrendMetric } from '#features/analytics/services/analytics.service';

@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ToastProvider } from '@insforge/ui';
+import { ToastProvider } from '@yarahdev/ui';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ComputeConfig } from '@insforge/shared-schemas';
+import type { ComputeConfig } from '@yarahdev/shared-schemas';
 
 const api = vi.hoisted(() => ({
   config: {

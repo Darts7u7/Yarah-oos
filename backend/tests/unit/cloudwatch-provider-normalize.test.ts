@@ -27,10 +27,10 @@ describe('CloudWatchProvider.normalizeBody', () => {
   it('passes already-Vector-shaped payloads through unchanged', () => {
     const input = {
       event_message: 'something happened',
-      appname: 'insforge',
+      appname: 'yarah',
       metadata: { level: 'error', extra: 'value' },
     };
-    const out = normalizeBody(JSON.stringify(input), 'insforge.logs');
+    const out = normalizeBody(JSON.stringify(input), 'yarah.logs');
     expect(out).toEqual(input);
   });
 
@@ -38,12 +38,12 @@ describe('CloudWatchProvider.normalizeBody', () => {
     // Passthrough now requires event_message as well as metadata.level — an
     // appname-only payload would otherwise leak through with no message column.
     const input = {
-      appname: 'insforge',
+      appname: 'yarah',
       metadata: { level: 'info' },
       foo: 'bar',
     };
-    const out = normalizeBody(JSON.stringify(input), 'insforge.logs');
-    expect(out).toMatchObject({ appname: 'insforge', foo: 'bar' });
+    const out = normalizeBody(JSON.stringify(input), 'yarah.logs');
+    expect(out).toMatchObject({ appname: 'yarah', foo: 'bar' });
     expect(typeof out.event_message).toBe('string');
     expect((out.metadata as { level: string }).level).toBe('info');
   });
@@ -52,11 +52,11 @@ describe('CloudWatchProvider.normalizeBody', () => {
     // Without metadata.level the dashboard would render as informational, so we
     // must run the Winston path to lift any top-level `level` field.
     const input = {
-      appname: 'insforge',
+      appname: 'yarah',
       level: 'error',
       message: 'boom',
     };
-    const out = normalizeBody(JSON.stringify(input), 'insforge.logs');
+    const out = normalizeBody(JSON.stringify(input), 'yarah.logs');
     expect((out.metadata as { level: string }).level).toBe('error');
     expect(out.event_message).toBe('error - boom');
   });
@@ -68,7 +68,7 @@ describe('CloudWatchProvider.normalizeBody', () => {
       timestamp: '2024-01-01T00:00:00Z',
       metadata: { requestId: 'abc' },
     };
-    const out = normalizeBody(JSON.stringify(input), 'insforge.logs');
+    const out = normalizeBody(JSON.stringify(input), 'yarah.logs');
     expect(out.event_message).toBe('info - started');
     expect(out.metadata).toEqual({ requestId: 'abc', level: 'info' });
     expect(out.timestamp).toBe('2024-01-01T00:00:00Z');
@@ -83,7 +83,7 @@ describe('CloudWatchProvider.normalizeBody', () => {
       error: 'TypeError: x is undefined',
       stack: 'at foo (file.ts:1)\nat bar (file.ts:2)',
     };
-    const out = normalizeBody(JSON.stringify(input), 'insforge.logs');
+    const out = normalizeBody(JSON.stringify(input), 'yarah.logs');
     expect(out.event_message).toBe('error - request failed');
     expect((out.metadata as { level: string }).level).toBe('error');
     expect(out.error).toBe('TypeError: x is undefined');
@@ -92,14 +92,14 @@ describe('CloudWatchProvider.normalizeBody', () => {
 
   it('lowercases the Winston level field', () => {
     const input = { level: 'ERROR', message: 'oops' };
-    const out = normalizeBody(JSON.stringify(input), 'insforge.logs');
+    const out = normalizeBody(JSON.stringify(input), 'yarah.logs');
     expect((out.metadata as { level: string }).level).toBe('error');
     expect(out.event_message).toBe('error - oops');
   });
 
   it('strips the msg key (pino-style) and prefixes level on the rest spread', () => {
     const input = { level: 'info', msg: 'hello', extra: 1 };
-    const out = normalizeBody(JSON.stringify(input), 'insforge.logs');
+    const out = normalizeBody(JSON.stringify(input), 'yarah.logs');
     expect(out.event_message).toBe('info - hello');
     expect(out).not.toHaveProperty('msg');
     expect(out.extra).toBe(1);
@@ -118,7 +118,7 @@ describe('CloudWatchProvider.normalizeBody', () => {
       userAgent: 'curl/8.0',
       timestamp: '2024-01-01T00:00:00Z',
     };
-    const out = normalizeBody(JSON.stringify(input), 'insforge.logs');
+    const out = normalizeBody(JSON.stringify(input), 'yarah.logs');
     expect(out.event_message).toBe('GET /rest/v1/users 200 1234 12.3ms - 127.0.0.1 - curl/8.0');
     expect(out.method).toBe('GET');
     expect(out.path).toBe('/rest/v1/users');
@@ -139,33 +139,33 @@ describe('CloudWatchProvider.normalizeBody', () => {
     // Edge case: a non-request log that happens to mention a method/path. The
     // request branch is keyed strictly on `duration` to match Vector's check.
     const input = { level: 'info', message: 'routing', method: 'GET', path: '/foo' };
-    const out = normalizeBody(JSON.stringify(input), 'insforge.logs');
+    const out = normalizeBody(JSON.stringify(input), 'yarah.logs');
     expect(out.event_message).toBe('info - routing');
     expect(out).not.toHaveProperty('status_code');
   });
 
   it('falls back to raw text parsing on malformed JSON', () => {
-    const out = normalizeBody('not json {{{', 'insforge.logs');
+    const out = normalizeBody('not json {{{', 'yarah.logs');
     expect(out).toHaveProperty('event_message', 'not json {{{');
     expect(out.metadata).toEqual({ level: 'info' });
   });
 
   it('falls back to raw text parsing on JSON arrays', () => {
-    const out = normalizeBody('[1,2,3]', 'insforge.logs');
+    const out = normalizeBody('[1,2,3]', 'yarah.logs');
     expect(out).toHaveProperty('event_message', '[1,2,3]');
     expect(out.metadata).toBeDefined();
   });
 
   it('defaults metadata.level to info when JSON has no level field', () => {
     const input = { message: 'no level here', foo: 'bar' };
-    const out = normalizeBody(JSON.stringify(input), 'insforge.logs');
+    const out = normalizeBody(JSON.stringify(input), 'yarah.logs');
     expect(out.event_message).toBe('no level here');
     expect((out.metadata as { level: string }).level).toBe('info');
     expect(out.foo).toBe('bar');
   });
 
   it('handles empty input', () => {
-    const out = normalizeBody('', 'insforge.logs');
+    const out = normalizeBody('', 'yarah.logs');
     expect(out).toHaveProperty('event_message', '');
     expect(out.metadata).toBeDefined();
   });

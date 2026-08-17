@@ -1,14 +1,14 @@
 ---
-title: "Self-Host InsForge on Coolify"
-description: "Self-host InsForge on Coolify as a Docker Compose resource, with the Postgres image built from the repo so its config always matches the release."
+title: "Self-Host Yarah on Coolify"
+description: "Self-host Yarah on Coolify as a Docker Compose resource, with the Postgres image built from the repo so its config always matches the release."
 ---
 
-# Self-Host InsForge on Coolify
+# Self-Host Yarah on Coolify
 
-This guide walks through self-hosting the InsForge platform on [Coolify](https://coolify.io), an open-source PaaS you run on your own server.
+This guide walks through self-hosting the Yarah platform on [Coolify](https://coolify.io), an open-source PaaS you run on your own server.
 
 <Note>
-  **This deploys InsForge itself, not the app you built.** If you just want to take your app live, use [Sites](/core-concepts/sites/overview) instead.
+  **This deploys Yarah itself, not the app you built.** If you just want to take your app live, use [Sites](/core-concepts/sites/overview) instead.
 </Note>
 
 ## Prerequisites
@@ -43,20 +43,20 @@ ROOT_ADMIN_PASSWORD=<strong password>
 
 Postgres reads `POSTGRES_PASSWORD` only when it initializes the cluster. Changing it later does not change the database password.
 
-Everything else is optional; [`.env.example`](https://github.com/insforge/insforge/blob/main/.env.example) lists every supported variable with its default.
+Everything else is optional; [`.env.example`](https://github.com/yarah/yarah/blob/main/.env.example) lists every supported variable with its default.
 
 ## 3. Assign a domain
 
-Coolify does not expose a compose service that publishes no ports. Under the resource's **insforge** service, assign your domain and set the port to `7130`, then add the matching URLs to the environment:
+Coolify does not expose a compose service that publishes no ports. Under the resource's **yarah** service, assign your domain and set the port to `7130`, then add the matching URLs to the environment:
 
 ```env
-API_BASE_URL=https://insforge.example.com
-VITE_API_BASE_URL=https://insforge.example.com
+API_BASE_URL=https://yarah.example.com
+VITE_API_BASE_URL=https://yarah.example.com
 ```
 
 These have to match the URL browsers use, or the dashboard will call the wrong origin.
 
-Only `insforge` needs a domain. Postgres, PostgREST and the Deno runtime stay on the internal network.
+Only `yarah` needs a domain. Postgres, PostgREST and the Deno runtime stay on the internal network.
 
 ## 4. Deploy
 
@@ -76,6 +76,6 @@ Object storage defaults to the container filesystem on a Docker volume. For S3, 
 
 ## Why Postgres is built rather than pulled
 
-InsForge's Postgres needs three files from this repository: `postgresql.conf`, which loads the `insforge_pg_utils` extension that row-level security on managed tables depends on, plus two init scripts.
+Yarah's Postgres needs three files from this repository: `postgresql.conf`, which loads the `yarah_pg_utils` extension that row-level security on managed tables depends on, plus two init scripts.
 
 Coolify creates file bind mounts as directories ([coollabsio/coolify#3375](https://github.com/coollabsio/coolify/issues/3375)), so mounting them is not an option — Postgres will not start. Building the image at deploy time puts the current files in it instead, which also means the configuration cannot fall behind the code the way a prebuilt image can.

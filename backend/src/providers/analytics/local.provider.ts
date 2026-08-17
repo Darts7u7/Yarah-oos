@@ -13,7 +13,7 @@ import {
   type PosthogWebOverviewResponse,
   type PosthogWebStatsResponse,
   type PosthogWebStatsRow,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { AppError } from '@/utils/errors.js';
 import logger from '@/utils/logger.js';
 import {
@@ -104,7 +104,7 @@ export class LocalAnalyticsProvider implements AnalyticsProvider {
   }
 
   // PostHog 401/403 becomes 502: a 401 reaching the dashboard reads as an
-  // expired InsForge session and bounces the user to login, when the fix is to
+  // expired Yarah session and bounces the user to login, when the fix is to
   // reconnect PostHog. Detail is logged, not returned.
   private upstreamError(err: unknown, label: string): AppError {
     let status = 502;

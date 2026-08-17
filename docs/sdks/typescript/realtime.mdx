@@ -1,6 +1,6 @@
 ---
 title: TypeScript realtime SDK reference
-description: Subscribe to channels, publish events, track presence, and handle reconnects and token refreshes over Socket.IO with the InsForge TypeScript SDK.
+description: Subscribe to channels, publish events, track presence, and handle reconnects and token refreshes over Socket.IO with the Yarah TypeScript SDK.
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
@@ -11,12 +11,12 @@ import Installation from '/snippets/sdk-installation.mdx';
 
 ## Mental model
 
-The TypeScript SDK opens one Socket.IO connection to your InsForge backend. You subscribe to named channels, listen for event names, and optionally publish events back to channels you have joined.
+The TypeScript SDK opens one Socket.IO connection to your Yarah backend. You subscribe to named channels, listen for event names, and optionally publish events back to channels you have joined.
 
 Events can come from two places:
 
 - Database triggers that call `realtime.publish(channel, event, payload)`.
-- Clients that call `insforge.realtime.publish(channel, event, payload)`.
+- Clients that call `yarah.realtime.publish(channel, event, payload)`.
 
 For the backend channel and RLS model, see [Realtime overview](/core-concepts/realtime/overview).
 
@@ -25,28 +25,28 @@ For the backend channel and RLS model, see [Realtime overview](/core-concepts/re
 ```typescript
 import { createClient } from '@insforge/sdk';
 
-const insforge = createClient({
-  baseUrl: 'https://your-app.insforge.app',
+const yarah = createClient({
+  baseUrl: 'https://your-app.apps.yarah.dev',
   anonKey: 'your-anon-key'
 });
 
-insforge.realtime.on('connect', () => {
-  console.log('Connected:', insforge.realtime.socketId);
+yarah.realtime.on('connect', () => {
+  console.log('Connected:', yarah.realtime.socketId);
 });
 
-insforge.realtime.on('error', (error) => {
+yarah.realtime.on('error', (error) => {
   console.error(error.code, error.message);
 });
 
-await insforge.realtime.connect();
+await yarah.realtime.connect();
 
-const subscription = await insforge.realtime.subscribe('order:123');
+const subscription = await yarah.realtime.subscribe('order:123');
 
 if (!subscription.ok) {
   throw new Error(subscription.error.message);
 }
 
-insforge.realtime.on('status_changed', (message) => {
+yarah.realtime.on('status_changed', (message) => {
   console.log(message.status);
   console.log(message.meta.messageId);
 });
@@ -61,7 +61,7 @@ insforge.realtime.on('status_changed', (message) => {
 Establish a WebSocket connection.
 
 ```typescript
-await insforge.realtime.connect();
+await yarah.realtime.connect();
 ```
 
 Returns:
@@ -81,7 +81,7 @@ Notes:
 Subscribe to a channel and receive the current presence snapshot.
 
 ```typescript
-const response = await insforge.realtime.subscribe('chat:room-1');
+const response = await yarah.realtime.subscribe('chat:room-1');
 
 if (response.ok) {
   console.log(response.channel);
@@ -127,7 +127,7 @@ type SubscribeResponse =
 Publish an event to a channel.
 
 ```typescript
-await insforge.realtime.publish('chat:room-1', 'new_message', {
+await yarah.realtime.publish('chat:room-1', 'new_message', {
   text: 'Hello',
   sentAt: new Date().toISOString()
 });
@@ -152,7 +152,7 @@ Publish failures are emitted through the `error` event.
 Listen for custom events, connection events, presence events, and realtime errors.
 
 ```typescript
-insforge.realtime.on('new_message', (message) => {
+yarah.realtime.on('new_message', (message) => {
   console.log(message.text);
   console.log(message.meta.senderType);
 });
@@ -175,7 +175,7 @@ Reserved events:
 Listen for an event once, then remove the listener automatically.
 
 ```typescript
-insforge.realtime.once('checkout_completed', (message) => {
+yarah.realtime.once('checkout_completed', (message) => {
   console.log('Completed:', message.orderId);
 });
 ```
@@ -189,8 +189,8 @@ function handleStatus(message: OrderStatusMessage) {
   console.log(message.status);
 }
 
-insforge.realtime.on('status_changed', handleStatus);
-insforge.realtime.off('status_changed', handleStatus);
+yarah.realtime.on('status_changed', handleStatus);
+yarah.realtime.off('status_changed', handleStatus);
 ```
 
 ## unsubscribe()
@@ -198,7 +198,7 @@ insforge.realtime.off('status_changed', handleStatus);
 Leave a channel.
 
 ```typescript
-insforge.realtime.unsubscribe('chat:room-1');
+yarah.realtime.unsubscribe('chat:room-1');
 ```
 
 `unsubscribe()` is fire-and-forget. If this was the final socket for a logical member, other subscribers receive `presence:leave`.
@@ -208,7 +208,7 @@ insforge.realtime.unsubscribe('chat:room-1');
 Close the WebSocket and clear local subscriptions.
 
 ```typescript
-insforge.realtime.disconnect();
+yarah.realtime.disconnect();
 ```
 
 ## Message shape
@@ -223,7 +223,7 @@ interface OrderStatusMessage extends SocketMessage {
   status: string;
 }
 
-insforge.realtime.on<OrderStatusMessage>('status_changed', (message) => {
+yarah.realtime.on<OrderStatusMessage>('status_changed', (message) => {
   console.log(message.id);
   console.log(message.status);
   console.log(message.meta.messageId);
@@ -252,7 +252,7 @@ interface SocketMessageMeta {
 A successful subscription returns the current presence snapshot.
 
 ```typescript
-const response = await insforge.realtime.subscribe('chat:room-1');
+const response = await yarah.realtime.subscribe('chat:room-1');
 
 if (response.ok) {
   for (const member of response.presence.members) {
@@ -280,11 +280,11 @@ type PresenceMember =
 Listen for changes:
 
 ```typescript
-insforge.realtime.on('presence:join', (message) => {
+yarah.realtime.on('presence:join', (message) => {
   console.log('Joined:', message.member.presenceId);
 });
 
-insforge.realtime.on('presence:leave', (message) => {
+yarah.realtime.on('presence:leave', (message) => {
   console.log('Left:', message.member.presenceId);
 });
 ```
@@ -294,7 +294,7 @@ insforge.realtime.on('presence:leave', (message) => {
 The SDK maintains the member list for every subscribed channel — seeded from the subscribe snapshot and kept current from `presence:join`/`presence:leave` deltas and reconnect resyncs. Read it at any time instead of merging deltas yourself:
 
 ```typescript
-const members = insforge.realtime.getPresenceState('chat:room-1');
+const members = yarah.realtime.getPresenceState('chat:room-1');
 ```
 
 Returns an empty array for channels you are not subscribed to. While the socket is briefly disconnected it holds the last known state, replaced by a fresh snapshot as soon as the channel resubscribes.
@@ -306,7 +306,7 @@ When the connection drops, the SDK automatically resubscribes to every channel o
 ```typescript
 import type { PresenceSyncEvent } from '@insforge/sdk';
 
-insforge.realtime.on<PresenceSyncEvent>('presence:sync', ({ channel, presence }) => {
+yarah.realtime.on<PresenceSyncEvent>('presence:sync', ({ channel, presence }) => {
   replaceMembers(channel, presence.members);
 });
 ```
@@ -332,15 +332,15 @@ Access *reductions* apply lazily on a live connection. Publishing is re-checked 
 ## Error handling
 
 ```typescript
-insforge.realtime.on('connect_error', (error) => {
+yarah.realtime.on('connect_error', (error) => {
   console.error('Connection failed:', error.message);
 });
 
-insforge.realtime.on('disconnect', (reason) => {
+yarah.realtime.on('disconnect', (reason) => {
   console.log('Disconnected:', reason);
 });
 
-insforge.realtime.on('error', (error) => {
+yarah.realtime.on('error', (error) => {
   console.error(error.channel, error.code, error.message);
 });
 ```
@@ -358,29 +358,29 @@ Common realtime error codes:
 ```typescript
 const channel = `order:${orderId}`;
 
-insforge.realtime.on('error', (error) => {
+yarah.realtime.on('error', (error) => {
   console.error(error.code, error.message);
 });
 
-await insforge.realtime.connect();
+await yarah.realtime.connect();
 
-const response = await insforge.realtime.subscribe(channel);
+const response = await yarah.realtime.subscribe(channel);
 
 if (!response.ok) {
   throw new Error(response.error.message);
 }
 
-insforge.realtime.on('status_changed', (message) => {
+yarah.realtime.on('status_changed', (message) => {
   renderOrderStatus(message.status);
 });
 
-await insforge.realtime.publish(channel, 'customer_viewed', {
+await yarah.realtime.publish(channel, 'customer_viewed', {
   orderId,
   viewedAt: new Date().toISOString()
 });
 
 function cleanup() {
-  insforge.realtime.unsubscribe(channel);
-  insforge.realtime.disconnect();
+  yarah.realtime.unsubscribe(channel);
+  yarah.realtime.disconnect();
 }
 ```

@@ -1,17 +1,17 @@
 ---
 title: OAuth 服务器
-description: 使用 InsForge 作为 OAuth 2.0 身份提供商，在第三方应用中验证用户，涵盖客户端注册、授权流程、令牌颁发以及作用域配置的完整集成指南。
+description: 使用 Yarah 作为 OAuth 2.0 身份提供商，在第三方应用中验证用户，涵盖客户端注册、授权流程、令牌颁发以及作用域配置的完整集成指南。
 ---
 
 ## 概述
 
-InsForge 可以作为 OAuth 2.0 身份提供商，允许第三方应用程序通过"使用 InsForge 登录"来验证用户身份。这使得在您的平台上进行开发的开发者能够利用 InsForge 的身份验证系统，而无需管理自己的用户凭据。
+Yarah 可以作为 OAuth 2.0 身份提供商，允许第三方应用程序通过"使用 Yarah 登录"来验证用户身份。这使得在您的平台上进行开发的开发者能够利用 Yarah 的身份验证系统，而无需管理自己的用户凭据。
 
 ## 使用场景
 
 <CardGroup cols={2}>
   <Card title="开发者平台" icon="code">
-    允许第三方开发者使用"使用 InsForge 登录"构建集成，同时您仍保持对用户数据访问的控制。
+    允许第三方开发者使用"使用 Yarah 登录"构建集成，同时您仍保持对用户数据访问的控制。
   </Card>
 
   <Card title="AI 智能体与 MCP" icon="robot">
@@ -19,7 +19,7 @@ InsForge 可以作为 OAuth 2.0 身份提供商，允许第三方应用程序通
   </Card>
 
   <Card title="合作伙伴应用" icon="handshake">
-    允许合作伙伴应用程序针对您的 InsForge 项目验证用户身份，而无需共享凭据。
+    允许合作伙伴应用程序针对您的 Yarah 项目验证用户身份，而无需共享凭据。
   </Card>
 
   <Card title="CLI 与桌面应用" icon="terminal">
@@ -29,24 +29,24 @@ InsForge 可以作为 OAuth 2.0 身份提供商，允许第三方应用程序通
 
 ## OAuth 2.0 流程
 
-InsForge 实现了带 PKCE（Proof Key for Code Exchange，代码交换验证密钥）的**授权码流程**（Authorization Code flow），这是适用于 Web 和原生应用程序的最安全的 OAuth 流程。
+Yarah 实现了带 PKCE（Proof Key for Code Exchange，代码交换验证密钥）的**授权码流程**（Authorization Code flow），这是适用于 Web 和原生应用程序的最安全的 OAuth 流程。
 
 ```mermaid
 sequenceDiagram
     participant App as Your Application
     participant User as User Browser
-    participant InsForge as InsForge Auth
-    participant API as InsForge API
+    participant Yarah as Yarah Auth
+    participant API as Yarah API
 
     App->>App: Generate code_verifier & code_challenge
     App->>User: Redirect to /api/oauth/v1/authorize
-    User->>InsForge: User authenticates
-    InsForge->>User: Authorization prompt
-    User->>InsForge: User approves
-    InsForge->>App: Redirect with authorization code
-    App->>InsForge: POST /api/oauth/v1/token<br/>(code + code_verifier)
-    InsForge->>InsForge: Verify PKCE
-    InsForge->>App: Access token + Refresh token
+    User->>Yarah: User authenticates
+    Yarah->>User: Authorization prompt
+    User->>Yarah: User approves
+    Yarah->>App: Redirect with authorization code
+    App->>Yarah: POST /api/oauth/v1/token<br/>(code + code_verifier)
+    Yarah->>Yarah: Verify PKCE
+    Yarah->>App: Access token + Refresh token
     App->>API: API requests with access token
     API->>App: Protected resources
 ```
@@ -55,7 +55,7 @@ sequenceDiagram
 
 <Steps>
   <Step title="注册您的应用程序">
-    联系 InsForge 将您的应用程序注册为 OAuth 客户端。您将获得：
+    联系 Yarah 将您的应用程序注册为 OAuth 客户端。您将获得：
     - **Client ID（客户端 ID）**：您应用程序的公开标识符
     - **Client Secret（客户端密钥）**：用于服务器端令牌交换的机密密钥
     - **Allowed Redirect URIs（允许的重定向 URI）**：用户在授权后可被重定向到的 URL
@@ -84,7 +84,7 @@ sequenceDiagram
 将用户重定向到此端点以启动 OAuth 流程。
 
 ```
-GET https://api.insforge.dev/api/oauth/v1/authorize
+GET https://api.yarah.dev/api/oauth/v1/authorize
 ```
 
 **查询参数：**
@@ -102,7 +102,7 @@ GET https://api.insforge.dev/api/oauth/v1/authorize
 **示例：**
 
 ```
-https://api.insforge.dev/api/oauth/v1/authorize?
+https://api.yarah.dev/api/oauth/v1/authorize?
   client_id=clf_abc123xyz&
   redirect_uri=https://example.com/callback&
   response_type=code&
@@ -117,7 +117,7 @@ https://api.insforge.dev/api/oauth/v1/authorize?
 用授权码交换访问令牌和刷新令牌。
 
 ```
-POST https://api.insforge.dev/api/oauth/v1/token
+POST https://api.yarah.dev/api/oauth/v1/token
 ```
 
 **请求正文（JSON）：**
@@ -149,7 +149,7 @@ POST https://api.insforge.dev/api/oauth/v1/token
 用刷新令牌交换新的访问令牌。
 
 ```
-POST https://api.insforge.dev/api/oauth/v1/token
+POST https://api.yarah.dev/api/oauth/v1/token
 ```
 
 **请求正文（JSON）：**
@@ -168,7 +168,7 @@ POST https://api.insforge.dev/api/oauth/v1/token
 获取已验证用户的资料信息。
 
 ```
-GET https://api.insforge.dev/auth/v1/profile
+GET https://api.yarah.dev/auth/v1/profile
 Authorization: Bearer {access_token}
 ```
 
@@ -272,9 +272,9 @@ function base64UrlEncode(buffer) {
 ```bash
 # .env - DO NOT commit this file to version control
 SESSION_SECRET=your-secure-random-secret-min-32-chars
-INSFORGE_CLIENT_ID=clf_your_client_id
-INSFORGE_CLIENT_SECRET=your_client_secret
-INSFORGE_URL=https://api.insforge.dev
+YARAH_CLIENT_ID=clf_your_client_id
+YARAH_CLIENT_SECRET=your_client_secret
+YARAH_URL=https://api.yarah.dev
 REDIRECT_URI=http://localhost:3000/auth/callback
 ```
 
@@ -293,7 +293,7 @@ const session = require('express-session');
 const app = express();
 
 // Validate required environment variables
-const requiredEnvVars = ['SESSION_SECRET', 'INSFORGE_CLIENT_ID', 'INSFORGE_CLIENT_SECRET'];
+const requiredEnvVars = ['SESSION_SECRET', 'YARAH_CLIENT_ID', 'YARAH_CLIENT_SECRET'];
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
     console.error(`Missing required environment variable: ${envVar}`);
@@ -310,9 +310,9 @@ app.use(session({
 }));
 
 const config = {
-  clientId: process.env.INSFORGE_CLIENT_ID,
-  clientSecret: process.env.INSFORGE_CLIENT_SECRET,
-  insforgeUrl: process.env.INSFORGE_URL || 'https://api.insforge.dev',
+  clientId: process.env.YARAH_CLIENT_ID,
+  clientSecret: process.env.YARAH_CLIENT_SECRET,
+  yarahUrl: process.env.YARAH_URL || 'https://api.yarah.dev',
   redirectUri: process.env.REDIRECT_URI || 'http://localhost:3000/auth/callback',
   scopes: 'user:read organizations:read'
 };
@@ -334,7 +334,7 @@ app.get('/auth/login', (req, res) => {
   req.session.oauthState = state;
 
   // Build authorization URL
-  const authUrl = new URL(`${config.insforgeUrl}/api/oauth/v1/authorize`);
+  const authUrl = new URL(`${config.yarahUrl}/api/oauth/v1/authorize`);
   authUrl.searchParams.set('client_id', config.clientId);
   authUrl.searchParams.set('redirect_uri', config.redirectUri);
   authUrl.searchParams.set('response_type', 'code');
@@ -362,7 +362,7 @@ app.get('/auth/callback', async (req, res) => {
 
   try {
     // Exchange code for tokens
-    const tokenResponse = await fetch(`${config.insforgeUrl}/api/oauth/v1/token`, {
+    const tokenResponse = await fetch(`${config.yarahUrl}/api/oauth/v1/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -382,7 +382,7 @@ app.get('/auth/callback', async (req, res) => {
     }
 
     // Fetch user profile
-    const profileResponse = await fetch(`${config.insforgeUrl}/auth/v1/profile`, {
+    const profileResponse = await fetch(`${config.yarahUrl}/auth/v1/profile`, {
       headers: { 'Authorization': `Bearer ${tokens.access_token}` }
     });
 
@@ -410,7 +410,7 @@ app.get('/api/organizations', async (req, res) => {
     return res.status(401).json({ error: 'Not authenticated' });
   }
 
-  const response = await fetch(`${config.insforgeUrl}/organizations/v1`, {
+  const response = await fetch(`${config.yarahUrl}/organizations/v1`, {
     headers: { 'Authorization': `Bearer ${req.session.accessToken}` }
   });
 
@@ -434,7 +434,7 @@ function loginWithPopup() {
 
   const popup = window.open(
     '/auth/login?mode=popup',
-    'insforge-oauth',
+    'yarah-oauth',
     `width=${width},height=${height},left=${left},top=${top}`
   );
 
@@ -506,8 +506,8 @@ if (req.query.mode === 'popup') {
 | `scope` | 已授予的作用域 |
 | `iat` | 签发时间戳 |
 | `exp` | 过期时间戳 |
-| `iss` | 签发者（`insforge`） |
-| `aud` | 受众（`insforge-api`） |
+| `iss` | 签发者（`yarah`） |
+| `aud` | 受众（`yarah-api`） |
 
 ## 错误处理
 
@@ -557,6 +557,6 @@ OAuth 端点受到速率限制以防止滥用：
 
 ## 资源
 
-<Card title="OAuth 示例仓库" icon="github" href="https://github.com/InsForge/insforge-oauth-example">
-  完整可运行的示例，展示如何将"使用 InsForge 登录"集成到您的应用程序中。
+<Card title="OAuth 示例仓库" icon="github" href="https://github.com/Yarah/yarah-oauth-example">
+  完整可运行的示例，展示如何将"使用 Yarah 登录"集成到您的应用程序中。
 </Card>

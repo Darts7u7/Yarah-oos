@@ -1,6 +1,6 @@
-import { ColumnType } from '@insforge/shared-schemas';
+import { ColumnType } from '@yarahdev/shared-schemas';
 import { describe, expect, it } from 'vitest';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 import {
   compareVersions,
   convertValueForColumn,

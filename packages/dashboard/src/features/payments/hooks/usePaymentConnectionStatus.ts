@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import type { PaymentEnvironment, PaymentProvider } from '@insforge/shared-schemas';
+import type { PaymentEnvironment, PaymentProvider } from '@yarahdev/shared-schemas';
 import { stripeService } from '#features/payments/services/stripe.service';
 import { razorpayService } from '#features/payments/services/razorpay.service';
 import { razorpayQueryKeys, stripeQueryKeys } from '#features/payments/queryKeys';

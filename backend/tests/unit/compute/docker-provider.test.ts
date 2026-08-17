@@ -49,14 +49,14 @@ import { appConfig } from '@/infra/config/app.config.js';
 function ownedContainer(overrides: Record<string, unknown> = {}) {
   return {
     Id: 'container-abc',
-    Name: '/insforge-testkey1-api',
+    Name: '/yarah-testkey1-api',
     State: { Status: 'running', ExitCode: 0, Running: true },
     Config: {
       Image: 'nginx:alpine',
       Labels: {
-        'insforge.managed': 'true',
-        'insforge.project': 'testkey1',
-        'insforge.service': 'insforge-testkey1-api',
+        'yarah.managed': 'true',
+        'yarah.project': 'testkey1',
+        'yarah.service': 'yarah-testkey1-api',
       },
     },
     NetworkSettings: { Ports: {} },
@@ -183,15 +183,15 @@ describe('DockerProvider', () => {
   });
 
   describe('resolveAppName', () => {
-    // One host commonly runs several InsForge projects, so two of them deploying
+    // One host commonly runs several Yarah projects, so two of them deploying
     // a service called `api` must not collide on the same daemon.
     it('namespaces the container name by APP_KEY', () => {
       expect(provider.resolveAppName({ name: 'api', projectId: 'proj-1' })).toBe(
-        'insforge-testkey1-api'
+        'yarah-testkey1-api'
       );
       process.env.APP_KEY = 'otherkey';
       expect(provider.resolveAppName({ name: 'api', projectId: 'proj-2' })).toBe(
-        'insforge-otherkey-api'
+        'yarah-otherkey-api'
       );
     });
   });
@@ -202,7 +202,7 @@ describe('DockerProvider', () => {
       mockRequest.mockResolvedValueOnce({ Id: 'container-new' }).mockResolvedValueOnce(undefined);
 
       const result = await provider.launchMachine({
-        appId: 'insforge-testkey1-api',
+        appId: 'yarah-testkey1-api',
         image: 'nginx:alpine',
         port: 8080,
         cpu: 'shared-2x',
@@ -214,17 +214,17 @@ describe('DockerProvider', () => {
       expect(result).toEqual({ machineId: 'container-new', endpointUrl: null });
 
       const [, path, opts] = mockRequest.mock.calls[0];
-      expect(path).toBe('/containers/create?name=insforge-testkey1-api');
+      expect(path).toBe('/containers/create?name=yarah-testkey1-api');
       const body = opts.body;
 
       expect(body.Labels).toMatchObject({
-        'insforge.managed': 'true',
-        'insforge.project': 'testkey1',
-        'insforge.service': 'insforge-testkey1-api',
+        'yarah.managed': 'true',
+        'yarah.project': 'testkey1',
+        'yarah.service': 'yarah-testkey1-api',
       });
       // Spec hash is stamped so a later update can tell an in-place resize from a
       // change that needs the container recreated.
-      expect(body.Labels['insforge.spec']).toMatch(/^[0-9a-f]{16}$/);
+      expect(body.Labels['yarah.spec']).toMatch(/^[0-9a-f]{16}$/);
       expect(body.Env).toEqual(['FOO=bar']);
       // Survives a host reboot — measured as the difference between a container
       // coming back and staying exited.
@@ -243,7 +243,7 @@ describe('DockerProvider', () => {
       imageAlreadyPresent();
       mockRequest.mockResolvedValueOnce({ Id: 'c1' }).mockResolvedValueOnce(undefined);
       await provider.launchMachine({
-        appId: 'insforge-testkey1-api',
+        appId: 'yarah-testkey1-api',
         image: 'nginx:alpine',
         port: 80,
         cpu: 'shared-1x',
@@ -266,7 +266,7 @@ describe('DockerProvider', () => {
       imageAlreadyPresent();
       mockRequest.mockResolvedValueOnce({ Id: 'c1' }).mockResolvedValueOnce(undefined);
       await provider.launchMachine({
-        appId: 'insforge-testkey1-api',
+        appId: 'yarah-testkey1-api',
         image: 'nginx:alpine',
         port: 8080,
         cpu: 'shared-1x',
@@ -292,7 +292,7 @@ describe('DockerProvider', () => {
       mockRequest.mockResolvedValueOnce({ Id: 'c-pulled' }).mockResolvedValueOnce(undefined);
 
       const result = await provider.launchMachine({
-        appId: 'insforge-testkey1-api',
+        appId: 'yarah-testkey1-api',
         image: 'nginx:alpine',
         port: 80,
         cpu: 'shared-1x',
@@ -314,7 +314,7 @@ describe('DockerProvider', () => {
       imageAlreadyPresent();
       mockRequest.mockResolvedValueOnce({ Id: 'c1' }).mockResolvedValueOnce(undefined);
       await provider.launchMachine({
-        appId: 'insforge-testkey1-api',
+        appId: 'yarah-testkey1-api',
         image: 'nginx:alpine',
         port: 80,
         cpu: 'shared-1x',
@@ -340,7 +340,7 @@ describe('DockerProvider', () => {
 
       await expect(
         provider.launchMachine({
-          appId: 'insforge-testkey1-api',
+          appId: 'yarah-testkey1-api',
           image: 'nope:bad',
           port: 80,
           cpu: 'shared-1x',
@@ -363,7 +363,7 @@ describe('DockerProvider', () => {
 
       await expect(
         provider.launchMachine({
-          appId: 'insforge-testkey1-api',
+          appId: 'yarah-testkey1-api',
           image: 'bad:image',
           port: 80,
           cpu: 'shared-1x',
@@ -380,7 +380,7 @@ describe('DockerProvider', () => {
 
   describe('updateMachine', () => {
     const baseSpec = {
-      appId: 'insforge-testkey1-api',
+      appId: 'yarah-testkey1-api',
       image: 'nginx:alpine',
       port: 8080,
       cpu: 'shared-1x',
@@ -397,7 +397,7 @@ describe('DockerProvider', () => {
       await provider.launchMachine({ ...spec, region: 'local' });
       const labels = mockRequest.mock.calls[0][2].body.Labels as Record<string, string>;
       mockRequest.mockReset();
-      return labels['insforge.spec'];
+      return labels['yarah.spec'];
     }
 
     it('resizes cpu/memory in place when the immutable spec is unchanged', async () => {
@@ -408,9 +408,9 @@ describe('DockerProvider', () => {
             Config: {
               Image: 'nginx:alpine',
               Labels: {
-                'insforge.managed': 'true',
-                'insforge.project': 'testkey1',
-                'insforge.spec': spec,
+                'yarah.managed': 'true',
+                'yarah.project': 'testkey1',
+                'yarah.spec': spec,
               },
             },
           })
@@ -441,13 +441,13 @@ describe('DockerProvider', () => {
       mockRequest
         .mockResolvedValueOnce(
           ownedContainer({
-            Name: '/insforge-testkey1-api',
+            Name: '/yarah-testkey1-api',
             Config: {
               Image: 'nginx:alpine',
               Labels: {
-                'insforge.managed': 'true',
-                'insforge.project': 'testkey1',
-                'insforge.spec': oldSpec,
+                'yarah.managed': 'true',
+                'yarah.project': 'testkey1',
+                'yarah.spec': oldSpec,
               },
             },
           })
@@ -470,7 +470,7 @@ describe('DockerProvider', () => {
         'GET /containers/container-abc/json',
         'POST /containers/container-abc/stop',
         'DELETE /containers/container-abc?force=true',
-        'POST /containers/create?name=insforge-testkey1-api',
+        'POST /containers/create?name=yarah-testkey1-api',
         'POST /containers/container-new/start',
       ]);
       // Replacement runs the requested image, under the original name.
@@ -487,9 +487,9 @@ describe('DockerProvider', () => {
             Config: {
               Image: 'nginx:alpine',
               Labels: {
-                'insforge.managed': 'true',
-                'insforge.project': 'testkey1',
-                'insforge.spec': twoVars,
+                'yarah.managed': 'true',
+                'yarah.project': 'testkey1',
+                'yarah.spec': twoVars,
               },
             },
           })
@@ -516,9 +516,9 @@ describe('DockerProvider', () => {
             Config: {
               Image: 'nginx:alpine',
               Labels: {
-                'insforge.managed': 'true',
-                'insforge.project': 'testkey1',
-                'insforge.spec': spec,
+                'yarah.managed': 'true',
+                'yarah.project': 'testkey1',
+                'yarah.spec': spec,
               },
             },
           })
@@ -542,7 +542,7 @@ describe('DockerProvider', () => {
     it('refuses to act on a container that is not ours', async () => {
       mockRequest.mockResolvedValueOnce({
         Id: 'postgres-container',
-        Name: '/insforge_postgres_1',
+        Name: '/yarah_postgres_1',
         State: { Status: 'running', ExitCode: 0, Running: true },
         Config: { Image: 'postgres:15', Labels: { 'com.docker.compose.service': 'postgres' } },
         NetworkSettings: {},
@@ -560,7 +560,7 @@ describe('DockerProvider', () => {
         ownedContainer({
           Config: {
             Image: 'nginx',
-            Labels: { 'insforge.managed': 'true', 'insforge.project': 'someoneelse' },
+            Labels: { 'yarah.managed': 'true', 'yarah.project': 'someoneelse' },
           },
         })
       );
@@ -572,7 +572,7 @@ describe('DockerProvider', () => {
 
     it('acts on a container that carries our labels', async () => {
       mockRequest.mockResolvedValueOnce(ownedContainer()).mockResolvedValueOnce(undefined);
-      await provider.stopMachine('insforge-testkey1-api', 'container-abc');
+      await provider.stopMachine('yarah-testkey1-api', 'container-abc');
       expect(mockRequest.mock.calls[1][1]).toBe('/containers/container-abc/stop');
     });
   });
@@ -584,15 +584,15 @@ describe('DockerProvider', () => {
     // being stopped.
     it('anchors the name filter and drops any prefix match that slips through', async () => {
       mockRequest.mockResolvedValueOnce([
-        { Id: 'right', State: 'running', Names: ['/insforge-testkey1-api'] },
-        { Id: 'wrong', State: 'running', Names: ['/insforge-testkey1-api-v2'] },
+        { Id: 'right', State: 'running', Names: ['/yarah-testkey1-api'] },
+        { Id: 'wrong', State: 'running', Names: ['/yarah-testkey1-api-v2'] },
       ]);
 
-      const list = await provider.listMachines('insforge-testkey1-api');
+      const list = await provider.listMachines('yarah-testkey1-api');
 
       const url = mockRequest.mock.calls[0][1] as string;
       const filters = JSON.parse(decodeURIComponent(url.split('filters=')[1]));
-      expect(filters.name).toEqual(['^/?insforge-testkey1-api$']);
+      expect(filters.name).toEqual(['^/?yarah-testkey1-api$']);
       expect(list.map((m) => m.id)).toEqual(['right']);
     });
   });
@@ -802,7 +802,7 @@ describe('DockerProvider', () => {
       try {
         const fresh = new DockerProvider();
         const params = {
-          appId: 'insforge-testkey1-api',
+          appId: 'yarah-testkey1-api',
           image: 'nginx:alpine',
           port: 80,
           cpu: 'shared-1x',
@@ -825,13 +825,13 @@ describe('DockerProvider', () => {
         mockRequest.mockClear();
         imageAlreadyPresent();
         mockRequest.mockResolvedValueOnce({
-          NetworkSettings: { Networks: { bridge: {}, 'myproj_insforge-network': {} } },
+          NetworkSettings: { Networks: { bridge: {}, 'myproj_yarah-network': {} } },
         });
         mockRequest.mockResolvedValueOnce({ Id: 'new-2' });
         mockRequest.mockResolvedValueOnce(undefined);
         await fresh.launchMachine(params);
         expect(createBody()?.NetworkingConfig).toEqual({
-          EndpointsConfig: { 'myproj_insforge-network': {} },
+          EndpointsConfig: { 'myproj_yarah-network': {} },
         });
       } finally {
         config.docker.isolateNetwork = isolated;
@@ -844,7 +844,7 @@ describe('DockerProvider', () => {
     // nothing: measured on EC2, a closed security group makes a published port
     // hang with no diagnostic.
     it('is null under `none` ingress, where nothing is published', () => {
-      expect(provider.endpointUrl('insforge-testkey1-api')).toBeNull();
+      expect(provider.endpointUrl('yarah-testkey1-api')).toBeNull();
     });
   });
 });

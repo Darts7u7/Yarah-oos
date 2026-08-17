@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 // Own file: the constructor runs once per module instance, so the empty secret has to
 // be in place before the first getInstance() anywhere in the file.
 const configMock = {
   cloud: { apiHost: 'https://cloud.test', projectId: 'proj-1' },
   app: { jwtSecret: '', logLevel: 'error' },
-  server: { logsDir: '/tmp/insforge-token-manager-test-logs' },
+  server: { logsDir: '/tmp/yarah-token-manager-test-logs' },
 };
 vi.mock('@/infra/config/app.config.js', () => ({ config: configMock, appConfig: configMock }));
 

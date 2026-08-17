@@ -1,6 +1,6 @@
 ---
 title: Authentication SDK Reference
-description: Sign up, sign in, manage sessions, and update user profiles from Android and JVM apps with the InsForge Kotlin SDK auth client and JWT tokens.
+description: Sign up, sign in, manage sessions, and update user profiles from Android and JVM apps with the Yarah Kotlin SDK auth client and JWT tokens.
 ---
 
 import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
@@ -67,7 +67,7 @@ class AuthViewModel : ViewModel() {
                 // Registration complete, user is signed in
                 _uiState.value = AuthUiState.Authenticated
             }
-        } catch (e: InsforgeHttpException) {
+        } catch (e: YarahHttpException) {
             _uiState.value = AuthUiState.Error(e.message ?: "Sign up failed")
         }
     }
@@ -78,7 +78,7 @@ class AuthViewModel : ViewModel() {
             client.auth.verifyEmail(email = email, code = code)
             // Verification successful, user can now sign in
             _uiState.value = AuthUiState.VerificationSuccess
-        } catch (e: InsforgeHttpException) {
+        } catch (e: YarahHttpException) {
             _uiState.value = AuthUiState.Error("Invalid verification code")
         }
     }
@@ -88,7 +88,7 @@ class AuthViewModel : ViewModel() {
         try {
             client.auth.resendVerificationEmail(email = email)
             // Show success message
-        } catch (e: InsforgeHttpException) {
+        } catch (e: YarahHttpException) {
             _uiState.value = AuthUiState.Error("Failed to resend verification email")
         }
     }
@@ -105,11 +105,11 @@ sealed class AuthUiState {
 
 ### Email Verification
 
-For users who register with email, the InsForge backend provides three options:
+For users who register with email, the Yarah backend provides three options:
 
 1. **No email verification** - Users can sign in immediately after registration. `SignUpResponse` will have `accessToken != null`.
 2. **Link-based verification** - Users must open their email and click the verification link before they can sign in.
-3. **Code-based verification** - The InsForge backend sends a 6-digit verification code to the user's email. The client app needs to display a verification screen where users can enter the code, then call `verifyEmail(email, code)` to complete verification. Only after this can users sign in with email + password.
+3. **Code-based verification** - The Yarah backend sends a 6-digit verification code to the user's email. The client app needs to display a verification screen where users can enter the code, then call `verifyEmail(email, code)` to complete verification. Only after this can users sign in with email + password.
 
 When `requireEmailVerification` is `true`, the response will have:
 - `accessToken = null`
@@ -143,7 +143,7 @@ try {
     result.user?.let { user ->
         Log.d("Auth", "Welcome back, ${user.profile?.name ?: user.email}")
     }
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Sign in failed: ${e.message}")
 }
 ```
@@ -168,7 +168,7 @@ Sign out the current user.
 try {
     client.auth.signOut()
     Log.d("Auth", "User signed out")
-} catch (e: InsforgeException) {
+} catch (e: YarahException) {
     Log.e("Auth", "Sign out failed: ${e.message}")
 }
 ```
@@ -200,7 +200,7 @@ enum class OAuthProvider(val value: String) {
 ### Parameters
 
 - `provider` (`OAuthProvider`) - The OAuth provider to authenticate with
-- `redirectUri` (`String`) - Callback URL where InsForge will redirect after authentication
+- `redirectUri` (`String`) - Callback URL where Yarah will redirect after authentication
 
 ### Returns
 
@@ -212,10 +212,10 @@ String  // The OAuth authorization URL (also opens in browser automatically)
 
 1. Configure BrowserLauncher
 
-When creating the InsForge client, configure the `browserLauncher` to handle opening URLs:
+When creating the Yarah client, configure the `browserLauncher` to handle opening URLs:
 
 ```kotlin
-val client = createInsforgeClient(baseURL, anonKey) {
+val client = createYarahClient(baseURL, anonKey) {
     install(Auth) {
         browserLauncher = BrowserLauncher { url ->
             val customTabsIntent = CustomTabsIntent.Builder()
@@ -290,8 +290,8 @@ fun startGoogleLogin() {
 
 ```kotlin
 class AuthCallbackActivity : AppCompatActivity() {
-    // Example: read the shared InsForge client from your Application class.
-    private val client by lazy { (application as MyApp).insforgeClient }
+    // Example: read the shared Yarah client from your Application class.
+    private val client by lazy { (application as MyApp).yarahClient }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -331,7 +331,7 @@ class AuthCallbackActivity : AppCompatActivity() {
 }
 ```
 
-`client` should come from the same shared InsForge client instance you use elsewhere in the app, such as an `Application` singleton or your DI container.
+`client` should come from the same shared Yarah client instance you use elsewhere in the app, such as an `Application` singleton or your DI container.
 
 ---
 
@@ -352,7 +352,7 @@ try {
     val response = client.auth.getCurrentUser()
     Log.d("Auth", "Email: ${response.email}")
     Log.d("Auth", "Name: ${response.profile?.name ?: "N/A"}")
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Failed to get user: ${e.message}")
 }
 ```
@@ -389,7 +389,7 @@ try {
         )
     )
     Log.d("Auth", "Profile updated: ${result.name}")
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Update failed: ${e.message}")
 }
 ```
@@ -398,7 +398,7 @@ try {
 
 ## Password Reset
 
-InsForge supports two password reset methods, configured in the backend:
+Yarah supports two password reset methods, configured in the backend:
 
 - **Code method**: User receives a 6-digit code via email, verifies it to get a reset token, then resets password
 - **Link method**: User receives a magic link via email containing the reset token, then resets password directly
@@ -418,7 +418,7 @@ try {
     client.auth.sendPasswordReset(email = "user@example.com")
     // Show message to check email
     showMessage("If your email is registered, you will receive a password reset email.")
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Failed to send reset email: ${e.message}")
 }
 ```
@@ -462,7 +462,7 @@ try {
     // Store the token and proceed to password reset screen
     val resetToken = response.token
     showPasswordResetScreen(token = resetToken)
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Invalid or expired code: ${e.message}")
 }
 ```
@@ -489,7 +489,7 @@ try {
     // Password reset successful
     showMessage("Password reset successfully. You can now sign in.")
     navigateToSignIn()
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Password reset failed: ${e.message}")
 }
 ```
@@ -499,12 +499,12 @@ try {
 ## Error Handling
 
 ```kotlin
-import dev.insforge.exceptions.InsforgeHttpException
-import dev.insforge.exceptions.InsforgeException
+import dev.yarah.exceptions.YarahHttpException
+import dev.yarah.exceptions.YarahException
 
 try {
     val result = client.auth.signIn(email, password)
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     // HTTP errors from API with error codes
     when (e.error) {
         "INVALID_CREDENTIALS" -> showError("Invalid email or password")
@@ -514,7 +514,7 @@ try {
         "WEAK_PASSWORD" -> showError("Password is too weak")
         else -> showError("Error: ${e.message}")
     }
-} catch (e: InsforgeException) {
+} catch (e: YarahException) {
     // Other SDK errors (network, parsing, etc.)
     showError("Error: ${e.message}")
 }

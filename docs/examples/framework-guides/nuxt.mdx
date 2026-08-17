@@ -1,21 +1,21 @@
 ---
 title: Nuxt
-description: Create an InsForge project and build a full-stack Nuxt app with the CLI and MCP, using AI editors like Cursor for schemas, queries, and deploys.
+description: Create an Yarah project and build a full-stack Nuxt app with the CLI and MCP, using AI editors like Cursor for schemas, queries, and deploys.
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
 
-Learn how to create an InsForge project and build a Nuxt app using AI tools like Cursor.
+Learn how to create an Yarah project and build a Nuxt app using AI tools like Cursor.
 
-## 1. Create an InsForge project
+## 1. Create an Yarah project
 
-Create a new InsForge project at [insforge.dev](https://insforge.dev).
+Create a new Yarah project at [yarah.dev](https://yarah.dev).
 
-## 2. Connect InsForge
+## 2. Connect Yarah
 
 Two pieces:
 
-- **CLI link** — see the [Quickstart](/quickstart) to run `npx @insforge/cli link --project-id <your-project-id>` so the agent can read your project ID and keys.
+- **CLI link** — see the [Quickstart](/quickstart) to run `npx @yarah/cli link --project-id <your-project-id>` so the agent can read your project ID and keys.
 - **MCP setup** — see [MCP Setup](/mcp-setup) for the per-editor config (Cursor, Claude Code, Windsurf, Codex, VS Code).
 
 With both wired up the agent can read schemas, run queries, and deploy code from your editor.
@@ -27,9 +27,9 @@ In Cursor or your AI assistant, use this prompt:
 ```
 Create a new Nuxt app with TypeScript.
 Add Tailwind CSS 3.4 for styling.
-Install the InsForge SDK and set up the client configuration.
+Install the Yarah SDK and set up the client configuration.
 
-In my InsForge database, create a sports table with id and name columns.
+In my Yarah database, create a sports table with id and name columns.
 Add sample data: basketball, soccer, and tennis. Make it publicly readable.
 
 Create a page that fetches and displays all sports from the database.
@@ -47,8 +47,8 @@ Your AI assistant will automatically create files like these. You don't need to 
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      insforgeBaseUrl: process.env.NUXT_PUBLIC_INSFORGE_BASE_URL,
-      insforgeAnonKey: process.env.NUXT_PUBLIC_INSFORGE_ANON_KEY
+      yarahBaseUrl: process.env.NUXT_PUBLIC_YARAH_BASE_URL,
+      yarahAnonKey: process.env.NUXT_PUBLIC_YARAH_ANON_KEY
     }
   }
 })
@@ -63,8 +63,8 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   const client = createClient({
-    baseUrl: config.public.insforgeBaseUrl,
-    anonKey: config.public.insforgeAnonKey
+    baseUrl: config.public.yarahBaseUrl,
+    anonKey: config.public.yarahAnonKey
   })
 
   const { data, error } = await client.database
@@ -160,11 +160,11 @@ Store favorites in a user_favorites table with user_id and sport_id.
 ```
 
 ```
-Add images to each sport using InsForge Storage.
+Add images to each sport using Yarah Storage.
 Allow users to upload sport images and display them in the grid.
 ```
 
 ```
 Add an AI chat feature that can answer questions about sports.
-Use InsForge AI with streaming responses.
+Use Yarah AI with streaming responses.
 ```

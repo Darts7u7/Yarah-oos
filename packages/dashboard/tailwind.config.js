@@ -1,11 +1,11 @@
-import insforgeTailwindPreset from '@insforge/ui/tailwind-preset';
+import yarahTailwindPreset from '@yarahdev/ui/tailwind-preset';
 
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
   content: ['./src/**/*.{js,ts,jsx,tsx}', '../ui/src/**/*.{ts,tsx}'],
   prefix: '',
-  presets: [insforgeTailwindPreset],
+  presets: [yarahTailwindPreset],
   theme: {
     container: {
       center: true,

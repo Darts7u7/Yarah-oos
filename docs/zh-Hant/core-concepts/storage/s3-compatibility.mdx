@@ -1,9 +1,9 @@
 ---
 title: S3 相容閘道
-description: "透過 S3 相容閘道以任何 AWS SigV4 用戶端存取 InsForge Storage，重用既有的 aws-cli、SDK 與備份工具。"
+description: "透過 S3 相容閘道以任何 AWS SigV4 用戶端存取 Yarah Storage，重用既有的 aws-cli、SDK 與備份工具。"
 ---
 
-InsForge Storage 在 `/storage/v1/s3` 處使用 [AWS S3 通訊協定](https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html)。僅限雲端專案。
+Yarah Storage 在 `/storage/v1/s3` 處使用 [AWS S3 通訊協定](https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html)。僅限雲端專案。
 
 ## 概念
 
@@ -15,21 +15,21 @@ InsForge Storage 在 `/storage/v1/s3` 處使用 [AWS S3 通訊協定](https://do
 
 ```ini
 # ~/.aws/credentials
-[insforge]
+[yarah]
 aws_access_key_id = your_access_key_id
 aws_secret_access_key = your_secret_access_key
 
 # ~/.aws/config
-[profile insforge]
+[profile yarah]
 region = us-east-2
-endpoint_url = https://project_ref.region.insforge.app/storage/v1/s3
+endpoint_url = https://project_ref.region.apps.yarah.dev/storage/v1/s3
 s3 =
   addressing_style = path
 ```
 
 ```bash
-aws --profile insforge s3 cp ./photo.jpg s3://my-bucket/photo.jpg
-aws --profile insforge s3 sync ./dist s3://my-bucket/dist
+aws --profile yarah s3 cp ./photo.jpg s3://my-bucket/photo.jpg
+aws --profile yarah s3 sync ./dist s3://my-bucket/dist
 ```
 
 在程式碼中，設定 `forcePathStyle: true` 並將 `endpoint` 指向 `/storage/v1/s3`。
@@ -40,7 +40,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 const client = new S3Client({
   forcePathStyle: true,
   region: 'us-east-2',
-  endpoint: 'https://project_ref.region.insforge.app/storage/v1/s3',
+  endpoint: 'https://project_ref.region.apps.yarah.dev/storage/v1/s3',
   credentials: { accessKeyId: '...', secretAccessKey: '...' },
 });
 

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { FilePreviewDialog } from '#features/storage/components/FilePreviewDialog';
-import type { StorageFileSchema } from '@insforge/shared-schemas';
+import type { StorageFileSchema } from '@yarahdev/shared-schemas';
 
 const fileA: StorageFileSchema = {
   key: 'images/a.png',

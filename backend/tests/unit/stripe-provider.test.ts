@@ -280,12 +280,12 @@ describe('StripeProvider', () => {
 
     await provider.createCustomer({
       email: 'buyer@example.com',
-      metadata: { insforge_subject_type: 'team', insforge_subject_id: 'team_123' },
+      metadata: { yarah_subject_type: 'team', yarah_subject_id: 'team_123' },
     });
 
     expect(client.customers.create).toHaveBeenCalledWith({
       email: 'buyer@example.com',
-      metadata: { insforge_subject_type: 'team', insforge_subject_id: 'team_123' },
+      metadata: { yarah_subject_type: 'team', yarah_subject_id: 'team_123' },
     });
   });
 
@@ -374,7 +374,7 @@ describe('StripeProvider', () => {
       successUrl: 'https://example.com/success',
       cancelUrl: 'https://example.com/cancel',
       customerId: 'cus_123',
-      metadata: { insforge_subject_type: 'team', insforge_subject_id: 'team_123' },
+      metadata: { yarah_subject_type: 'team', yarah_subject_id: 'team_123' },
     });
 
     expect(client.checkout.sessions.create).toHaveBeenCalledWith({
@@ -382,10 +382,10 @@ describe('StripeProvider', () => {
       line_items: [{ price: 'price_123', quantity: 1 }],
       success_url: 'https://example.com/success',
       cancel_url: 'https://example.com/cancel',
-      metadata: { insforge_subject_type: 'team', insforge_subject_id: 'team_123' },
+      metadata: { yarah_subject_type: 'team', yarah_subject_id: 'team_123' },
       customer: 'cus_123',
       subscription_data: {
-        metadata: { insforge_subject_type: 'team', insforge_subject_id: 'team_123' },
+        metadata: { yarah_subject_type: 'team', yarah_subject_id: 'team_123' },
       },
     });
   });
@@ -453,29 +453,29 @@ describe('StripeProvider', () => {
 
     await provider.createCustomer({
       email: 'buyer@example.com',
-      idempotencyKey: 'insforge:test:customer:checkout-123',
+      idempotencyKey: 'yarah:test:customer:checkout-123',
     });
     await provider.createCheckoutSession({
       mode: 'payment',
       lineItems: [{ priceId: 'price_123', quantity: 1 }],
       successUrl: 'https://example.com/success',
       cancelUrl: 'https://example.com/cancel',
-      idempotencyKey: 'insforge:test:checkout_session:checkout-123',
+      idempotencyKey: 'yarah:test:checkout_session:checkout-123',
     });
     await provider.createProduct({
       name: 'Pro',
-      idempotencyKey: 'insforge:test:product:agent-123',
+      idempotencyKey: 'yarah:test:product:agent-123',
     });
     await provider.createPrice({
       productId: 'prod_123',
       currency: 'usd',
       unitAmount: 2000,
-      idempotencyKey: 'insforge:test:price:agent-123',
+      idempotencyKey: 'yarah:test:price:agent-123',
     });
 
     expect(client.customers.create).toHaveBeenCalledWith(
       { email: 'buyer@example.com' },
-      { idempotencyKey: 'insforge:test:customer:checkout-123' }
+      { idempotencyKey: 'yarah:test:customer:checkout-123' }
     );
     expect(client.checkout.sessions.create).toHaveBeenCalledWith(
       {
@@ -484,11 +484,11 @@ describe('StripeProvider', () => {
         success_url: 'https://example.com/success',
         cancel_url: 'https://example.com/cancel',
       },
-      { idempotencyKey: 'insforge:test:checkout_session:checkout-123' }
+      { idempotencyKey: 'yarah:test:checkout_session:checkout-123' }
     );
     expect(client.products.create).toHaveBeenCalledWith(
       { name: 'Pro' },
-      { idempotencyKey: 'insforge:test:product:agent-123' }
+      { idempotencyKey: 'yarah:test:product:agent-123' }
     );
     expect(client.prices.create).toHaveBeenCalledWith(
       {
@@ -496,7 +496,7 @@ describe('StripeProvider', () => {
         currency: 'usd',
         unit_amount: 2000,
       },
-      { idempotencyKey: 'insforge:test:price:agent-123' }
+      { idempotencyKey: 'yarah:test:price:agent-123' }
     );
   });
 
@@ -552,7 +552,7 @@ describe('StripeProvider', () => {
       provider.createWebhookEndpoint({
         url: 'https://example.com/api/webhooks/stripe/test',
         enabledEvents: ['checkout.session.completed'],
-        metadata: { managed_by: 'insforge' },
+        metadata: { managed_by: 'yarah' },
       })
     ).resolves.toMatchObject({ id: 'we_new', secret: 'whsec_new' });
     await provider.deleteWebhookEndpoint('we_123');
@@ -562,7 +562,7 @@ describe('StripeProvider', () => {
       url: 'https://example.com/api/webhooks/stripe/test',
       enabled_events: ['checkout.session.completed'],
       api_version: Stripe.API_VERSION,
-      metadata: { managed_by: 'insforge' },
+      metadata: { managed_by: 'yarah' },
     });
     expect(client.webhookEndpoints.del).toHaveBeenCalledWith('we_123');
   });

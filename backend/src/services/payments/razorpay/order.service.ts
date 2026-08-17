@@ -25,9 +25,9 @@ import {
   type RoleSchema,
   type VerifyRazorpayOrderRequest,
   type VerifyRazorpayOrderResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
-const RAZORPAY_ORDER_NOTES_KEY = 'insforge_order_id';
+const RAZORPAY_ORDER_NOTES_KEY = 'yarah_order_id';
 
 const RAZORPAY_ORDER_COLUMNS = `
   id,

@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@insforge/ui';
+import { Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@yarahdev/ui';
 import type { DashboardAdvisorSeverity } from '#types';
 
 const SEVERITIES: Array<{ value: DashboardAdvisorSeverity; label: string }> = [

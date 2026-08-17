@@ -1,11 +1,11 @@
 ---
 title: AI REST 参考
-description: 通过 InsForge 模型网关的 HTTP 端点直接调用 OpenRouter，集成任意 LLM 到你的应用，涵盖聊天补全、流式响应、嵌入向量与辅助工具端点。
+description: 通过 Yarah 模型网关的 HTTP 端点直接调用 OpenRouter，集成任意 LLM 到你的应用，涵盖聊天补全、流式响应、嵌入向量与辅助工具端点。
 ---
 
 ## 概述
 
-新的 AI 集成应直接调用 OpenRouter，使用由 InsForge 提供的 OpenRouter 密钥。InsForge AI 代理路由（用于聊天、图像生成和嵌入）是已弃用的兼容性端点。
+新的 AI 集成应直接调用 OpenRouter，使用由 Yarah 提供的 OpenRouter 密钥。Yarah AI 代理路由（用于聊天、图像生成和嵌入）是已弃用的兼容性端点。
 
 使用仪表板将活跃 OpenRouter 密钥复制到仅服务器的 `OPENROUTER_API_KEY` 环境变量中。
 
@@ -69,11 +69,11 @@ curl "https://openrouter.ai/api/v1/models?output_modalities=all"
 OpenRouter 拥有 AI 模型调用的当前请求和响应格式。查看 OpenRouter 的 API 文档以了解模型特定参数、支持的模式、插件和视频生成端点。
 </Note>
 
-## InsForge 管理员辅助端点
+## Yarah 管理员辅助端点
 
 这些端点可帮助仪表板显示活跃模型网关密钥、模型目录和使用概述。它们需要管理员身份验证。
 
-在 `Authorization` 标头中使用管理员 JWT 持有者令牌或 InsForge API 密钥持有者令牌。
+在 `Authorization` 标头中使用管理员 JWT 持有者令牌或 Yarah API 密钥持有者令牌。
 
 ### 获取可用模型
 
@@ -82,13 +82,13 @@ GET /api/ai/models
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/models" \
+curl "https://your-app.apps.yarah.dev/api/ai/models" \
   -H "Authorization: Bearer <ADMIN_JWT_TOKEN>"
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/models" \
-  -H "Authorization: Bearer <INSFORGE_API_KEY>"
+curl "https://your-app.apps.yarah.dev/api/ai/models" \
+  -H "Authorization: Bearer <YARAH_API_KEY>"
 ```
 
 <Warning>
@@ -120,13 +120,13 @@ GET /api/ai/openrouter/api-key
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/openrouter/api-key" \
+curl "https://your-app.apps.yarah.dev/api/ai/openrouter/api-key" \
   -H "Authorization: Bearer <ADMIN_JWT_TOKEN>"
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/openrouter/api-key" \
-  -H "Authorization: Bearer <INSFORGE_API_KEY>"
+curl "https://your-app.apps.yarah.dev/api/ai/openrouter/api-key" \
+  -H "Authorization: Bearer <YARAH_API_KEY>"
 ```
 
 ```json
@@ -147,18 +147,18 @@ GET /api/ai/overview
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/overview" \
+curl "https://your-app.apps.yarah.dev/api/ai/overview" \
   -H "Authorization: Bearer <ADMIN_JWT_TOKEN>"
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/overview" \
-  -H "Authorization: Bearer <INSFORGE_API_KEY>"
+curl "https://your-app.apps.yarah.dev/api/ai/overview" \
+  -H "Authorization: Bearer <YARAH_API_KEY>"
 ```
 
 当活跃密钥有活动访问权限时，返回密钥级 OpenRouter 使用和活动时间序列。
 
-## 已弃用的 InsForge 代理路由
+## 已弃用的 Yarah 代理路由
 
 以下路由仍然存在用于现有应用，但新代码应直接使用 OpenRouter。
 
@@ -174,7 +174,7 @@ curl "https://your-app.insforge.app/api/ai/overview" \
 POST /api/ai/chat/completion
 ```
 
-此路由验证 InsForge 格式的请求，将其转发到 OpenRouter，并返回 InsForge 格式的响应。它不公开完整的 OpenRouter API 表面。
+此路由验证 Yarah 格式的请求，将其转发到 OpenRouter，并返回 Yarah 格式的响应。它不公开完整的 OpenRouter API 表面。
 
 ### 传统图像代理
 
@@ -182,7 +182,7 @@ POST /api/ai/chat/completion
 POST /api/ai/image/generation
 ```
 
-此路由将 InsForge 格式的图像请求转发到 OpenRouter 聊天完成（带图像输出）。仅为了兼容性而保留。
+此路由将 Yarah 格式的图像请求转发到 OpenRouter 聊天完成（带图像输出）。仅为了兼容性而保留。
 
 ### 传统嵌入代理
 
@@ -190,4 +190,4 @@ POST /api/ai/image/generation
 POST /api/ai/embeddings
 ```
 
-此路由将 InsForge 格式的嵌入请求转发到 OpenRouter。对于新代码，更喜欢直接 OpenRouter 嵌入端点。
+此路由将 Yarah 格式的嵌入请求转发到 OpenRouter。对于新代码，更喜欢直接 OpenRouter 嵌入端点。

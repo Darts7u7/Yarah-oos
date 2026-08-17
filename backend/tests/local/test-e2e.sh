@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# End-to-End test script for Insforge Backend
+# End-to-End test script for Yarah Backend
 
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -25,7 +25,7 @@ register_test_user "$TEST_EMAIL"
 register_test_table "$TEST_TABLE"
 register_test_bucket "$TEST_BUCKET"
 
-echo "Starting End-to-End Tests for Insforge Backend"
+echo "Starting End-to-End Tests for Yarah Backend"
 echo "=================================="
 
 # Function to test endpoint

@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   cn,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { CursorDeeplinkGenerator } from './mcp/CursorDeeplinkGenerator';
 import { QoderDeeplinkGenerator } from './mcp/QoderDeeplinkGenerator';
 import { MCP_AGENTS, GenerateInstallCommand, createMCPConfig, type MCPAgent } from './mcp/helpers';
@@ -71,8 +71,7 @@ export function MCPSection({
             selectedAgent.id !== 'mcp' && (
               <p className="text-sm leading-6 text-muted-foreground">
                 {t('overview.runInstallCommand', {
-                  defaultValue:
-                    'Run the following command in terminal to install InsForge MCP Server',
+                  defaultValue: 'Run the following command in terminal to install Yarah MCP Server',
                 })}
               </p>
             )}

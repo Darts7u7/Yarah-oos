@@ -1,6 +1,6 @@
-# InsForge Edge Function Examples
+# Yarah Edge Function Examples
 
-This folder contains **example serverless (edge) functions** you can deploy to InsForge.
+This folder contains **example serverless (edge) functions** you can deploy to Yarah.
 
 ## Files
 
@@ -9,7 +9,7 @@ This folder contains **example serverless (edge) functions** you can deploy to I
 
 ## Deploy
 
-Use the InsForge MCP tools:
+Use the Yarah MCP tools:
 
 - `create-function` with `slug` matching the function name you want (e.g. `demo-hello-world`)
 - `update-function` to redeploy after edits
@@ -18,14 +18,14 @@ Use the InsForge MCP tools:
 
 ```js
 // GET
-await insforge.functions.invoke('demo-hello-world', { method: 'GET' })
+await yarah.functions.invoke('demo-hello-world', { method: 'GET' })
 
 // POST
-await insforge.functions.invoke('demo-hello-world', {
+await yarah.functions.invoke('demo-hello-world', {
   body: { name: 'Gary' }
 })
 
 // Authenticated GET (SDK auto-includes user token if logged in)
-await insforge.functions.invoke('demo-whoami', { method: 'GET' })
+await yarah.functions.invoke('demo-whoami', { method: 'GET' })
 ```
 

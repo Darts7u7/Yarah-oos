@@ -24,7 +24,7 @@ import {
   type GetRazorpayWebhookSetupResponse,
   type RazorpayConnection,
   type RazorpayKeyConfig,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const RAZORPAY_KEY_ID_BY_ENVIRONMENT: Record<RazorpayEnvironment, string> = {
   test: 'RAZORPAY_TEST_KEY_ID',

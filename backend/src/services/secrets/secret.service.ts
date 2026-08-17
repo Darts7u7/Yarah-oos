@@ -4,7 +4,7 @@ import { DatabaseManager } from '@/infra/database/database.manager.js';
 import { AppError } from '@/utils/errors.js';
 import logger from '@/utils/logger.js';
 import { EncryptionManager } from '@/infra/security/encryption.manager.js';
-import { SecretSchema, CreateSecretRequest, ERROR_CODES } from '@insforge/shared-schemas';
+import { SecretSchema, CreateSecretRequest, ERROR_CODES } from '@yarahdev/shared-schemas';
 import { appConfig } from '@/infra/config/app.config.js';
 
 export interface CreateSecretInput extends CreateSecretRequest {
@@ -507,7 +507,7 @@ export class SecretService {
   }
 
   /**
-   * Generate a new API key with 'ik_' prefix (Insforge Key)
+   * Generate a new API key with 'ik_' prefix (Yarah Key)
    */
   generateApiKey(): string {
     return 'ik_' + crypto.randomBytes(32).toString('hex');

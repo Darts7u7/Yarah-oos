@@ -1,5 +1,5 @@
 import { apiClient } from '#lib/api/client';
-import { RawSQLRequest, RawSQLResponse } from '@insforge/shared-schemas';
+import { RawSQLRequest, RawSQLResponse } from '@yarahdev/shared-schemas';
 
 export class AdvanceService {
   /**

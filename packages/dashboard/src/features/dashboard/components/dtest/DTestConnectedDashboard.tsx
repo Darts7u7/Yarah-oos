@@ -2,13 +2,13 @@ import { type ReactNode, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
-import { Badge } from '@insforge/ui';
+import { Badge } from '@yarahdev/ui';
 import { Braces, Database, Download, HardDrive, User } from 'lucide-react';
 import { MetricCard } from '#features/dashboard/components/MetricCard';
 import { useMetadata } from '#lib/hooks/useMetadata';
 import { useCloudProjectInfo } from '#lib/hooks/useCloudProjectInfo';
 import { useUsers } from '#features/auth';
-import { isInsForgeCloudProject } from '#lib/utils/utils';
+import { isYarahCloudProject } from '#lib/utils/utils';
 import { useMcpUsage } from '#features/logs/hooks/useMcpUsage';
 import { useAdvisorLatest } from '#features/dashboard/hooks/useAdvisor';
 import { useLastBackup } from '#features/dashboard/hooks/useLastBackup';
@@ -54,7 +54,7 @@ const STATUS_BADGE_CLASS =
 export function DTestConnectedDashboard() {
   const { t } = useTranslation('chrome');
   const navigate = useNavigate();
-  const isCloudProject = isInsForgeCloudProject();
+  const isCloudProject = isYarahCloudProject();
   const isCloudHostingMode = useIsCloudHostingMode();
   const {
     metadata,
@@ -93,8 +93,8 @@ export function DTestConnectedDashboard() {
     );
 
   const projectName = isCloudProject
-    ? projectInfo.name || t('overview.myProject', { defaultValue: 'My InsForge Project' })
-    : t('overview.myProject', { defaultValue: 'My InsForge Project' });
+    ? projectInfo.name || t('overview.myProject', { defaultValue: 'My Yarah Project' })
+    : t('overview.myProject', { defaultValue: 'My Yarah Project' });
   const instanceType = projectInfo.instanceType?.toUpperCase();
   const showInstanceTypeBadge = isCloudProject && !!instanceType;
 
@@ -204,7 +204,7 @@ export function DTestConnectedDashboard() {
             >
               <Download className="h-5 w-5" aria-hidden="true" />
               <span className="px-1">
-                {t('overview.installInsForge', { defaultValue: 'Install InsForge' })}
+                {t('overview.installYarah', { defaultValue: 'Install Yarah' })}
               </span>
             </button>
           </section>

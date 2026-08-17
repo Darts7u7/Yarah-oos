@@ -20,8 +20,8 @@ import {
   MenuDialogSideNavTitle,
   MenuDialogTitle,
   useToast,
-} from '@insforge/ui';
-import type { PosthogConnection } from '@insforge/shared-schemas';
+} from '@yarahdev/ui';
+import type { PosthogConnection } from '@yarahdev/shared-schemas';
 import { useDashboardHost, useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
 import { PosthogKeyForm } from './posthog/PosthogKeyForm';
 import {

@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import { DatabaseManager } from '@/infra/database/database.manager.js';
 import logger from '@/utils/logger.js';
-import type { RealtimeMessage } from '@insforge/shared-schemas';
+import type { RealtimeMessage } from '@yarahdev/shared-schemas';
 import { RealtimeChannelService } from './realtime-channel.service.js';
 import type { UserContext } from '@/api/middlewares/auth.js';
 import { withUserContext } from '@/services/database/user-context.service.js';

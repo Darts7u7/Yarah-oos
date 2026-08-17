@@ -1,14 +1,14 @@
 ---
 title: "Razorpay Payments"
 sidebarTitle: "Razorpay"
-description: "Integrate Razorpay Orders, Items, Plans, and Subscriptions with InsForge: server-side signature verification, mirrored tables, and webhook fulfillment."
+description: "Integrate Razorpay Orders, Items, Plans, and Subscriptions with Yarah: server-side signature verification, mirrored tables, and webhook fulfillment."
 ---
 
 Use the Razorpay integration when you want Razorpay Orders, Razorpay Checkout, Items, Plans, and Subscriptions. Razorpay is not a hosted redirect flow like Stripe Checkout. Your backend creates the provider object, your frontend opens the Razorpay Checkout script, and your backend verifies the returned signature.
 
 ## Razorpay model
 
-| Razorpay concept | Meaning in InsForge |
+| Razorpay concept | Meaning in Yarah |
 |------------------|---------------------|
 | Item | Amount-bearing sellable unit. Mirrored in `payments.razorpay_items`. |
 | Plan | Recurring subscription definition around an item. Mirrored in `payments.razorpay_plans`. |
@@ -17,20 +17,20 @@ Use the Razorpay integration when you want Razorpay Orders, Razorpay Checkout, I
 | Subscription | Razorpay subscription tied to a Plan. Mirrored in `payments.razorpay_subscriptions`. |
 | Webhook event | Verified provider event in `payments.webhook_events` with `provider = 'razorpay'`. |
 
-Razorpay does not have a Stripe Billing Portal equivalent. InsForge exposes backend routes to cancel, pause, and resume subscriptions after checking the caller against `payments.razorpay_subscriptions` RLS `UPDATE` policies.
+Razorpay does not have a Stripe Billing Portal equivalent. Yarah exposes backend routes to cancel, pause, and resume subscriptions after checking the caller against `payments.razorpay_subscriptions` RLS `UPDATE` policies.
 
-For one-time products, Razorpay Orders can be created with only an amount, currency, and receipt. Still, prefer creating Razorpay Items for sellable products so the catalog is visible in InsForge and Razorpay after sync. Treat Orders as payment attempts, not as your product catalog.
+For one-time products, Razorpay Orders can be created with only an amount, currency, and receipt. Still, prefer creating Razorpay Items for sellable products so the catalog is visible in Yarah and Razorpay after sync. Treat Orders as payment attempts, not as your product catalog.
 
 ## Setup
 
-Configure `test` and `live` Razorpay Key ID and Key Secret in Dashboard -> Payments -> Settings or through the admin API. InsForge generates a webhook signing secret if one does not already exist.
+Configure `test` and `live` Razorpay Key ID and Key Secret in Dashboard -> Payments -> Settings or through the admin API. Yarah generates a webhook signing secret if one does not already exist.
 
 Razorpay webhooks must be created manually in the Razorpay Dashboard. Razorpay normal merchant API keys do not support automatic webhook registration.
 
 1. Open Dashboard -> Payments -> Settings -> Webhooks.
 2. Copy the Razorpay Webhook URL and Webhook Secret.
 3. In the Razorpay Dashboard, create a webhook with the copied URL and secret.
-4. Select the events InsForge handles.
+4. Select the events Yarah handles.
 5. Save the webhook and complete a test payment to confirm delivery.
 
 Razorpay can only deliver webhooks to a public HTTPS URL. Localhost URLs need a public tunnel or a deployed backend.
@@ -59,10 +59,10 @@ Handled events:
 
 ## One-time orders
 
-Create an app-owned pending order first. Then create a Razorpay Order with the current InsForge user token.
+Create an app-owned pending order first. Then create a Razorpay Order with the current Yarah user token.
 
 ```typescript
-const { data, error } = await insforge.payments.razorpay.createOrder('test', {
+const { data, error } = await yarah.payments.razorpay.createOrder('test', {
   amount: 50000,
   currency: 'INR',
   receipt: 'order_123',
@@ -81,7 +81,7 @@ If your fulfillment trigger reads `notes.order_id`, pass `notes: { order_id: ...
 After Razorpay Checkout returns `razorpay_order_id`, `razorpay_payment_id`, and `razorpay_signature`, verify the signature on the backend:
 
 ```typescript
-await insforge.payments.razorpay.verifyOrder('test', {
+await yarah.payments.razorpay.verifyOrder('test', {
   orderId: response.razorpay_order_id,
   paymentId: response.razorpay_payment_id,
   signature: response.razorpay_signature
@@ -95,7 +95,7 @@ Signature verification proves the immediate Checkout callback came from Razorpay
 Create or sync a Razorpay Plan before creating subscriptions. A Plan is not the same thing as a Stripe Price. It is a recurring definition around a Razorpay Item.
 
 ```typescript
-const { data, error } = await insforge.payments.razorpay.createSubscription('test', {
+const { data, error } = await yarah.payments.razorpay.createSubscription('test', {
   planId: 'plan_123',
   totalCount: 12,
   subject: { type: 'team', id: 'team_123' },
@@ -108,7 +108,7 @@ if (error) throw error;
 The SDK wraps `POST /api/payments/razorpay/{environment}/subscriptions`. The response includes `checkoutOptions.subscription_id`. Open Razorpay Checkout with that subscription ID. After Checkout returns `razorpay_subscription_id`, `razorpay_payment_id`, and `razorpay_signature`, verify the authorization payment:
 
 ```typescript
-await insforge.payments.razorpay.verifySubscription('test', {
+await yarah.payments.razorpay.verifySubscription('test', {
   subscriptionId: response.razorpay_subscription_id,
   paymentId: response.razorpay_payment_id,
   signature: response.razorpay_signature
@@ -118,12 +118,12 @@ await insforge.payments.razorpay.verifySubscription('test', {
 Manage subscriptions through backend routes:
 
 ```typescript
-await insforge.payments.razorpay.cancelSubscription('test', 'sub_123', {
+await yarah.payments.razorpay.cancelSubscription('test', 'sub_123', {
   cancelAtCycleEnd: false
 });
 
-await insforge.payments.razorpay.pauseSubscription('test', 'sub_123');
-await insforge.payments.razorpay.resumeSubscription('test', 'sub_123');
+await yarah.payments.razorpay.pauseSubscription('test', 'sub_123');
+await yarah.payments.razorpay.resumeSubscription('test', 'sub_123');
 ```
 
 Subscription creation evaluates `INSERT` policies on `payments.razorpay_subscriptions`. Cancel, pause, and resume evaluate `UPDATE` policies on the same table. PostgreSQL also applies `SELECT` policies to rows returned by `INSERT/UPDATE ... RETURNING`, so make the same subject visible to the caller when a policy probe needs to return the row. Grant users only the table access needed for policy checks; provider mutations still run through the backend.

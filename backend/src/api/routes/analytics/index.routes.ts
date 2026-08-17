@@ -7,7 +7,7 @@ import {
   posthogRegionSchema,
   recordAgentToolCallSchema,
   updatePosthogConfigSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { verifyUser, verifyAdmin, AuthRequest } from '@/api/middlewares/auth.js';
 import { AppError } from '@/utils/errors.js';
 import { AnalyticsService } from '@/services/analytics/analytics.service.js';
@@ -108,7 +108,7 @@ analyticsRouter.delete(
 function assertSelfHostedAnalyticsConfig(): void {
   if (isCloudEnvironment()) {
     throw new AppError(
-      'The PostHog connection is managed by InsForge Cloud.',
+      'The PostHog connection is managed by Yarah Cloud.',
       400,
       ERROR_CODES.INVALID_INPUT
     );

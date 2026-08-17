@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
-import { Button, cn } from '@insforge/ui';
+import { Button, cn } from '@yarahdev/ui';
 import { ConnectionStringSectionV2 } from '#features/dashboard/components/connect/ConnectionStringSectionV2';
 import { APIKeysSectionV2 } from '#features/dashboard/components/connect/APIKeysSectionV2';
 import { DTestMCPSection } from './DTestMCPSection';
@@ -63,7 +63,7 @@ export function ClientDetailPage({ clientId, onBack }: ClientDetailPageProps) {
   const connectionUrlWithPassword = dbPassword
     ? connectionUrl.replace('********', dbPassword)
     : connectionUrl;
-  const connectionStringPrompt = `I'm using InsForge as my backend. Here's my database connection string:\n\n${connectionUrlWithPassword || '<connection string>'}\n\nPlease connect to my database.`;
+  const connectionStringPrompt = `I'm using Yarah as my backend. Here's my database connection string:\n\n${connectionUrlWithPassword || '<connection string>'}\n\nPlease connect to my database.`;
 
   return (
     <main className="h-full min-h-0 min-w-0 overflow-y-auto bg-semantic-1">

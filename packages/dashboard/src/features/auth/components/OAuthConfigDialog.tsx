@@ -15,17 +15,17 @@ import {
   DialogTitle,
   Input,
   Switch,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import WarningIcon from '#assets/icons/warning.svg';
 import {
   oAuthConfigSchema,
   OAuthConfigSchema,
   OAuthProvidersSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { type OAuthProviderInfo } from '#features/auth/helpers';
 import { SecretInput } from './SecretInput';
 import { useOAuthConfig } from '#features/auth/hooks/useOAuthConfig';
-import { getBackendUrl, isInsForgeCloudProject } from '#lib/utils/utils';
+import { getBackendUrl, isYarahCloudProject } from '#lib/utils/utils';
 
 const getCallbackUrl = (provider?: string) => {
   // Use backend API URL for OAuth callback
@@ -129,7 +129,7 @@ export function OAuthConfigDialog({
     'microsoft',
   ] satisfies readonly OAuthProvidersSchema[];
   const isSharedKeysAvailable =
-    isInsForgeCloudProject() && provider?.id && sharedKeyProviders.includes(provider.id);
+    isYarahCloudProject() && provider?.id && sharedKeyProviders.includes(provider.id);
 
   // Use useFormState hook for better reactivity
   const { isDirty } = useFormState({
@@ -312,7 +312,7 @@ export function OAuthConfigDialog({
                     <p className="text-sm text-zinc-500 dark:text-neutral-400">
                       {t('auth.sharedKeysDescription', {
                         defaultValue:
-                          'Shared keys are created by the InsForge team for development. It helps you get started, but will show a InsForge logo and name on the OAuth screen.',
+                          'Shared keys are created by the Yarah team for development. It helps you get started, but will show a Yarah logo and name on the OAuth screen.',
                       })}
                     </p>
 

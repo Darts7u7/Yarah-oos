@@ -1,4 +1,4 @@
-import type { ComputeConfig, UpdateComputeConfig } from '@insforge/shared-schemas';
+import type { ComputeConfig, UpdateComputeConfig } from '@yarahdev/shared-schemas';
 import { appConfig } from '@/infra/config/app.config.js';
 import { SecretService } from '@/services/secrets/secret.service.js';
 import logger from '@/utils/logger.js';

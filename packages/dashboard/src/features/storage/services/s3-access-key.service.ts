@@ -4,7 +4,7 @@ import type {
   S3AccessKeyWithSecretSchema,
   CreateS3AccessKeyRequest,
   S3GatewayConfigSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 /** Client-side service for managing project-scoped S3 access keys. */
 export class S3AccessKeyService {

@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { DEFAULT_DATABASE_SCHEMA } from '#features/database/helpers';
 import { recordService } from '#features/database/services/record.service.js';
-import { BulkUpsertResponse } from '@insforge/shared-schemas';
+import { BulkUpsertResponse } from '@yarahdev/shared-schemas';
 
 interface UseCSVImportOptions {
   onSuccess?: (data: BulkUpsertResponse) => void;

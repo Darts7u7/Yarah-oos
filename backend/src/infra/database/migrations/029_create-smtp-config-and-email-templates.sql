@@ -1,5 +1,5 @@
 -- Migration: Create SMTP configuration and email templates tables
--- These tables support custom SMTP email delivery as an alternative to InsForge cloud
+-- These tables support custom SMTP email delivery as an alternative to Yarah cloud
 
 CREATE SCHEMA IF NOT EXISTS email;
 

@@ -1,14 +1,14 @@
 ---
-title: "Implementar InsForge en AWS EC2"
-description: "Guía paso a paso para implementar InsForge en una instancia de AWS EC2 usando Docker Compose, incluyendo configuración de SSH, dominio y terminación TLS."
+title: "Implementar Yarah en AWS EC2"
+description: "Guía paso a paso para implementar Yarah en una instancia de AWS EC2 usando Docker Compose, incluyendo configuración de SSH, dominio y terminación TLS."
 ---
 
-# Implementar InsForge en AWS EC2
+# Implementar Yarah en AWS EC2
 
-Esta guía te llevará paso a paso por la implementación de InsForge en una instancia de AWS EC2 usando Docker Compose.
+Esta guía te llevará paso a paso por la implementación de Yarah en una instancia de AWS EC2 usando Docker Compose.
 
 <Note>
-  Esta guía de nube la mantiene la comunidad y puede quedar por detrás de la última versión de InsForge. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de InsForge](https://github.com/InsForge/InsForge).
+  Esta guía de nube la mantiene la comunidad y puede quedar por detrás de la última versión de Yarah. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de Yarah](https://github.com/Yarah/Yarah).
 </Note>
 
 ## 📋 Requisitos previos
@@ -26,7 +26,7 @@ Esta guía te llevará paso a paso por la implementación de InsForge en una ins
 1. **Inicia sesión en AWS Console** y navega al panel de EC2
 2. **Haz clic en "Launch Instance"**
 3. **Configura la instancia:**
-   - **Name**: `insforge-server` (o el nombre que prefieras)
+   - **Name**: `yarah-server` (o el nombre que prefieras)
    - **AMI**: Ubuntu Server 24.04 LTS (HVM), tipo de volumen SSD
    - **Instance Type**: `t3.medium` o superior (mínimo 2 vCPU, 4 GB de RAM)
      - Para producción: se recomienda `t3.large` (2 vCPU, 8 GB de RAM)
@@ -110,12 +110,12 @@ docker ps
 sudo apt install git -y
 ```
 
-### 4. Implementar InsForge
+### 4. Implementar Yarah
 
 #### 4.1 Obtener el repositorio
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh | sh -s ~/insforge
+curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 Descarga los archivos que el stack lee y genera `JWT_SECRET`, `ENCRYPTION_KEY`, `ROOT_ADMIN_PASSWORD` y `POSTGRES_PASSWORD` en `.env`. No arranca nada.
@@ -123,7 +123,7 @@ Descarga los archivos que el stack lee y genera `JWT_SECRET`, `ENCRYPTION_KEY`, 
 #### 4.2 Crear la configuración del entorno
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 nano .env
 ```
 
@@ -147,7 +147,7 @@ GOOGLE_CLIENT_SECRET=
 
 > 💡 Guarda una copia de `.env` en un lugar seguro. Sus secretos son lo que te permite migrar o restaurar esta instancia.
 
-#### 4.3 Iniciar los servicios de InsForge
+#### 4.3 Iniciar los servicios de Yarah
 
 ```bash
 # Descarga las imágenes de Docker e inicia los servicios
@@ -168,11 +168,11 @@ docker compose ps
 # Deberías ver 4 servicios en ejecución:
 # - postgres
 # - postgrest
-# - insforge
+# - yarah
 # - deno
 ```
 
-### 5. Acceder a tu instancia de InsForge
+### 5. Acceder a tu instancia de Yarah
 
 #### 5.1 Probar la API del backend
 
@@ -185,7 +185,7 @@ Respuesta esperada:
 {
   "status": "ok",
   "version": "2.1.7",
-  "service": "Insforge OSS Backend",
+  "service": "Yarah OSS Backend",
   "timestamp": "2025-10-17T..."
 }
 ```
@@ -218,7 +218,7 @@ sudo apt install nginx -y
 Crea la configuración de Nginx:
 
 ```bash
-sudo nano /etc/nginx/sites-available/insforge
+sudo nano /etc/nginx/sites-available/yarah
 ```
 
 Agrega la siguiente configuración:
@@ -264,7 +264,7 @@ server {
 Habilita la configuración:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/insforge /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/yarah /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -284,7 +284,7 @@ sudo certbot --nginx -d api.yourdomain.com -d app.yourdomain.com
 Actualiza tu archivo `.env` con las URLs de HTTPS:
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 nano .env
 ```
 
@@ -310,7 +310,7 @@ docker compose up -d
 docker compose logs -f
 
 # Servicio específico
-docker compose logs -f insforge
+docker compose logs -f yarah
 docker compose logs -f postgres
 docker compose logs -f deno
 ```
@@ -327,12 +327,12 @@ docker compose down
 docker compose restart
 ```
 
-### Actualizar InsForge
+### Actualizar Yarah
 
-Actualizar consiste en descargar y reiniciar, pero el checkout también importa: el stack lee de él la configuración de Postgres y las funciones de Deno. Ejecuta esto desde `~/insforge`:
+Actualizar consiste en descargar y reiniciar, pero el checkout también importa: el stack lee de él la configuración de Postgres y las funciones de Deno. Ejecuta esto desde `~/yarah`:
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 git pull origin main
 
 # Pick up any files this release added to the sparse checkout
@@ -343,14 +343,14 @@ docker compose pull && docker compose up -d
 
 ### Copia de seguridad de la base de datos
 
-Ejecuta esto desde `~/insforge`:
+Ejecuta esto desde `~/yarah`:
 
 ```bash
 # Crea una copia de seguridad
-docker compose exec postgres pg_dump -U postgres insforge > backup_$(date +%Y%m%d_%H%M%S).sql
+docker compose exec postgres pg_dump -U postgres yarah > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Restaura desde una copia de seguridad
-cat backup_file.sql | docker compose exec -T postgres psql -U postgres -d insforge
+cat backup_file.sql | docker compose exec -T postgres psql -U postgres -d yarah
 ```
 
 ### Monitorear recursos
@@ -458,9 +458,9 @@ effective_cache_size = 3GB
 
 ## 🆘 Soporte y recursos
 
-- **Documentación**: [https://docs.insforge.dev](https://docs.insforge.dev)
-- **Issues de GitHub**: [https://github.com/insforge/insforge/issues](https://github.com/insforge/insforge/issues)
-- **Comunidad de Discord**: [https://discord.com/invite/MPxwj5xVvW](https://discord.com/invite/MPxwj5xVvW)
+- **Documentación**: [https://docs.yarah.dev](https://docs.yarah.dev)
+- **Issues de GitHub**: [https://github.com/yarah/yarah/issues](https://github.com/yarah/yarah/issues)
+- **Comunidad de Discord**: [https://yarah.dev/community](https://yarah.dev/community)
 
 ## 📝 Estimación de costos
 
@@ -478,6 +478,6 @@ effective_cache_size = 3GB
 
 ---
 
-**¡Felicidades! 🎉** Tu instancia de InsForge ahora se está ejecutando en AWS EC2. Puedes empezar a construir aplicaciones conectando agentes de IA a tu plataforma backend.
+**¡Felicidades! 🎉** Tu instancia de Yarah ahora se está ejecutando en AWS EC2. Puedes empezar a construir aplicaciones conectando agentes de IA a tu plataforma backend.
 
 Para otras estrategias de implementación en producción, consulta nuestras [guías de implementación](/deployment/deployment-security-guide).

@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { NextFunction, Request, Response, Router } from 'express';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { AppError } from '../../src/utils/errors';
 
 interface RefreshPayload {
@@ -203,7 +203,7 @@ describe('POST /api/auth/logout CSRF policy', () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expectClearedCookie(response.clearCookie, 'insforge_refresh_token', '/api/auth');
+    expectClearedCookie(response.clearCookie, 'yarah_refresh_token', '/api/auth');
     expect(mocks.verifyRefreshToken).not.toHaveBeenCalled();
   });
 
@@ -214,11 +214,11 @@ describe('POST /api/auth/logout CSRF policy', () => {
 
     const response = await callLogout(router, {
       query: { client_type: 'web' },
-      cookies: { insforge_refresh_token: 'stale-refresh-token' },
+      cookies: { yarah_refresh_token: 'stale-refresh-token' },
     });
 
     expect(response.statusCode).toBe(200);
-    expectClearedCookie(response.clearCookie, 'insforge_refresh_token', '/api/auth');
+    expectClearedCookie(response.clearCookie, 'yarah_refresh_token', '/api/auth');
     expect(mocks.csrfTokenMatches).not.toHaveBeenCalled();
   });
 
@@ -227,7 +227,7 @@ describe('POST /api/auth/logout CSRF policy', () => {
 
     const response = await callLogout(router, {
       query: { client_type: 'web' },
-      cookies: { insforge_refresh_token: 'valid-refresh-token' },
+      cookies: { yarah_refresh_token: 'valid-refresh-token' },
     });
 
     expect(response.statusCode).toBe(403);
@@ -241,7 +241,7 @@ describe('POST /api/auth/logout CSRF policy', () => {
 
     const response = await callLogout(router, {
       query: { client_type: 'web' },
-      cookies: { insforge_refresh_token: 'valid-refresh-token' },
+      cookies: { yarah_refresh_token: 'valid-refresh-token' },
       headers: { 'x-csrf-token': ['csrf-a', 'csrf-b'] },
     });
 
@@ -259,31 +259,31 @@ describe('POST /api/auth/logout CSRF policy', () => {
 
     const response = await callLogout(router, {
       query: { client_type: 'web' },
-      cookies: { insforge_refresh_token: 'admin-refresh-token' },
+      cookies: { yarah_refresh_token: 'admin-refresh-token' },
       headers: { 'x-csrf-token': 'csrf-token' },
     });
 
     expect(response.statusCode).toBe(200);
-    expectClearedCookie(response.clearCookie, 'insforge_refresh_token', '/api/auth');
+    expectClearedCookie(response.clearCookie, 'yarah_refresh_token', '/api/auth');
     expect(mocks.csrfTokenMatches).not.toHaveBeenCalled();
   });
 
   it('clears a valid web refresh cookie when CSRF is valid', async () => {
     const response = await callLogout(router, {
       query: { client_type: 'web' },
-      cookies: { insforge_refresh_token: 'valid-refresh-token' },
+      cookies: { yarah_refresh_token: 'valid-refresh-token' },
       headers: { 'x-csrf-token': 'csrf-token' },
     });
 
     expect(response.statusCode).toBe(200);
-    expectClearedCookie(response.clearCookie, 'insforge_refresh_token', '/api/auth');
+    expectClearedCookie(response.clearCookie, 'yarah_refresh_token', '/api/auth');
     expect(mocks.csrfTokenMatches).toHaveBeenCalledWith('csrf-token', userPayload);
   });
 
   it('leaves non-web logout unchanged', async () => {
     const response = await callLogout(router, {
       query: { client_type: 'mobile' },
-      cookies: { insforge_refresh_token: 'valid-refresh-token' },
+      cookies: { yarah_refresh_token: 'valid-refresh-token' },
     });
 
     expect(response.statusCode).toBe(200);
@@ -309,7 +309,7 @@ describe('POST /api/auth/admin/logout CSRF policy', () => {
     const response = await callLogout(router);
 
     expect(response.statusCode).toBe(200);
-    expectClearedCookie(response.clearCookie, 'insforge_admin_refresh_token', '/api/auth/admin');
+    expectClearedCookie(response.clearCookie, 'yarah_admin_refresh_token', '/api/auth/admin');
     expect(mocks.verifyRefreshToken).not.toHaveBeenCalled();
   });
 
@@ -319,11 +319,11 @@ describe('POST /api/auth/admin/logout CSRF policy', () => {
     });
 
     const response = await callLogout(router, {
-      cookies: { insforge_admin_refresh_token: 'stale-admin-refresh-token' },
+      cookies: { yarah_admin_refresh_token: 'stale-admin-refresh-token' },
     });
 
     expect(response.statusCode).toBe(200);
-    expectClearedCookie(response.clearCookie, 'insforge_admin_refresh_token', '/api/auth/admin');
+    expectClearedCookie(response.clearCookie, 'yarah_admin_refresh_token', '/api/auth/admin');
     expect(mocks.csrfTokenMatches).not.toHaveBeenCalled();
   });
 
@@ -331,7 +331,7 @@ describe('POST /api/auth/admin/logout CSRF policy', () => {
     mocks.csrfTokenMatches.mockReturnValue(false);
 
     const response = await callLogout(router, {
-      cookies: { insforge_admin_refresh_token: 'valid-admin-refresh-token' },
+      cookies: { yarah_admin_refresh_token: 'valid-admin-refresh-token' },
     });
 
     expect(response.statusCode).toBe(403);
@@ -344,7 +344,7 @@ describe('POST /api/auth/admin/logout CSRF policy', () => {
     mocks.csrfTokenMatches.mockReturnValue(false);
 
     const response = await callLogout(router, {
-      cookies: { insforge_admin_refresh_token: 'valid-admin-refresh-token' },
+      cookies: { yarah_admin_refresh_token: 'valid-admin-refresh-token' },
       headers: { 'x-csrf-token': ['csrf-a', 'csrf-b'] },
     });
 
@@ -358,23 +358,23 @@ describe('POST /api/auth/admin/logout CSRF policy', () => {
     mocks.verifyRefreshToken.mockReturnValue(userPayload);
 
     const response = await callLogout(router, {
-      cookies: { insforge_admin_refresh_token: 'user-refresh-token' },
+      cookies: { yarah_admin_refresh_token: 'user-refresh-token' },
       headers: { 'x-csrf-token': 'csrf-token' },
     });
 
     expect(response.statusCode).toBe(200);
-    expectClearedCookie(response.clearCookie, 'insforge_admin_refresh_token', '/api/auth/admin');
+    expectClearedCookie(response.clearCookie, 'yarah_admin_refresh_token', '/api/auth/admin');
     expect(mocks.csrfTokenMatches).not.toHaveBeenCalled();
   });
 
   it('clears a valid admin refresh cookie when CSRF is valid', async () => {
     const response = await callLogout(router, {
-      cookies: { insforge_admin_refresh_token: 'valid-admin-refresh-token' },
+      cookies: { yarah_admin_refresh_token: 'valid-admin-refresh-token' },
       headers: { 'x-csrf-token': 'csrf-token' },
     });
 
     expect(response.statusCode).toBe(200);
-    expectClearedCookie(response.clearCookie, 'insforge_admin_refresh_token', '/api/auth/admin');
+    expectClearedCookie(response.clearCookie, 'yarah_admin_refresh_token', '/api/auth/admin');
     expect(mocks.csrfTokenMatches).toHaveBeenCalledWith('csrf-token', adminPayload);
   });
 });

@@ -5,7 +5,7 @@
 --
 -- Status flow:
 --   WAITING -> UPLOADING -> (Vercel statuses: QUEUED/BUILDING/READY/ERROR/CANCELED)
---   InsForge statuses:
+--   Yarah statuses:
 --   - WAITING: Record created, waiting for source zip upload or direct file registration/content
 --   - UPLOADING: File uploads or provider deployment creation are in progress
 --   Vercel statuses (stored directly):

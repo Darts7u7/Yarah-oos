@@ -1,7 +1,7 @@
 import type { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { AppError } from '../../src/utils/errors.js';
 
 const { mockTokenManager, mockSecretService } = vi.hoisted(() => ({

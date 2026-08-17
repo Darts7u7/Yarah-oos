@@ -1,5 +1,5 @@
 import { convertSqlTypeToColumnType } from '../../src/utils/utils';
-import { ColumnType } from '@insforge/shared-schemas';
+import { ColumnType } from '@yarahdev/shared-schemas';
 import { describe, it, expect } from 'vitest';
 describe('convertSqlTypeToColumnType', () => {
   it('converts UUID correctly', () => {

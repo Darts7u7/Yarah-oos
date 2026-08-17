@@ -21,7 +21,7 @@ import {
   Input,
   Skeleton,
   useToast,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { useDeployments } from '#features/deployments/hooks/useDeployments';
 import { useDeploymentSlug } from '#features/deployments/hooks/useDeploymentSlug';
 import { useDeploymentMetadata } from '#features/deployments/hooks/useDeploymentMetadata';
@@ -30,14 +30,14 @@ import { useCopyToClipboard } from '#lib/hooks/useCopyToClipboard';
 import type { CustomDomain } from '#features/deployments/services/deployments.service';
 
 /**
- * Extracts the slug portion from a custom insforge.site domain URL.
- * e.g. "https://my-slug.insforge.site" -> "my-slug"
+ * Extracts the slug portion from a custom yarah.site domain URL.
+ * e.g. "https://my-slug.yarah.site" -> "my-slug"
  */
 function extractSlugFromUrl(url: string | null): string {
   if (!url) {
     return '';
   }
-  const match = url.match(/^https?:\/\/([^.]+)\.insforge\.site$/);
+  const match = url.match(/^https?:\/\/([^.]+)\.yarah\.site$/);
   return match?.[1] ?? '';
 }
 
@@ -341,7 +341,7 @@ function CustomDomainRow({
 
 /**
  * Page for managing deployment domains.
- * Shows the auto-generated default domain, the insforge.site custom slug,
+ * Shows the auto-generated default domain, the yarah.site custom slug,
  * and user-owned custom domains with full DNS verification workflow.
  */
 export default function DeploymentDomainsPage() {
@@ -374,7 +374,7 @@ export default function DeploymentDomainsPage() {
     removingDomain,
   } = useCustomDomains();
   const { showToast } = useToast();
-  const RESERVED_HOSTED_DOMAIN_SUFFIX = '.insforge.site';
+  const RESERVED_HOSTED_DOMAIN_SUFFIX = '.yarah.site';
 
   const latestReadyDeployment = deployments.find((d) => d.status === 'READY') ?? null;
   const defaultDomain = latestReadyDeployment?.url ?? null;
@@ -483,7 +483,7 @@ export default function DeploymentDomainsPage() {
     if (trimmed.endsWith(RESERVED_HOSTED_DOMAIN_SUFFIX)) {
       setDomainError(
         t('deployments.reservedDomainSuffix', {
-          defaultValue: 'Domains ending with .insforge.site are reserved by InsForge',
+          defaultValue: 'Domains ending with .yarah.site are reserved by Yarah',
         })
       );
       return;
@@ -607,9 +607,7 @@ export default function DeploymentDomainsPage() {
                       placeholder=""
                       className="h-8 w-[200px]"
                     />
-                    <span className="text-[13px] text-zinc-950 dark:text-white">
-                      .insforge.site
-                    </span>
+                    <span className="text-[13px] text-zinc-950 dark:text-white">.yarah.site</span>
                   </div>
                 ) : savedCustomSlug ? (
                   <div className="flex items-center gap-1">

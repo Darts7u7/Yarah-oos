@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '@insforge/ui';
-import type { ModelGatewayConfig, UpdateModelGatewayConfig } from '@insforge/shared-schemas';
+import { useToast } from '@yarahdev/ui';
+import type { ModelGatewayConfig, UpdateModelGatewayConfig } from '@yarahdev/shared-schemas';
 import { aiService } from '#features/ai/services/ai.service';
 import { AI_OVERVIEW_QUERY_KEY } from '#features/ai/hooks/useAIOverview';
 import { OPENROUTER_KEY_QUERY_KEY } from '#features/ai/hooks/useOpenRouterKey';

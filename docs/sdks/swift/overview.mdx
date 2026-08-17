@@ -1,11 +1,11 @@
 ---
 title: Swift SDK for iOS, macOS, tvOS, watchOS
-description: Install and initialize the official InsForge Swift SDK via Swift Package Manager to use auth, database, storage, and realtime across Apple platforms.
+description: Install and initialize the official Yarah Swift SDK via Swift Package Manager to use auth, database, storage, and realtime across Apple platforms.
 ---
 
 import SwiftSdkInstallation from '/snippets/swift-sdk-installation.mdx';
 
-The InsForge Swift SDK provides a native Swift client for interacting with InsForge services from iOS, macOS, tvOS, and watchOS applications.
+The Yarah Swift SDK provides a native Swift client for interacting with Yarah services from iOS, macOS, tvOS, and watchOS applications.
 
 ## Installation
 
@@ -15,21 +15,21 @@ The InsForge Swift SDK provides a native Swift client for interacting with InsFo
 
 Or add it via Xcode:
 1. File → Add Packages...
-2. Enter: `https://github.com/insforge/insforge-swift.git`
+2. Enter: `https://github.com/yarah/yarah-swift.git`
 
 ### CocoaPods (coming soon)
 
 ```ruby
-pod 'InsForge', '~> 1.0'
+pod 'Yarah', '~> 1.0'
 ```
 
 ## Quick start
 
 ```swift
-import InsForge
+import Yarah
 
-let insforge = InsForgeClient(
-    baseUrl: "https://your-app.insforge.app",
+let yarah = YarahClient(
+    baseUrl: "https://your-app.apps.yarah.dev",
     anonKey: "your-anon-key"
 )
 ```

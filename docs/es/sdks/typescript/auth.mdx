@@ -1,6 +1,6 @@
 ---
 title: Referencia de SDK de Autenticación
-description: Autentica usuarios, gestiona perfiles, sesiones JWT y OAuth con el SDK de TypeScript de InsForge para Node, navegadores y tiempos de ejecución edge.
+description: Autentica usuarios, gestiona perfiles, sesiones JWT y OAuth con el SDK de TypeScript de Yarah para Node, navegadores y tiempos de ejecución edge.
 ---
 
 ## Instalación
@@ -18,7 +18,7 @@ Crea una nueva cuenta de usuario con correo electrónico y contraseña.
 - `email` (string, required) - Dirección de correo electrónico del usuario
 - `password` (string, required) - Contraseña del usuario
 - `name` (string, optional) - Nombre para mostrar del usuario
-- `redirectTo` (string, optional) - Utilizado para verificación de correo electrónico basada en enlaces. El enlace de correo electrónico siempre abre primero un punto final del servidor InsForge; después de verificar el token, InsForge redirige el navegador a esta URL con el resultado de la verificación. Requerido cuando `verifyEmailMethod` se establece en `link`. Esta URL debe incluirse en `allowedRedirectUrls`. Recomendado: usa tu página de inicio de sesión de la aplicación.
+- `redirectTo` (string, optional) - Utilizado para verificación de correo electrónico basada en enlaces. El enlace de correo electrónico siempre abre primero un punto final del servidor Yarah; después de verificar el token, Yarah redirige el navegador a esta URL con el resultado de la verificación. Requerido cuando `verifyEmailMethod` se establece en `link`. Esta URL debe incluirse en `allowedRedirectUrls`. Recomendado: usa tu página de inicio de sesión de la aplicación.
 
 ### Devoluciones
 
@@ -35,13 +35,13 @@ Crea una nueva cuenta de usuario con correo electrónico y contraseña.
 ```
 
 <Note>
-  Cuando `requireEmailVerification` es verdadero, `accessToken` será nulo hasta que el usuario verifique su correo electrónico. InsForge envía un correo de verificación con un enlace o código de 6 dígitos, según la configuración del panel (`verifyEmailMethod`). Para verificación por código, implementa una página que pida al usuario ingresar el código (ver [verifyEmail()](#verifyemail)). Para verificación por enlace, proporciona una URL `redirectTo` que debería recibir el navegador después de que InsForge verifique el token. Recomendado: usa tu página de inicio de sesión como `redirectTo`, luego muestra un mensaje de éxito y pide al usuario que inicie sesión con su correo electrónico y contraseña.
+  Cuando `requireEmailVerification` es verdadero, `accessToken` será nulo hasta que el usuario verifique su correo electrónico. Yarah envía un correo de verificación con un enlace o código de 6 dígitos, según la configuración del panel (`verifyEmailMethod`). Para verificación por código, implementa una página que pida al usuario ingresar el código (ver [verifyEmail()](#verifyemail)). Para verificación por enlace, proporciona una URL `redirectTo` que debería recibir el navegador después de que Yarah verifique el token. Recomendado: usa tu página de inicio de sesión como `redirectTo`, luego muestra un mensaje de éxito y pide al usuario que inicie sesión con su correo electrónico y contraseña.
 </Note>
 
 ### Ejemplo
 
 ```javascript
-const { data, error } = await insforge.auth.signUp({
+const { data, error } = await yarah.auth.signUp({
   email: 'user@example.com',
   password: 'secure_password123',
   name: 'John Doe',
@@ -111,7 +111,7 @@ Inicia sesión con un usuario existente usando correo electrónico y contraseña
 ### Ejemplo
 
 ```javascript
-const { data, error } = await insforge.auth.signInWithPassword({
+const { data, error } = await yarah.auth.signInWithPassword({
   email: 'user@example.com',
   password: 'secure_password123',
 });
@@ -169,21 +169,21 @@ Inicia el flujo de autenticación OAuth con proveedores configurados (proveedore
 ```
 
 <Note>
-  Después del redireccionamiento OAuth, el SDK detecta automáticamente el `insforge_code` de devolución de llamada, lo intercambia por una sesión y guarda la sesión automáticamente.
+  Después del redireccionamiento OAuth, el SDK detecta automáticamente el `yarah_code` de devolución de llamada, lo intercambia por una sesión y guarda la sesión automáticamente.
 </Note>
 
 ### Ejemplo
 
 ```javascript
 // Default: auto-redirect
-await insforge.auth.signInWithOAuth('google', {
+await yarah.auth.signInWithOAuth('google', {
   redirectTo: 'http://localhost:3000/dashboard',
   additionalParams: { prompt: 'select_account' },
 });
 // Browser immediately redirects to Google
 
 // skipBrowserRedirect: get URL for manual handling
-const { data } = await insforge.auth.signInWithOAuth('google', {
+const { data } = await yarah.auth.signInWithOAuth('google', {
   redirectTo: 'http://localhost:3000/dashboard',
   skipBrowserRedirect: true,
 });
@@ -192,11 +192,11 @@ window.location.href = data.url; // Redirect when ready
 ```
 
 <Note>
-  `additionalParams` es solo para pistas opcionales específicas del proveedor. No pases campos OAuth propiedad del servidor como `client_id`, `redirect_uri`, `code_challenge`, `state`, `response_type` o `scope`; InsForge establece esos valores en el servidor e ignora las claves proporcionadas por el cliente en conflicto.
+  `additionalParams` es solo para pistas opcionales específicas del proveedor. No pases campos OAuth propiedad del servidor como `client_id`, `redirect_uri`, `code_challenge`, `state`, `response_type` o `scope`; Yarah establece esos valores en el servidor e ignora las claves proporcionadas por el cliente en conflicto.
 </Note>
 
 <Note>
-  Los proveedores personalizados deben configurarse primero en el panel de InsForge bajo `Auth Methods` con credenciales de cliente y una URL de descubrimiento OIDC.
+  Los proveedores personalizados deben configurarse primero en el panel de Yarah bajo `Auth Methods` con credenciales de cliente y una URL de descubrimiento OIDC.
 </Note>
 
 ### Salida
@@ -232,7 +232,7 @@ Ninguno
 ### Ejemplo
 
 ```javascript
-const { error } = await insforge.auth.signOut();
+const { error } = await yarah.auth.signOut();
 ```
 
 ### Salida
@@ -271,7 +271,7 @@ Ninguno
 ### Ejemplo
 
 ```javascript
-const { data, error } = await insforge.auth.getCurrentUser();
+const { data, error } = await yarah.auth.getCurrentUser();
 
 if (data.user) {
   console.log('User:', data.user.email);
@@ -330,7 +330,7 @@ Obtén el perfil público de cualquier usuario por ID. Devuelve un objeto de per
 ### Ejemplo
 
 ```javascript
-const { data, error } = await insforge.auth.getProfile('usr_xyz789');
+const { data, error } = await yarah.auth.getProfile('usr_xyz789');
 
 if (data) {
   console.log(data.name);
@@ -388,7 +388,7 @@ Actualiza el perfil del usuario actual en la tabla de usuarios. Admite cualquier
 ### Ejemplo
 
 ```javascript
-const { data, error } = await insforge.auth.setProfile({
+const { data, error } = await yarah.auth.setProfile({
   name: 'JohnDev',
   bio: 'Full-stack developer',
   avatar_url: 'https://example.com/avatar.jpg',
@@ -417,7 +417,7 @@ const { data, error } = await insforge.auth.setProfile({
 
 ## resendVerificationEmail()
 
-Reenvía la verificación de correo cuando el OTP anterior ha expirado o no fue recibido. Usa el método configurado en la configuración de autenticación (`verifyEmailMethod`). Cuando el método es `code`, envía un código numérico de 6 dígitos. Cuando el método es `link`, envía un enlace de verificación del navegador que primero va a través de un punto final del servidor InsForge.
+Reenvía la verificación de correo cuando el OTP anterior ha expirado o no fue recibido. Usa el método configurado en la configuración de autenticación (`verifyEmailMethod`). Cuando el método es `code`, envía un código numérico de 6 dígitos. Cuando el método es `link`, envía un enlace de verificación del navegador que primero va a través de un punto final del servidor Yarah.
 
 <Note>
   Este punto final previene la enumeración de usuarios al devolver éxito incluso si el correo electrónico no existe.
@@ -426,7 +426,7 @@ Reenvía la verificación de correo cuando el OTP anterior ha expirado o no fue 
 ### Parámetros
 
 - `email` (string, required) - Dirección de correo electrónico del usuario
-- `redirectTo` (string, optional) - Utilizado para verificación de correo electrónico basada en enlaces. El enlace de correo electrónico siempre abre primero un punto final del servidor InsForge; después de verificar el token, InsForge redirige el navegador a esta URL con el resultado de la verificación. Requerido cuando `verifyEmailMethod` se establece en `link`. Esta URL debe incluirse en `allowedRedirectUrls`. Recomendado: usa tu página de inicio de sesión de la aplicación.
+- `redirectTo` (string, optional) - Utilizado para verificación de correo electrónico basada en enlaces. El enlace de correo electrónico siempre abre primero un punto final del servidor Yarah; después de verificar el token, Yarah redirige el navegador a esta URL con el resultado de la verificación. Requerido cuando `verifyEmailMethod` se establece en `link`. Esta URL debe incluirse en `allowedRedirectUrls`. Recomendado: usa tu página de inicio de sesión de la aplicación.
 
 ### Devoluciones
 
@@ -440,7 +440,7 @@ Reenvía la verificación de correo cuando el OTP anterior ha expirado o no fue 
 ### Ejemplo
 
 ```javascript
-const { data, error } = await insforge.auth.resendVerificationEmail({
+const { data, error } = await yarah.auth.resendVerificationEmail({
   email: 'user@example.com',
   redirectTo: 'http://localhost:3000/sign-in',
 });
@@ -474,13 +474,13 @@ Los usuarios verificados exitosamente que usan este punto final de código recib
 
 Para verificación basada en enlaces, tu frontend debe manejar el redireccionamiento del navegador así:
 
-- Éxito: `?insforge_status=success&insforge_type=verify_email`
-- Error: `?insforge_status=error&insforge_type=verify_email&insforge_error=...`
-- `insforge_status`: Resultado del flujo de enlace del navegador. Para verificación, los valores son `success` o `error`.
-- `insforge_type`: Identificador de flujo. Para enlaces de verificación esto es siempre `verify_email`.
-- `insforge_error`: Presente solo cuando `insforge_status=error`. Mensaje de error legible por humanos para mostrar o registrar.
+- Éxito: `?yarah_status=success&yarah_type=verify_email`
+- Error: `?yarah_status=error&yarah_type=verify_email&yarah_error=...`
+- `yarah_status`: Resultado del flujo de enlace del navegador. Para verificación, los valores son `success` o `error`.
+- `yarah_type`: Identificador de flujo. Para enlaces de verificación esto es siempre `verify_email`.
+- `yarah_error`: Presente solo cuando `yarah_status=error`. Mensaje de error legible por humanos para mostrar o registrar.
 
-Manejo recomendado: usa tu página de inicio de sesión como `redirectTo`. Cuando `insforge_status=success`, muestra un mensaje de confirmación y pide al usuario que inicie sesión con su correo electrónico y contraseña.
+Manejo recomendado: usa tu página de inicio de sesión como `redirectTo`. Cuando `yarah_status=success`, muestra un mensaje de confirmación y pide al usuario que inicie sesión con su correo electrónico y contraseña.
 
 ### Parámetros
 
@@ -502,7 +502,7 @@ Manejo recomendado: usa tu página de inicio de sesión como `redirectTo`. Cuand
 ### Ejemplo
 
 ```javascript
-const { data, error } = await insforge.auth.verifyEmail({
+const { data, error } = await yarah.auth.verifyEmail({
   email: 'user@example.com',
   otp: '123456',
 });
@@ -532,7 +532,7 @@ if (data) {
 
 ## sendResetPasswordEmail()
 
-Envía correo de restablecimiento de contraseña usando el método configurado en la configuración de autenticación (`resetPasswordMethod`). Cuando el método es `code`, envía un código numérico de 6 dígitos para flujo de dos pasos. Cuando el método es `link`, envía un enlace de restablecimiento de navegador que primero va a través de un punto final del servidor InsForge.
+Envía correo de restablecimiento de contraseña usando el método configurado en la configuración de autenticación (`resetPasswordMethod`). Cuando el método es `code`, envía un código numérico de 6 dígitos para flujo de dos pasos. Cuando el método es `link`, envía un enlace de restablecimiento de navegador que primero va a través de un punto final del servidor Yarah.
 
 <Note>
   Este punto final previene la enumeración de usuarios al devolver éxito incluso si el correo electrónico no existe.
@@ -541,7 +541,7 @@ Envía correo de restablecimiento de contraseña usando el método configurado e
 ### Parámetros
 
 - `email` (string, required) - Dirección de correo electrónico del usuario
-- `redirectTo` (string, optional) - Utilizado para restablecimiento de contraseña basado en enlaces. El enlace de correo electrónico siempre abre primero un punto final del servidor InsForge; InsForge entonces redirige el navegador a esta URL con el `token` de restablecimiento en la cadena de consulta para que tu aplicación pueda renderizar su propia página de restablecimiento de contraseña. Requerido cuando `resetPasswordMethod` se establece en `link`. Esta URL debe incluirse en `allowedRedirectUrls`. Recomendado: usa tu página dedicada de restablecimiento de contraseña de la aplicación.
+- `redirectTo` (string, optional) - Utilizado para restablecimiento de contraseña basado en enlaces. El enlace de correo electrónico siempre abre primero un punto final del servidor Yarah; Yarah entonces redirige el navegador a esta URL con el `token` de restablecimiento en la cadena de consulta para que tu aplicación pueda renderizar su propia página de restablecimiento de contraseña. Requerido cuando `resetPasswordMethod` se establece en `link`. Esta URL debe incluirse en `allowedRedirectUrls`. Recomendado: usa tu página dedicada de restablecimiento de contraseña de la aplicación.
 
 ### Devoluciones
 
@@ -555,7 +555,7 @@ Envía correo de restablecimiento de contraseña usando el método configurado e
 ### Ejemplo
 
 ```javascript
-const { data, error } = await insforge.auth.sendResetPasswordEmail({
+const { data, error } = await yarah.auth.sendResetPasswordEmail({
   email: 'user@example.com',
   redirectTo: 'http://localhost:3000/reset-password',
 });
@@ -604,14 +604,14 @@ Intercambia un código de restablecimiento de contraseña de 6 dígitos por un t
 ### Ejemplo
 
 ```javascript
-const { data, error } = await insforge.auth.exchangeResetPasswordToken({
+const { data, error } = await yarah.auth.exchangeResetPasswordToken({
   email: 'user@example.com',
   code: '123456',
 });
 
 if (data) {
   // Use token to reset password
-  await insforge.auth.resetPassword({
+  await yarah.auth.resetPassword({
     newPassword: 'newSecurePassword123',
     otp: data.token,
   });
@@ -645,14 +645,14 @@ Restablece la contraseña del usuario con un token. El token puede ser:
 
 Para restablecimiento de contraseña basado en enlaces, tu frontend debe manejar el redireccionamiento del navegador así:
 
-- Listo para restablecer: `?token=...&insforge_status=ready&insforge_type=reset_password`
-- Error: `?insforge_status=error&insforge_type=reset_password&insforge_error=...`
-- `token`: Presente solo cuando `insforge_status=ready`. Pasa este valor a `resetPassword({ otp })`.
-- `insforge_status`: Resultado del flujo de enlace del navegador. Para enlaces de restablecimiento, los valores son `ready` o `error`.
-- `insforge_type`: Identificador de flujo. Para enlaces de restablecimiento esto es siempre `reset_password`.
-- `insforge_error`: Presente solo cuando `insforge_status=error`. Mensaje de error legible por humanos para mostrar o registrar.
+- Listo para restablecer: `?token=...&yarah_status=ready&yarah_type=reset_password`
+- Error: `?yarah_status=error&yarah_type=reset_password&yarah_error=...`
+- `token`: Presente solo cuando `yarah_status=ready`. Pasa este valor a `resetPassword({ otp })`.
+- `yarah_status`: Resultado del flujo de enlace del navegador. Para enlaces de restablecimiento, los valores son `ready` o `error`.
+- `yarah_type`: Identificador de flujo. Para enlaces de restablecimiento esto es siempre `reset_password`.
+- `yarah_error`: Presente solo cuando `yarah_status=error`. Mensaje de error legible por humanos para mostrar o registrar.
 
-Solo renderiza el formulario de restablecimiento de contraseña cuando `insforge_status=ready` y `token` está presente.
+Solo renderiza el formulario de restablecimiento de contraseña cuando `yarah_status=ready` y `token` está presente.
 
 ### Devoluciones
 
@@ -667,13 +667,13 @@ Solo renderiza el formulario de restablecimiento de contraseña cuando `insforge
 
 ```javascript
 // Code method flow: after exchangeResetPasswordToken
-const { data, error } = await insforge.auth.resetPassword({
+const { data, error } = await yarah.auth.resetPassword({
   newPassword: 'newSecurePassword123',
   otp: resetToken, // Token from exchangeResetPasswordToken
 });
 
 // Link method flow: token from the reset page URL
-const { data, error } = await insforge.auth.resetPassword({
+const { data, error } = await yarah.auth.resetPassword({
   newPassword: 'newSecurePassword123',
   otp: 'a1b2c3d4e5f6...', // Token from the magic link URL
 });
@@ -701,7 +701,7 @@ if (data) {
 Todos los métodos de autenticación devuelven errores estructurados:
 
 ```javascript
-const { data, error } = await insforge.auth.signInWithPassword({
+const { data, error } = await yarah.auth.signInWithPassword({
   email: 'user@example.com',
   password: 'wrong_password',
 });

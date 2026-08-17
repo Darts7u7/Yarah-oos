@@ -1,22 +1,22 @@
 ---
 title: "Autenticación"
 sidebarTitle: "Overview"
-description: "Autentica y autoriza a tus usuarios con InsForge: correo y contraseña, sin contraseña, OAuth, sesiones JWT, Row Level Security y modo de servidor OAuth."
+description: "Autentica y autoriza a tus usuarios con Yarah: correo y contraseña, sin contraseña, OAuth, sesiones JWT, Row Level Security y modo de servidor OAuth."
 ---
 
-Use la autenticación de InsForge para manejar el registro, inicio de sesión, sesiones e identidad de su aplicación. Los usuarios pueden iniciar sesión con correo electrónico y contraseña, enlace mágico, código de un solo uso, proveedores de OAuth (Google, GitHub, Apple y otros) o cualquier proveedor de identidad compatible con OIDC que traiga. InsForge emite JSON Web Tokens al iniciar sesión, y todos los demás productos de la plataforma consumen el mismo token.
+Use la autenticación de Yarah para manejar el registro, inicio de sesión, sesiones e identidad de su aplicación. Los usuarios pueden iniciar sesión con correo electrónico y contraseña, enlace mágico, código de un solo uso, proveedores de OAuth (Google, GitHub, Apple y otros) o cualquier proveedor de identidad compatible con OIDC que traiga. Yarah emite JSON Web Tokens al iniciar sesión, y todos los demás productos de la plataforma consumen el mismo token.
 
 <Frame caption="Métodos de inicio de sesión configurados: correo electrónico y contraseña, Google y GitHub OAuth.">
-  <img src="/images/authentication-methods.png" alt="Panel de InsForge Métodos de autenticación que muestran correo electrónico y contraseña, Google OAuth y GitHub OAuth" />
+  <img src="/images/authentication-methods.png" alt="Panel de Yarah Métodos de autenticación que muestran correo electrónico y contraseña, Google OAuth y GitHub OAuth" />
 </Frame>
 
 <Note>
-  **Autenticación** es verificar que un usuario es quien dice ser. **Autorización** es verificar qué pueden hacer. InsForge maneja lo primero directamente y potencia lo segundo a través de políticas de [seguridad a nivel de fila](/core-concepts/database/overview) que leen el JWT de autenticación.
+  **Autenticación** es verificar que un usuario es quien dice ser. **Autorización** es verificar qué pueden hacer. Yarah maneja lo primero directamente y potencia lo segundo a través de políticas de [seguridad a nivel de fila](/core-concepts/database/overview) que leen el JWT de autenticación.
 </Note>
 
 ```mermaid
 graph TB
-    Client[Client Application] --> SDK[InsForge SDK]
+    Client[Client Application] --> SDK[Yarah SDK]
     SDK --> AuthAPI[Auth API]
 
     AuthAPI --> JWT[JWT Service]
@@ -66,11 +66,11 @@ Soporte de primera clase para Google, GitHub, Apple, Microsoft, GitLab, Discord 
 
 ### Modo servidor de OAuth
 
-Ejecute InsForge como un proveedor de identidad OAuth 2.0 / OIDC para sus propias aplicaciones posteriores. Vea la [guía del servidor OAuth](/oauth-server) para la configuración completa.
+Ejecute Yarah como un proveedor de identidad OAuth 2.0 / OIDC para sus propias aplicaciones posteriores. Vea la [guía del servidor OAuth](/oauth-server) para la configuración completa.
 
 ### Seguridad a nivel de fila
 
-El JWT de autenticación fluye automáticamente a través de cada llamada del SDK de InsForge. Las políticas RLS de Postgres leen reclamaciones del token y deciden, fila a fila, qué puede leer y escribir el usuario. La misma identidad y las mismas políticas se aplican tanto si la solicitud llega a la base de datos, el almacenamiento o un canal en tiempo real.
+El JWT de autenticación fluye automáticamente a través de cada llamada del SDK de Yarah. Las políticas RLS de Postgres leen reclamaciones del token y deciden, fila a fila, qué puede leer y escribir el usuario. La misma identidad y las mismas políticas se aplican tanto si la solicitud llega a la base de datos, el almacenamiento o un canal en tiempo real.
 
 ### `auth.users` en su base de datos
 

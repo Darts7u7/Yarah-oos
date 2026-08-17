@@ -9,7 +9,7 @@ import {
   type DeleteDatabaseBackupResponse,
   type RestoreDatabaseBackupResponse,
   type UpdateDatabaseBackupResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { verifyAdmin, AuthRequest } from '@/api/middlewares/auth.js';
 import { AppError } from '@/utils/errors.js';
 import { DatabaseBackupService } from '@/services/database/database-backup.service.js';

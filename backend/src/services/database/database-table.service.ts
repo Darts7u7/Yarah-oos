@@ -13,7 +13,7 @@ import {
   UpdateTableSchemaResponse,
   DeleteTableResponse,
   ForeignKeySchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { validateIdentifier, validateSchemaName } from '@/utils/validations.js';
 import { convertSqlTypeToColumnType } from '@/utils/utils.js';
 import {

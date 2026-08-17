@@ -118,7 +118,7 @@ describe('verifyUser credential dispatch', () => {
     const legacyAnonJwt = jwt.sign(
       {
         sub: '12345678-1234-5678-90ab-cdef12345678',
-        email: 'anon@insforge.com',
+        email: 'anon@yarah.com',
         role: 'anon',
       },
       TEST_JWT_SECRET,

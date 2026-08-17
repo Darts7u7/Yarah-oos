@@ -89,7 +89,7 @@ describe('FunctionService Code Validation (Public API)', () => {
       const code = `
         // Standalone Deno apps often use Deno.serve(() => {}).
         export default async function(req: Request) {
-          const docs = "Deno.serve(() => {}) is not used by InsForge functions";
+          const docs = "Deno.serve(() => {}) is not used by Yarah functions";
           return new Response(docs);
         }
       `;

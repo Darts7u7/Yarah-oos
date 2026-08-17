@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import type { PaymentEnvironment } from '@insforge/shared-schemas';
+import type { PaymentEnvironment } from '@yarahdev/shared-schemas';
 import { createEmptyEnvironmentValues, hydrateEnvironmentValues } from '#features/payments/helpers';
 
 export interface EnvironmentValueInputs {

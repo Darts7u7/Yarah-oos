@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { useShareToken } from '#features/analytics/hooks/useAnalytics';
 
 interface Props {

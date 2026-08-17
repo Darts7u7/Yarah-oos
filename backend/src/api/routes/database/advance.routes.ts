@@ -11,7 +11,7 @@ import {
   exportRequestSchema,
   importRequestSchema,
   bulkUpsertRequestSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 import { successResponse } from '@/utils/response.js';
 import { analyzeQuery, type DatabaseResourceUpdate } from '@/utils/sql-parser.js';

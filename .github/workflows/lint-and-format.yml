@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check insforge-dev skill copies are in sync
+      - name: Check yarah-dev skill copies are in sync
         run: scripts/sync-skills.sh --check
 
       - name: Check deploy/setup.sh invariants

@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react';
 import { HardDrive, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { BucketMetadataSchema } from '@insforge/shared-schemas';
+import { BucketMetadataSchema } from '@yarahdev/shared-schemas';
 
 interface BucketNodeProps {
   data: {

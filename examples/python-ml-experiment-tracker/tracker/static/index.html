@@ -260,7 +260,7 @@
     if (runsResp.status === 502 || expsResp.status === 502) {
       loadingIndicator.hidden = true;
       const body = await runsResp.json().catch(() => ({}));
-      showError('connect', body.message || 'Cannot connect to InsForge. Is it running?');
+      showError('connect', body.message || 'Cannot connect to Yarah. Is it running?');
       return;
     }
     if (!runsResp.ok || !expsResp.ok) {

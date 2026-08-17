@@ -1,9 +1,13 @@
-interface PartnershipConfig {
-  partner_sites: string[];
-}
-
-const PARTNERSHIP_CONFIG_URL = 'https://config.insforge.dev/partnership.json';
-const FAILED_FETCH_RETRY_MS = 60_000;
+/**
+ * Partner origins for the cloud-hosting postMessage bridge.
+ *
+ * Yarah ships with no remote partner list: no network call is made and no
+ * third-party origins are trusted. To white-label the dashboard for partner
+ * sites in the future, populate PARTNER_ORIGINS with their origins (e.g.
+ * 'https://partner.example.com') or reintroduce a config fetch against
+ * infrastructure you control.
+ */
+const PARTNER_ORIGINS: string[] = [];
 
 function normalizeOrigin(value: string): string | null {
   try {
@@ -14,57 +18,19 @@ function normalizeOrigin(value: string): string | null {
 }
 
 export class PartnerService {
-  private partnerOriginsCache: Set<string> | null = null;
-  private fetchPromise: Promise<Set<string>> | null = null;
-  private lastFetchFailureAt: number | null = null;
+  private readonly partnerOrigins: Set<string>;
 
-  async fetchPartnerOrigins(): Promise<Set<string>> {
-    if (this.partnerOriginsCache) {
-      return this.partnerOriginsCache;
-    }
+  constructor() {
+    this.partnerOrigins = new Set(
+      PARTNER_ORIGINS.flatMap((site) => {
+        const normalized = normalizeOrigin(site);
+        return normalized ? [normalized] : [];
+      })
+    );
+  }
 
-    // Avoid retry storms when the partnership config is temporarily unavailable.
-    if (
-      this.lastFetchFailureAt !== null &&
-      Date.now() - this.lastFetchFailureAt < FAILED_FETCH_RETRY_MS
-    ) {
-      return new Set<string>();
-    }
-
-    if (this.fetchPromise) {
-      return this.fetchPromise;
-    }
-
-    this.fetchPromise = (async () => {
-      try {
-        const response = await fetch(PARTNERSHIP_CONFIG_URL);
-        if (!response.ok) {
-          console.warn('Failed to fetch partnership config:', response.status);
-          this.lastFetchFailureAt = Date.now();
-          return new Set<string>();
-        }
-
-        const data = (await response.json()) as PartnershipConfig;
-        const partnerOrigins = Array.isArray(data?.partner_sites)
-          ? data.partner_sites.flatMap((site) => {
-              const normalized = typeof site === 'string' ? normalizeOrigin(site) : null;
-              return normalized ? [normalized] : [];
-            })
-          : [];
-
-        this.lastFetchFailureAt = null;
-        this.partnerOriginsCache = new Set(partnerOrigins);
-        return this.partnerOriginsCache;
-      } catch (error) {
-        console.warn('Error fetching partnership config:', error);
-        this.lastFetchFailureAt = Date.now();
-        return new Set<string>();
-      } finally {
-        this.fetchPromise = null;
-      }
-    })();
-
-    return this.fetchPromise;
+  fetchPartnerOrigins(): Promise<Set<string>> {
+    return Promise.resolve(this.partnerOrigins);
   }
 }
 

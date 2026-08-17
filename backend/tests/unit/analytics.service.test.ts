@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi, afterAll } from 'vitest';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 const cloudConfig = vi.hoisted(() => ({ projectId: undefined as string | undefined }));
 vi.mock('../../src/infra/config/app.config.js', () => ({
   appConfig: {
     cloud: cloudConfig,
     app: { jwtSecret: 's'.repeat(32), logLevel: 'error' },
-    server: { logsDir: '/tmp/insforge-analytics-service-test-logs' },
+    server: { logsDir: '/tmp/yarah-analytics-service-test-logs' },
   },
   config: { cloud: cloudConfig },
 }));

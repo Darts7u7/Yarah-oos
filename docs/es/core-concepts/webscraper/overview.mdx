@@ -1,19 +1,19 @@
 ---
-title: "Web Scraper: integración de Apify para InsForge"
+title: "Web Scraper: integración de Apify para Yarah"
 sidebarTitle: "Overview"
-description: "Conecte Apify a InsForge para que su agente de codificación ejecute raspadores bajo demanda, gestione actors y ejecuciones, y guarde datasets en su app."
+description: "Conecte Apify a Yarah para que su agente de codificación ejecute raspadores bajo demanda, gestione actors y ejecuciones, y guarde datasets en su app."
 ---
 
-Use InsForge Web Scraper para dar a su agente de codificación acceso en vivo a datos externos: conecte su propia cuenta de Apify una sola vez, y su agente podrá ejecutar raspadores (Apify los llama actors) bajo demanda, mientras el panel muestra sus actors, el historial de ejecuciones y los conjuntos de datos raspados sin salir de InsForge.
+Use Yarah Web Scraper para dar a su agente de codificación acceso en vivo a datos externos: conecte su propia cuenta de Apify una sola vez, y su agente podrá ejecutar raspadores (Apify los llama actors) bajo demanda, mientras el panel muestra sus actors, el historial de ejecuciones y los conjuntos de datos raspados sin salir de Yarah.
 
-Conecte Apify una sola vez y luego pegue el prompt de raspado en su agente de codificación. El agente se autentica con su token de Apify gestionado por InsForge, elige el actor adecuado para la tarea y devuelve los resultados.
+Conecte Apify una sola vez y luego pegue el prompt de raspado en su agente de codificación. El agente se autentica con su token de Apify gestionado por Yarah, elige el actor adecuado para la tarea y devuelve los resultados.
 
 <Frame caption="Panel de Web Scraper: actors conectados con su última ejecución y el número total de ejecuciones.">
-  <img src="/images/dashboard-webscraper.png" alt="Panel de InsForge Web Scraper mostrando la pestaña Actors con los actors de Apify conectados, sus últimos horarios de ejecución y el número de ejecuciones" />
+  <img src="/images/dashboard-webscraper.png" alt="Panel de Yarah Web Scraper mostrando la pestaña Actors con los actors de Apify conectados, sus últimos horarios de ejecución y el número de ejecuciones" />
 </Frame>
 
 <Note>
-  Apify sigue siendo la fuente de verdad para los actors, las ejecuciones y los conjuntos de datos. InsForge muestra un subconjunto enfocado para las verificaciones diarias, y luego enlaza directamente a la consola de Apify para cualquier cosa que vaya más allá. La integración de Web Scraper funciona tanto en InsForge Cloud como en las implementaciones autoalojadas; lo único que cambia es la forma de conectar Apify.
+  Apify sigue siendo la fuente de verdad para los actors, las ejecuciones y los conjuntos de datos. Yarah muestra un subconjunto enfocado para las verificaciones diarias, y luego enlaza directamente a la consola de Apify para cualquier cosa que vaya más allá. La integración de Web Scraper funciona tanto en Yarah Cloud como en las implementaciones autoalojadas; lo único que cambia es la forma de conectar Apify.
 </Note>
 
 ```mermaid
@@ -47,11 +47,11 @@ flowchart TB
 
 ### Conexión a Apify
 
-Conecte Apify desde la página Web Scraper en el panel. Lo que ocurre a continuación depende de dónde se ejecute InsForge.
+Conecte Apify desde la página Web Scraper en el panel. Lo que ocurre a continuación depende de dónde se ejecute Yarah.
 
-En InsForge Cloud basta con un clic: InsForge lo guía a través del flujo de OAuth de Apify, almacena las credenciales en el servidor y mantiene el token de acceso actualizado por usted.
+En Yarah Cloud basta con un clic: Yarah lo guía a través del flujo de OAuth de Apify, almacena las credenciales en el servidor y mantiene el token de acceso actualizado por usted.
 
-Las implementaciones autoalojadas no tienen un intermediario de OAuth delante, así que aporta usted su propia credencial. Cree un token de API en la consola de Apify, en **Settings → Integrations**, péguelo en la página Web Scraper e InsForge lo guardará cifrado en el almacén de secretos de su propio backend. `insforge webscraper apify connect --token <token>` hace lo mismo desde el CLI.
+Las implementaciones autoalojadas no tienen un intermediario de OAuth delante, así que aporta usted su propia credencial. Cree un token de API en la consola de Apify, en **Settings → Integrations**, péguelo en la página Web Scraper e Yarah lo guardará cifrado en el almacén de secretos de su propio backend. `yarah webscraper apify connect --token <token>` hace lo mismo desde el CLI.
 
 En cualquiera de los dos casos, el token no llega a su repositorio ni al paquete de su aplicación; los agentes y las funciones obtienen un token en vivo desde el backend cuando lo necesitan.
 
@@ -61,7 +61,7 @@ En cualquiera de los dos casos, el token no llega a su repositorio ni al paquete
   token almacenado tal cual a quien llame como administrador, que es lo que
   permite al agente iniciar sesión en el CLI de Apify; por eso, lo que ese token
   pueda hacer en Apify es lo que puede hacer una clave de administrador de
-  InsForge.
+  Yarah.
 </Warning>
 
 ### Raspar mediante su agente de codificación
@@ -69,10 +69,10 @@ En cualquiera de los dos casos, el token no llega a su repositorio ni al paquete
 Después de conectar, el estado vacío ofrece un prompt de raspado que puede pegar en su agente de codificación:
 
 ```
-Use the insforge webscraper apify skill to scrape <what you want> and return the results.
+Use the yarah webscraper apify skill to scrape <what you want> and return the results.
 ```
 
-Detrás de este prompt, `npx @insforge/cli webscraper apify login` obtiene su token de Apify gestionado por InsForge, autentica el CLI local de Apify de forma silenciosa (sin OAuth por navegador) e instala las skills del agente de Apify. A partir de ahí, el agente elige un actor de la Apify Store, inicia ejecuciones y lee los resultados.
+Detrás de este prompt, `npx @yarah/cli webscraper apify login` obtiene su token de Apify gestionado por Yarah, autentica el CLI local de Apify de forma silenciosa (sin OAuth por navegador) e instala las skills del agente de Apify. A partir de ahí, el agente elige un actor de la Apify Store, inicia ejecuciones y lee los resultados.
 
 ### Actors
 
@@ -92,7 +92,7 @@ Los resultados raspados residen en los conjuntos de datos de Apify de forma pred
 
 ### Configuración y desconexión
 
-El cuadro de diálogo de configuración de Web Scraper (el icono de engranaje en la barra lateral) muestra la cuenta de Apify conectada, el plan y la retención de datos, enlaza a la consola de Apify y permite a los administradores desconectarse. Desconectar solo detiene el uso de sus credenciales de Apify por parte de InsForge; en una implementación autoalojada, elimina directamente el token de API guardado en su almacén de secretos. Su cuenta de Apify, sus actors y sus conjuntos de datos permanecen intactos, y puede volver a conectarse en cualquier momento.
+El cuadro de diálogo de configuración de Web Scraper (el icono de engranaje en la barra lateral) muestra la cuenta de Apify conectada, el plan y la retención de datos, enlaza a la consola de Apify y permite a los administradores desconectarse. Desconectar solo detiene el uso de sus credenciales de Apify por parte de Yarah; en una implementación autoalojada, elimina directamente el token de API guardado en su almacén de secretos. Su cuenta de Apify, sus actors y sus conjuntos de datos permanecen intactos, y puede volver a conectarse en cualquier momento.
 
 ## Conceptos
 
@@ -109,8 +109,8 @@ El cuadro de diálogo de configuración de Web Scraper (el icono de engranaje en
 ## Construya con esto
 
 <CardGroup cols={2}>
-  <Card title="InsForge CLI" icon="terminal" href="/quickstart">
-    `npx @insforge/cli webscraper apify connect` vincula su proyecto a Apify y luego inicia sesión en su agente local.
+  <Card title="Yarah CLI" icon="terminal" href="/quickstart">
+    `npx @yarah/cli webscraper apify connect` vincula su proyecto a Apify y luego inicia sesión en su agente local.
   </Card>
 
   <Card title="Apify Store" icon="store" href="https://apify.com/store">

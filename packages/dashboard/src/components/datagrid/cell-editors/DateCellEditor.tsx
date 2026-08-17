@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { format, isValid, parse } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import { Button, cn } from '@insforge/ui';
+import { Button, cn } from '@yarahdev/ui';
 import { Popover, PopoverContent, PopoverTrigger } from '#components';
 import type { DateCellEditorProps } from './types';
-import { ColumnType } from '@insforge/shared-schemas';
+import { ColumnType } from '@yarahdev/shared-schemas';
 
 type PickerMode = 'day' | 'month' | 'year';
 

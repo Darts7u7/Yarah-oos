@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { SmtpConfigSchema, UpsertSmtpConfigRequest } from '@insforge/shared-schemas';
+import { SmtpConfigSchema, UpsertSmtpConfigRequest } from '@yarahdev/shared-schemas';
 import { smtpConfigService } from '#features/auth/services/smtp-config.service';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 interface UseSmtpConfigOptions {
   enabled?: boolean;

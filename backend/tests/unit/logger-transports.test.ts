@@ -37,7 +37,7 @@ describe('logger transports', () => {
     }
   });
 
-  it('writes insforge.logs.jsonl when self-hosted', async () => {
+  it('writes yarah.logs.jsonl when self-hosted', async () => {
     const logger = await importLogger();
 
     const file = logger.transports.find(
@@ -72,7 +72,7 @@ describe('logger transports', () => {
     let plain: { eventMessage: string }[] = [];
     let errored: { eventMessage: string }[] = [];
     for (let i = 0; i < 20 && (plain.length === 0 || errored.length === 0); i++) {
-      const { logs } = await provider.getLogsBySource('insforge.logs');
+      const { logs } = await provider.getLogsBySource('yarah.logs');
       plain = logs.filter((l) => l.eventMessage === 'info - Round trip works');
       errored = logs.filter((l) => l.eventMessage.startsWith('error - Round trip failed'));
       if (plain.length === 0 || errored.length === 0) {
@@ -87,7 +87,7 @@ describe('logger transports', () => {
   });
 
   it('does not add a file transport in cloud environments', async () => {
-    process.env.AWS_INSTANCE_PROFILE_NAME = 'insforge-instance-profile';
+    process.env.AWS_INSTANCE_PROFILE_NAME = 'yarah-instance-profile';
 
     const logger = await importLogger();
 

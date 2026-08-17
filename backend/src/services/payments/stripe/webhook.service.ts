@@ -31,7 +31,7 @@ import {
   ERROR_CODES,
   type StripeWebhookEvent,
   type StripeWebhookResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class StripeWebhookService {
   private static instance: StripeWebhookService;

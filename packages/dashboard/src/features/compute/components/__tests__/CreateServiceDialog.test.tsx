@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ComputeCapabilitiesSchema } from '@insforge/shared-schemas';
+import type { ComputeCapabilitiesSchema } from '@yarahdev/shared-schemas';
 
 // The dialog reads capabilities through this hook; driving it directly keeps the
 // test about what the form offers rather than about react-query.

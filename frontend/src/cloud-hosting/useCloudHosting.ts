@@ -12,7 +12,7 @@ import type {
   DashboardMetricName,
   DashboardMetricsRange,
   DashboardMetricsResponse,
-} from '@insforge/dashboard';
+} from '@yarahdev/dashboard';
 import { partnerService } from './partner.service';
 
 const VALID_METRICS_RANGES: readonly DashboardMetricsRange[] = ['1h', '6h', '24h', '3d'] as const;
@@ -86,8 +86,8 @@ type PendingRequests = {
 
 const DEFAULT_TIMEOUT_MS = 15000;
 const INSTANCE_CHANGE_TIMEOUT_MS = 5 * 60 * 1000;
-const INSFORGE_ROOT_ORIGIN = 'https://insforge.dev';
-const INSFORGE_SUBDOMAIN_SUFFIX = '.insforge.dev';
+const YARAH_ROOT_ORIGIN = 'https://yarah.dev';
+const YARAH_SUBDOMAIN_SUFFIX = '.yarah.dev';
 
 function normalizeUrl(url: string) {
   return url.replace(/\/$/, '');
@@ -101,13 +101,13 @@ function normalizeOrigin(value: string): string | null {
   }
 }
 
-function isInsForgeOrigin(origin: string): boolean {
+function isYarahOrigin(origin: string): boolean {
   try {
     const url = new URL(origin);
     return (
       url.protocol === 'https:' &&
-      (url.origin === INSFORGE_ROOT_ORIGIN ||
-        (url.port === '' && url.hostname.endsWith(INSFORGE_SUBDOMAIN_SUFFIX)))
+      (url.origin === YARAH_ROOT_ORIGIN ||
+        (url.port === '' && url.hostname.endsWith(YARAH_SUBDOMAIN_SUFFIX)))
     );
   } catch {
     return false;
@@ -120,7 +120,7 @@ async function isTrustedCloudOrigin(origin: string): Promise<boolean> {
     return false;
   }
 
-  if (isInsForgeOrigin(normalizedOrigin)) {
+  if (isYarahOrigin(normalizedOrigin)) {
     return true;
   }
 

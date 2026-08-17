@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from 'express';
-import type { DashboardEvent } from '@insforge/shared-schemas';
+import type { DashboardEvent } from '@yarahdev/shared-schemas';
 import { verifyAdmin } from '@/api/middlewares/auth.js';
 import { dashboardEventService } from '@/services/dashboard/dashboard-event.service.js';
 

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { formatDistance } from 'date-fns';
-import type { PosthogRecordingItem } from '@insforge/shared-schemas';
+import type { PosthogRecordingItem } from '@yarahdev/shared-schemas';
 import { formatDuration, truncateId } from '#features/analytics/lib/format';
 
 interface SessionRowProps {

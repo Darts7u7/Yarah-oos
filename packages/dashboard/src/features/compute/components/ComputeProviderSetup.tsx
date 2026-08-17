@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from 'lucide-react';
-import { Button, CopyButton } from '@insforge/ui';
+import { Button, CopyButton } from '@yarahdev/ui';
 import { computeProviderLabel } from '#features/compute/constants';
 
 interface ComputeProviderSetupProps {
@@ -15,11 +15,11 @@ interface ComputeProviderSetupProps {
 }
 
 const COMPOSE_SNIPPET = `services:
-  insforge:
+  yarah:
     volumes:
       - \${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:\${DOCKER_SOCKET_PATH:-/var/run/docker.sock}`;
 
-const RESTART_COMMAND = 'docker compose up -d insforge';
+const RESTART_COMMAND = 'docker compose up -d yarah';
 
 /**
  * Setup flow for a provider that is not enabled yet, shown in the content pane
@@ -61,7 +61,7 @@ export function ComputeProviderSetup({
           <p className="text-sm text-muted-foreground">
             {provider === 'docker'
               ? t('compute.setupDockerSummary', {
-                  defaultValue: 'Run containers on the same Docker daemon that runs InsForge.',
+                  defaultValue: 'Run containers on the same Docker daemon that runs Yarah.',
                 })
               : t('compute.setupFlySummary', {
                   defaultValue:
@@ -78,7 +78,7 @@ export function ComputeProviderSetup({
                   title={t('compute.dockerStep1', { defaultValue: 'Mount the Docker socket' })}
                   body={t('compute.dockerStep1Body', {
                     defaultValue:
-                      'In docker-compose.yml, uncomment the volume on the insforge service:',
+                      'In docker-compose.yml, uncomment the volume on the yarah service:',
                   })}
                 />
                 <Snippet label="docker-compose.yml" code={COMPOSE_SNIPPET} />
@@ -86,7 +86,7 @@ export function ComputeProviderSetup({
 
               <StepItem number={2} last>
                 {/* No body: the command below is the whole step. */}
-                <StepText title={t('compute.dockerStep3', { defaultValue: 'Restart InsForge' })} />
+                <StepText title={t('compute.dockerStep3', { defaultValue: 'Restart Yarah' })} />
                 {/* The path is data, not prose: the single most useful diagnostic when
                     a mount is missing, so it reads as a value rather than a sentence. */}
                 {socketPath && (

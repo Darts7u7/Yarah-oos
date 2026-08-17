@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Plus, Play, Square, Trash2, AlertTriangle } from 'lucide-react';
-import { Button } from '@insforge/ui';
+import { Button } from '@yarahdev/ui';
 import { ErrorState, LoadingState } from '#components';
 import { useComputeServices } from '#features/compute/hooks/useComputeServices';
 import { Navigate, useOutletContext, useParams } from 'react-router-dom';
@@ -13,7 +13,7 @@ import { ServiceLogs } from '#features/compute/components/ServiceLogs';
 import { CreateServiceDialog } from '#features/compute/components/CreateServiceDialog';
 import { DeleteServiceDialog } from '#features/compute/components/DeleteServiceDialog';
 import { statusColors, getReachableUrl, isComputeProviderSlug } from '#features/compute/constants';
-import type { ServiceSchema } from '@insforge/shared-schemas';
+import type { ServiceSchema } from '@yarahdev/shared-schemas';
 
 export default function ComputeServicesPage() {
   const { t } = useTranslation('chrome');
@@ -378,7 +378,7 @@ export default function ComputeServicesPage() {
                       })}
                     </p>
                     <code className="block px-3 py-2 bg-muted text-foreground rounded text-xs font-mono break-all">
-                      npx @insforge/cli compute deploy --name my-api --image nginx:alpine --port 80
+                      npx @yarah/cli compute deploy --name my-api --image nginx:alpine --port 80
                     </code>
                   </div>
                   <div>

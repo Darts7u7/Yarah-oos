@@ -15,7 +15,7 @@ Run the Better Auth test:
 
 ### Prerequisites
 
-- Docker must be running with the InsForge backend on port 7130
+- Docker must be running with the Yarah backend on port 7130
 - Root admin credentials should be configured in environment variables:
   - `ROOT_ADMIN_USERNAME` (default: admin)
   - `ROOT_ADMIN_PASSWORD` (default: change-this-password)
@@ -60,7 +60,7 @@ This is a standalone, client-side HTML test helper utility to manually verify Go
 
 #### Prerequisites
 
-- Running local InsForge backend on `http://localhost:7130`.
+- Running local Yarah backend on `http://localhost:7130`.
 - A valid Google Client ID configured in your `.env` (or use the pre-configured default client ID inside the HTML file for testing).
 
 #### How to Use

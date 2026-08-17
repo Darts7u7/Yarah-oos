@@ -8,7 +8,7 @@ import {
   ProjectIdResponse,
   RotateAnonKeyResponse,
   RotateApiKeyResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class MetadataService {
   async fetchApiKey(signal?: AbortSignal): Promise<string> {

@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
   cn,
   useToast,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { useDeployments } from '#features/deployments/hooks/useDeployments';
 import { useDeploymentMetadata } from '#features/deployments/hooks/useDeploymentMetadata';
 import { useCopyToClipboard } from '#lib/hooks/useCopyToClipboard';
@@ -27,7 +27,7 @@ const statusColors: Record<string, string> = {
   CANCELED: 'bg-gray-500',
 };
 
-const DEPLOY_PROMPT = 'Deploy my app to InsForge';
+const DEPLOY_PROMPT = 'Deploy my app to Yarah';
 
 export default function DeploymentOverviewPage() {
   const { t } = useTranslation('chrome');

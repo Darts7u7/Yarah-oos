@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { auditService } from '#features/logs/services/audit.service';
-import { GetAuditLogsRequest } from '@insforge/shared-schemas';
-import { useToast } from '@insforge/ui';
+import { GetAuditLogsRequest } from '@yarahdev/shared-schemas';
+import { useToast } from '@yarahdev/ui';
 
 export const useAuditLogs = (filters?: Partial<GetAuditLogsRequest>) => {
   return useQuery({

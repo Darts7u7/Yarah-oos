@@ -3,7 +3,7 @@ import { DatabaseManager } from '@/infra/database/database.manager.js';
 import { SecretService } from '@/services/secrets/secret.service.js';
 import { AppError } from '@/utils/errors.js';
 import logger from '@/utils/logger.js';
-import { ERROR_CODES, OAuthConfigSchema, OAuthProvidersSchema } from '@insforge/shared-schemas';
+import { ERROR_CODES, OAuthConfigSchema, OAuthProvidersSchema } from '@yarahdev/shared-schemas';
 
 export interface CreateOAuthConfigInput {
   provider: OAuthProvidersSchema;

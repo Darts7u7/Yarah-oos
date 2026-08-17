@@ -1,13 +1,13 @@
 ---
 title: "Sites"
 sidebarTitle: "Overview"
-description: "Deploy the frontend of your InsForge project to Vercel from the CLI or dashboard, with tracked URLs, environment variables, domains, and deployment history."
+description: "Deploy the frontend of your Yarah project to Vercel from the CLI or dashboard, with tracked URLs, environment variables, domains, and deployment history."
 ---
 
-Use InsForge Sites to deploy, publish, ship, or go live with the browser-facing app you built on InsForge. If you are asking "can I deploy my app?" or "how do I take my app live?", Sites is the answer. The InsForge CLI uploads your frontend source through InsForge, which creates a Vercel production deployment. The dashboard tracks the URL, status, deployment history, environment variables, and domains.
+Use Yarah Sites to deploy, publish, ship, or go live with the browser-facing app you built on Yarah. If you are asking "can I deploy my app?" or "how do I take my app live?", Sites is the answer. The Yarah CLI uploads your frontend source through Yarah, which creates a Vercel production deployment. The dashboard tracks the URL, status, deployment history, environment variables, and domains.
 
 <Frame caption="Sites dashboard: status, domains, env vars, and deployment history.">
-  <img src="/images/dashboard-sites.png" alt="InsForge Sites dashboard" />
+  <img src="/images/dashboard-sites.png" alt="Yarah Sites dashboard" />
 </Frame>
 
 <Note>
@@ -15,12 +15,12 @@ Use InsForge Sites to deploy, publish, ship, or go live with the browser-facing 
 </Note>
 
 <Note>
-  **Trying to run InsForge itself on your own servers?** That is self-hosting the InsForge platform, not deploying your app. See the self-hosting guides for [AWS EC2](/deployment/deploy-to-aws-ec2), [GCP](/deployment/deploy-to-google-cloud-compute-engine), [Azure](/deployment/deploy-to-azure-virtual-machines), or any [Linux VPS](/deployment/deployment-security-guide). Sites deploys the app you built; self-hosting deploys the InsForge backend that your app runs on.
+  **Trying to run Yarah itself on your own servers?** That is self-hosting the Yarah platform, not deploying your app. See the self-hosting guides for [AWS EC2](/deployment/deploy-to-aws-ec2), [GCP](/deployment/deploy-to-google-cloud-compute-engine), [Azure](/deployment/deploy-to-azure-virtual-machines), or any [Linux VPS](/deployment/deployment-security-guide). Sites deploys the app you built; self-hosting deploys the Yarah backend that your app runs on.
 </Note>
 
 ```mermaid
 flowchart TB
-    CLI[InsForge CLI] --> API[InsForge deployment API]
+    CLI[Yarah CLI] --> API[Yarah deployment API]
     Dashboard[Dashboard] --> API
 
     API --> Source[Frontend source upload]
@@ -48,24 +48,24 @@ flowchart TB
 
 ### CLI deploys
 
-Deploy from your app's source directory. The CLI uploads the source tree, skips local-only files such as `node_modules`, `.git`, build output, and `.env` files, then starts the Vercel build through InsForge.
+Deploy from your app's source directory. The CLI uploads the source tree, skips local-only files such as `node_modules`, `.git`, build output, and `.env` files, then starts the Vercel build through Yarah.
 
 ```bash
-npx @insforge/cli deployments deploy ./frontend
+npx @yarah/cli deployments deploy ./frontend
 ```
 
 ### Framework builds
 
-Deploy React, Vue, Svelte, Next.js, static sites, and other frontend projects. InsForge sends the source files to Vercel, where framework detection and project files such as `package.json` and `vercel.json` decide how the app builds.
+Deploy React, Vue, Svelte, Next.js, static sites, and other frontend projects. Yarah sends the source files to Vercel, where framework detection and project files such as `package.json` and `vercel.json` decide how the app builds.
 
 ### Environment variables
 
 Manage provider environment variables from the dashboard. Use public prefixes such as `VITE_` or `NEXT_PUBLIC_` only for values that are safe to expose in browser code.
 
 ```bash
-npx @insforge/cli deployments env list
-npx @insforge/cli deployments env set VITE_INSFORGE_URL https://your-project.region.insforge.app
-npx @insforge/cli deployments env set VITE_INSFORGE_ANON_KEY ik_xxx
+npx @yarah/cli deployments env list
+npx @yarah/cli deployments env set VITE_YARAH_URL https://your-project.region.apps.yarah.dev
+npx @yarah/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
 ```
 
 ### Deployment history
@@ -73,25 +73,25 @@ npx @insforge/cli deployments env set VITE_INSFORGE_ANON_KEY ik_xxx
 Review previous runs, sync Vercel status, inspect metadata, and cancel in-progress deployments from the Deployment Logs page.
 
 ```bash
-npx @insforge/cli deployments list
-npx @insforge/cli deployments status deployment_123 --sync
-npx @insforge/cli deployments cancel deployment_123
+npx @yarah/cli deployments list
+npx @yarah/cli deployments status deployment_123 --sync
+npx @yarah/cli deployments cancel deployment_123
 ```
 
 ### Domains
 
-Every ready deployment gets a default URL at `https://<appkey>.insforge.site`. You can also set an InsForge-managed slug at `https://<slug>.insforge.site`. For a custom domain, add the domain in the dashboard and configure the DNS record it returns, usually a CNAME for subdomains.
+Every ready deployment gets a default URL at `https://<appkey>.yarah.site`. You can also set an Yarah-managed slug at `https://<slug>.yarah.site`. For a custom domain, add the domain in the dashboard and configure the DNS record it returns, usually a CNAME for subdomains.
 
 ## Deploy with it
 
 <CardGroup cols={2}>
   <Card title="CLI quickstart" icon="terminal" href="/quickstart">
-    Connect your project and run InsForge CLI commands from your app directory.
+    Connect your project and run Yarah CLI commands from your app directory.
   </Card>
 </CardGroup>
 
 ## Next steps
 
 - Set up the [CLI](/quickstart) and connect your project.
-- Add browser-safe environment variables from the dashboard or with `npx @insforge/cli deployments env set`.
-- Run `npx @insforge/cli deployments deploy ./frontend`.
+- Add browser-safe environment variables from the dashboard or with `npx @yarah/cli deployments env set`.
+- Run `npx @yarah/cli deployments deploy ./frontend`.

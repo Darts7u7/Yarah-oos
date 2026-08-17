@@ -1,4 +1,4 @@
-# InsForge Razorpay Payments - Agent Documentation
+# Yarah Razorpay Payments - Agent Documentation
 
 ## Use Razorpay For
 
@@ -30,7 +30,7 @@ GET /api/payments/razorpay/test/webhook
 POST /api/payments/razorpay/test/webhook/rotate-secret
 ```
 
-Recommended active events are the events InsForge handles:
+Recommended active events are the events Yarah handles:
 
 - `payment.authorized`
 - `payment.captured`
@@ -59,7 +59,7 @@ Razorpay can only deliver webhooks to a public HTTPS URL.
 Create an app-owned pending order first. Then create the Razorpay Order with the provider-scoped SDK:
 
 ```typescript
-const { data, error } = await insforge.payments.razorpay.createOrder('test', {
+const { data, error } = await yarah.payments.razorpay.createOrder('test', {
   amount: 50000,
   currency: 'INR',
   receipt: 'order_123',
@@ -76,7 +76,7 @@ If a fulfillment trigger reads `notes.order_id`, pass `notes: { order_id: ... }`
 Open Razorpay Checkout in the frontend with `data.checkoutOptions`. After Checkout returns `razorpay_order_id`, `razorpay_payment_id`, and `razorpay_signature`, verify through the SDK:
 
 ```typescript
-await insforge.payments.razorpay.verifyOrder('test', {
+await yarah.payments.razorpay.verifyOrder('test', {
   orderId: response.razorpay_order_id,
   paymentId: response.razorpay_payment_id,
   signature: response.razorpay_signature
@@ -92,7 +92,7 @@ Razorpay subscriptions use Plans, not Stripe Prices. A Plan is a recurring defin
 Create or sync the plan first, then create the subscription through the provider-scoped SDK:
 
 ```typescript
-const { data, error } = await insforge.payments.razorpay.createSubscription('test', {
+const { data, error } = await yarah.payments.razorpay.createSubscription('test', {
   planId: 'plan_123',
   totalCount: 12,
   subject: { type: 'team', id: 'team_123' },
@@ -105,7 +105,7 @@ if (error) throw error;
 Open Razorpay Checkout with `data.checkoutOptions.subscription_id`. After Checkout returns the subscription payment signature values, verify through the SDK:
 
 ```typescript
-await insforge.payments.razorpay.verifySubscription('test', {
+await yarah.payments.razorpay.verifySubscription('test', {
   subscriptionId: response.razorpay_subscription_id,
   paymentId: response.razorpay_payment_id,
   signature: response.razorpay_signature
@@ -115,12 +115,12 @@ await insforge.payments.razorpay.verifySubscription('test', {
 Manage the subscription through provider-scoped SDK helpers:
 
 ```typescript
-await insforge.payments.razorpay.cancelSubscription('test', 'sub_123', {
+await yarah.payments.razorpay.cancelSubscription('test', 'sub_123', {
   cancelAtCycleEnd: false
 });
 
-await insforge.payments.razorpay.pauseSubscription('test', 'sub_123');
-await insforge.payments.razorpay.resumeSubscription('test', 'sub_123');
+await yarah.payments.razorpay.pauseSubscription('test', 'sub_123');
+await yarah.payments.razorpay.resumeSubscription('test', 'sub_123');
 ```
 
 Razorpay subscription creation evaluates the caller's `INSERT` policy on `payments.razorpay_subscriptions`. Cancel, pause, and resume evaluate `UPDATE` policies. PostgreSQL also applies `SELECT` policies to rows returned by `INSERT/UPDATE ... RETURNING`, so add matching `SELECT` visibility for the same billing subject when a policy probe needs to return the row. Do not let users submit arbitrary subjects unless the app checks that they can manage that billing subject.
@@ -160,7 +160,7 @@ CREATE TRIGGER fulfill_razorpay_order_from_webhook
   EXECUTE FUNCTION public.fulfill_razorpay_order();
 ```
 
-For subscriptions, resolve the billing subject from the subscription entity's `notes` in the event payload — InsForge stamps `insforge_subject_type` and `insforge_subject_id` into notes at subscription creation (and creates the `payments.customer_mappings` row at the same time, so the mapping is also a safe fallback):
+For subscriptions, resolve the billing subject from the subscription entity's `notes` in the event payload — Yarah stamps `yarah_subject_type` and `yarah_subject_id` into notes at subscription creation (and creates the `payments.customer_mappings` row at the same time, so the mapping is also a safe fallback):
 
 ```sql
 CREATE OR REPLACE FUNCTION public.grant_razorpay_subscription_access()
@@ -173,9 +173,9 @@ BEGIN
      AND NEW.event_type = 'subscription.charged'
      AND NEW.processing_status = 'processed' THEN
     v_subject_type := NEW.payload -> 'payload' -> 'subscription' -> 'entity'
-                      -> 'notes' ->> 'insforge_subject_type';
+                      -> 'notes' ->> 'yarah_subject_type';
     v_subject_id := NEW.payload -> 'payload' -> 'subscription' -> 'entity'
-                    -> 'notes' ->> 'insforge_subject_id';
+                    -> 'notes' ->> 'yarah_subject_id';
 
     IF v_subject_id IS NULL THEN
       SELECT m.subject_type, m.subject_id
@@ -224,7 +224,7 @@ Adapt the payload lookup to the app schema and event shape. Protect app-owned bi
 - Consider RLS on `payments.razorpay_orders` and `payments.razorpay_subscriptions`.
 - Do not expose `payments.customers`, `payments.transactions`, or `payments.razorpay_subscriptions` directly to end users.
 - Do not write provider-managed payments tables directly. Use the Payments API, Razorpay webhooks, or app-owned trigger targets.
-- Notes keys starting with `insforge_` are reserved.
+- Notes keys starting with `yarah_` are reserved.
 
 ## Debugging
 
@@ -293,5 +293,5 @@ LIMIT 20;
 | Signature verification fails | Pass the exact order or subscription ID, payment ID, and signature returned by Razorpay Checkout. |
 | Webhook signature is invalid | Confirm the Razorpay Dashboard webhook secret matches Dashboard -> Payments -> Settings -> Webhooks for the same `test` or `live` environment, and that the URL ends with `/api/webhooks/razorpay/{environment}`. |
 | Subscription creation fails | Verify the Plan exists in the same Razorpay environment and has a valid Item. |
-| Payment shows in Razorpay but not InsForge | Check manual webhook setup and `payments.webhook_events`. |
+| Payment shows in Razorpay but not Yarah | Check manual webhook setup and `payments.webhook_events`. |
 | User can start a subscription for another team | Add RLS or server-side membership checks for the billing subject. |

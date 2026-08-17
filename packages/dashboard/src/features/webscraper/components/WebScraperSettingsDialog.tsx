@@ -18,7 +18,7 @@ import {
   MenuDialogSideNavHeader,
   MenuDialogSideNavTitle,
   MenuDialogTitle,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import type { ApifyConnection } from '#features/webscraper/services/webscraper.service';
 import { useDashboardHost, useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
 import { ApifyTokenForm } from './ApifyTokenForm';

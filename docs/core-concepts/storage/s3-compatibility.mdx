@@ -1,9 +1,9 @@
 ---
 title: S3-compatible gateway
-description: Use any AWS SigV4 client — aws CLI, rclone, boto3, Terraform — against InsForge Storage through the S3-compatible gateway at /storage/v1/s3.
+description: Use any AWS SigV4 client — aws CLI, rclone, boto3, Terraform — against Yarah Storage through the S3-compatible gateway at /storage/v1/s3.
 ---
 
-InsForge Storage speaks the [AWS S3 protocol](https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html) at `/storage/v1/s3`. Available on cloud projects and on self-hosted deployments with an S3-backed storage provider — see [Self-hosted storage](/deployment/self-host-storage).
+Yarah Storage speaks the [AWS S3 protocol](https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html) at `/storage/v1/s3`. Available on cloud projects and on self-hosted deployments with an S3-backed storage provider — see [Self-hosted storage](/deployment/self-host-storage).
 
 ## Concepts
 
@@ -15,21 +15,21 @@ Fetch endpoint and region from the Dashboard or `GET /api/storage/s3/config`.
 
 ```ini
 # ~/.aws/credentials
-[insforge]
+[yarah]
 aws_access_key_id = your_access_key_id
 aws_secret_access_key = your_secret_access_key
 
 # ~/.aws/config
-[profile insforge]
+[profile yarah]
 region = us-east-2
-endpoint_url = https://project_ref.region.insforge.app/storage/v1/s3
+endpoint_url = https://project_ref.region.apps.yarah.dev/storage/v1/s3
 s3 =
   addressing_style = path
 ```
 
 ```bash
-aws --profile insforge s3 cp ./photo.jpg s3://my-bucket/photo.jpg
-aws --profile insforge s3 sync ./dist s3://my-bucket/dist
+aws --profile yarah s3 cp ./photo.jpg s3://my-bucket/photo.jpg
+aws --profile yarah s3 sync ./dist s3://my-bucket/dist
 ```
 
 In code, set `forcePathStyle: true` and point `endpoint` at `/storage/v1/s3`.
@@ -40,7 +40,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 const client = new S3Client({
   forcePathStyle: true,
   region: 'us-east-2',
-  endpoint: 'https://project_ref.region.insforge.app/storage/v1/s3',
+  endpoint: 'https://project_ref.region.apps.yarah.dev/storage/v1/s3',
   credentials: { accessKeyId: '...', secretAccessKey: '...' },
 });
 

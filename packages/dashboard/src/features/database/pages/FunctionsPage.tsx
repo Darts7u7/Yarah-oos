@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RefreshIcon from '#assets/icons/refresh.svg?react';
-import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@insforge/ui';
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@yarahdev/ui';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   DataGridEmptyState,
@@ -17,7 +17,7 @@ import { useDatabaseSchemaSelection } from '#features/database/hooks/useDatabase
 import { usePageSize } from '#lib/hooks/usePageSize';
 import { SQLModal, SQLCellButton } from '#features/database/components/SQLModal';
 import { DatabaseStudioSidebarPanel } from '#features/database/components/DatabaseSidebar';
-import { type DatabaseFunctionsResponse } from '@insforge/shared-schemas';
+import { type DatabaseFunctionsResponse } from '@yarahdev/shared-schemas';
 import { DatabaseSchemaSelect } from '#features/database/components/DatabaseSchemaSelect';
 import { DEFAULT_DATABASE_SCHEMA, getDatabaseSchemaInfo } from '#features/database/helpers';
 

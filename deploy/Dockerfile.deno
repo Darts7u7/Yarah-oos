@@ -1,5 +1,5 @@
 # The Deno function host, from this repository rather than a published image.
-# ghcr.io/insforge/deno-runtime is built in another repo and its copy of
+# ghcr.io/yarah/deno-runtime is built in another repo and its copy of
 # functions/ matches no commit here, so fixes made here never reach it.
 FROM denoland/deno:alpine-2.0.6
 

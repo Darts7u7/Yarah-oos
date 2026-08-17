@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { Skeleton } from '@insforge/ui';
+import { Skeleton } from '@yarahdev/ui';
 
 describe('Skeleton', () => {
   it('renders a pulsing placeholder with forwarded native attributes', () => {

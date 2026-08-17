@@ -84,7 +84,7 @@ export const createSessionRequestSchema = z.preprocess(
 );
 
 /**
- * POST /api/auth/id-token - Exchange a provider ID token for an InsForge session.
+ * POST /api/auth/id-token - Exchange a provider ID token for an Yarah session.
  * Apple requires the nonce that the client attached to its native authorization request.
  */
 const googleIdTokenSignInRequestSchema = z.object({
@@ -173,7 +173,7 @@ export const sendVerificationEmailRequestSchema = z.object({
 /**
  * POST /api/auth/email/verify - Verify email with a 6-digit code
  * Link verification uses GET /api/auth/email/verify-link instead.
- * The link flow redirects with insforge_status / insforge_type query params and does not create a frontend session.
+ * The link flow redirects with yarah_status / yarah_type query params and does not create a frontend session.
  */
 export const verifyEmailRequestSchema = z.object({
   email: emailSchema,
@@ -204,7 +204,7 @@ export const exchangeResetPasswordTokenRequestSchema = z.object({
  * - Magic link token (from send-reset-password endpoint when method is 'link')
  * - Reset token (from exchange-reset-password-token endpoint after code verification)
  * Both use RESET_PASSWORD purpose and are verified the same way
- * The link flow redirects with token / insforge_status / insforge_type query params.
+ * The link flow redirects with token / yarah_status / yarah_type query params.
  */
 export const resetPasswordRequestSchema = z.object({
   newPassword: passwordSchema,

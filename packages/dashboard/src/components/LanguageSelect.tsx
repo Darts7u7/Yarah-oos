@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
   useToast,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 
 // Endonyms on purpose — each language is shown in itself.
 const LOCALE_LABELS: Record<Locale, string> = {

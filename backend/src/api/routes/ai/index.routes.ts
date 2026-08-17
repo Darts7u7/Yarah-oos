@@ -20,7 +20,7 @@ import {
   embeddingsRequestSchema,
   imageGenerationRequestSchema,
   updateModelGatewayConfigSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const router = Router();
 const chatService = ChatCompletionService.getInstance();
@@ -204,7 +204,7 @@ function parseAIProvider(value: string | undefined): AIProvider {
 function assertSelfHostedModelGatewayConfig(): void {
   if (isCloudEnvironment()) {
     throw new AppError(
-      'Model Gateway credentials are managed by InsForge Cloud.',
+      'Model Gateway credentials are managed by Yarah Cloud.',
       400,
       ERROR_CODES.INVALID_INPUT
     );

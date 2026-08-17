@@ -2,7 +2,7 @@ import type { MouseEvent, ReactNode } from 'react';
 import { LockKeyhole, Mail, Users, Circle, ExternalLink, KeyRound } from 'lucide-react';
 import { Handle, Position } from '@xyflow/react';
 import { useNavigate } from 'react-router-dom';
-import { OAuthProvidersSchema } from '@insforge/shared-schemas';
+import { OAuthProvidersSchema } from '@yarahdev/shared-schemas';
 import { oauthProviders } from '#features/auth/helpers';
 
 interface AuthNodeProps {

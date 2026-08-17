@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import type { GetStripeStatusResponse, StripeEnvironment } from '@insforge/shared-schemas';
+import type { GetStripeStatusResponse, StripeEnvironment } from '@yarahdev/shared-schemas';
 import { stripeService } from '#features/payments/services/stripe.service';
 import { stripeQueryKeys } from '#features/payments/queryKeys';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 export function useStripeWebhook() {
   const { t } = useTranslation('chrome');

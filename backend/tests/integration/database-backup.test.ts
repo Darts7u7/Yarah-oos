@@ -62,7 +62,7 @@ beforeAll(async () => {
   teardown = conn.teardown;
   const cfg = conn.pg.config;
 
-  storageDir = await fs.mkdtemp(path.join(os.tmpdir(), 'insforge-backup-int-'));
+  storageDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yarah-backup-int-'));
   process.env.STORAGE_DIR = storageDir;
   process.env.POSTGRES_HOST = String(cfg.host ?? 'localhost');
   process.env.POSTGRES_PORT = String(cfg.port ?? 5432);

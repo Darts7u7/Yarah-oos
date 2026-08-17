@@ -4,7 +4,7 @@ import {
   RESERVED_FUNCTION_SLUGS,
   isReservedFunctionSlug,
   uploadFunctionRequestSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { FunctionService } from '../../src/services/functions/function.service.js';
 
 const clientQueryMock = vi.fn();

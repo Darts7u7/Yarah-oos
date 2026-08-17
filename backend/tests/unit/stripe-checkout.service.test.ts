@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 const { mockClient, mockPool } = vi.hoisted(() => ({
   mockClient: {
@@ -96,7 +96,7 @@ describe('StripeCheckoutService', () => {
     expect(insertCall?.[1]?.[10]).toEqual(expect.stringMatching(/^[a-f0-9]{64}$/));
     expect(insertCall?.[1]?.[11]).toBe(JSON.stringify({ plan: 'pro', source: 'agent' }));
     expect(lookupCall?.[1]?.[2]).toBe(insertCall?.[1]?.[10]);
-    expect(lookupCall?.[1]?.[10]).toBe('insforge_checkout_session_id');
+    expect(lookupCall?.[1]?.[10]).toBe('yarah_checkout_session_id');
     expect(lookupCall?.[1]?.[11]).toBe(JSON.stringify({ plan: 'pro', source: 'agent' }));
     expect(mockClient.release).toHaveBeenCalled();
   });

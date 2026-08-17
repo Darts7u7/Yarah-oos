@@ -5,7 +5,7 @@ import {
   ModelGatewayConfig,
   OpenRouterKey,
   UpdateModelGatewayConfig,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export type AIProvider = 'openrouter';
 

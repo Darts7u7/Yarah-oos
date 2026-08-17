@@ -16,7 +16,7 @@ import {
   Input,
   Skeleton,
   cn,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { PaginationControls } from '#components';
 import { useDeployments } from '#features/deployments/hooks/useDeployments';
 import type { DeploymentSchema } from '#features/deployments/services/deployments.service';

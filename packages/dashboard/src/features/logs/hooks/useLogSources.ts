@@ -9,7 +9,7 @@ import {
   setLocalStorageItem,
 } from '#lib/utils/local-storage';
 import { logService } from '#features/logs/services/log.service';
-import type { LogSourceSchema } from '@insforge/shared-schemas';
+import type { LogSourceSchema } from '@yarahdev/shared-schemas';
 
 export function useLogSources() {
   const { t } = useTranslation('chrome');

@@ -1,14 +1,14 @@
 ---
-title: "將 InsForge 自架於 Dokploy"
-description: "在 Dokploy 上以 Compose 應用部署 InsForge 後端，Postgres 映像從儲存庫建置，設定始終與所部署的版本一致。"
+title: "將 Yarah 自架於 Dokploy"
+description: "在 Dokploy 上以 Compose 應用部署 Yarah 後端，Postgres 映像從儲存庫建置，設定始終與所部署的版本一致。"
 ---
 
-# 將 InsForge 自架於 Dokploy
+# 將 Yarah 自架於 Dokploy
 
-本指南介紹如何在 [Dokploy](https://dokploy.com) 上自架 InsForge 平台。Dokploy 是執行於你自己伺服器上的開源 PaaS。
+本指南介紹如何在 [Dokploy](https://dokploy.com) 上自架 Yarah 平台。Dokploy 是執行於你自己伺服器上的開源 PaaS。
 
 <Note>
-  **這裡部署的是 InsForge 本身，而不是你用它建置的應用。** 若你只想讓自己的應用上線，請使用 [Sites](/core-concepts/sites/overview)。
+  **這裡部署的是 Yarah 本身，而不是你用它建置的應用。** 若你只想讓自己的應用上線，請使用 [Sites](/core-concepts/sites/overview)。
 </Note>
 
 ## 前置條件
@@ -41,7 +41,7 @@ ROOT_ADMIN_PASSWORD=<strong password>
 
 Postgres 僅在初始化資料叢集時讀取 `POSTGRES_PASSWORD`。之後再改不會變更資料庫密碼。
 
-其餘皆為選用；[`.env.example`](https://github.com/insforge/insforge/blob/main/.env.example) 列出所有支援的變數及其預設值。
+其餘皆為選用；[`.env.example`](https://github.com/yarah/yarah/blob/main/.env.example) 列出所有支援的變數及其預設值。
 
 ## 3. 新增網域
 
@@ -49,19 +49,19 @@ Postgres 僅在初始化資料叢集時讀取 `POSTGRES_PASSWORD`。之後再改
 
 | 欄位 | 值 |
 | --- | --- |
-| Service Name | `insforge` |
+| Service Name | `yarah` |
 | Container Port | `7130` |
 
 然後把對應網址加入環境變數：
 
 ```env
-API_BASE_URL=https://insforge.example.com
-VITE_API_BASE_URL=https://insforge.example.com
+API_BASE_URL=https://yarah.example.com
+VITE_API_BASE_URL=https://yarah.example.com
 ```
 
 這兩個必須與瀏覽器實際存取的網址一致，否則控制台會請求錯誤的來源。
 
-只有 `insforge` 需要網域。Postgres、PostgREST 與 Deno 執行環境都留在 Dokploy 的內部網路中。
+只有 `yarah` 需要網域。Postgres、PostgREST 與 Deno 執行環境都留在 Dokploy 的內部網路中。
 
 ## 4. 部署
 
@@ -81,6 +81,6 @@ VITE_API_BASE_URL=https://insforge.example.com
 
 ## 為什麼 Postgres 是建置而非拉取
 
-InsForge 的 Postgres 需要儲存庫中的三個檔案：`postgresql.conf`（它預先載入 `insforge_pg_utils` 擴充，受管表上的列級安全依賴此擴充）以及兩個 init 腳本。
+Yarah 的 Postgres 需要儲存庫中的三個檔案：`postgresql.conf`（它預先載入 `yarah_pg_utils` 擴充，受管表上的列級安全依賴此擴充）以及兩個 init 腳本。
 
 Dokploy 每次部署都會重新 clone `code/`，因此指向儲存庫的 bind mount 會失效——[其文件](https://docs.dokploy.com/docs/core/troubleshooting/volumes-mounts)要求在 UI 中建立 File Mounts 並以 `../files/` 引用，這對每個安裝都是一次手動設定。改為在部署時建置映像、放入當前檔案，無需任何設定，且設定不會像預先建置的映像那樣落後於程式碼。

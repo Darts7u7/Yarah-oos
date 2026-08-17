@@ -15,10 +15,10 @@ pnpm add @insforge/sdk@latest
 ```javascript
 import { createClient } from '@insforge/sdk';
 
-const insforge = createClient({
-  baseUrl: 'https://your-app.insforge.app',
+const yarah = createClient({
+  baseUrl: 'https://your-app.apps.yarah.dev',
   anonKey: 'your-anon-key'  // Optional: for public/unauthenticated requests
 });
 ```
 
-Find the anon key with `npx @insforge/cli secrets get ANON_KEY`, or in the dashboard: click **Install** and open **API Keys**.
+Find the anon key with `npx @yarah/cli secrets get ANON_KEY`, or in the dashboard: click **Install** and open **API Keys**.

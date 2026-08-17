@@ -2,7 +2,7 @@ import { Pool, Client } from 'pg';
 import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
-import { DatabaseMetadataSchema } from '@insforge/shared-schemas';
+import { DatabaseMetadataSchema } from '@yarahdev/shared-schemas';
 import pgFormat from 'pg-format';
 import { buildQualifiedTableKey, DEFAULT_DATABASE_SCHEMA } from '@/services/database/helpers.js';
 import { appConfig } from '@/infra/config/app.config.js';

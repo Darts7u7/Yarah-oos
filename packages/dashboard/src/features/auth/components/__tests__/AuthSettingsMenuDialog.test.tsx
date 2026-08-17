@@ -55,11 +55,11 @@ vi.mock('#features/auth/hooks/useSmtpConfig', () => ({
 }));
 
 vi.mock('#lib/utils/utils', () => ({
-  isInsForgeCloudProject: () => authSettingsMocks.isCloudProject,
+  isYarahCloudProject: () => authSettingsMocks.isCloudProject,
 }));
 
-vi.mock('@insforge/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@insforge/ui')>();
+vi.mock('@yarahdev/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@yarahdev/ui')>();
 
   return {
     ...actual,

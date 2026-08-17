@@ -16,7 +16,7 @@ import {
   type CreateCustomerPortalSessionResponse,
   type CustomerPortalSession,
   type RoleSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const CUSTOMER_PORTAL_SESSION_COLUMNS = `
   id,

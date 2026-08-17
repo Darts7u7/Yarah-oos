@@ -9,7 +9,7 @@ import type {
   UpdateScheduleRequest,
   UpdateScheduleResponse,
   DeleteScheduleResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class ScheduleService {
   async listSchedules(): Promise<ScheduleSchema[]> {

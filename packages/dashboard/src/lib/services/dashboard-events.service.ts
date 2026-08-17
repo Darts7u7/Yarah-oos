@@ -1,4 +1,4 @@
-import { dashboardEventSchema, type DashboardEvent } from '@insforge/shared-schemas';
+import { dashboardEventSchema, type DashboardEvent } from '@yarahdev/shared-schemas';
 import { apiClient } from '#lib/api/client';
 
 function parseEventBlock(block: string): DashboardEvent | null {

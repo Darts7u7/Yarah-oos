@@ -1,14 +1,14 @@
 ---
-title: "Implementar InsForge en Google Cloud Compute Engine"
-description: "Despliega InsForge en una VM de Google Cloud Compute Engine con Docker Compose, cubriendo reglas de firewall, acceso SSH, dominios personalizados y HTTPS."
+title: "Implementar Yarah en Google Cloud Compute Engine"
+description: "Despliega Yarah en una VM de Google Cloud Compute Engine con Docker Compose, cubriendo reglas de firewall, acceso SSH, dominios personalizados y HTTPS."
 ---
 
-# Implementar InsForge en Google Cloud Compute Engine
+# Implementar Yarah en Google Cloud Compute Engine
 
-Esta guía te llevará paso a paso por la implementación de InsForge en Google Cloud Compute Engine usando Docker Compose.
+Esta guía te llevará paso a paso por la implementación de Yarah en Google Cloud Compute Engine usando Docker Compose.
 
 <Note>
-  Esta guía de nube la mantiene la comunidad y puede quedar por detrás de la última versión de InsForge. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de InsForge](https://github.com/InsForge/InsForge).
+  Esta guía de nube la mantiene la comunidad y puede quedar por detrás de la última versión de Yarah. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de Yarah](https://github.com/Yarah/Yarah).
 </Note>
 
 ## 📋 Requisitos previos
@@ -26,7 +26,7 @@ Esta guía te llevará paso a paso por la implementación de InsForge en Google 
 1. **Inicia sesión en Google Cloud Console** en [console.cloud.google.com](https://console.cloud.google.com)
 2. **Haz clic en "Select a project"** en la barra de navegación superior
 3. **Haz clic en "New Project"**
-4. **Ingresa el nombre del proyecto** (p. ej., `insforge-deployment`)
+4. **Ingresa el nombre del proyecto** (p. ej., `yarah-deployment`)
 5. **Haz clic en "Create"**
 6. **Espera a que se complete la creación del proyecto**
 
@@ -43,7 +43,7 @@ Esta guía te llevará paso a paso por la implementación de InsForge en Google 
 1. Navega a **Compute Engine** → **VM instances**
 2. Haz clic en **"Create Instance"**
 3. Configura tu instancia:
-   - **Name**: `insforge-server` (o el nombre que prefieras)
+   - **Name**: `yarah-server` (o el nombre que prefieras)
    - **Region**: Elige una región cercana a tus usuarios
    - **Zone**: Selecciona una zona de disponibilidad (p. ej., us-central1-a)
    - **Machine configuration**:
@@ -66,13 +66,13 @@ Esta guía te llevará paso a paso por la implementación de InsForge en Google 
 
 | Name | Direction | Targets | Protocols/ports | Source filters |
 |------|-----------|---------|-----------------|----------------|
-| insforge-ssh | Ingress | insforge-server | tcp:22 | Tu dirección IP |
-| insforge-http | Ingress | insforge-server | tcp:80 | 0.0.0.0/0 |
-| insforge-https | Ingress | insforge-server | tcp:443 | 0.0.0.0/0 |
-| insforge-app | Ingress | insforge-server | tcp:7130 | 0.0.0.0/0 |
-| insforge-deno | Ingress | insforge-server | tcp:7133 | 0.0.0.0/0 |
-| insforge-postgrest | Ingress | insforge-server | tcp:5430 | 0.0.0.0/0 |
-| insforge-postgres | Ingress | insforge-server | tcp:5432 | 0.0.0.0/0 (solo si se necesita acceso externo) |
+| yarah-ssh | Ingress | yarah-server | tcp:22 | Tu dirección IP |
+| yarah-http | Ingress | yarah-server | tcp:80 | 0.0.0.0/0 |
+| yarah-https | Ingress | yarah-server | tcp:443 | 0.0.0.0/0 |
+| yarah-app | Ingress | yarah-server | tcp:7130 | 0.0.0.0/0 |
+| yarah-deno | Ingress | yarah-server | tcp:7133 | 0.0.0.0/0 |
+| yarah-postgrest | Ingress | yarah-server | tcp:5430 | 0.0.0.0/0 |
+| yarah-postgres | Ingress | yarah-server | tcp:5432 | 0.0.0.0/0 (solo si se necesita acceso externo) |
 
 > ⚠️ **Nota de seguridad**: Para producción, restringe PostgreSQL (5432) a direcciones IP específicas o elimina por completo el acceso externo. Considera usar un proxy inverso (nginx) y exponer solo los puertos 80/443.
 
@@ -83,7 +83,7 @@ Esta guía te llevará paso a paso por la implementación de InsForge en Google 
 
 ```bash
 # Usa la CLI de gcloud para conectarte por SSH (si tienes el SDK de gcloud instalado localmente)
-gcloud compute ssh insforge-server --zone=your-zone
+gcloud compute ssh yarah-server --zone=your-zone
 ```
 
 ### 3. Instalar dependencias
@@ -144,12 +144,12 @@ docker ps
 sudo apt install git -y
 ```
 
-### 4. Implementar InsForge
+### 4. Implementar Yarah
 
 #### 4.1 Obtener el repositorio
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh | sh -s ~/insforge
+curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 Descarga los archivos que el stack lee y genera `JWT_SECRET`, `ENCRYPTION_KEY`, `ROOT_ADMIN_PASSWORD` y `POSTGRES_PASSWORD` en `.env`. No arranca nada.
@@ -157,7 +157,7 @@ Descarga los archivos que el stack lee y genera `JWT_SECRET`, `ENCRYPTION_KEY`, 
 #### 4.2 Crear la configuración del entorno
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 nano .env
 ```
 
@@ -181,7 +181,7 @@ GOOGLE_CLIENT_SECRET=
 
 > 💡 Guarda una copia de `.env` en un lugar seguro. Sus secretos son lo que te permite migrar o restaurar esta instancia.
 
-#### 4.3 Iniciar los servicios de InsForge
+#### 4.3 Iniciar los servicios de Yarah
 
 ```bash
 # Descarga las imágenes de Docker e inicia los servicios
@@ -202,11 +202,11 @@ docker compose ps
 # Deberías ver 4 servicios en ejecución:
 # - postgres
 # - postgrest
-# - insforge
+# - yarah
 # - deno
 ```
 
-### 5. Acceder a tu instancia de InsForge
+### 5. Acceder a tu instancia de Yarah
 
 #### 5.1 Probar la API del backend
 
@@ -219,7 +219,7 @@ Respuesta esperada:
 {
   "status": "ok",
   "version": "2.1.7",
-  "service": "Insforge OSS Backend",
+  "service": "Yarah OSS Backend",
   "timestamp": "2025-10-17T..."
 }
 ```
@@ -237,7 +237,7 @@ http://your-external-ip:7130
 
 1. En Google Cloud Console, ve a **VPC network** → **External IP addresses**
 2. Haz clic en **Reserve Static Address**
-3. **Name**: `insforge-ip`
+3. **Name**: `yarah-ip`
 4. **Type**: Regional o Global (Regional para instancias de VM)
 5. **Region**: La misma que tu instancia de VM
 6. **Haz clic en Reserve**
@@ -259,7 +259,7 @@ sudo apt install nginx -y
 Crea la configuración de Nginx:
 
 ```bash
-sudo nano /etc/nginx/sites-available/insforge
+sudo nano /etc/nginx/sites-available/yarah
 ```
 
 Agrega la siguiente configuración:
@@ -305,7 +305,7 @@ server {
 Habilita la configuración:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/insforge /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/yarah /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -325,7 +325,7 @@ sudo certbot --nginx -d api.yourdomain.com -d app.yourdomain.com
 Actualiza tu archivo `.env` con las URLs de HTTPS:
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 nano .env
 ```
 
@@ -351,7 +351,7 @@ docker compose up -d
 docker compose logs -f
 
 # Servicio específico
-docker compose logs -f insforge
+docker compose logs -f yarah
 docker compose logs -f postgres
 docker compose logs -f deno
 ```
@@ -368,10 +368,10 @@ docker compose down
 docker compose restart
 ```
 
-### Actualizar InsForge
+### Actualizar Yarah
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 git pull origin main
 
 # Pick up any files this release added to the sparse checkout
@@ -384,7 +384,7 @@ docker compose pull && docker compose up -d
 
 ```bash
 # Crea una copia de seguridad (ejecutar desde deploy/docker-compose/)
-docker compose exec postgres pg_dump -U postgres insforge > backup_$(date +%Y%m%d_%H%M%S).sql
+docker compose exec postgres pg_dump -U postgres yarah > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Almacena la copia de seguridad en Google Cloud Storage (opcional)
 # Primero, instala la CLI de Google Cloud y autentícate
@@ -496,9 +496,9 @@ effective_cache_size = 3GB
 
 ## 🆘 Soporte y recursos
 
-- **Documentación**: [https://docs.insforge.dev](https://docs.insforge.dev)
-- **Issues de GitHub**: [https://github.com/insforge/insforge/issues](https://github.com/insforge/insforge/issues)
-- **Comunidad de Discord**: [https://discord.com/invite/MPxwj5xVvW](https://discord.com/invite/MPxwj5xVvW)
+- **Documentación**: [https://docs.yarah.dev](https://docs.yarah.dev)
+- **Issues de GitHub**: [https://github.com/yarah/yarah/issues](https://github.com/yarah/yarah/issues)
+- **Comunidad de Discord**: [https://yarah.dev/community](https://yarah.dev/community)
 
 ## 📝 Estimación de costos
 
@@ -515,6 +515,6 @@ effective_cache_size = 3GB
 
 ---
 
-**¡Felicidades! 🎉** Tu instancia de InsForge ahora se está ejecutando en Google Cloud Compute Engine. Puedes empezar a construir aplicaciones conectando agentes de IA a tu plataforma backend.
+**¡Felicidades! 🎉** Tu instancia de Yarah ahora se está ejecutando en Google Cloud Compute Engine. Puedes empezar a construir aplicaciones conectando agentes de IA a tu plataforma backend.
 
 Para otras estrategias de implementación en producción, consulta nuestras [guías de implementación](/deployment/deployment-security-guide).

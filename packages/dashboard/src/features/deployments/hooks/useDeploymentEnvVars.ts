@@ -2,8 +2,8 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { deploymentsService } from '#features/deployments/services/deployments.service';
-import type { DeploymentEnvVar, UpsertEnvVarRequest } from '@insforge/shared-schemas';
-import { useToast } from '@insforge/ui';
+import type { DeploymentEnvVar, UpsertEnvVarRequest } from '@yarahdev/shared-schemas';
+import { useToast } from '@yarahdev/ui';
 import { useConfirm } from '#lib/hooks/useConfirm';
 
 export function useDeploymentEnvVars() {

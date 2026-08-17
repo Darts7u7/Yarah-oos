@@ -4,9 +4,9 @@ import type {
   CreateCustomOAuthConfigRequest,
   UpdateCustomOAuthConfigRequest,
   ListCustomOAuthConfigsResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 import { customOAuthConfigService } from '#features/auth/services/custom-oauth-config.service';
 
 export function useCustomOAuthConfig(selectedKey?: string | null) {

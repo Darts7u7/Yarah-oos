@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RefreshIcon from '#assets/icons/refresh.svg?react';
-import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@insforge/ui';
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@yarahdev/ui';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   DataGrid,
@@ -13,7 +13,7 @@ import {
 } from '#components';
 import { formatTime } from '#lib/utils/utils';
 import { usePageSize } from '#lib/hooks/usePageSize';
-import type { DatabaseMigrationsResponse } from '@insforge/shared-schemas';
+import type { DatabaseMigrationsResponse } from '@yarahdev/shared-schemas';
 import { DatabaseStudioSidebarPanel } from '#features/database/components/DatabaseSidebar';
 import { SQLCellButton, SQLModal } from '#features/database/components/SQLModal';
 import { useMigrations } from '#features/database/hooks/useMigrations';

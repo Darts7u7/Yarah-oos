@@ -12,7 +12,7 @@ import {
   ERROR_CODES,
   type AnonKeyResponse,
   type ProjectIdResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { SecretService } from '@/services/secrets/secret.service.js';
 import { DatabaseManager } from '@/infra/database/database.manager.js';
 import { CloudDatabaseProvider } from '@/providers/database/cloud.provider.js';

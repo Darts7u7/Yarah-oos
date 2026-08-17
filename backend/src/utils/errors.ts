@@ -1,5 +1,5 @@
 import { DatabaseError } from 'pg';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { NEXT_ACTIONS } from './next-actions.js';
 
 export class AppError extends Error {

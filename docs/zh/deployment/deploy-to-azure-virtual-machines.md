@@ -1,14 +1,14 @@
 ---
-title: "在 Azure 虚拟机上自托管 InsForge"
-description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，涵盖 SSH 访问、网络安全组、自定义域名、HTTPS 证书与生产环境加固的完整分步指南。"
+title: "在 Azure 虚拟机上自托管 Yarah"
+description: "在 Azure 虚拟机上使用 Docker Compose 自托管 Yarah，涵盖 SSH 访问、网络安全组、自定义域名、HTTPS 证书与生产环境加固的完整分步指南。"
 ---
 
-# 📖 将 InsForge 部署到 Azure 虚拟机（扩展指南）
+# 📖 将 Yarah 部署到 Azure 虚拟机（扩展指南）
 
-本指南提供了在 Azure 虚拟机（VM）上使用 Docker Compose 部署、管理和保护 InsForge 的全面、逐步说明。
+本指南提供了在 Azure 虚拟机（VM）上使用 Docker Compose 部署、管理和保护 Yarah 的全面、逐步说明。
 
 <Note>
-  本云端演练由社区维护，可能落后于最新的 InsForge 版本。规范的、始终保持最新的配置位于 [InsForge 仓库](https://github.com/InsForge/InsForge)中的 `deploy/docker-compose/` 目录。
+  本云端演练由社区维护，可能落后于最新的 Yarah 版本。规范的、始终保持最新的配置位于 [Yarah 仓库](https://github.com/Yarah/Yarah)中的 `deploy/docker-compose/` 目录。
 </Note>
 
 ## 前提条件
@@ -24,19 +24,19 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
 1.  **登录 [Azure 门户](https://portal.azure.com/)**，然后导航到**虚拟机**。
 2.  点击 **+ 创建** > **Azure 虚拟机**。
 3.  **基本信息标签页：**
-    * **资源组：** 创建一个新的（例如 `insforge-rg`）。
-    * **虚拟机名称：** `insforge-vm`。
+    * **资源组：** 创建一个新的（例如 `yarah-rg`）。
+    * **虚拟机名称：** `yarah-vm`。
     * **镜像：** **Ubuntu Server 22.04 LTS** 或更新版本。
     * **大小：** `Standard_B2s`（2 个 vCPU，4 GiB 内存）是一个不错的起点。对于生产环境，考虑使用 `Standard_B4ms`（4 个 vCPU，16 GiB 内存）。
     * **身份验证类型：** **SSH 公钥**。
-    * **SSH 公钥来源：** **生成新的密钥对**。将其命名为 `insforge-key`。
+    * **SSH 公钥来源：** **生成新的密钥对**。将其命名为 `yarah-key`。
 4.  **网络标签页：**
     * 在**网络安全组**部分，点击**新建**。
     * 添加以下**入站端口规则**以允许流量：
         * `22`（SSH）
         * `80`（Nginx 的 HTTP）
         * `443`（Nginx/SSL 的 HTTPS）
-        * `7130`（InsForge API 和仪表盘）
+        * `7130`（Yarah API 和仪表盘）
 5.  **审阅并创建：**
     * 点击**审阅 + 创建**，然后点击**创建**。
     * 出现提示时，**下载私钥并创建资源**。请妥善保存 `.pem` 文件。
@@ -50,8 +50,8 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
     打开终端，为你的密钥设置正确的权限，然后连接到虚拟机。
 
     ```bash
-    chmod 400 /path/to/your/insforge-key.pem
-    ssh -i /path/to/your/insforge-key.pem azureuser@<your-vm-public-ip>
+    chmod 400 /path/to/your/yarah-key.pem
+    ssh -i /path/to/your/yarah-key.pem azureuser@<your-vm-public-ip>
     ```
 
 2.  **更新系统软件包：**
@@ -88,18 +88,18 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
 
 ---
 
-## 第 3 步：🚀 部署 InsForge
+## 第 3 步：🚀 部署 Yarah
 
 1.  **获取仓库：**
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh | sh -s ~/insforge
+    curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
     ```
     会 checkout 这个栈要读的文件，并把 `JWT_SECRET`、`ENCRYPTION_KEY`、`ROOT_ADMIN_PASSWORD`、`POSTGRES_PASSWORD` 生成到 `.env`。不启动任何东西。
 
 2.  **创建环境配置：**
     密钥已经生成好了，不要改动。把 API 地址指向你的虚拟机。
     ```bash
-    cd ~/insforge
+    cd ~/yarah
     nano .env
     ```
 
@@ -110,7 +110,7 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
     `.env.example` 里其余部分是可选功能（OpenRouter、Vercel 部署、OAuth 提供商），不需要就留空。
     > 请把 `.env` 备份到安全的地方。迁移或恢复这个实例靠的就是里面的密钥。
 
-3.  **启动 InsForge 服务：**
+3.  **启动 Yarah 服务：**
     拉取 Docker 镜像并在后台启动所有服务。
     ```bash
     docker compose up -d
@@ -121,11 +121,11 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
     ```bash
     docker compose ps
     ```
-    你应该会看到 `postgres`、`postgrest`、`insforge` 和 `deno` 服务正在运行。
+    你应该会看到 `postgres`、`postgrest`、`yarah` 和 `deno` 服务正在运行。
 
 ---
 
-## 第 4 步：🔑 访问你的 InsForge 实例
+## 第 4 步：🔑 访问你的 Yarah 实例
 
 1.  **测试后端 API：**
     使用 `curl` 检查健康检查端点。
@@ -150,7 +150,7 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
 2.  **安装并配置 Nginx 作为反向代理：**
     ```bash
     sudo apt install nginx -y
-    sudo nano /etc/nginx/sites-available/insforge
+    sudo nano /etc/nginx/sites-available/yarah
     ```
     粘贴以下配置：
     ```nginx
@@ -181,7 +181,7 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
     ```
     启用该配置并重新加载 Nginx：
     ```bash
-    sudo ln -s /etc/nginx/sites-available/insforge /etc/nginx/sites-enabled/
+    sudo ln -s /etc/nginx/sites-available/yarah /etc/nginx/sites-enabled/
     sudo nginx -t
     sudo systemctl reload nginx
     ```
@@ -198,7 +198,7 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
 4.  **使用 HTTPS URL 更新 `.env`：**
     编辑你的 `.env` 文件并更新 URL。
     ```bash
-    cd ~/insforge
+    cd ~/yarah
     nano .env
     ```
     将 URL 更改为 `https`：
@@ -215,19 +215,19 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
 
 ## 🔧 管理与维护
 
-* **查看日志：** `docker compose logs -f`（所有服务）或 `docker compose logs -f insforge`（指定服务）。
+* **查看日志：** `docker compose logs -f`（所有服务）或 `docker compose logs -f yarah`（指定服务）。
 * **停止服务：** `docker compose down`
 * **重启服务：** `docker compose restart`
-* **更新 InsForge：** 从 `~/insforge` 运行以下命令。镜像是预先构建好的，因此拉取最新标签即可，无需重新构建。
+* **更新 Yarah：** 从 `~/yarah` 运行以下命令。镜像是预先构建好的，因此拉取最新标签即可，无需重新构建。
     ```bash
-    cd ~/insforge
-    git -C ~/insforge pull origin main
+    cd ~/yarah
+    git -C ~/yarah pull origin main
     sh deploy/setup.sh .
     docker compose pull && docker compose up -d
     ```
-* **备份数据库：** 从 `~/insforge` 运行。
+* **备份数据库：** 从 `~/yarah` 运行。
     ```bash
-    docker compose exec postgres pg_dump -U postgres insforge > backup_$(date +%Y%m%d_%H%M%S).sql
+    docker compose exec postgres pg_dump -U postgres yarah > backup_$(date +%Y%m%d_%H%M%S).sql
     ```
 
 ## 🐛 故障排除
@@ -247,7 +247,7 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
 
 ### 入门配置（用于开发和小型项目）
 * **成本：** 约 **30 - 40 美元/月**
-* **资源：** 此估算适用于运行所有 InsForge Docker 容器的 `Standard_B2s` 虚拟机（2 个 vCPU，4 GiB 内存）。
+* **资源：** 此估算适用于运行所有 Yarah Docker 容器的 `Standard_B2s` 虚拟机（2 个 vCPU，4 GiB 内存）。
 * **明细：** 成本主要包括虚拟机计算时长。它还包括操作系统磁盘存储和一个静态公网 IP 地址。这一台虚拟机运行你的数据库、后端、Deno 以及所有其他服务。
 
 ### 生产配置（用于可扩展性和可靠性）
@@ -262,7 +262,7 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
 * **选项 B：托管服务（推荐用于生产环境）**
     * **成本：** 约 **120 美元以上/月**（变化很大）
     * **资源：**
-        * **应用程序虚拟机：** 用于应用服务（InsForge、PostgREST、Deno）的 `Standard_B2s` 虚拟机。`（约 30 美元/月）`
+        * **应用程序虚拟机：** 用于应用服务（Yarah、PostgREST、Deno）的 `Standard_B2s` 虚拟机。`（约 30 美元/月）`
         * **托管数据库：** 使用 **Azure Database for PostgreSQL** 以获得可靠性、自动备份和可扩展性。`（入门套餐约 40 美元以上/月）`
     * **优点：** 高度可靠且可扩展。数据库性能是隔离且有保障的。托管备份和安全性。
     * **缺点：** 配置更复杂，成本分布在多个服务上。
@@ -271,5 +271,5 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 InsForge，�
 
 * **更改默认密码：** 始终更新管理员和数据库密码。
 * **启用防火墙：** 使用 Azure **网络安全组（NSG）**限制对必要端口和 IP 地址的访问。
-* **定期更新：** 定期运行 `sudo apt update && sudo apt upgrade -y` 并更新 InsForge。
+* **定期更新：** 定期运行 `sudo apt update && sudo apt upgrade -y` 并更新 Yarah。
 * **定期备份：** 自动化数据库和配置的备份。

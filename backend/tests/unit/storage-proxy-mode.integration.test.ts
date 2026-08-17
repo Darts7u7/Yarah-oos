@@ -2,10 +2,10 @@
  * Storage proxy-mode integration test.
  *
  * Opt-in: set RUN_STORAGE_PROXY_INTEGRATION=1 to run. Requires:
- *   - backend running at INSFORGE_API_BASE (default http://localhost:7130)
+ *   - backend running at YARAH_API_BASE (default http://localhost:7130)
  *     with an S3 backend AND S3_USE_PRESIGNED_URLS=false — e.g. the MinIO overlay:
  *       docker compose -f docker-compose.yml -f docker-compose.minio.yml up -d
- *   - INSFORGE_API_KEY: an admin API key (ik_...) for the REST API
+ *   - YARAH_API_KEY: an admin API key (ik_...) for the REST API
  *
  * Verifies the proxy-mode contract end to end: direct upload strategy,
  * PUT round-trip through the backend, streamed download, and ranged 206.
@@ -15,8 +15,8 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 const INTEGRATION = process.env.RUN_STORAGE_PROXY_INTEGRATION === '1';
 const describeIf = INTEGRATION ? describe : describe.skip;
 
-const BASE = (process.env.INSFORGE_API_BASE || 'http://localhost:7130').replace(/\/+$/, '');
-const API_KEY = process.env.INSFORGE_API_KEY as string;
+const BASE = (process.env.YARAH_API_BASE || 'http://localhost:7130').replace(/\/+$/, '');
+const API_KEY = process.env.YARAH_API_KEY as string;
 const HEADERS = { Authorization: `Bearer ${API_KEY}` };
 
 describeIf('Storage proxy mode (integration)', () => {

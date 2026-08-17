@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   SearchInput,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import {
   DataGrid,
   DataGridEmptyState,
@@ -27,7 +27,7 @@ import { useRecords } from '#features/database/hooks/useRecords';
 import { useUsers } from '#features/auth/hooks/useUsers';
 import { convertSchemaToColumns } from './DatabaseDataGrid';
 import { formatValueForDisplay } from '#lib/utils/utils';
-import { ColumnType } from '@insforge/shared-schemas';
+import { ColumnType } from '@yarahdev/shared-schemas';
 import { AUTH_USERS_TABLE, authUsersSchema } from '#features/database/constants';
 import { getPrimaryKeyColumns, parseDatabaseTableReference } from '#features/database/helpers';
 

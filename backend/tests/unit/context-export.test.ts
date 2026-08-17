@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MetadataService } from '../../src/services/metadata/metadata.service.js';
-import type { AppMetadataSchema } from '@insforge/shared-schemas';
+import type { AppMetadataSchema } from '@yarahdev/shared-schemas';
 
 const metadataService = MetadataService.getInstance();
 

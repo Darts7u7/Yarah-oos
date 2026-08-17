@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { useSuppressAdvisorIssue } from '#features/dashboard/hooks/useAdvisor';
 import { SUPPRESSION_REASON_LABELS, SUPPRESSION_REASONS } from './suppression';
 

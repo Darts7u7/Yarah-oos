@@ -2,7 +2,7 @@ import type { Pool } from 'pg';
 import { AppError } from '@/utils/errors.js';
 import { DatabaseManager } from '@/infra/database/database.manager.js';
 import type { PaymentEnvironment, PaymentProvider } from '@/types/payments.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 /**
  * How long a row may sit in `pending` before another delivery of the same event

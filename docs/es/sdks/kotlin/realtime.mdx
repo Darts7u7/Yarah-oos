@@ -1,6 +1,6 @@
 ---
 title: Referencia de SDK de Kotlin en tiempo real
-description: Conecta vía Socket.IO, suscríbete a canales, publica eventos, rastrea presencia y maneja reconexiones con el cliente en tiempo real de Kotlin de InsForge.
+description: Conecta vía Socket.IO, suscríbete a canales, publica eventos, rastrea presencia y maneja reconexiones con el cliente en tiempo real de Kotlin de Yarah.
 ---
 
 import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
@@ -11,14 +11,14 @@ import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
 
 ## Modelo mental
 
-El SDK de Kotlin se conecta a InsForge Realtime a través de Socket.IO. Suscríbete a nombres de canales como `order:123` o `chat:room-1`, luego escucha los nombres de eventos publicados en esos canales.
+El SDK de Kotlin se conecta a Yarah Realtime a través de Socket.IO. Suscríbete a nombres de canales como `order:123` o `chat:room-1`, luego escucha los nombres de eventos publicados en esos canales.
 
 Los eventos se publican mediante disparadores de base de datos que llaman a `realtime.publish(...)` o por clientes que publican en un canal al que ya se han unido. Consulta [descripción general de tiempo real](/core-concepts/realtime/overview) para el modelo de canal y RLS.
 
 ## Inicio rápido
 
 ```kotlin
-import dev.insforge.realtime.models.SocketMessage
+import dev.yarah.realtime.models.SocketMessage
 
 client.realtime.connect()
 

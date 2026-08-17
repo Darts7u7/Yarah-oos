@@ -5,7 +5,7 @@ import { loginService } from '#features/login/services/login.service';
 import { useDashboardHost } from '#lib/config/DashboardHostContext';
 import { apiClient } from '#lib/api/client';
 import { getCurrentDistinctId, identifyUser } from '#lib/analytics/posthog';
-import type { AdminSchema } from '@insforge/shared-schemas';
+import type { AdminSchema } from '@yarahdev/shared-schemas';
 
 interface AuthContextType {
   user: AdminSchema | null;

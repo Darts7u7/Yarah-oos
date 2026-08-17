@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import { appConfig } from '@/infra/config/app.config.js';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 export interface LaunchMachineParams {
   appId: string;

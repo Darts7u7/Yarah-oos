@@ -10,11 +10,11 @@ import {
   type FeatureSidebarListItem,
 } from '#components';
 import { ScrollArea } from '#components/radix/ScrollArea';
-import { Button, cn } from '@insforge/ui';
+import { Button, cn } from '@yarahdev/ui';
 import { DatabaseSchemaSelect } from '#features/database/components/DatabaseSchemaSelect';
 import { DatabaseSettingsDialog } from '#features/database/components/DatabaseSettingsDialog';
 import { useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
-import type { DatabaseSchemaInfo } from '@insforge/shared-schemas';
+import type { DatabaseSchemaInfo } from '@yarahdev/shared-schemas';
 
 const DATABASE_STUDIO_SIDEBAR_BASE_ITEMS: Array<{
   id: string;

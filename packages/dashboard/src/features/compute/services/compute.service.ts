@@ -5,7 +5,7 @@ import type {
   UpdateServiceRequest,
   ComputeConfig,
   UpdateComputeConfig,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 interface ListServicesResponse {
   services: ServiceSchema[];

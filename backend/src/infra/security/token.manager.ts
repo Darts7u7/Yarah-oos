@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { createRemoteJWKSet, JWTPayload, jwtVerify } from 'jose';
 import { AppError } from '@/utils/errors.js';
 import { isCloudEnvironment } from '@/utils/environment.js';
-import { ERROR_CODES, type ErrorCode, type TokenPayloadSchema } from '@insforge/shared-schemas';
+import { ERROR_CODES, type ErrorCode, type TokenPayloadSchema } from '@yarahdev/shared-schemas';
 import { NEXT_ACTIONS } from '../../utils/next-actions.js';
 import logger from '../../utils/logger.js';
 import { appConfig } from '@/infra/config/app.config.js';
@@ -240,7 +240,7 @@ export class TokenManager {
     try {
       const decoded = jwt.verify(token, JWT_SECRET, {
         algorithms: ['HS256'],
-        issuer: 'insforge',
+        issuer: 'yarah',
       }) as RefreshTokenPayload;
 
       // Ensure this is a refresh token, not an access token
@@ -341,17 +341,13 @@ export class TokenManager {
    */
   signCloudToken(feature: string, errorCode: ErrorCode = ERROR_CODES.INTERNAL_ERROR): string {
     if (!isCloudEnvironment()) {
-      throw new AppError(
-        `${feature} is only available on InsForge Cloud projects.`,
-        500,
-        errorCode
-      );
+      throw new AppError(`${feature} is only available on Yarah Cloud projects.`, 500, errorCode);
     }
 
     const projectId = appConfig.cloud?.projectId;
     if (!projectId || projectId === 'local') {
       throw new AppError(
-        'PROJECT_ID is not configured. Cannot reach the InsForge Cloud API.',
+        'PROJECT_ID is not configured. Cannot reach the Yarah Cloud API.',
         500,
         errorCode
       );
@@ -371,7 +367,7 @@ export class TokenManager {
 
   /**
    * Verify cloud backend JWT token
-   * Validates JWT tokens from api.insforge.dev using JWKS.
+   * Validates JWT tokens from api.yarah.dev using JWKS.
    * Inbound only — outbound requests are signed by signCloudToken above.
    */
   async verifyCloudToken(token: string): Promise<{ projectId: string; payload: JWTPayload }> {
@@ -454,7 +450,7 @@ export class TokenManager {
   generateCsrfToken(payload: RefreshTokenPayload): string {
     return crypto
       .createHmac('sha256', JWT_SECRET)
-      .update(`insforge:csrf:v1:${payload.sessionType}:${payload.sub}:${payload.csrfNonce}`)
+      .update(`yarah:csrf:v1:${payload.sessionType}:${payload.sub}:${payload.csrfNonce}`)
       .digest('hex');
   }
 
@@ -497,7 +493,7 @@ export class TokenManager {
     return {
       sub: userId,
       type: 'refresh',
-      iss: 'insforge',
+      iss: 'yarah',
       csrfNonce,
       sessionType,
     };

@@ -1,6 +1,6 @@
-# InsForge Zeabur Template
+# Yarah Zeabur Template
 
-Internal template for one-click InsForge deployment on Zeabur.
+Internal template for one-click Yarah deployment on Zeabur.
 
 ## CLI Authentication
 

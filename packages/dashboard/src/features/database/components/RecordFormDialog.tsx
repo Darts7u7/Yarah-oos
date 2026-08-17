@@ -13,12 +13,12 @@ import {
   DialogHeader,
   DialogTitle,
   cn,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { ScrollArea } from '#components';
 import { useRecords } from '#features/database/hooks/useRecords';
 import { buildDynamicSchema, getInitialValues } from '#features/database';
 import { RecordFormField } from './RecordFormField';
-import { ColumnSchema, type ForeignKeySchema } from '@insforge/shared-schemas';
+import { ColumnSchema, type ForeignKeySchema } from '@yarahdev/shared-schemas';
 import { getForeignKeyByColumn, SYSTEM_FIELDS } from '#features/database/helpers';
 
 interface RecordFormDialogProps {

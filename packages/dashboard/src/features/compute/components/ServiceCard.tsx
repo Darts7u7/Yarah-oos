@@ -6,8 +6,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from '@insforge/ui';
-import type { ServiceSchema } from '@insforge/shared-schemas';
+} from '@yarahdev/ui';
+import type { ServiceSchema } from '@yarahdev/shared-schemas';
 import { statusColors, getReachableUrl, INGRESS_MODES } from '#features/compute/constants';
 import { useServiceHealth } from '#features/compute/hooks/useComputeServices';
 import { useComputeCapabilities } from '#features/compute/hooks/useComputeCapabilities';

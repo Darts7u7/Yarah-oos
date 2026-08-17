@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { LocalAnalyticsProvider } from '../../src/providers/analytics/local.provider.js';
 import type { StoredPosthogConnection } from '../../src/services/analytics/posthog-config.service.js';
 
@@ -92,7 +92,7 @@ describe('LocalAnalyticsProvider', () => {
 
   describe('upstream error mapping', () => {
     // A PostHog 401 must not reach the dashboard as a 401 — that reads as an
-    // InsForge session failure and bounces the user to login, when the real fix
+    // Yarah session failure and bounces the user to login, when the real fix
     // is reconnecting PostHog.
     it('remaps PostHog 401 to 502 with a reconnect hint', async () => {
       const { provider, api } = makeProvider();

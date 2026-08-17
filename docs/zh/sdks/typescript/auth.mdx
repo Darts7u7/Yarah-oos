@@ -1,6 +1,6 @@
 ---
 title: 身份验证 SDK 参考
-description: 使用 InsForge TypeScript SDK 实现用户注册、登录、邮箱验证、OAuth 第三方登录、会话管理与用户资料读写，覆盖 Node、浏览器与边缘运行时。
+description: 使用 Yarah TypeScript SDK 实现用户注册、登录、邮箱验证、OAuth 第三方登录、会话管理与用户资料读写，覆盖 Node、浏览器与边缘运行时。
 ---
 
 ## 安装
@@ -18,7 +18,7 @@ import Installation from '/snippets/sdk-installation.mdx';
 - `email` (string, required) - 用户的电子邮件地址
 - `password` (string, required) - 用户的密码
 - `name` (string, optional) - 用户的显示名称
-- `redirectTo` (string, optional) - 用于基于链接的电子邮件验证。电子邮件链接始终首先打开 InsForge 后端端点；在验证令牌后，InsForge 将浏览器重定向到此 URL 以获取验证结果。当 `verifyEmailMethod` 设置为 `link` 时需要。此 URL 必须包含在 `allowedRedirectUrls` 中。推荐：使用您的应用登录页面。
+- `redirectTo` (string, optional) - 用于基于链接的电子邮件验证。电子邮件链接始终首先打开 Yarah 后端端点；在验证令牌后，Yarah 将浏览器重定向到此 URL 以获取验证结果。当 `verifyEmailMethod` 设置为 `link` 时需要。此 URL 必须包含在 `allowedRedirectUrls` 中。推荐：使用您的应用登录页面。
 
 ### 返回
 
@@ -35,13 +35,13 @@ import Installation from '/snippets/sdk-installation.mdx';
 ```
 
 <Note>
-  当 `requireEmailVerification` 为真时，`accessToken` 将为空直到用户验证其电子邮件。InsForge 发送一个验证电子邮件，其中包含一个链接或 6 位数字代码，具体取决于您的仪表板配置（`verifyEmailMethod`）。对于代码验证，实现一个提示用户输入代码的页面（见 [verifyEmail()](#verifyemail)）。对于链接验证，提供一个在 InsForge 验证令牌后应接收浏览器的 `redirectTo` URL。推荐：使用您的登录页面作为 `redirectTo`，然后显示成功消息并询问用户使用其电子邮件和密码登录。
+  当 `requireEmailVerification` 为真时，`accessToken` 将为空直到用户验证其电子邮件。Yarah 发送一个验证电子邮件，其中包含一个链接或 6 位数字代码，具体取决于您的仪表板配置（`verifyEmailMethod`）。对于代码验证，实现一个提示用户输入代码的页面（见 [verifyEmail()](#verifyemail)）。对于链接验证，提供一个在 Yarah 验证令牌后应接收浏览器的 `redirectTo` URL。推荐：使用您的登录页面作为 `redirectTo`，然后显示成功消息并询问用户使用其电子邮件和密码登录。
 </Note>
 
 ### 示例
 
 ```javascript
-const { data, error } = await insforge.auth.signUp({
+const { data, error } = await yarah.auth.signUp({
   email: 'user@example.com',
   password: 'secure_password123',
   name: 'John Doe',
@@ -111,7 +111,7 @@ if (data?.requireEmailVerification) {
 ### 示例
 
 ```javascript
-const { data, error } = await insforge.auth.signInWithPassword({
+const { data, error } = await yarah.auth.signInWithPassword({
   email: 'user@example.com',
   password: 'secure_password123',
 });
@@ -169,21 +169,21 @@ if (data) {
 ```
 
 <Note>
-  OAuth 重定向后，SDK 自动检测回调 `insforge_code`，将其交换为会话，并自动保存会话。
+  OAuth 重定向后，SDK 自动检测回调 `yarah_code`，将其交换为会话，并自动保存会话。
 </Note>
 
 ### 示例
 
 ```javascript
 // Default: auto-redirect
-await insforge.auth.signInWithOAuth('google', {
+await yarah.auth.signInWithOAuth('google', {
   redirectTo: 'http://localhost:3000/dashboard',
   additionalParams: { prompt: 'select_account' },
 });
 // Browser immediately redirects to Google
 
 // skipBrowserRedirect: get URL for manual handling
-const { data } = await insforge.auth.signInWithOAuth('google', {
+const { data } = await yarah.auth.signInWithOAuth('google', {
   redirectTo: 'http://localhost:3000/dashboard',
   skipBrowserRedirect: true,
 });
@@ -192,11 +192,11 @@ window.location.href = data.url; // Redirect when ready
 ```
 
 <Note>
-  `additionalParams` 仅用于提供商特定的可选提示。不要传递服务器拥有的 OAuth 字段如 `client_id`、`redirect_uri`、`code_challenge`、`state`、`response_type` 或 `scope`；InsForge 在服务器上设置这些值并忽略冲突的客户端提供的密钥。
+  `additionalParams` 仅用于提供商特定的可选提示。不要传递服务器拥有的 OAuth 字段如 `client_id`、`redirect_uri`、`code_challenge`、`state`、`response_type` 或 `scope`；Yarah 在服务器上设置这些值并忽略冲突的客户端提供的密钥。
 </Note>
 
 <Note>
-  自定义提供商必须首先在 InsForge 仪表板的 `Auth Methods` 中使用客户端凭证和 OIDC 发现 URL 配置。
+  自定义提供商必须首先在 Yarah 仪表板的 `Auth Methods` 中使用客户端凭证和 OIDC 发现 URL 配置。
 </Note>
 
 ### 输出
@@ -232,7 +232,7 @@ window.location.href = data.url; // Redirect when ready
 ### 示例
 
 ```javascript
-const { error } = await insforge.auth.signOut();
+const { error } = await yarah.auth.signOut();
 ```
 
 ### 输出
@@ -271,7 +271,7 @@ const { error } = await insforge.auth.signOut();
 ### 示例
 
 ```javascript
-const { data, error } = await insforge.auth.getCurrentUser();
+const { data, error } = await yarah.auth.getCurrentUser();
 
 if (data.user) {
   console.log('User:', data.user.email);
@@ -330,7 +330,7 @@ if (data.user) {
 ### 示例
 
 ```javascript
-const { data, error } = await insforge.auth.getProfile('usr_xyz789');
+const { data, error } = await yarah.auth.getProfile('usr_xyz789');
 
 if (data) {
   console.log(data.name);
@@ -388,7 +388,7 @@ if (data) {
 ### 示例
 
 ```javascript
-const { data, error } = await insforge.auth.setProfile({
+const { data, error } = await yarah.auth.setProfile({
   name: 'JohnDev',
   bio: 'Full-stack developer',
   avatar_url: 'https://example.com/avatar.jpg',
@@ -417,7 +417,7 @@ const { data, error } = await insforge.auth.setProfile({
 
 ## resendVerificationEmail()
 
-当之前的 OTP 已过期或未收到时，重新发送电子邮件验证。使用身份验证设置中配置的方法（`verifyEmailMethod`）。当方法为 `code` 时，发送 6 位数字代码。当方法为 `link` 时，发送通过 InsForge 后端端点的浏览器验证链接。
+当之前的 OTP 已过期或未收到时，重新发送电子邮件验证。使用身份验证设置中配置的方法（`verifyEmailMethod`）。当方法为 `code` 时，发送 6 位数字代码。当方法为 `link` 时，发送通过 Yarah 后端端点的浏览器验证链接。
 
 <Note>
   此端点通过即使电子邮件不存在也返回成功来防止用户枚举。
@@ -426,7 +426,7 @@ const { data, error } = await insforge.auth.setProfile({
 ### 参数
 
 - `email` (string, required) - 用户的电子邮件地址
-- `redirectTo` (string, optional) - 用于基于链接的电子邮件验证。电子邮件链接始终首先打开 InsForge 后端端点；在验证令牌后，InsForge 将浏览器重定向到此 URL 以获取验证结果。当 `verifyEmailMethod` 设置为 `link` 时需要。此 URL 必须包含在 `allowedRedirectUrls` 中。推荐：使用您的应用登录页面。
+- `redirectTo` (string, optional) - 用于基于链接的电子邮件验证。电子邮件链接始终首先打开 Yarah 后端端点；在验证令牌后，Yarah 将浏览器重定向到此 URL 以获取验证结果。当 `verifyEmailMethod` 设置为 `link` 时需要。此 URL 必须包含在 `allowedRedirectUrls` 中。推荐：使用您的应用登录页面。
 
 ### 返回
 
@@ -440,7 +440,7 @@ const { data, error } = await insforge.auth.setProfile({
 ### 示例
 
 ```javascript
-const { data, error } = await insforge.auth.resendVerificationEmail({
+const { data, error } = await yarah.auth.resendVerificationEmail({
   email: 'user@example.com',
   redirectTo: 'http://localhost:3000/sign-in',
 });
@@ -474,13 +474,13 @@ if (data?.success) {
 
 对于基于链接的验证，您的前端应按如下方式处理浏览器重定向：
 
-- 成功：`?insforge_status=success&insforge_type=verify_email`
-- 错误：`?insforge_status=error&insforge_type=verify_email&insforge_error=...`
-- `insforge_status`：浏览器链接流的结果。对于验证，值为 `success` 或 `error`。
-- `insforge_type`：流标识符。对于验证链接，这始终是 `verify_email`。
-- `insforge_error`：仅当 `insforge_status=error` 时存在。人类可读的错误消息用于显示或日志。
+- 成功：`?yarah_status=success&yarah_type=verify_email`
+- 错误：`?yarah_status=error&yarah_type=verify_email&yarah_error=...`
+- `yarah_status`：浏览器链接流的结果。对于验证，值为 `success` 或 `error`。
+- `yarah_type`：流标识符。对于验证链接，这始终是 `verify_email`。
+- `yarah_error`：仅当 `yarah_status=error` 时存在。人类可读的错误消息用于显示或日志。
 
-推荐处理：使用您的登录页面作为 `redirectTo`。当 `insforge_status=success` 时，显示确认消息并询问用户使用其电子邮件和密码登录。
+推荐处理：使用您的登录页面作为 `redirectTo`。当 `yarah_status=success` 时，显示确认消息并询问用户使用其电子邮件和密码登录。
 
 ### 参数
 
@@ -502,7 +502,7 @@ if (data?.success) {
 ### 示例
 
 ```javascript
-const { data, error } = await insforge.auth.verifyEmail({
+const { data, error } = await yarah.auth.verifyEmail({
   email: 'user@example.com',
   otp: '123456',
 });
@@ -532,7 +532,7 @@ if (data) {
 
 ## sendResetPasswordEmail()
 
-使用身份验证设置中配置的方法（`resetPasswordMethod`）发送密码重置电子邮件。当方法为 `code` 时，发送 6 位数字代码用于两步流程。当方法为 `link` 时，发送通过 InsForge 后端端点的浏览器重置链接。
+使用身份验证设置中配置的方法（`resetPasswordMethod`）发送密码重置电子邮件。当方法为 `code` 时，发送 6 位数字代码用于两步流程。当方法为 `link` 时，发送通过 Yarah 后端端点的浏览器重置链接。
 
 <Note>
   此端点通过即使电子邮件不存在也返回成功来防止用户枚举。
@@ -541,7 +541,7 @@ if (data) {
 ### 参数
 
 - `email` (string, required) - 用户的电子邮件地址
-- `redirectTo` (string, optional) - 用于基于链接的密码重置。电子邮件链接始终首先打开 InsForge 后端端点；InsForge 然后将浏览器重定向到此 URL，在查询字符串中包含重置 `token`，以便您的应用可以呈现其自己的重置密码页面。当 `resetPasswordMethod` 设置为 `link` 时需要。此 URL 必须包含在 `allowedRedirectUrls` 中。推荐：使用您的应用的专用重置密码页面。
+- `redirectTo` (string, optional) - 用于基于链接的密码重置。电子邮件链接始终首先打开 Yarah 后端端点；Yarah 然后将浏览器重定向到此 URL，在查询字符串中包含重置 `token`，以便您的应用可以呈现其自己的重置密码页面。当 `resetPasswordMethod` 设置为 `link` 时需要。此 URL 必须包含在 `allowedRedirectUrls` 中。推荐：使用您的应用的专用重置密码页面。
 
 ### 返回
 
@@ -555,7 +555,7 @@ if (data) {
 ### 示例
 
 ```javascript
-const { data, error } = await insforge.auth.sendResetPasswordEmail({
+const { data, error } = await yarah.auth.sendResetPasswordEmail({
   email: 'user@example.com',
   redirectTo: 'http://localhost:3000/reset-password',
 });
@@ -604,14 +604,14 @@ if (data?.success) {
 ### 示例
 
 ```javascript
-const { data, error } = await insforge.auth.exchangeResetPasswordToken({
+const { data, error } = await yarah.auth.exchangeResetPasswordToken({
   email: 'user@example.com',
   code: '123456',
 });
 
 if (data) {
   // Use token to reset password
-  await insforge.auth.resetPassword({
+  await yarah.auth.resetPassword({
     newPassword: 'newSecurePassword123',
     otp: data.token,
   });
@@ -645,14 +645,14 @@ if (data) {
 
 对于基于链接的密码重置，您的前端应按如下方式处理浏览器重定向：
 
-- 准备重置：`?token=...&insforge_status=ready&insforge_type=reset_password`
-- 错误：`?insforge_status=error&insforge_type=reset_password&insforge_error=...`
-- `token`：仅当 `insforge_status=ready` 时存在。将此值传递给 `resetPassword({ otp })`。
-- `insforge_status`：浏览器链接流的结果。对于重置链接，值为 `ready` 或 `error`。
-- `insforge_type`：流标识符。对于重置链接，这始终是 `reset_password`。
-- `insforge_error`：仅当 `insforge_status=error` 时存在。人类可读的错误消息用于显示或日志。
+- 准备重置：`?token=...&yarah_status=ready&yarah_type=reset_password`
+- 错误：`?yarah_status=error&yarah_type=reset_password&yarah_error=...`
+- `token`：仅当 `yarah_status=ready` 时存在。将此值传递给 `resetPassword({ otp })`。
+- `yarah_status`：浏览器链接流的结果。对于重置链接，值为 `ready` 或 `error`。
+- `yarah_type`：流标识符。对于重置链接，这始终是 `reset_password`。
+- `yarah_error`：仅当 `yarah_status=error` 时存在。人类可读的错误消息用于显示或日志。
 
-仅当 `insforge_status=ready` 且 `token` 存在时才呈现重置密码表单。
+仅当 `yarah_status=ready` 且 `token` 存在时才呈现重置密码表单。
 
 ### 返回
 
@@ -667,13 +667,13 @@ if (data) {
 
 ```javascript
 // Code method flow: after exchangeResetPasswordToken
-const { data, error } = await insforge.auth.resetPassword({
+const { data, error } = await yarah.auth.resetPassword({
   newPassword: 'newSecurePassword123',
   otp: resetToken, // Token from exchangeResetPasswordToken
 });
 
 // Link method flow: token from the reset page URL
-const { data, error } = await insforge.auth.resetPassword({
+const { data, error } = await yarah.auth.resetPassword({
   newPassword: 'newSecurePassword123',
   otp: 'a1b2c3d4e5f6...', // Token from the magic link URL
 });
@@ -701,7 +701,7 @@ if (data) {
 所有身份验证方法返回结构化错误：
 
 ```javascript
-const { data, error } = await insforge.auth.signInWithPassword({
+const { data, error } = await yarah.auth.signInWithPassword({
   email: 'user@example.com',
   password: 'wrong_password',
 });

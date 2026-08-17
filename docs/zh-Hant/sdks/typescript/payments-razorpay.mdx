@@ -1,6 +1,6 @@
 ---
 title: Razorpay 支付 SDK
-description: "從 TypeScript 應用程式建立 Razorpay 訂單與訂閱，處理 webhook 履行並將付款狀態同步回 InsForge 資料庫。"
+description: "從 TypeScript 應用程式建立 Razorpay 訂單與訂閱，處理 webhook 履行並將付款狀態同步回 Yarah 資料庫。"
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
@@ -11,13 +11,13 @@ import Installation from '/snippets/sdk-installation.mdx';
 
 TypeScript SDK 為產生的應用前端公開 Razorpay 執行時助手：
 
-- `insforge.payments.razorpay.createOrder(...)`
-- `insforge.payments.razorpay.verifyOrder(...)`
-- `insforge.payments.razorpay.createSubscription(...)`
-- `insforge.payments.razorpay.verifySubscription(...)`
-- `insforge.payments.razorpay.cancelSubscription(...)`
-- `insforge.payments.razorpay.pauseSubscription(...)`
-- `insforge.payments.razorpay.resumeSubscription(...)`
+- `yarah.payments.razorpay.createOrder(...)`
+- `yarah.payments.razorpay.verifyOrder(...)`
+- `yarah.payments.razorpay.createSubscription(...)`
+- `yarah.payments.razorpay.verifySubscription(...)`
+- `yarah.payments.razorpay.cancelSubscription(...)`
+- `yarah.payments.razorpay.pauseSubscription(...)`
+- `yarah.payments.razorpay.resumeSubscription(...)`
 
 Razorpay 不傳回託管的 Checkout URL。後端建立 Razorpay 訂單或訂閱並傳回 `checkoutOptions`。瀏覽器載入 Razorpay Checkout 並使用這些選項開啟它。
 
@@ -30,8 +30,8 @@ Razorpay 不傳回託管的 Checkout URL。後端建立 Razorpay 訂單或訂閱
 ```typescript
 import { createClient } from '@insforge/sdk';
 
-const insforge = createClient({
-  baseUrl: 'https://your-project.insforge.app',
+const yarah = createClient({
+  baseUrl: 'https://your-project.apps.yarah.dev',
   anonKey: 'your-anon-key'
 });
 
@@ -43,7 +43,7 @@ declare global {
 
 ```
 
-SDK 使用目前 InsForge 使用者令牌呼叫 Razorpay 執行時路由。不要使用提供商密鑰呼叫這些路由。
+SDK 使用目前 Yarah 使用者令牌呼叫 Razorpay 執行時路由。不要使用提供商密鑰呼叫這些路由。
 
 ## 載入 Razorpay Checkout
 
@@ -66,9 +66,9 @@ function loadRazorpayCheckout(): Promise<void> {
 
 ## 一次性訂單
 
-首先建立一個應用擁有的待處理訂單。然後透過 InsForge 建立 Razorpay 訂單：
+首先建立一個應用擁有的待處理訂單。然後透過 Yarah 建立 Razorpay 訂單：
 
-Razorpay 訂單可以是僅金額的，但為一次性可售產品建立 Razorpay 商品是一個好做法，因為同步的商品使目錄在 InsForge 和 Razorpay 中可見。將訂單視為付款嘗試。
+Razorpay 訂單可以是僅金額的，但為一次性可售產品建立 Razorpay 商品是一個好做法，因為同步的商品使目錄在 Yarah 和 Razorpay 中可見。將訂單視為付款嘗試。
 
 ```typescript
 type CreateRazorpayOrderResponse = {
@@ -94,7 +94,7 @@ type CreateRazorpayOrderResponse = {
 };
 
 const { data: orderResponse, error } =
-  await insforge.payments.razorpay.createOrder('test', {
+  await yarah.payments.razorpay.createOrder('test', {
     amount: 50000,
     currency: 'INR',
     receipt: order.id,
@@ -126,7 +126,7 @@ const checkout = new RazorpayCheckout({
     razorpay_payment_id: string;
     razorpay_signature: string;
   }) => {
-    const { error } = await insforge.payments.razorpay.verifyOrder('test', {
+    const { error } = await yarah.payments.razorpay.verifyOrder('test', {
       orderId: response.razorpay_order_id,
       paymentId: response.razorpay_payment_id,
       signature: response.razorpay_signature
@@ -143,7 +143,7 @@ checkout.open();
 
 ## 訂閱
 
-首先建立或同步一個 Razorpay 計劃。然後透過 InsForge 建立訂閱：
+首先建立或同步一個 Razorpay 計劃。然後透過 Yarah 建立訂閱：
 
 ```typescript
 type CreateRazorpaySubscriptionResponse = {
@@ -166,7 +166,7 @@ type CreateRazorpaySubscriptionResponse = {
 };
 
 const { data: subscriptionResponse, error } =
-  await insforge.payments.razorpay.createSubscription('test', {
+  await yarah.payments.razorpay.createSubscription('test', {
     planId: 'plan_123',
     totalCount: 12,
     subject: { type: 'team', id: teamId },
@@ -196,7 +196,7 @@ const checkout = new RazorpayCheckout({
     razorpay_payment_id: string;
     razorpay_signature: string;
   }) => {
-    const { error } = await insforge.payments.razorpay.verifySubscription('test', {
+    const { error } = await yarah.payments.razorpay.verifySubscription('test', {
       subscriptionId: response.razorpay_subscription_id,
       paymentId: response.razorpay_payment_id,
       signature: response.razorpay_signature
@@ -214,13 +214,13 @@ checkout.open();
 Razorpay 不提供 Stripe 計費入口的等價物。使用後端路由進行訂閱管理：
 
 ```typescript
-await insforge.payments.razorpay.cancelSubscription('test', 'sub_123', {
+await yarah.payments.razorpay.cancelSubscription('test', 'sub_123', {
   cancelAtCycleEnd: false
 });
 
-await insforge.payments.razorpay.pauseSubscription('test', 'sub_123');
+await yarah.payments.razorpay.pauseSubscription('test', 'sub_123');
 
-await insforge.payments.razorpay.resumeSubscription('test', 'sub_123');
+await yarah.payments.razorpay.resumeSubscription('test', 'sub_123');
 ```
 
 訂閱建立檢查 `payments.razorpay_subscriptions` 上的 `INSERT` 原則。取消、暫停和恢復檢查同一表上的 `UPDATE` 原則。PostgreSQL 還將 `SELECT` 原則套用於 `INSERT/UPDATE ... RETURNING` 傳回的列，因此當原則探測需要傳回列時，為同一計費主體新增相符的 `SELECT` 可見性。在為共享主體公開這些控制項之前，新增應用特定的 RLS 或伺服器端成員資格檢查。

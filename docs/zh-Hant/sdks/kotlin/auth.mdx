@@ -1,6 +1,6 @@
 ---
 title: 身份驗證 SDK 參考
-description: "使用 InsForge Kotlin SDK 處理使用者註冊、登入、OAuth、工作階段管理與個人資料設定，適用於 Android 與 KMP。"
+description: "使用 Yarah Kotlin SDK 處理使用者註冊、登入、OAuth、工作階段管理與個人資料設定，適用於 Android 與 KMP。"
 ---
 
 import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
@@ -67,7 +67,7 @@ class AuthViewModel : ViewModel() {
                 // Registration complete, user is signed in
                 _uiState.value = AuthUiState.Authenticated
             }
-        } catch (e: InsforgeHttpException) {
+        } catch (e: YarahHttpException) {
             _uiState.value = AuthUiState.Error(e.message ?: "Sign up failed")
         }
     }
@@ -78,7 +78,7 @@ class AuthViewModel : ViewModel() {
             client.auth.verifyEmail(email = email, code = code)
             // Verification successful, user can now sign in
             _uiState.value = AuthUiState.VerificationSuccess
-        } catch (e: InsforgeHttpException) {
+        } catch (e: YarahHttpException) {
             _uiState.value = AuthUiState.Error("Invalid verification code")
         }
     }
@@ -88,7 +88,7 @@ class AuthViewModel : ViewModel() {
         try {
             client.auth.resendVerificationEmail(email = email)
             // Show success message
-        } catch (e: InsforgeHttpException) {
+        } catch (e: YarahHttpException) {
             _uiState.value = AuthUiState.Error("Failed to resend verification email")
         }
     }
@@ -105,11 +105,11 @@ sealed class AuthUiState {
 
 ### 電子郵件驗證
 
-對於使用電子郵件註冊的使用者，InsForge 後端提供三種選項：
+對於使用電子郵件註冊的使用者，Yarah 後端提供三種選項：
 
 1. **無電子郵件驗證** - 使用者可在註冊後立即登入。`SignUpResponse` 將具有 `accessToken != null`。
 2. **基於連結的驗證** - 使用者必須開啟電子郵件並按一下驗證連結，然後才能登入。
-3. **基於代碼的驗證** - InsForge 後端向使用者的電子郵件傳送 6 位驗證代碼。用戶端應用程式需要顯示驗證畫面，使用者可以在其中輸入代碼，然後呼叫 `verifyEmail(email, code)` 以完成驗證。只有之後使用者才能使用電子郵件 + 密碼登入。
+3. **基於代碼的驗證** - Yarah 後端向使用者的電子郵件傳送 6 位驗證代碼。用戶端應用程式需要顯示驗證畫面，使用者可以在其中輸入代碼，然後呼叫 `verifyEmail(email, code)` 以完成驗證。只有之後使用者才能使用電子郵件 + 密碼登入。
 
 當 `requireEmailVerification` 為 `true` 時，回應將具有：
 - `accessToken = null`
@@ -143,7 +143,7 @@ try {
     result.user?.let { user ->
         Log.d("Auth", "Welcome back, ${user.profile?.name ?: user.email}")
     }
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Sign in failed: ${e.message}")
 }
 ```
@@ -168,7 +168,7 @@ try {
 try {
     client.auth.signOut()
     Log.d("Auth", "User signed out")
-} catch (e: InsforgeException) {
+} catch (e: YarahException) {
     Log.e("Auth", "Sign out failed: ${e.message}")
 }
 ```
@@ -200,7 +200,7 @@ enum class OAuthProvider(val value: String) {
 ### 參數
 
 - `provider` (`OAuthProvider`) - 用於身份驗證的 OAuth 提供者
-- `redirectUri` (`String`) - 回呼 URL，InsForge 將在身份驗證後重新導向到此 URL
+- `redirectUri` (`String`) - 回呼 URL，Yarah 將在身份驗證後重新導向到此 URL
 
 ### 傳回值
 
@@ -212,10 +212,10 @@ String  // The OAuth authorization URL (also opens in browser automatically)
 
 1. 設定 BrowserLauncher
 
-建立 InsForge 用戶端時，設定 `browserLauncher` 以處理開啟 URL：
+建立 Yarah 用戶端時，設定 `browserLauncher` 以處理開啟 URL：
 
 ```kotlin
-val client = createInsforgeClient(baseURL, anonKey) {
+val client = createYarahClient(baseURL, anonKey) {
     install(Auth) {
         browserLauncher = BrowserLauncher { url ->
             val customTabsIntent = CustomTabsIntent.Builder()
@@ -290,8 +290,8 @@ fun startGoogleLogin() {
 
 ```kotlin
 class AuthCallbackActivity : AppCompatActivity() {
-    // Example: read the shared InsForge client from your Application class.
-    private val client by lazy { (application as MyApp).insforgeClient }
+    // Example: read the shared Yarah client from your Application class.
+    private val client by lazy { (application as MyApp).yarahClient }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -331,7 +331,7 @@ class AuthCallbackActivity : AppCompatActivity() {
 }
 ```
 
-`client` 應來自您在應用程式中其他地方使用的同一共用 InsForge 用戶端執行個體，例如 `Application` 單一形式或您的 DI 容器。
+`client` 應來自您在應用程式中其他地方使用的同一共用 Yarah 用戶端執行個體，例如 `Application` 單一形式或您的 DI 容器。
 
 ---
 
@@ -352,7 +352,7 @@ try {
     val response = client.auth.getCurrentUser()
     Log.d("Auth", "Email: ${response.email}")
     Log.d("Auth", "Name: ${response.profile?.name ?: "N/A"}")
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Failed to get user: ${e.message}")
 }
 ```
@@ -389,7 +389,7 @@ try {
         )
     )
     Log.d("Auth", "Profile updated: ${result.name}")
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Update failed: ${e.message}")
 }
 ```
@@ -398,7 +398,7 @@ try {
 
 ## 密碼重設
 
-InsForge 支援兩種密碼重設方法，在後端中設定：
+Yarah 支援兩種密碼重設方法，在後端中設定：
 
 - **代碼方法**：使用者透過電子郵件接收 6 位代碼，驗證該代碼以取得重設權杖，然後重設密碼
 - **連結方法**：使用者透過電子郵件接收包含重設權杖的魔法連結，然後直接重設密碼
@@ -418,7 +418,7 @@ try {
     client.auth.sendPasswordReset(email = "user@example.com")
     // Show message to check email
     showMessage("If your email is registered, you will receive a password reset email.")
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Failed to send reset email: ${e.message}")
 }
 ```
@@ -462,7 +462,7 @@ try {
     // Store the token and proceed to password reset screen
     val resetToken = response.token
     showPasswordResetScreen(token = resetToken)
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Invalid or expired code: ${e.message}")
 }
 ```
@@ -489,7 +489,7 @@ try {
     // Password reset successful
     showMessage("Password reset successfully. You can now sign in.")
     navigateToSignIn()
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     Log.e("Auth", "Password reset failed: ${e.message}")
 }
 ```
@@ -499,12 +499,12 @@ try {
 ## 錯誤處理
 
 ```kotlin
-import dev.insforge.exceptions.InsforgeHttpException
-import dev.insforge.exceptions.InsforgeException
+import dev.yarah.exceptions.YarahHttpException
+import dev.yarah.exceptions.YarahException
 
 try {
     val result = client.auth.signIn(email, password)
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     // HTTP errors from API with error codes
     when (e.error) {
         "INVALID_CREDENTIALS" -> showError("Invalid email or password")
@@ -514,7 +514,7 @@ try {
         "WEAK_PASSWORD" -> showError("Password is too weak")
         else -> showError("Error: ${e.message}")
     }
-} catch (e: InsforgeException) {
+} catch (e: YarahException) {
     // Other SDK errors (network, parsing, etc.)
     showError("Error: ${e.message}")
 }

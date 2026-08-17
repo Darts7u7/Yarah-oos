@@ -2,7 +2,7 @@ import type {
   DashboardDataUpdateEvent,
   DashboardEvent,
   DashboardMcpConnectedEvent,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 
 type DashboardEventListener = (event: DashboardEvent) => void;

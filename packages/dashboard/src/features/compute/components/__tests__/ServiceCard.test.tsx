@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ComputeCapabilitiesSchema, ServiceSchema } from '@insforge/shared-schemas';
+import type { ComputeCapabilitiesSchema, ServiceSchema } from '@yarahdev/shared-schemas';
 
 // Capabilities are looked up per provider, so the mock records which provider it was
 // asked about — that is the whole behaviour under test.
@@ -58,9 +58,9 @@ function service(overrides: Partial<ServiceSchema> = {}): ServiceSchema {
     scaleToZero: false,
     ingress: 'port',
     provider: 'docker',
-    providerAppId: 'insforge-k-worker',
+    providerAppId: 'yarah-k-worker',
     providerInstanceId: 'abc123',
-    flyAppId: 'insforge-k-worker',
+    flyAppId: 'yarah-k-worker',
     flyMachineId: 'abc123',
     status: 'running',
     endpointUrl: null,

@@ -1,5 +1,5 @@
 import { Type, Clock, Calendar, Hash, Percent, ToggleLeft, Fingerprint, Code } from 'lucide-react';
-import { ColumnType } from '@insforge/shared-schemas';
+import { ColumnType } from '@yarahdev/shared-schemas';
 
 // Special handling for auth.users foreign key references
 export const AUTH_USERS_TABLE = 'auth.users';

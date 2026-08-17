@@ -1,9 +1,9 @@
 ---
 title: S3 兼容网关
-description: 通过 /storage/v1/s3 端点使用任意 AWS SigV4 客户端访问 InsForge Storage，兼容 S3 协议，便于迁移现有工具链，仅限云项目。
+description: 通过 /storage/v1/s3 端点使用任意 AWS SigV4 客户端访问 Yarah Storage，兼容 S3 协议，便于迁移现有工具链，仅限云项目。
 ---
 
-InsForge Storage 在 `/storage/v1/s3` 处使用 [AWS S3 协议](https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html)。仅限云项目。
+Yarah Storage 在 `/storage/v1/s3` 处使用 [AWS S3 协议](https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html)。仅限云项目。
 
 ## 概念
 
@@ -15,21 +15,21 @@ InsForge Storage 在 `/storage/v1/s3` 处使用 [AWS S3 协议](https://docs.aws
 
 ```ini
 # ~/.aws/credentials
-[insforge]
+[yarah]
 aws_access_key_id = your_access_key_id
 aws_secret_access_key = your_secret_access_key
 
 # ~/.aws/config
-[profile insforge]
+[profile yarah]
 region = us-east-2
-endpoint_url = https://project_ref.region.insforge.app/storage/v1/s3
+endpoint_url = https://project_ref.region.apps.yarah.dev/storage/v1/s3
 s3 =
   addressing_style = path
 ```
 
 ```bash
-aws --profile insforge s3 cp ./photo.jpg s3://my-bucket/photo.jpg
-aws --profile insforge s3 sync ./dist s3://my-bucket/dist
+aws --profile yarah s3 cp ./photo.jpg s3://my-bucket/photo.jpg
+aws --profile yarah s3 sync ./dist s3://my-bucket/dist
 ```
 
 在代码中，设置 `forcePathStyle: true` 并将 `endpoint` 指向 `/storage/v1/s3`。
@@ -40,7 +40,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 const client = new S3Client({
   forcePathStyle: true,
   region: 'us-east-2',
-  endpoint: 'https://project_ref.region.insforge.app/storage/v1/s3',
+  endpoint: 'https://project_ref.region.apps.yarah.dev/storage/v1/s3',
   credentials: { accessKeyId: '...', secretAccessKey: '...' },
 });
 

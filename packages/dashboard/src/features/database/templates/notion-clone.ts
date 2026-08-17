@@ -315,7 +315,7 @@ CREATE TABLE page_shares (
   UNIQUE(page_id, user_id)
 );
 
--- Attachments table (files stored in InsForge storage)
+-- Attachments table (files stored in Yarah storage)
 CREATE TABLE attachments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   page_id UUID NOT NULL REFERENCES pages(id) ON UPDATE CASCADE ON DELETE CASCADE,

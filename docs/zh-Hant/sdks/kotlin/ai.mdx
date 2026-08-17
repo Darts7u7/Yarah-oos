@@ -1,13 +1,13 @@
 ---
 title: 模型閘道
-description: "使用 InsForge 預配的 OpenRouter 金鑰，從 Kotlin 應用程式呼叫 LLM 建構聊天、摘要與嵌入等 AI 功能。"
+description: "使用 Yarah 預配的 OpenRouter 金鑰，從 Kotlin 應用程式呼叫 LLM 建構聊天、摘要與嵌入等 AI 功能。"
 ---
 
 ## 概述
 
-InsForge 為模型閘道專案預配了一個 OpenRouter API 金鑰。新的 Kotlin 應用程式應從受信任的伺服器端程式碼、後端 API 或其他安全邊界呼叫 OpenRouter。不要將 OpenRouter 金鑰嵌入 Android 或桌面用戶端二進位檔案中。
+Yarah 為模型閘道專案預配了一個 OpenRouter API 金鑰。新的 Kotlin 應用程式應從受信任的伺服器端程式碼、後端 API 或其他安全邊界呼叫 OpenRouter。不要將 OpenRouter 金鑰嵌入 Android 或桌面用戶端二進位檔案中。
 
-以前的 InsForge Kotlin AI SDK 方法已被棄用為相容性包裝函式。使用 InsForge SDK 來實現資料庫、身份驗證、儲存空間、函式和即時功能；使用 OpenRouter 來進行模型呼叫。
+以前的 Yarah Kotlin AI SDK 方法已被棄用為相容性包裝函式。使用 Yarah SDK 來實現資料庫、身份驗證、儲存空間、函式和即時功能；使用 OpenRouter 來進行模型呼叫。
 
 ## 建議的架構
 
@@ -78,7 +78,7 @@ suspend fun sendPrompt(prompt: String, sessionToken: String): ChatResponse {
 
 對您的後端路由使用應用工作階段權杖或另一個使用者範圍的認證。切勿從 Kotlin 用戶端傳送 OpenRouter 金鑰。
 
-## 舊版 InsForge AI 方法
+## 舊版 Yarah AI 方法
 
 這些 Kotlin SDK 方法已為新的 AI 整合棄用：
 
@@ -88,4 +88,4 @@ suspend fun sendPrompt(prompt: String, sessionToken: String): ChatResponse {
 - `client.ai.generateEmbeddings(...)`
 - `client.ai.generateImage(...)`
 
-它們針對已棄用的 InsForge AI 代理。新的整合應使用儀表板中的 OpenRouter 金鑰，並遵循 OpenRouter 目前的 API 文件來瞭解模型參數和功能。
+它們針對已棄用的 Yarah AI 代理。新的整合應使用儀表板中的 OpenRouter 金鑰，並遵循 OpenRouter 目前的 API 文件來瞭解模型參數和功能。

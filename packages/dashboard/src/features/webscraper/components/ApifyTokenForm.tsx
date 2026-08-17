@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Input } from '@insforge/ui';
+import { Button, Input } from '@yarahdev/ui';
 import { useUpdateApifyConfig } from '#features/webscraper/hooks/useWebscraper';
 import { APIFY_CONSOLE_URL } from './shared';
 

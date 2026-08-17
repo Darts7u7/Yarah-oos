@@ -7,7 +7,7 @@ import { isCloudEnvironment } from '@/utils/environment.js';
 import { NEXT_ACTIONS } from '@/utils/next-actions.js';
 import { EmailTemplate } from '@/types/email.js';
 import logger from '@/utils/logger.js';
-import { ERROR_CODES, SendRawEmailRequest } from '@insforge/shared-schemas';
+import { ERROR_CODES, SendRawEmailRequest } from '@yarahdev/shared-schemas';
 
 /**
  * Email service — resolves provider per-call so SMTP config changes take effect without restart

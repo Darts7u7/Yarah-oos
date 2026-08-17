@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Skeleton } from '@insforge/ui';
+import { Skeleton } from '@yarahdev/ui';
 import { useMcpUsage } from '#features/logs/hooks/useMcpUsage';
 import { ClientDetailPage } from '#features/dashboard/components/dtest/ClientDetailPage';
-import { InstallInsForgePage } from '#features/dashboard/components/dtest/InstallInsForgePage';
+import { InstallYarahPage } from '#features/dashboard/components/dtest/InstallYarahPage';
 import type { ClientId } from '#features/dashboard/components/dtest/clientRegistry';
 
 function DTestLoadingState() {
@@ -46,7 +46,7 @@ export default function DTestInstallPage() {
   }
 
   return (
-    <InstallInsForgePage
+    <InstallYarahPage
       onSelectClient={(id) => setSelectedClient(id)}
       onDismiss={() => void navigate('/dashboard')}
     />

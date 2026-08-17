@@ -9,7 +9,7 @@ const switchVariants = cva(
     'peer inline-flex shrink-0 cursor-pointer items-center rounded-full border-transparent transition-colors',
     'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[rgb(var(--foreground))] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgb(var(--inverse))]',
     'disabled:cursor-not-allowed disabled:opacity-40',
-    'data-[state=checked]:bg-[rgb(var(--insforge-green-600))] data-[state=unchecked]:bg-[var(--alpha-16)]',
+    'data-[state=checked]:bg-[rgb(var(--yarah-green-600))] data-[state=unchecked]:bg-[var(--alpha-16)]',
   ],
   {
     variants: {

@@ -322,7 +322,7 @@ describe('Stripe payment services', () => {
       id: 'cus_123',
       object: 'customer',
       email: 'buyer@example.com',
-      metadata: { insforge_subject_type: 'team', insforge_subject_id: 'team_123' },
+      metadata: { yarah_subject_type: 'team', yarah_subject_id: 'team_123' },
     });
     mockProvider.listCustomers.mockResolvedValue([]);
     mockProvider.createCustomerPortalSession.mockResolvedValue({
@@ -478,11 +478,11 @@ describe('Stripe payment services', () => {
         'customer.subscription.resumed',
       ],
       metadata: {
-        managed_by: 'insforge',
-        insforge_webhook: 'stripe_payments',
-        insforge_environment: 'test',
-        insforge_endpoint_path: '/api/webhooks/stripe/test',
-        insforge_endpoint_url: 'http://localhost:7130/api/webhooks/stripe/test',
+        managed_by: 'yarah',
+        yarah_webhook: 'stripe_payments',
+        yarah_environment: 'test',
+        yarah_endpoint_path: '/api/webhooks/stripe/test',
+        yarah_endpoint_url: 'http://localhost:7130/api/webhooks/stripe/test',
       },
     });
     expect(mockEncrypt).toHaveBeenCalledWith('whsec_new');
@@ -563,7 +563,7 @@ describe('Stripe payment services', () => {
     expect(mockProvider.listSubscriptions).toHaveBeenCalledTimes(1);
   });
 
-  it('recreates existing InsForge-managed Stripe webhooks even when the stored endpoint URL is stale', async () => {
+  it('recreates existing Yarah-managed Stripe webhooks even when the stored endpoint URL is stale', async () => {
     const mockClient = {
       query: vi.fn().mockResolvedValue({ rows: [] }),
       release: vi.fn(),
@@ -579,9 +579,9 @@ describe('Stripe payment services', () => {
         object: 'webhook_endpoint',
         url: 'https://old.example.com/api/webhooks/stripe/test',
         metadata: {
-          managed_by: 'insforge',
-          insforge_webhook: 'stripe_payments',
-          insforge_environment: 'test',
+          managed_by: 'yarah',
+          yarah_webhook: 'stripe_payments',
+          yarah_environment: 'test',
         },
       },
       {
@@ -589,9 +589,9 @@ describe('Stripe payment services', () => {
         object: 'webhook_endpoint',
         url: 'https://old.example.com/api/webhooks/stripe/live',
         metadata: {
-          managed_by: 'insforge',
-          insforge_webhook: 'stripe_payments',
-          insforge_environment: 'live',
+          managed_by: 'yarah',
+          yarah_webhook: 'stripe_payments',
+          yarah_environment: 'live',
         },
       },
       {
@@ -1351,7 +1351,7 @@ describe('Stripe payment services', () => {
       name: 'New Product',
       active: true,
       metadata: { tier: 'new' },
-      idempotencyKey: 'insforge:live:product:agent-product-123',
+      idempotencyKey: 'yarah:live:product:agent-product-123',
     });
     expect(mockGetSecretByKey).toHaveBeenCalledWith('STRIPE_LIVE_SECRET_KEY');
     expect(mockMirrorClient.query).toHaveBeenCalledWith(
@@ -1547,7 +1547,7 @@ describe('Stripe payment services', () => {
       currency: 'usd',
       unitAmount: 2000,
       recurring: { interval: 'month', intervalCount: 1 },
-      idempotencyKey: 'insforge:test:price:agent-price-123',
+      idempotencyKey: 'yarah:test:price:agent-price-123',
     });
     expect(mockProvider.updatePrice).toHaveBeenCalledWith('price_123', {
       active: false,
@@ -1760,21 +1760,21 @@ describe('Stripe payment services', () => {
       clientReferenceId: expect.any(String),
       metadata: {
         plan: 'pro',
-        insforge_checkout_mode: 'subscription',
-        insforge_subject_type: 'team',
-        insforge_subject_id: 'team_123',
-        insforge_checkout_session_id: expect.any(String),
+        yarah_checkout_mode: 'subscription',
+        yarah_subject_type: 'team',
+        yarah_subject_id: 'team_123',
+        yarah_checkout_session_id: expect.any(String),
       },
-      idempotencyKey: 'insforge:test:checkout_session:checkout-123',
+      idempotencyKey: 'yarah:test:checkout_session:checkout-123',
     });
     const checkoutUpdateCall = mockPool.query.mock.calls.find(([sql]) =>
       /UPDATE payments\.stripe_checkout_sessions/i.test(String(sql))
     );
     expect(checkoutUpdateCall?.[1]?.[8]).toEqual({
       plan: 'pro',
-      insforge_checkout_mode: 'subscription',
-      insforge_subject_type: 'team',
-      insforge_subject_id: 'team_123',
+      yarah_checkout_mode: 'subscription',
+      yarah_subject_type: 'team',
+      yarah_subject_id: 'team_123',
     });
   });
 
@@ -1839,11 +1839,11 @@ describe('Stripe payment services', () => {
         JSON.stringify([{ priceId: 'price_123', quantity: 1 }]),
         'https://example.com/success',
         'https://example.com/cancel',
-        'insforge_checkout_session_id',
+        'yarah_checkout_session_id',
         JSON.stringify({
-          insforge_checkout_mode: 'subscription',
-          insforge_subject_type: 'team',
-          insforge_subject_id: 'team_123',
+          yarah_checkout_mode: 'subscription',
+          yarah_subject_type: 'team',
+          yarah_subject_id: 'team_123',
         }),
       ]
     );
@@ -1923,12 +1923,12 @@ describe('Stripe payment services', () => {
       customerEmail: 'buyer@example.com',
       clientReferenceId: existingCheckoutSessionRow.id,
       metadata: {
-        insforge_checkout_mode: 'subscription',
-        insforge_subject_type: 'team',
-        insforge_subject_id: 'team_123',
-        insforge_checkout_session_id: existingCheckoutSessionRow.id,
+        yarah_checkout_mode: 'subscription',
+        yarah_subject_type: 'team',
+        yarah_subject_id: 'team_123',
+        yarah_checkout_session_id: existingCheckoutSessionRow.id,
       },
-      idempotencyKey: 'insforge:test:checkout_session:checkout-123',
+      idempotencyKey: 'yarah:test:checkout_session:checkout-123',
     });
     expect(mockPool.query).toHaveBeenCalledWith(
       expect.stringMatching(/UPDATE payments\.stripe_checkout_sessions/i),
@@ -1986,11 +1986,11 @@ describe('Stripe payment services', () => {
         JSON.stringify([{ priceId: 'price_123', quantity: 1 }]),
         'https://example.com/success',
         'https://example.com/cancel',
-        'insforge_checkout_session_id',
+        'yarah_checkout_session_id',
         JSON.stringify({
-          insforge_checkout_mode: 'subscription',
-          insforge_subject_type: 'team',
-          insforge_subject_id: 'team_123',
+          yarah_checkout_mode: 'subscription',
+          yarah_subject_type: 'team',
+          yarah_subject_id: 'team_123',
         }),
       ]
     );
@@ -2039,13 +2039,13 @@ describe('Stripe payment services', () => {
         customerId: 'cus_existing',
         customerEmail: null,
         metadata: {
-          insforge_checkout_mode: 'payment',
-          insforge_subject_type: 'organization',
-          insforge_subject_id: 'org_123',
-          insforge_checkout_session_id: expect.any(String),
+          yarah_checkout_mode: 'payment',
+          yarah_subject_type: 'organization',
+          yarah_subject_id: 'org_123',
+          yarah_checkout_session_id: expect.any(String),
         },
         clientReferenceId: expect.any(String),
-        idempotencyKey: expect.stringMatching(/^insforge:test:checkout_session:/),
+        idempotencyKey: expect.stringMatching(/^yarah:test:checkout_session:/),
       })
     );
   });
@@ -2091,10 +2091,10 @@ describe('Stripe payment services', () => {
         customerEmail: 'buyer@example.com',
         customerCreation: 'always',
         metadata: {
-          insforge_checkout_mode: 'payment',
-          insforge_subject_type: 'organization',
-          insforge_subject_id: 'org_123',
-          insforge_checkout_session_id: expect.any(String),
+          yarah_checkout_mode: 'payment',
+          yarah_subject_type: 'organization',
+          yarah_subject_id: 'org_123',
+          yarah_checkout_session_id: expect.any(String),
         },
       })
     );
@@ -2141,10 +2141,10 @@ describe('Stripe payment services', () => {
       customerEmail: 'anon@example.com',
       clientReferenceId: expect.any(String),
       metadata: {
-        insforge_checkout_mode: 'payment',
-        insforge_checkout_session_id: expect.any(String),
+        yarah_checkout_mode: 'payment',
+        yarah_checkout_session_id: expect.any(String),
       },
-      idempotencyKey: expect.stringMatching(/^insforge:test:checkout_session:/),
+      idempotencyKey: expect.stringMatching(/^yarah:test:checkout_session:/),
     });
     expect(mockPool.query).not.toHaveBeenCalledWith(
       expect.stringMatching(/payments\.customer_mappings/i),
@@ -2152,7 +2152,7 @@ describe('Stripe payment services', () => {
     );
   });
 
-  it('rejects caller-controlled InsForge checkout metadata before creating Stripe checkout', async () => {
+  it('rejects caller-controlled Yarah checkout metadata before creating Stripe checkout', async () => {
     const mockClient = {
       query: vi.fn().mockResolvedValue({ rows: [] }),
       release: vi.fn(),
@@ -2169,13 +2169,13 @@ describe('Stripe payment services', () => {
           cancelUrl: 'https://example.com/cancel',
           customerEmail: 'anon@example.com',
           metadata: {
-            insforge_subject_type: 'team',
-            insforge_subject_id: 'team_victim',
+            yarah_subject_type: 'team',
+            yarah_subject_id: 'team_victim',
           },
         },
         anonCheckoutUser
       )
-    ).rejects.toThrow(/reserved for InsForge/i);
+    ).rejects.toThrow(/reserved for Yarah/i);
 
     expect(mockProvider.createCheckoutSession).not.toHaveBeenCalled();
     expect(mockProvider.createCustomer).not.toHaveBeenCalled();
@@ -2446,8 +2446,8 @@ describe('Stripe payment services', () => {
           payment_intent: 'pi_123',
           subscription: null,
           metadata: {
-            insforge_subject_type: 'team',
-            insforge_subject_id: 'team_123',
+            yarah_subject_type: 'team',
+            yarah_subject_id: 'team_123',
           },
         },
       },
@@ -2567,8 +2567,8 @@ describe('Stripe payment services', () => {
           payment_intent: 'pi_postprocess_123',
           subscription: null,
           metadata: {
-            insforge_subject_type: 'team',
-            insforge_subject_id: 'team_123',
+            yarah_subject_type: 'team',
+            yarah_subject_id: 'team_123',
           },
         },
       },
@@ -2723,8 +2723,8 @@ describe('Stripe payment services', () => {
           payment_intent: 'pi_delayed_123',
           subscription: null,
           metadata: {
-            insforge_subject_type: 'team',
-            insforge_subject_id: 'team_123',
+            yarah_subject_type: 'team',
+            yarah_subject_id: 'team_123',
           },
         },
       },
@@ -2816,8 +2816,8 @@ describe('Stripe payment services', () => {
           payment_intent: null,
           subscription: null,
           metadata: {
-            insforge_subject_type: 'team',
-            insforge_subject_id: 'team_123',
+            yarah_subject_type: 'team',
+            yarah_subject_id: 'team_123',
           },
         },
       },
@@ -2920,8 +2920,8 @@ describe('Stripe payment services', () => {
           payment_intent: 'pi_async_123',
           subscription: null,
           metadata: {
-            insforge_subject_type: 'team',
-            insforge_subject_id: 'team_123',
+            yarah_subject_type: 'team',
+            yarah_subject_id: 'team_123',
           },
         },
       },
@@ -3028,8 +3028,8 @@ describe('Stripe payment services', () => {
             subscription_details: {
               subscription: 'sub_123',
               metadata: {
-                insforge_subject_type: 'organization',
-                insforge_subject_id: 'org_123',
+                yarah_subject_type: 'organization',
+                yarah_subject_id: 'org_123',
               },
             },
           },
@@ -3252,7 +3252,7 @@ describe('Stripe payment services', () => {
     );
   });
 
-  it('ignores PaymentIntent webhooks that are not InsForge one-time checkout payments', async () => {
+  it('ignores PaymentIntent webhooks that are not Yarah one-time checkout payments', async () => {
     mockGetSecretByKey
       .mockResolvedValueOnce('whsec_test_123')
       .mockResolvedValueOnce('sk_test_1234567890');
@@ -3336,7 +3336,7 @@ describe('Stripe payment services', () => {
     );
   });
 
-  it('records InsForge one-time PaymentIntent webhooks with non-refund uniqueness', async () => {
+  it('records Yarah one-time PaymentIntent webhooks with non-refund uniqueness', async () => {
     mockGetSecretByKey
       .mockResolvedValueOnce('whsec_test_123')
       .mockResolvedValueOnce('sk_test_1234567890');
@@ -3355,9 +3355,9 @@ describe('Stripe payment services', () => {
           customer: 'cus_123',
           latest_charge: 'ch_123',
           metadata: {
-            insforge_checkout_mode: 'payment',
-            insforge_subject_type: 'team',
-            insforge_subject_id: 'team_123',
+            yarah_checkout_mode: 'payment',
+            yarah_subject_type: 'team',
+            yarah_subject_id: 'team_123',
           },
           receipt_email: 'buyer@example.com',
           description: 'One-time checkout',
@@ -3612,9 +3612,9 @@ describe('Stripe payment services', () => {
       receipt_email: 'early@example.com',
       created: 1777334400,
       metadata: {
-        insforge_checkout_mode: 'payment',
-        insforge_subject_type: 'team',
-        insforge_subject_id: 'team_early_123',
+        yarah_checkout_mode: 'payment',
+        yarah_subject_type: 'team',
+        yarah_subject_id: 'team_early_123',
       },
     } as unknown as StripePaymentIntent);
     mockProvider.retrieveCharge.mockResolvedValueOnce({
@@ -3813,8 +3813,8 @@ describe('Stripe payment services', () => {
         subscription_details: {
           subscription: 'sub_early_123',
           metadata: {
-            insforge_subject_type: 'organization',
-            insforge_subject_id: 'org_early_123',
+            yarah_subject_type: 'organization',
+            yarah_subject_id: 'org_early_123',
           },
         },
       },
@@ -3959,8 +3959,8 @@ describe('Stripe payment services', () => {
           trial_end: null,
           latest_invoice: 'in_123',
           metadata: {
-            insforge_subject_type: 'organization',
-            insforge_subject_id: 'org_123',
+            yarah_subject_type: 'organization',
+            yarah_subject_id: 'org_123',
           },
           items: {
             data: [
@@ -4143,7 +4143,7 @@ describe('Stripe payment services', () => {
     expect(mockProvider.listCustomers).toHaveBeenCalledTimes(1);
     expect(mockProvider.listSubscriptionItems).toHaveBeenCalledWith('sub_existing');
     expect(mockLogger.warn).not.toHaveBeenCalledWith(
-      'Stripe subscription projection is missing InsForge billing subject',
+      'Stripe subscription projection is missing Yarah billing subject',
       expect.any(Object)
     );
     expect(mockClient.query).toHaveBeenCalledWith(

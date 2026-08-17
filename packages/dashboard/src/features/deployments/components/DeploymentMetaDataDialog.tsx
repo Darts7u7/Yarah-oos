@@ -1,6 +1,6 @@
 import { Copy, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button, Dialog, DialogContent, DialogDescription, DialogTitle } from '@insforge/ui';
+import { Button, Dialog, DialogContent, DialogDescription, DialogTitle } from '@yarahdev/ui';
 import { ScrollArea } from '#components';
 import { useCopyToClipboard } from '#lib/hooks/useCopyToClipboard';
 import type { DeploymentSchema } from '#features/deployments/services/deployments.service';

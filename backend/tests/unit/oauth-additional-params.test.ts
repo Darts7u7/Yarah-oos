@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import axios from 'axios';
-import { oAuthInitRequestSchema } from '@insforge/shared-schemas';
+import { oAuthInitRequestSchema } from '@yarahdev/shared-schemas';
 import { GoogleOAuthProvider } from '../../src/providers/oauth/google.provider.js';
 
 const mocks = vi.hoisted(() => ({

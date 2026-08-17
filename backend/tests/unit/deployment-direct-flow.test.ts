@@ -44,7 +44,7 @@ vi.mock('../../src/providers/storage/s3.provider.js', () => ({
 
 import { DeploymentService } from '../../src/services/deployments/deployment.service';
 import { DeploymentStatus } from '../../src/types/deployments';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 describe('DeploymentService direct deployment flow', () => {
   beforeEach(() => {

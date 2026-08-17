@@ -7,7 +7,7 @@ import { successResponse } from '@/utils/response.js';
 import { parseZodSchema } from '@/utils/zod.js';
 import { getPaymentEnvironment } from '@/services/payments/helpers.js';
 import { normalizeStripeError } from '@/providers/payments/stripe-errors.js';
-import { ERROR_CODES, upsertStripeConfigBodySchema } from '@insforge/shared-schemas';
+import { ERROR_CODES, upsertStripeConfigBodySchema } from '@yarahdev/shared-schemas';
 
 const router = Router({ mergeParams: true });
 const configService = StripeConfigService.getInstance();

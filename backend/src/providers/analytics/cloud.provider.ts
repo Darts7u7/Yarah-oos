@@ -25,7 +25,7 @@ import {
   type PosthogRetentionResponse,
   type PosthogRecordingsResponse,
   type PosthogShareTokenResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import type { AnalyticsProvider } from './base.provider.js';
 
 export class CloudAnalyticsProvider implements AnalyticsProvider {
@@ -44,7 +44,7 @@ export class CloudAnalyticsProvider implements AnalyticsProvider {
 
   private throwUnsupported(): never {
     throw new AppError(
-      'PostHog integration is only available on Insforge Cloud, not in self-hosted mode.',
+      'PostHog integration is only available on Yarah Cloud, not in self-hosted mode.',
       501,
       ERROR_CODES.ANALYTICS_UNAVAILABLE
     );

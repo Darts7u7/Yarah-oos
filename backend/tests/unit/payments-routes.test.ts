@@ -35,7 +35,7 @@ import {
   updateRazorpayItemBodySchema,
   verifyRazorpayOrderBodySchema,
   verifyRazorpaySubscriptionBodySchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const FAKE_LIVE_SECRET_KEY = 'stripe_live_secret_placeholder';
 
@@ -744,13 +744,13 @@ describe('payments route schemas', () => {
     expect(razorpayCatalogRouteSource).not.toMatch(/router\.delete\(\s*'\/plans/);
   });
 
-  it('rejects caller-provided InsForge-reserved Razorpay notes', () => {
+  it('rejects caller-provided Yarah-reserved Razorpay notes', () => {
     expect(() =>
       createRazorpayOrderBodySchema.parse({
         amount: 50000,
         currency: 'INR',
         notes: {
-          insforge_subject_type: 'team',
+          yarah_subject_type: 'team',
         },
       })
     ).toThrow(/reserved/i);
@@ -765,7 +765,7 @@ describe('payments route schemas', () => {
           currency: 'INR',
         },
         notes: {
-          insforge_subject_id: 'team_123',
+          yarah_subject_id: 'team_123',
         },
       })
     ).toThrow(/reserved/i);
@@ -791,7 +791,7 @@ describe('payments route schemas', () => {
     });
   });
 
-  it('rejects caller-provided InsForge-reserved checkout metadata', () => {
+  it('rejects caller-provided Yarah-reserved checkout metadata', () => {
     expect(() =>
       createCheckoutSessionBodySchema.parse({
         mode: 'payment',
@@ -799,8 +799,8 @@ describe('payments route schemas', () => {
         successUrl: 'https://example.com/success',
         cancelUrl: 'https://example.com/cancel',
         metadata: {
-          insforge_subject_type: 'team',
-          insforge_subject_id: 'team_victim',
+          yarah_subject_type: 'team',
+          yarah_subject_id: 'team_victim',
         },
       })
     ).toThrow(/reserved/i);

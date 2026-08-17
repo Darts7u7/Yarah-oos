@@ -1,4 +1,4 @@
-import { ColumnType, type ColumnSchema } from '@insforge/shared-schemas';
+import { ColumnType, type ColumnSchema } from '@yarahdev/shared-schemas';
 import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_DATABASE_SCHEMA,

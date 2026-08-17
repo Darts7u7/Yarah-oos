@@ -14,7 +14,7 @@ import type {
   SyncStripePaymentsRequest,
   SyncStripePaymentsResponse,
   SyncStripePaymentsSubscriptionsSummary,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class StripeSyncService {
   private static instance: StripeSyncService;

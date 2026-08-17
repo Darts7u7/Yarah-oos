@@ -1,16 +1,16 @@
 ---
 title: "Stripe Payments"
 sidebarTitle: "Stripe"
-description: "Integrate Stripe Checkout, Billing Portal, Products, Prices, Subscriptions, and verified webhook fulfillment with InsForge Payments and mirrored tables."
+description: "Integrate Stripe Checkout, Billing Portal, Products, Prices, Subscriptions, and verified webhook fulfillment with Yarah Payments and mirrored tables."
 ---
 
 Use the Stripe integration when you want Stripe-hosted Checkout, Stripe Products and Prices, Stripe Subscriptions, and the hosted Billing Portal.
 
-InsForge stores Stripe secret keys server-side, creates Checkout and Billing Portal sessions from your app, automatically manages the Stripe webhook endpoint when your backend is reachable, mirrors Stripe state into the `payments` schema, and records verified webhook events.
+Yarah stores Stripe secret keys server-side, creates Checkout and Billing Portal sessions from your app, automatically manages the Stripe webhook endpoint when your backend is reachable, mirrors Stripe state into the `payments` schema, and records verified webhook events.
 
 ## Stripe model
 
-| Stripe concept | InsForge table or API |
+| Stripe concept | Yarah table or API |
 |----------------|-----------------------|
 | Product | `payments.stripe_products` |
 | Price | `payments.stripe_prices` |
@@ -26,20 +26,20 @@ InsForge stores Stripe secret keys server-side, creates Checkout and Billing Por
 Configure `test` and `live` Stripe secret keys in Dashboard -> Payments -> Settings, the CLI, or the admin API.
 
 ```bash
-npx @insforge/cli payments stripe status
-npx @insforge/cli payments stripe config set --environment test sk_test_xxx
-npx @insforge/cli payments stripe sync --environment test
-npx @insforge/cli payments stripe webhooks configure --environment test
+npx @yarah/cli payments stripe status
+npx @yarah/cli payments stripe config set --environment test sk_test_xxx
+npx @yarah/cli payments stripe sync --environment test
+npx @yarah/cli payments stripe webhooks configure --environment test
 ```
 
-After a key is connected, InsForge validates the account, stores the key in the secret store, tries to create the managed Stripe webhook endpoint, and runs sync for Products, Prices, Customers, and Subscriptions.
+After a key is connected, Yarah validates the account, stores the key in the secret store, tries to create the managed Stripe webhook endpoint, and runs sync for Products, Prices, Customers, and Subscriptions.
 
 ## Checkout
 
-Create Checkout Sessions from frontend code with the current InsForge user token.
+Create Checkout Sessions from frontend code with the current Yarah user token.
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'payment',
   lineItems: [{ priceId: 'price_123', quantity: 1 }],
   successUrl: `${window.location.origin}/checkout/success`,
@@ -58,7 +58,7 @@ if (data?.checkoutSession.url) {
 For subscription Checkout, pass a billing subject. The subject is your app-owned billing owner, such as a user, team, workspace, organization, tenant, or group.
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'subscription',
   subject: { type: 'team', id: teamId },
   lineItems: [{ priceId: 'price_monthly_123', quantity: 1 }],
@@ -74,14 +74,14 @@ if (data?.checkoutSession.url) {
 }
 ```
 
-Checkout inserts a row in `payments.stripe_checkout_sessions` using the caller's InsForge token. Add RLS policies so users can only create sessions for subjects they are allowed to bill. PostgreSQL applies `SELECT` policies to rows returned by `INSERT ... RETURNING` and idempotent lookups, so retries also need a matching `SELECT` policy for the same subject and idempotency key.
+Checkout inserts a row in `payments.stripe_checkout_sessions` using the caller's Yarah token. Add RLS policies so users can only create sessions for subjects they are allowed to bill. PostgreSQL applies `SELECT` policies to rows returned by `INSERT ... RETURNING` and idempotent lookups, so retries also need a matching `SELECT` policy for the same subject and idempotency key.
 
 ## Billing Portal
 
 Use the hosted Billing Portal for an existing Stripe customer mapping.
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCustomerPortalSession('test', {
+const { data, error } = await yarah.payments.stripe.createCustomerPortalSession('test', {
   subject: { type: 'team', id: teamId },
   returnUrl: `${window.location.origin}/billing`
 });
@@ -103,9 +103,9 @@ Portal creation requires an authenticated user and an existing `payments.custome
 
 ## Webhooks and fulfillment
 
-Stripe webhooks are managed automatically when the backend has a public URL. InsForge listens for the events needed to keep checkout attempts, customers, subscriptions, refunds, and transaction projections current.
+Stripe webhooks are managed automatically when the backend has a public URL. Yarah listens for the events needed to keep checkout attempts, customers, subscriptions, refunds, and transaction projections current.
 
-Stripe also recommends fulfilling Checkout orders from webhooks instead of the success URL. In InsForge, attach fulfillment triggers to `payments.webhook_events`.
+Stripe also recommends fulfilling Checkout orders from webhooks instead of the success URL. In Yarah, attach fulfillment triggers to `payments.webhook_events`.
 
 ```sql
 CREATE OR REPLACE FUNCTION public.fulfill_stripe_order()
@@ -134,9 +134,9 @@ CREATE TRIGGER fulfill_stripe_order_from_webhook
 
 ### Event ordering
 
-Webhook events are verified and processed independently. InsForge commits every row derived from an event before marking that event `processed`, but Stripe gives no ordering guarantee across events: `invoice.paid` can be processed before `checkout.session.completed`, so rows created by another event (such as `payments.customer_mappings`) may not exist yet when your trigger fires.
+Webhook events are verified and processed independently. Yarah commits every row derived from an event before marking that event `processed`, but Stripe gives no ordering guarantee across events: `invoice.paid` can be processed before `checkout.session.completed`, so rows created by another event (such as `payments.customer_mappings`) may not exist yet when your trigger fires.
 
-For subscription events, resolve the billing subject from the event payload first — InsForge stamps `insforge_subject_type` and `insforge_subject_id` into subscription metadata at checkout, and Stripe snapshots it onto subscription-generated invoices as `parent.subscription_details.metadata`. Check `invoice.metadata` next, then fall back to `payments.customer_mappings` (the same order InsForge uses internally):
+For subscription events, resolve the billing subject from the event payload first — Yarah stamps `yarah_subject_type` and `yarah_subject_id` into subscription metadata at checkout, and Stripe snapshots it onto subscription-generated invoices as `parent.subscription_details.metadata`. Check `invoice.metadata` next, then fall back to `payments.customer_mappings` (the same order Yarah uses internally):
 
 ```sql
 CREATE OR REPLACE FUNCTION public.grant_subscription_access()
@@ -150,13 +150,13 @@ BEGIN
      AND NEW.processing_status = 'processed' THEN
     v_subject_type := COALESCE(
       NEW.payload -> 'data' -> 'object' -> 'parent'
-        -> 'subscription_details' -> 'metadata' ->> 'insforge_subject_type',
-      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'insforge_subject_type'
+        -> 'subscription_details' -> 'metadata' ->> 'yarah_subject_type',
+      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'yarah_subject_type'
     );
     v_subject_id := COALESCE(
       NEW.payload -> 'data' -> 'object' -> 'parent'
-        -> 'subscription_details' -> 'metadata' ->> 'insforge_subject_id',
-      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'insforge_subject_id'
+        -> 'subscription_details' -> 'metadata' ->> 'yarah_subject_id',
+      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'yarah_subject_id'
     );
 
     IF v_subject_id IS NULL THEN

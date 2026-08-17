@@ -1,49 +1,49 @@
 ---
 title: "VS Code 擴充功能"
-description: "從 VS Code 登入 InsForge、選擇組織與專案，並一鍵為 AI 編碼助手安裝 InsForge MCP 伺服器與相關工具。"
+description: "從 VS Code 登入 Yarah、選擇組織與專案，並一鍵為 AI 編碼助手安裝 Yarah MCP 伺服器與相關工具。"
 ---
 
 ## 概覽
 
-InsForge VS Code 擴充功能：
+Yarah VS Code 擴充功能：
 
-- 讓您登入 InsForge（OAuth + PKCE）
+- 讓您登入 Yarah（OAuth + PKCE）
 - 讓您選擇組織/專案
-- 為您的 AI 用戶端安裝 InsForge MCP
+- 為您的 AI 用戶端安裝 Yarah MCP
 
-它透過您的專案的 API 金鑰和 API 基礎 URL 啟動 MCP 安裝程式（`npx @insforge/install`）。
+它透過您的專案的 API 金鑰和 API 基礎 URL 啟動 MCP 安裝程式（`npx @yarah/install`）。
 
 ## 連結
 
-- [VS Code 市場](https://marketplace.visualstudio.com/items?itemName=InsForge.insforge)
-- [開放 VSX](https://open-vsx.org/extension/InsForge/insforge)
+- [VS Code 市場](https://marketplace.visualstudio.com/items?itemName=Yarah.yarah)
+- [開放 VSX](https://open-vsx.org/extension/Yarah/yarah)
 
 ## 安裝
 
 1. 打開 VS Code
 2. 前往**擴充功能**
-3. 搜尋**InsForge**
-4. 安裝由**insforge**發佈的擴充功能
+3. 搜尋**Yarah**
+4. 安裝由**yarah**發佈的擴充功能
 
 ## 使用擴充功能
 
 <Steps>
-  <Step title="打開 InsForge 面板">
-    按一下活動列（左側邊欄）中的**InsForge**圖示。
+  <Step title="打開 Yarah 面板">
+    按一下活動列（左側邊欄）中的**Yarah**圖示。
   </Step>
 
   <Step title="登入">
-    按一下**使用 InsForge 登入**並在您的瀏覽器中完成登入流程。
+    按一下**使用 Yarah 登入**並在您的瀏覽器中完成登入流程。
 
     <Note>回呼是 <code>http://127.0.0.1:54321/callback</code>。</Note>
   </Step>
 
   <Step title="選擇專案">
-    從 InsForge 樹狀檢視中選擇組織和專案，或從命令面板執行 <code>InsForge: Select Project</code>。
+    從 Yarah 樹狀檢視中選擇組織和專案，或從命令面板執行 <code>Yarah: Select Project</code>。
   </Step>
 
   <Step title="安裝 MCP">
-    執行 <code>InsForge: Install MCP</code>（或以滑鼠右鍵按一下專案並選擇**安裝 MCP**），然後選擇您要設定的 AI 用戶端。
+    執行 <code>Yarah: Install MCP</code>（或以滑鼠右鍵按一下專案並選擇**安裝 MCP**），然後選擇您要設定的 AI 用戶端。
 
     安裝程式在 VS Code 終端機中執行。
   </Step>
@@ -51,7 +51,7 @@ InsForge VS Code 擴充功能：
 
 ## 支援的 AI 用戶端
 
-擴充功能支援下列 MCP"用戶端"（傳遞給 `@insforge/install` 的值）：
+擴充功能支援下列 MCP"用戶端"（傳遞給 `@yarah/install` 的值）：
 
 | 用戶端 | 典型配置位置 |
 |---|---|

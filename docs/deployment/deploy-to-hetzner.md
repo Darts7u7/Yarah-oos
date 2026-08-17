@@ -1,18 +1,18 @@
 ---
-title: "Self-Host InsForge on Hetzner Cloud"
-description: "Step-by-step guide to self-host the InsForge platform on a Hetzner Cloud VPS using Docker Compose, including firewall setup, domain config, and TLS termination."
+title: "Self-Host Yarah on Hetzner Cloud"
+description: "Step-by-step guide to self-host the Yarah platform on a Hetzner Cloud VPS using Docker Compose, including firewall setup, domain config, and TLS termination."
 ---
 
-# Self-Host InsForge on Hetzner Cloud
+# Self-Host Yarah on Hetzner Cloud
 
-This guide walks through self-hosting the InsForge platform on a [Hetzner Cloud](https://www.hetzner.com/cloud) server using Docker Compose.
+This guide walks through self-hosting the Yarah platform on a [Hetzner Cloud](https://www.hetzner.com/cloud) server using Docker Compose.
 
 <Note>
-  **This deploys InsForge itself, not the app you built.** If you just want to take your app live, use [Sites](/core-concepts/sites/overview) instead. This guide is for running the InsForge backend on your own infrastructure.
+  **This deploys Yarah itself, not the app you built.** If you just want to take your app live, use [Sites](/core-concepts/sites/overview) instead. This guide is for running the Yarah backend on your own infrastructure.
 </Note>
 
 <Note>
-  This cloud walkthrough is community-maintained and can lag the latest InsForge release. The canonical, always-current setup is the `deploy/docker-compose/` directory in the [InsForge repo](https://github.com/InsForge/InsForge).
+  This cloud walkthrough is community-maintained and can lag the latest Yarah release. The canonical, always-current setup is the `deploy/docker-compose/` directory in the [Yarah repo](https://github.com/Yarah/Yarah).
 </Note>
 
 ## 📋 Prerequisites
@@ -36,7 +36,7 @@ This guide walks through self-hosting the InsForge platform on a [Hetzner Cloud]
 | **Type** | **CX23** (2 vCPU, 4 GB RAM, 40 GB disk) for testing, or **CX33** (4 vCPU, 8 GB RAM, 80 GB disk) for production. These are Hetzner [Cost-Optimized](https://www.hetzner.com/cloud/cost-optimized/) plans on shared x86 CPUs. |
 | **Networking** | Enable a **Primary IPv4** address. IPv6 is optional and free. |
 | **SSH key** | Select the key you uploaded earlier. |
-| **Name** | e.g. `insforge-server` |
+| **Name** | e.g. `yarah-server` |
 
 3. Optional add-ons:
    - **Backups** — daily automatic disk snapshots with seven rotating slots ([Hetzner docs](https://docs.hetzner.com/cloud/servers/getting-started/enabling-backups))
@@ -44,7 +44,7 @@ This guide walks through self-hosting the InsForge platform on a [Hetzner Cloud]
 
 4. Click **Create & Buy now**.
 
-> 💡 **Plan note:** Hetzner also offers ARM-based **CAX** servers. InsForge publishes multi-arch images, but this guide assumes **CX** (x86) unless you have verified every container image pulls on your plan.
+> 💡 **Plan note:** Hetzner also offers ARM-based **CAX** servers. Yarah publishes multi-arch images, but this guide assumes **CX** (x86) unless you have verified every container image pulls on your plan.
 
 > 💡 **Pricing note:** Server prices depend on location and plan. A Primary IPv4 address is billed separately ([€0.50/month excluding VAT](https://docs.hetzner.com/cloud/servers/primary-ips/overview)). See [Hetzner Cloud pricing](https://www.hetzner.com/cloud) for current rates.
 
@@ -65,7 +65,7 @@ Hetzner Cloud Firewalls are free and filter traffic before it reaches your serve
 3. Attach the firewall to your server under **Apply to**.
 4. Click **Create Firewall**.
 
-> ⚠️ **Do not open** ports 5432, 5430, or 7133. In the self-host compose file, PostgreSQL, PostgREST, and Deno bind to `127.0.0.1` on the host and are not meant to be reached from the internet. For production, put Nginx or Caddy in front of InsForge on port 443 and stop exposing 7130 publicly — see [Configure Domain](#6-configure-domain-optional-but-recommended) below and the [deployment security guide](/deployment/deployment-security-guide).
+> ⚠️ **Do not open** ports 5432, 5430, or 7133. In the self-host compose file, PostgreSQL, PostgREST, and Deno bind to `127.0.0.1` on the host and are not meant to be reached from the internet. For production, put Nginx or Caddy in front of Yarah on port 443 and stop exposing 7130 publicly — see [Configure Domain](#6-configure-domain-optional-but-recommended) below and the [deployment security guide](/deployment/deployment-security-guide).
 
 ### 3. Connect to Your Server
 
@@ -112,28 +112,28 @@ apt install git -y
 
 > 💡 **Shortcut:** Hetzner offers a [Docker CE app](https://docs.hetzner.com/cloud/apps/list/docker-ce/) that preinstalls Docker and the Compose plugin on Ubuntu 24.04. You can select it instead of a plain Ubuntu image if you prefer; the rest of this guide is the same.
 
-### 5. Deploy InsForge
+### 5. Deploy Yarah
 
 #### 5.1 Fetch the Self-Host Files
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh | sh -s ~/insforge
+curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
-This sparse-checkouts the files the stack reads and writes `JWT_SECRET`, `ENCRYPTION_KEY`, `ROOT_ADMIN_PASSWORD`, `POSTGRES_PASSWORD`, and the API keys into `~/insforge/.env` (mode `600`). Nothing is started yet.
+This sparse-checkouts the files the stack reads and writes `JWT_SECRET`, `ENCRYPTION_KEY`, `ROOT_ADMIN_PASSWORD`, `POSTGRES_PASSWORD`, and the API keys into `~/yarah/.env` (mode `600`). Nothing is started yet.
 
 > Rather not pipe a script into a shell? Read it first:
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh -o setup.sh
+> curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh -o setup.sh
 > less setup.sh
-> sh setup.sh ~/insforge
+> sh setup.sh ~/yarah
 > ```
 
 #### 5.2 Configure Environment
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 nano .env
 ```
 
@@ -172,9 +172,9 @@ Press `Ctrl+C` to exit the log view.
 docker compose ps
 ```
 
-You should see four services — `postgres`, `postgrest`, `insforge`, and `deno`. Postgres and Deno report `healthy` when their health checks pass; PostgREST has no health check in this compose file and shows `running`.
+You should see four services — `postgres`, `postgrest`, `yarah`, and `deno`. Postgres and Deno report `healthy` when their health checks pass; PostgREST has no health check in this compose file and shows `running`.
 
-### 6. Access Your InsForge Instance
+### 6. Access Your Yarah Instance
 
 #### 6.1 Test the API
 
@@ -182,7 +182,7 @@ You should see four services — `postgres`, `postgrest`, `insforge`, and `deno`
 curl http://<your-server-ipv4>:7130/api/health
 ```
 
-You should get JSON with `"status": "ok"` and `"service": "Insforge OSS Backend"`.
+You should get JSON with `"status": "ok"` and `"service": "Yarah OSS Backend"`.
 
 #### 6.2 Open the Dashboard
 
@@ -201,7 +201,7 @@ Log in with `ROOT_ADMIN_USERNAME` and `ROOT_ADMIN_PASSWORD` from `.env`.
 Point a DNS **A record** at your server's IPv4 address:
 
 ```text
-insforge.yourdomain.com  →  <your-server-ipv4>
+yarah.yourdomain.com  →  <your-server-ipv4>
 ```
 
 If you use a [Floating IP](https://docs.hetzner.com/cloud/floating-ips/overview) instead of the server's Primary IP, point DNS at the floating address so you can move it between servers later.
@@ -217,14 +217,14 @@ apt install nginx -y
 Create a site config:
 
 ```bash
-nano /etc/nginx/sites-available/insforge
+nano /etc/nginx/sites-available/yarah
 ```
 
 ```nginx
 server {
     listen 80;
     listen [::]:80;
-    server_name insforge.yourdomain.com;
+    server_name yarah.yourdomain.com;
 
     location / {
         proxy_pass http://127.0.0.1:7130;
@@ -243,7 +243,7 @@ server {
 Enable it:
 
 ```bash
-ln -s /etc/nginx/sites-available/insforge /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/yarah /etc/nginx/sites-enabled/
 nginx -t
 systemctl reload nginx
 ```
@@ -252,20 +252,20 @@ Obtain a certificate with Certbot:
 
 ```bash
 apt install certbot python3-certbot-nginx -y
-certbot --nginx -d insforge.yourdomain.com
+certbot --nginx -d yarah.yourdomain.com
 ```
 
 Update `.env` with your HTTPS URL:
 
 ```env
-API_BASE_URL=https://insforge.yourdomain.com
-VITE_API_BASE_URL=https://insforge.yourdomain.com
+API_BASE_URL=https://yarah.yourdomain.com
+VITE_API_BASE_URL=https://yarah.yourdomain.com
 ```
 
-Restart InsForge:
+Restart Yarah:
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 docker compose down
 docker compose up -d
 ```
@@ -279,9 +279,9 @@ For Caddy, UFW, SSH hardening, and more detail, see the [deployment security gui
 ### View Logs
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 docker compose logs -f
-docker compose logs -f insforge
+docker compose logs -f yarah
 ```
 
 ### Stop or Restart
@@ -291,12 +291,12 @@ docker compose down
 docker compose restart
 ```
 
-### Update InsForge
+### Update Yarah
 
 The stack reads Postgres configuration and Deno function sources from this checkout, so updates are more than an image pull:
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 git pull origin main
 sh deploy/setup.sh .
 docker compose pull && docker compose up -d
@@ -305,14 +305,14 @@ docker compose pull && docker compose up -d
 ### Backup Database
 
 ```bash
-cd ~/insforge
-docker compose exec postgres pg_dump -U postgres insforge > backup_$(date +%Y%m%d_%H%M%S).sql
+cd ~/yarah
+docker compose exec postgres pg_dump -U postgres yarah > backup_$(date +%Y%m%d_%H%M%S).sql
 ```
 
 Restore:
 
 ```bash
-cat backup_file.sql | docker compose exec -T postgres psql -U postgres -d insforge
+cat backup_file.sql | docker compose exec -T postgres psql -U postgres -d yarah
 ```
 
 Hetzner **Backups** (if enabled) snapshot the whole disk. They complement — but do not replace — logical `pg_dump` backups.
@@ -341,7 +341,7 @@ docker compose up -d
 
 - Confirm the Hetzner Firewall allows the port you are using (7130 or 443).
 - Check `API_BASE_URL` and `VITE_API_BASE_URL` match how you open the site in your browser.
-- Run `curl http://localhost:7130/api/health` on the server. If that works but the public URL does not, the issue is firewall or DNS — not InsForge.
+- Run `curl http://localhost:7130/api/health` on the server. If that works but the public URL does not, the issue is firewall or DNS — not Yarah.
 
 ### Out of Memory
 
@@ -352,15 +352,15 @@ Resize to a larger plan in the Hetzner Console (**Rescale**), for example from *
 1. Restrict SSH (port 22) to your IP in the Hetzner Firewall.
 2. Use HTTPS in production and stop exposing port 7130 publicly once a reverse proxy is in place.
 3. Keep `.env` at mode `600` and back it up securely.
-4. Run `apt upgrade` regularly and pull new InsForge images when you update.
+4. Run `apt upgrade` regularly and pull new Yarah images when you update.
 5. See the [deployment security guide](/deployment/deployment-security-guide) for UFW, SSH hardening, and automated backups.
 
 ## 🆘 Support & Resources
 
-- **InsForge docs**: [https://docs.insforge.dev](https://docs.insforge.dev)
+- **Yarah docs**: [https://docs.yarah.dev](https://docs.yarah.dev)
 - **Hetzner docs**: [https://docs.hetzner.com/cloud/](https://docs.hetzner.com/cloud/)
-- **GitHub Issues**: [https://github.com/InsForge/InsForge/issues](https://github.com/InsForge/InsForge/issues)
-- **Discord**: [https://discord.com/invite/MPxwj5xVvW](https://discord.com/invite/MPxwj5xVvW)
+- **GitHub Issues**: [https://github.com/Yarah/Yarah/issues](https://github.com/Yarah/Yarah/issues)
+- **Discord**: [https://yarah.dev/community](https://yarah.dev/community)
 
 ## 📝 Cost Notes
 
@@ -374,4 +374,4 @@ Check [hetzner.com/cloud](https://www.hetzner.com/cloud) for current plan prices
 
 ---
 
-**Congratulations!** Your InsForge instance is running on Hetzner Cloud. For hardening, backups, and rollback procedures, see the [deployment security guide](/deployment/deployment-security-guide).
+**Congratulations!** Your Yarah instance is running on Hetzner Cloud. For hardening, backups, and rollback procedures, see the [deployment security guide](/deployment/deployment-security-guide).

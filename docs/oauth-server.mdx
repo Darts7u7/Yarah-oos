@@ -1,17 +1,17 @@
 ---
 title: OAuth Server
-description: Use InsForge as an OAuth 2.0 identity provider with PKCE so third-party apps, MCP tools, and CLI clients can sign in users against your project.
+description: Use Yarah as an OAuth 2.0 identity provider with PKCE so third-party apps, MCP tools, and CLI clients can sign in users against your project.
 ---
 
 ## Overview
 
-InsForge can function as an OAuth 2.0 identity provider, allowing third-party applications to authenticate users with "Sign in with InsForge". This enables developers building on your platform to leverage InsForge's authentication system without managing their own user credentials.
+Yarah can function as an OAuth 2.0 identity provider, allowing third-party applications to authenticate users with "Sign in with Yarah". This enables developers building on your platform to leverage Yarah's authentication system without managing their own user credentials.
 
 ## Use Cases
 
 <CardGroup cols={2}>
   <Card title="Developer Platforms" icon="code">
-    Enable third-party developers to build integrations with "Sign in with InsForge" while you maintain control over user data access.
+    Enable third-party developers to build integrations with "Sign in with Yarah" while you maintain control over user data access.
   </Card>
 
   <Card title="AI Agents & MCP" icon="robot">
@@ -19,7 +19,7 @@ InsForge can function as an OAuth 2.0 identity provider, allowing third-party ap
   </Card>
 
   <Card title="Partner Applications" icon="handshake">
-    Allow partner applications to authenticate users against your InsForge project without sharing credentials.
+    Allow partner applications to authenticate users against your Yarah project without sharing credentials.
   </Card>
 
   <Card title="CLI & Desktop Apps" icon="terminal">
@@ -29,24 +29,24 @@ InsForge can function as an OAuth 2.0 identity provider, allowing third-party ap
 
 ## OAuth 2.0 Flow
 
-InsForge implements the **Authorization Code flow with PKCE** (Proof Key for Code Exchange), the most secure OAuth flow for both web and native applications.
+Yarah implements the **Authorization Code flow with PKCE** (Proof Key for Code Exchange), the most secure OAuth flow for both web and native applications.
 
 ```mermaid
 sequenceDiagram
     participant App as Your Application
     participant User as User Browser
-    participant InsForge as InsForge Auth
-    participant API as InsForge API
+    participant Yarah as Yarah Auth
+    participant API as Yarah API
 
     App->>App: Generate code_verifier & code_challenge
     App->>User: Redirect to /api/oauth/v1/authorize
-    User->>InsForge: User authenticates
-    InsForge->>User: Authorization prompt
-    User->>InsForge: User approves
-    InsForge->>App: Redirect with authorization code
-    App->>InsForge: POST /api/oauth/v1/token<br/>(code + code_verifier)
-    InsForge->>InsForge: Verify PKCE
-    InsForge->>App: Access token + Refresh token
+    User->>Yarah: User authenticates
+    Yarah->>User: Authorization prompt
+    User->>Yarah: User approves
+    Yarah->>App: Redirect with authorization code
+    App->>Yarah: POST /api/oauth/v1/token<br/>(code + code_verifier)
+    Yarah->>Yarah: Verify PKCE
+    Yarah->>App: Access token + Refresh token
     App->>API: API requests with access token
     API->>App: Protected resources
 ```
@@ -55,7 +55,7 @@ sequenceDiagram
 
 <Steps>
   <Step title="Register Your Application">
-    Contact InsForge to register your application as an OAuth client. You'll receive:
+    Contact Yarah to register your application as an OAuth client. You'll receive:
     - **Client ID**: Public identifier for your application
     - **Client Secret**: Confidential key for server-side token exchange
     - **Allowed Redirect URIs**: URLs where users can be redirected after authorization
@@ -84,7 +84,7 @@ sequenceDiagram
 Redirect users to this endpoint to initiate the OAuth flow.
 
 ```
-GET https://api.insforge.dev/api/oauth/v1/authorize
+GET https://api.yarah.dev/api/oauth/v1/authorize
 ```
 
 **Query Parameters:**
@@ -102,7 +102,7 @@ GET https://api.insforge.dev/api/oauth/v1/authorize
 **Example:**
 
 ```
-https://api.insforge.dev/api/oauth/v1/authorize?
+https://api.yarah.dev/api/oauth/v1/authorize?
   client_id=clf_abc123xyz&
   redirect_uri=https://example.com/callback&
   response_type=code&
@@ -117,7 +117,7 @@ https://api.insforge.dev/api/oauth/v1/authorize?
 Exchange the authorization code for access and refresh tokens.
 
 ```
-POST https://api.insforge.dev/api/oauth/v1/token
+POST https://api.yarah.dev/api/oauth/v1/token
 ```
 
 **Request Body (JSON):**
@@ -149,7 +149,7 @@ POST https://api.insforge.dev/api/oauth/v1/token
 Exchange a refresh token for a new access token.
 
 ```
-POST https://api.insforge.dev/api/oauth/v1/token
+POST https://api.yarah.dev/api/oauth/v1/token
 ```
 
 **Request Body (JSON):**
@@ -168,7 +168,7 @@ POST https://api.insforge.dev/api/oauth/v1/token
 Retrieve the authenticated user's profile information.
 
 ```
-GET https://api.insforge.dev/auth/v1/profile
+GET https://api.yarah.dev/auth/v1/profile
 Authorization: Bearer {access_token}
 ```
 
@@ -272,9 +272,9 @@ Here's a complete Express.js implementation. First, create a `.env` file with yo
 ```bash
 # .env - DO NOT commit this file to version control
 SESSION_SECRET=your-secure-random-secret-min-32-chars
-INSFORGE_CLIENT_ID=clf_your_client_id
-INSFORGE_CLIENT_SECRET=your_client_secret
-INSFORGE_URL=https://api.insforge.dev
+YARAH_CLIENT_ID=clf_your_client_id
+YARAH_CLIENT_SECRET=your_client_secret
+YARAH_URL=https://api.yarah.dev
 REDIRECT_URI=http://localhost:3000/auth/callback
 ```
 
@@ -293,7 +293,7 @@ const session = require('express-session');
 const app = express();
 
 // Validate required environment variables
-const requiredEnvVars = ['SESSION_SECRET', 'INSFORGE_CLIENT_ID', 'INSFORGE_CLIENT_SECRET'];
+const requiredEnvVars = ['SESSION_SECRET', 'YARAH_CLIENT_ID', 'YARAH_CLIENT_SECRET'];
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
     console.error(`Missing required environment variable: ${envVar}`);
@@ -310,9 +310,9 @@ app.use(session({
 }));
 
 const config = {
-  clientId: process.env.INSFORGE_CLIENT_ID,
-  clientSecret: process.env.INSFORGE_CLIENT_SECRET,
-  insforgeUrl: process.env.INSFORGE_URL || 'https://api.insforge.dev',
+  clientId: process.env.YARAH_CLIENT_ID,
+  clientSecret: process.env.YARAH_CLIENT_SECRET,
+  yarahUrl: process.env.YARAH_URL || 'https://api.yarah.dev',
   redirectUri: process.env.REDIRECT_URI || 'http://localhost:3000/auth/callback',
   scopes: 'user:read organizations:read'
 };
@@ -334,7 +334,7 @@ app.get('/auth/login', (req, res) => {
   req.session.oauthState = state;
 
   // Build authorization URL
-  const authUrl = new URL(`${config.insforgeUrl}/api/oauth/v1/authorize`);
+  const authUrl = new URL(`${config.yarahUrl}/api/oauth/v1/authorize`);
   authUrl.searchParams.set('client_id', config.clientId);
   authUrl.searchParams.set('redirect_uri', config.redirectUri);
   authUrl.searchParams.set('response_type', 'code');
@@ -362,7 +362,7 @@ app.get('/auth/callback', async (req, res) => {
 
   try {
     // Exchange code for tokens
-    const tokenResponse = await fetch(`${config.insforgeUrl}/api/oauth/v1/token`, {
+    const tokenResponse = await fetch(`${config.yarahUrl}/api/oauth/v1/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -382,7 +382,7 @@ app.get('/auth/callback', async (req, res) => {
     }
 
     // Fetch user profile
-    const profileResponse = await fetch(`${config.insforgeUrl}/auth/v1/profile`, {
+    const profileResponse = await fetch(`${config.yarahUrl}/auth/v1/profile`, {
       headers: { 'Authorization': `Bearer ${tokens.access_token}` }
     });
 
@@ -410,7 +410,7 @@ app.get('/api/organizations', async (req, res) => {
     return res.status(401).json({ error: 'Not authenticated' });
   }
 
-  const response = await fetch(`${config.insforgeUrl}/organizations/v1`, {
+  const response = await fetch(`${config.yarahUrl}/organizations/v1`, {
     headers: { 'Authorization': `Bearer ${req.session.accessToken}` }
   });
 
@@ -434,7 +434,7 @@ function loginWithPopup() {
 
   const popup = window.open(
     '/auth/login?mode=popup',
-    'insforge-oauth',
+    'yarah-oauth',
     `width=${width},height=${height},left=${left},top=${top}`
   );
 
@@ -506,8 +506,8 @@ Access tokens are JWTs containing the following claims:
 | `scope` | Granted scopes |
 | `iat` | Issued at timestamp |
 | `exp` | Expiration timestamp |
-| `iss` | Issuer (`insforge`) |
-| `aud` | Audience (`insforge-api`) |
+| `iss` | Issuer (`yarah`) |
+| `aud` | Audience (`yarah-api`) |
 
 ## Error Handling
 
@@ -557,7 +557,7 @@ OAuth endpoints are rate-limited to prevent abuse:
 
 ## Resources
 
-<Card title="OAuth Example Repository" icon="github" href="https://github.com/InsForge/insforge-oauth-example">
-  Complete working example showing how to integrate "Sign in with InsForge" into your application.
+<Card title="OAuth Example Repository" icon="github" href="https://github.com/Yarah/yarah-oauth-example">
+  Complete working example showing how to integrate "Sign in with Yarah" into your application.
 </Card>
 

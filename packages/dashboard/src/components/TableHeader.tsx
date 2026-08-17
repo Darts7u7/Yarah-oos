@@ -1,4 +1,4 @@
-import { SearchInput, cn } from '@insforge/ui';
+import { SearchInput, cn } from '@yarahdev/ui';
 import { useTranslation } from 'react-i18next';
 
 interface TableHeaderProps {

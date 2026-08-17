@@ -1,13 +1,13 @@
 ---
 title: "实时"
 sidebarTitle: "Overview"
-description: "通过 InsForge 实时频道推送数据库变更、广播消息、在线状态（presence）与 Webhook 分发，基于 Socket.IO 为客户端 SDK 提供低延迟双向通信。"
+description: "通过 Yarah 实时频道推送数据库变更、广播消息、在线状态（presence）与 Webhook 分发，基于 Socket.IO 为客户端 SDK 提供低延迟双向通信。"
 ---
 
-当你的应用需要在不刷新页面的情况下更新时，可以使用 InsForge Realtime。客户端订阅诸如 `order:123` 或 `chat:room-1` 这样的频道，然后通过 WebSocket 接收数据库更改、广播和状态呈现更新。当另一个服务需要接收事件时，频道还可以将相同的消息分发到 webhook URL。
+当你的应用需要在不刷新页面的情况下更新时，可以使用 Yarah Realtime。客户端订阅诸如 `order:123` 或 `chat:room-1` 这样的频道，然后通过 WebSocket 接收数据库更改、广播和状态呈现更新。当另一个服务需要接收事件时，频道还可以将相同的消息分发到 webhook URL。
 
 <Frame caption="Realtime 控制台：频道模式、消息历史、权限和保留设置。">
-  <img src="/images/dashboard-realtime.png" alt="InsForge Realtime 控制台" />
+  <img src="/images/dashboard-realtime.png" alt="Yarah Realtime 控制台" />
 </Frame>
 
 <Note>
@@ -16,7 +16,7 @@ description: "通过 InsForge 实时频道推送数据库变更、广播消息�
 
 ```mermaid
 graph TB
-    App[Client application] --> SDK[InsForge SDK]
+    App[Client application] --> SDK[Yarah SDK]
     SDK --> Channel[Realtime channel]
 
     Database[(Postgres)] --> Trigger[Database trigger]
@@ -83,14 +83,14 @@ CREATE TRIGGER order_status_realtime
 ```typescript
 const channel = `order:${orderId}`;
 
-await insforge.realtime.connect();
+await yarah.realtime.connect();
 
-const subscription = await insforge.realtime.subscribe(channel);
+const subscription = await yarah.realtime.subscribe(channel);
 if (!subscription.ok) {
   throw new Error(subscription.error.message);
 }
 
-insforge.realtime.on('status_changed', (message) => {
+yarah.realtime.on('status_changed', (message) => {
   renderOrderStatus(message.status);
 });
 ```
@@ -100,7 +100,7 @@ insforge.realtime.on('status_changed', (message) => {
 客户端可以向已经加入的频道发布消息。可将其用于聊天、输入提示、光标、协同编辑信号等不需要从数据库写入开始的用户间更新。
 
 ```typescript
-await insforge.realtime.publish(`chat:${roomId}`, 'typing', {
+await yarah.realtime.publish(`chat:${roomId}`, 'typing', {
   userId,
   isTyping: true
 });
@@ -108,24 +108,24 @@ await insforge.realtime.publish(`chat:${roomId}`, 'typing', {
 
 ### Webhook
 
-当另一个服务需要接收每条消息时，可以为频道附加 webhook URL。InsForge 会将事件负载发布到每个已配置的 URL，包含事件名称、频道和消息 ID 的请求头，重试瞬时网络故障，并在消息历史中记录 webhook 投递次数。
+当另一个服务需要接收每条消息时，可以为频道附加 webhook URL。Yarah 会将事件负载发布到每个已配置的 URL，包含事件名称、频道和消息 ID 的请求头，重试瞬时网络故障，并在消息历史中记录 webhook 投递次数。
 
 ### 状态呈现（Presence）
 
 状态呈现（Presence）用于跟踪频道中谁在线。客户端在订阅时会收到当前成员快照，随后会在成员上线或离线时收到 `presence:join` 和 `presence:leave` 事件。请将持久化的房间成员关系、角色和权限存储在你自己的数据表中；状态呈现只提供在线状态。
 
 ```typescript
-const response = await insforge.realtime.subscribe(`chat:${roomId}`);
+const response = await yarah.realtime.subscribe(`chat:${roomId}`);
 
 if (response.ok) {
   renderOnlineMembers(response.presence.members);
 }
 
-insforge.realtime.on('presence:join', (message) => {
+yarah.realtime.on('presence:join', (message) => {
   addOnlineMember(message.member);
 });
 
-insforge.realtime.on('presence:leave', (message) => {
+yarah.realtime.on('presence:leave', (message) => {
   removeOnlineMember(message.member.presenceId);
 });
 ```

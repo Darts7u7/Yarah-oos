@@ -17,7 +17,7 @@ import {
   listCustomOAuthConfigsResponseSchema,
   oAuthInitRequestSchema,
   customOAuthKeySchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const router = Router();
 const authService = AuthService.getInstance();
@@ -316,7 +316,7 @@ router.get('/:key/callback', async (req: Request, res: Response, next: NextFunct
     });
 
     const successUrl = new URL(stateData.redirectUri);
-    successUrl.searchParams.set('insforge_code', exchangeCode);
+    successUrl.searchParams.set('yarah_code', exchangeCode);
     return res.redirect(successUrl.toString());
   } catch (error) {
     logger.error('Custom OAuth callback failed', {

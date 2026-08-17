@@ -17,7 +17,7 @@ import type {
   RazorpayItem,
   RazorpayPlan,
   UpdateRazorpayItemRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class RazorpayCatalogService {
   private static instance: RazorpayCatalogService;

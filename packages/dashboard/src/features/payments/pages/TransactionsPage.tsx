@@ -7,7 +7,7 @@ import type {
   PaymentTransaction,
   PaymentTransactionStatus,
   PaymentTransactionType,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import {
   Alert,
   AlertDescription,
@@ -21,7 +21,7 @@ import { PaymentsOnboardingState } from '#features/payments/components/PaymentsO
 import type { PaymentsOutletContext } from '#features/payments/components/PaymentsLayout';
 import { usePaymentClientPagination } from '#features/payments/hooks/usePaymentClientPagination';
 import { usePaymentTransactions } from '#features/payments/hooks/usePaymentTransactions';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 import { formatCurrencyAmount } from '#features/payments/helpers';
 
 const TRANSACTIONS_GRID_TEMPLATE =

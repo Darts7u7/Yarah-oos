@@ -1,4 +1,4 @@
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 // These tests run the real `deno check` (deno binary present in CI/dev). They

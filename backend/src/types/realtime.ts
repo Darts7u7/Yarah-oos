@@ -1,7 +1,7 @@
 /**
  * Realtime feature types - Backend-only types
  *
- * Shared types should be imported directly from @insforge/shared-schemas.
+ * Shared types should be imported directly from @yarahdev/shared-schemas.
  */
 
 // ============================================================================

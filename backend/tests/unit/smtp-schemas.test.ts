@@ -7,7 +7,7 @@ import {
   authConfigAdminResponseSchema,
   getPublicAuthConfigResponseSchema,
   adminSmtpMetadataSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 describe('SMTP Config Request Schema', () => {
   it('accepts valid SMTP config', () => {

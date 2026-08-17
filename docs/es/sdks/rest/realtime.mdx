@@ -1,6 +1,6 @@
 ---
 title: Referencia de API en tiempo real
-description: Administra canales en tiempo real, inspecciona el historial de mensajes y usa pub/sub de Socket.IO sin procesar con la API REST de InsForge.
+description: Administra canales en tiempo real, inspecciona el historial de mensajes y usa pub/sub de Socket.IO sin procesar con la API REST de Yarah.
 ---
 
 ## Descripción general
@@ -32,7 +32,7 @@ X-API-Key: <ik_api_key>
 Las conexiones Socket.IO se autentican a través del objeto Socket.IO `auth`:
 
 ```javascript
-const socket = io('https://your-app.insforge.app', {
+const socket = io('https://your-app.apps.yarah.dev', {
   auth: {
     token: '<user-jwt-or-anon-token>'
   }
@@ -42,7 +42,7 @@ const socket = io('https://your-app.insforge.app', {
 Los clientes de servidor/administrador pueden pasar una clave API:
 
 ```javascript
-const socket = io('https://your-app.insforge.app', {
+const socket = io('https://your-app.apps.yarah.dev', {
   auth: {
     apiKey: '<ik_api_key>'
   }
@@ -51,7 +51,7 @@ const socket = io('https://your-app.insforge.app', {
 
 ## Pub/Sub de Socket.IO
 
-Instala el cliente Socket.IO cuando no estés usando el SDK de InsForge:
+Instala el cliente Socket.IO cuando no estés usando el SDK de Yarah:
 
 ```bash
 npm install socket.io-client
@@ -62,7 +62,7 @@ npm install socket.io-client
 ```javascript
 import { io } from 'socket.io-client';
 
-const socket = io('https://your-app.insforge.app', {
+const socket = io('https://your-app.apps.yarah.dev', {
   auth: {
     token: '<user-jwt-or-anon-token>'
   }
@@ -156,7 +156,7 @@ GET /api/realtime/channels
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/realtime/channels" \
+curl "https://your-app.apps.yarah.dev/api/realtime/channels" \
   -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>"
 ```
 
@@ -192,7 +192,7 @@ Cuerpo de la solicitud:
 | `enabled` | `boolean` | No | Por defecto es `true`. Los canales deshabilitados no pueden unirse ni entregarse. |
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/realtime/channels" \
+curl -X POST "https://your-app.apps.yarah.dev/api/realtime/channels" \
   -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -216,7 +216,7 @@ PUT /api/realtime/channels/{id}
 ```
 
 ```bash
-curl -X PUT "https://your-app.insforge.app/api/realtime/channels/550e8400-e29b-41d4-a716-446655440000" \
+curl -X PUT "https://your-app.apps.yarah.dev/api/realtime/channels/550e8400-e29b-41d4-a716-446655440000" \
   -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -257,7 +257,7 @@ Parámetros de consulta:
 | `offset` | `integer` | Por defecto es 0. |
 
 ```bash
-curl "https://your-app.insforge.app/api/realtime/messages?eventName=status_changed&limit=50" \
+curl "https://your-app.apps.yarah.dev/api/realtime/messages?eventName=status_changed&limit=50" \
   -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>"
 ```
 
@@ -365,7 +365,7 @@ PATCH /api/realtime/config
 ```
 
 ```bash
-curl -X PATCH "https://your-app.insforge.app/api/realtime/config" \
+curl -X PATCH "https://your-app.apps.yarah.dev/api/realtime/config" \
   -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -383,8 +383,8 @@ El cuerpo de la solicitud es la carga útil de mensaje original. Los encabezados
 
 | Encabezado | Valor |
 |--------|-------|
-| `X-InsForge-Event` | Nombre del evento |
-| `X-InsForge-Channel` | Nombre del canal resuelto |
-| `X-InsForge-Message-Id` | UUID del mensaje |
+| `X-Yarah-Event` | Nombre del evento |
+| `X-Yarah-Channel` | Nombre del canal resuelto |
+| `X-Yarah-Message-Id` | UUID del mensaje |
 
 Los intentos de entrega se reflejan en `whAudienceCount` y `whDeliveredCount` en el historial de mensajes.

@@ -7,7 +7,7 @@
  * - Demonstrates reading secrets via Deno.env.get('KEY')
  *
  * Notes:
- * - `createClient` and `Deno` are injected by InsForge's worker template.
+ * - `createClient` and `Deno` are injected by Yarah's worker template.
  * - Keep exports exactly: module.exports = async function(request) { ... }
  */
 
@@ -38,7 +38,7 @@ module.exports = async function (request) {
     (url.searchParams.get('name') || '').trim() ||
     'World';
 
-  // Example secret (configure in InsForge -> Functions -> Secrets):
+  // Example secret (configure in Yarah -> Functions -> Secrets):
   // - HELLO_PREFIX="Hello"
   const helloPrefix = Deno.env.get('HELLO_PREFIX') || 'Hello';
 

@@ -7,7 +7,7 @@
     "rootDir": "..",
     "paths": {
       "@/*": ["./src/*"],
-      "@insforge/shared-schemas": ["../packages/shared-schemas/src/index.ts"]
+      "@yarahdev/shared-schemas": ["../packages/shared-schemas/src/index.ts"]
     },
     "strict": true,
     "esModuleInterop": true,

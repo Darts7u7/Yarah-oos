@@ -44,7 +44,7 @@ export class MicrosoftOAuthProvider implements OAuthProvider {
         throw new Error('State parameter is required for shared Microsoft OAuth');
       }
       // Use shared keys if configured
-      const cloudBaseUrl = process.env.CLOUD_API_HOST || 'https://api.insforge.dev';
+      const cloudBaseUrl = process.env.CLOUD_API_HOST || 'https://api.yarah.dev';
       const redirectUri = `${selfBaseUrl}/api/auth/oauth/shared/callback/${encodeURIComponent(state)}`;
 
       let sharedAuthUrl: string;

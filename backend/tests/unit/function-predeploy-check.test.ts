@@ -1,4 +1,4 @@
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppError } from '../../src/utils/errors.js';
 

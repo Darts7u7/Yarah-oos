@@ -4,7 +4,7 @@ import logger from '@/utils/logger.js';
 import { SecretService } from '@/services/secrets/secret.service.js';
 import { StripeSyncService } from '@/services/payments/stripe/sync.service.js';
 import { OAuthConfigService } from '@/services/auth/oauth-config.service.js';
-import { OAuthProvidersSchema } from '@insforge/shared-schemas';
+import { OAuthProvidersSchema } from '@yarahdev/shared-schemas';
 import { AuthConfigService } from '@/services/auth/auth-config.service.js';
 import { TokenManager } from '@/infra/security/token.manager.js';
 import { ModelGatewayConfigService } from '@/services/ai/model-gateway-config.service.js';
@@ -178,7 +178,7 @@ export async function seedBackend(): Promise<void> {
   const dbManager = DatabaseManager.getInstance();
 
   try {
-    logger.info(`\n🚀 Insforge Backend Starting...`);
+    logger.info(`\n🚀 Yarah Backend Starting...`);
 
     // Initialize API key (from env or generate)
     const apiKey = await secretService.initializeApiKey();
@@ -198,7 +198,7 @@ export async function seedBackend(): Promise<void> {
     logger.info(`✅ Database connected to PostgreSQL`, {
       host: process.env.POSTGRES_HOST || 'localhost',
       port: process.env.POSTGRES_PORT || '5432',
-      database: process.env.POSTGRES_DB || 'insforge',
+      database: process.env.POSTGRES_DB || 'yarah',
     });
     // Database connection info is already logged above
 
@@ -216,17 +216,17 @@ export async function seedBackend(): Promise<void> {
 
     // Initialize reserved secrets for edge functions
     if (!isCloudEnvironment()) {
-      // Add INSFORGE_INTERNAL_URL for Deno-to-backend container communication
-      const insforgInternalUrl = 'http://insforge:7130';
-      const existingInternalUrlSecret = await secretService.getSecretByKey('INSFORGE_INTERNAL_URL');
+      // Add YARAH_INTERNAL_URL for Deno-to-backend container communication
+      const insforgInternalUrl = 'http://yarah:7130';
+      const existingInternalUrlSecret = await secretService.getSecretByKey('YARAH_INTERNAL_URL');
 
       if (existingInternalUrlSecret === null) {
         await secretService.createSecret({
-          key: 'INSFORGE_INTERNAL_URL',
+          key: 'YARAH_INTERNAL_URL',
           isReserved: true,
           value: insforgInternalUrl,
         });
-        logger.info('✅ INSFORGE_INTERNAL_URL secret initialized');
+        logger.info('✅ YARAH_INTERNAL_URL secret initialized');
       }
     }
 
@@ -235,16 +235,16 @@ export async function seedBackend(): Promise<void> {
     // migrating any legacy JWT-format value left behind by older deployments.
     const anonKey = await secretService.initializeAnonKey();
 
-    // Add INSFORGE_BASE_URL for edge functions to call back to API
-    const existingBaseUrlSecret = await secretService.getSecretByKey('INSFORGE_BASE_URL');
+    // Add YARAH_BASE_URL for edge functions to call back to API
+    const existingBaseUrlSecret = await secretService.getSecretByKey('YARAH_BASE_URL');
 
     if (existingBaseUrlSecret === null) {
       await secretService.createSecret({
-        key: 'INSFORGE_BASE_URL',
+        key: 'YARAH_BASE_URL',
         isReserved: true,
         value: getApiBaseUrl(),
       });
-      logger.info('✅ INSFORGE_BASE_URL secret initialized');
+      logger.info('✅ YARAH_BASE_URL secret initialized');
     }
 
     // Add JWT_SECRET so CLI/SDK can access it via secrets API

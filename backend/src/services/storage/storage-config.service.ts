@@ -6,7 +6,7 @@ import {
   ERROR_CODES,
   type StorageConfigSchema,
   type UpdateStorageConfigRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { appConfig } from '@/infra/config/app.config.js';
 
 const DEFAULT_MAX_FILE_SIZE_MB = 50;

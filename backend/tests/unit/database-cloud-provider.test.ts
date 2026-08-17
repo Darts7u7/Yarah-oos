@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 const configMock = {
   cloud: { projectId: 'zeabur-project-1' as string | undefined, apiHost: 'https://cloud.test' },
   app: { jwtSecret: 's'.repeat(32), logLevel: 'error' },
-  server: { logsDir: '/tmp/insforge-db-cloud-test-logs' },
+  server: { logsDir: '/tmp/yarah-db-cloud-test-logs' },
 };
 vi.mock('@/infra/config/app.config.js', () => ({ config: configMock, appConfig: configMock }));
 
@@ -37,7 +37,7 @@ describe('CloudDatabaseProvider', () => {
     const provider = CloudDatabaseProvider.getInstance();
 
     await expect(provider.getDatabaseConnectionString()).rejects.toThrow(
-      'only available on InsForge Cloud projects'
+      'only available on Yarah Cloud projects'
     );
     expect(axiosGet).not.toHaveBeenCalled();
   });

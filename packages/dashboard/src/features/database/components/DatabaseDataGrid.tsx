@@ -12,7 +12,7 @@ import {
   JsonCellEditor,
   TextCellEditor,
 } from '#components/datagrid';
-import { ColumnSchema, ColumnType, TableSchema } from '@insforge/shared-schemas';
+import { ColumnSchema, ColumnType, TableSchema } from '@yarahdev/shared-schemas';
 import { ForeignKeyCell } from './ForeignKeyCell';
 import {
   encodeRecordKey,

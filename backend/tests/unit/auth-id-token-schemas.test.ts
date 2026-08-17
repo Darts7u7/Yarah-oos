@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { idTokenSignInRequestSchema, oAuthConfigSchema } from '@insforge/shared-schemas';
+import { idTokenSignInRequestSchema, oAuthConfigSchema } from '@yarahdev/shared-schemas';
 
 describe('idTokenSignInRequestSchema', () => {
   it('keeps the existing Google request compatible', () => {

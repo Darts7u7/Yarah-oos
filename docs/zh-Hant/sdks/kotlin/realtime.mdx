@@ -1,6 +1,6 @@
 ---
 title: Kotlin 即時 SDK 參考
-description: "使用 InsForge Kotlin 即時用戶端透過 Socket.IO 連線、訂閱頻道、發佈事件、追蹤線上狀態並自動處理重新連線。"
+description: "使用 Yarah Kotlin 即時用戶端透過 Socket.IO 連線、訂閱頻道、發佈事件、追蹤線上狀態並自動處理重新連線。"
 ---
 
 import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
@@ -11,14 +11,14 @@ import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
 
 ## 心智模型
 
-Kotlin SDK 透過 Socket.IO 連線到 InsForge 即時系統。訂閱頻道名稱（如 `order:123` 或 `chat:room-1`），然後監聽發佈到這些頻道的事件名稱。
+Kotlin SDK 透過 Socket.IO 連線到 Yarah 即時系統。訂閱頻道名稱（如 `order:123` 或 `chat:room-1`），然後監聽發佈到這些頻道的事件名稱。
 
 事件由資料庫觸發程式發佈，這些觸發程式呼叫 `realtime.publish(...)` 或由已加入頻道的用戶端發佈。有關頻道和 RLS 模型，請參閱[即時概述](/core-concepts/realtime/overview)。
 
 ## 快速開始
 
 ```kotlin
-import dev.insforge.realtime.models.SocketMessage
+import dev.yarah.realtime.models.SocketMessage
 
 client.realtime.connect()
 

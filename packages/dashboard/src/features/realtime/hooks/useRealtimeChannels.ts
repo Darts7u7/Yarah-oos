@@ -5,8 +5,8 @@ import {
   realtimeService,
   type RealtimeChannel,
 } from '#features/realtime/services/realtime.service';
-import { useToast } from '@insforge/ui';
-import type { CreateChannelRequest, UpdateChannelRequest } from '@insforge/shared-schemas';
+import { useToast } from '@yarahdev/ui';
+import type { CreateChannelRequest, UpdateChannelRequest } from '@yarahdev/shared-schemas';
 
 export function useRealtimeChannels() {
   const { t } = useTranslation('chrome');

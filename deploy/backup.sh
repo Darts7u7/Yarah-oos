@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Back up a self-hosted InsForge install: logical Postgres dump + .env copy.
+# Back up a self-hosted Yarah install: logical Postgres dump + .env copy.
 #
 # Run by path (use the shebang — this script requires bash):
-#   ~/insforge/deploy/backup.sh
+#   ~/yarah/deploy/backup.sh
 #   ./deploy/backup.sh              # when cwd is the install root
 #
 # Requires a running stack and a readable .env beside this checkout.
 # Override defaults:
 #   RETENTION_DAYS=30 ./deploy/backup.sh
-#   BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
+#   BACKUP_DIR=/mnt/backups/yarah ./deploy/backup.sh
 set -euo pipefail
 umask 077
 
@@ -41,7 +41,7 @@ set +a
 mkdir -p "$BACKUP_DIR"
 
 docker compose exec -T postgres \
-  pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" \
+  pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-yarah}" \
   > "$DUMP_TMP"
 
 if [ ! -s "$DUMP_TMP" ]; then

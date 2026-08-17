@@ -1,4 +1,4 @@
-import { CopyButton, cn } from '@insforge/ui';
+import { CopyButton, cn } from '@yarahdev/ui';
 import { useTranslation } from 'react-i18next';
 
 interface CredentialRowProps {

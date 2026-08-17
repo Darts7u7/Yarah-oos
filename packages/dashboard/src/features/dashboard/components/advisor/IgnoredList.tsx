@@ -4,7 +4,7 @@ import type {
   DashboardAdvisorSeverity,
   DashboardAdvisorSuppression,
 } from '#types';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 import { EmptyState } from '#components';
 import {
   useAdvisorSuppressions,

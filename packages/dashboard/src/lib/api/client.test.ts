@@ -16,7 +16,7 @@ describe('ApiClient CSRF cookie handling', () => {
 
     client.setCsrfToken('csrf token');
 
-    expect(document.cookie).toContain('insforge_admin_csrf_token=csrf%20token');
+    expect(document.cookie).toContain('yarah_admin_csrf_token=csrf%20token');
     expect(document.cookie).toContain('SameSite=Lax; Secure');
     expect(client.getCsrfToken()).toBe('csrf token');
   });
@@ -27,7 +27,7 @@ describe('ApiClient CSRF cookie handling', () => {
 
     client.clearCsrfToken();
 
-    expect(document.cookie).toContain('insforge_admin_csrf_token=; max-age=0');
+    expect(document.cookie).toContain('yarah_admin_csrf_token=; max-age=0');
     expect(document.cookie).toContain('SameSite=Lax');
     expect(document.cookie).toContain('Secure');
   });

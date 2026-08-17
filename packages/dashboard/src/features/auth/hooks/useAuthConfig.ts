@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { AuthConfigSchema, UpdateAuthConfigRequest } from '@insforge/shared-schemas';
+import { AuthConfigSchema, UpdateAuthConfigRequest } from '@yarahdev/shared-schemas';
 import { authConfigService } from '#features/auth/services/config.service';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 export function useAuthConfig() {
   const { t } = useTranslation('chrome');

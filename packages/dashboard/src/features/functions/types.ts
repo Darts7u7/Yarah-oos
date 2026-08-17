@@ -1,4 +1,4 @@
-import type { CreateScheduleRequest } from '@insforge/shared-schemas';
+import type { CreateScheduleRequest } from '@yarahdev/shared-schemas';
 
 // Form schema type for creating/editing schedules
 export type ScheduleFormSchema = CreateScheduleRequest;

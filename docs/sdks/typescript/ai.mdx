@@ -1,13 +1,13 @@
 ---
 title: Model Gateway
-description: Build AI features in TypeScript with the OpenAI SDK and the OpenRouter API key provisioned by the InsForge Model Gateway for chat, streaming, and embeddings.
+description: Build AI features in TypeScript with the OpenAI SDK and the OpenRouter API key provisioned by the Yarah Model Gateway for chat, streaming, and embeddings.
 ---
 
 ## Overview
 
-InsForge provisions an OpenRouter API key for Model Gateway projects. For new AI features, use that key directly with OpenRouter's OpenAI-compatible API instead of the deprecated InsForge AI proxy methods.
+Yarah provisions an OpenRouter API key for Model Gateway projects. For new AI features, use that key directly with OpenRouter's OpenAI-compatible API instead of the deprecated Yarah AI proxy methods.
 
-Use the InsForge dashboard to copy the active OpenRouter key, store it in `OPENROUTER_API_KEY`, and call OpenRouter from trusted server-side code.
+Use the Yarah dashboard to copy the active OpenRouter key, store it in `OPENROUTER_API_KEY`, and call OpenRouter from trusted server-side code.
 
 <Warning>
 Do not expose `OPENROUTER_API_KEY` in browser bundles. In React, Next.js, Vue, Svelte, and similar apps, put OpenRouter calls behind a backend route, server action, function, or other server-only boundary.
@@ -247,17 +247,17 @@ export async function POST(request: Request) {
 }
 ```
 
-## Using InsForge Data with AI
+## Using Yarah Data with AI
 
-Use the InsForge SDK for database, auth, storage, functions, and realtime. Use OpenRouter directly for model calls.
+Use the Yarah SDK for database, auth, storage, functions, and realtime. Use OpenRouter directly for model calls.
 
 ```typescript
 import { createClient } from '@insforge/sdk';
 import OpenAI from 'openai';
 
-const insforge = createClient({
-  baseUrl: process.env.INSFORGE_BASE_URL!,
-  anonKey: process.env.INSFORGE_ANON_KEY!,
+const yarah = createClient({
+  baseUrl: process.env.YARAH_BASE_URL!,
+  anonKey: process.env.YARAH_ANON_KEY!,
 });
 
 const openai = new OpenAI({
@@ -265,7 +265,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
-const { data: documents } = await insforge.database
+const { data: documents } = await yarah.database
   .from('documents')
   .select()
   .limit(5);
@@ -283,16 +283,16 @@ const completion = await openai.chat.completions.create({
 console.log(completion.choices[0]?.message?.content);
 ```
 
-## Legacy InsForge AI Proxy
+## Legacy Yarah AI Proxy
 
-The previous InsForge AI SDK methods are deprecated:
+The previous Yarah AI SDK methods are deprecated:
 
-- `insforge.ai.chat.completions.create()`
-- `insforge.ai.images.generate()`
-- `insforge.ai.embeddings.create()`
+- `yarah.ai.chat.completions.create()`
+- `yarah.ai.images.generate()`
+- `yarah.ai.embeddings.create()`
 
-They map to backend proxy routes that still exist for compatibility, but new integrations should use OpenRouter directly. The direct path gives access to OpenRouter's complete and evolving API surface without waiting for InsForge SDK wrapper updates.
+They map to backend proxy routes that still exist for compatibility, but new integrations should use OpenRouter directly. The direct path gives access to OpenRouter's complete and evolving API surface without waiting for Yarah SDK wrapper updates.
 
 ## Model Catalog
 
-Use the InsForge dashboard or OpenRouter model catalog to choose a model. Model IDs use the `provider/model` format, such as `openai/gpt-4o`, `anthropic/claude-3.5-haiku`, and `google/gemini-2.5-flash-image`.
+Use the Yarah dashboard or OpenRouter model catalog to choose a model. Model IDs use the `provider/model` format, such as `openai/gpt-4o`, `anthropic/claude-3.5-haiku`, and `google/gemini-2.5-flash-image`.

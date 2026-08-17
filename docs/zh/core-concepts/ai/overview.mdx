@@ -1,13 +1,13 @@
 ---
 title: "模型网关"
 sidebarTitle: "Overview"
-description: "通过 InsForge 模型网关调用 OpenAI、Anthropic、Google 等任意 LLM，仅需一个托管密钥，具备按项目配额、用量分析与统一 API。"
+description: "通过 Yarah 模型网关调用 OpenAI、Anthropic、Google 等任意 LLM，仅需一个托管密钥，具备按项目配额、用量分析与统一 API。"
 ---
 
-使用模型网关通过一个 OpenAI 兼容的端点调用聊天、流式和嵌入模型。InsForge 保有提供商密钥，跟踪每个项目的使用情况，并通过 [OpenRouter](https://openrouter.ai) 路由流量，因此您的应用代码永远不会直接看到 Anthropic、OpenAI 或 Mistral 凭证。
+使用模型网关通过一个 OpenAI 兼容的端点调用聊天、流式和嵌入模型。Yarah 保有提供商密钥，跟踪每个项目的使用情况，并通过 [OpenRouter](https://openrouter.ai) 路由流量，因此您的应用代码永远不会直接看到 Anthropic、OpenAI 或 Mistral 凭证。
 
 <Frame caption="一个 OpenAI 兼容的端点，具有按提供商访问、随时可复制的代码和使用跟踪。">
-  <img src="/images/model-gateway-overview.png" alt="InsForge 仪表盘模型网关概览，显示代码示例、提供商芯片和使用图表" />
+  <img src="/images/model-gateway-overview.png" alt="Yarah 仪表盘模型网关概览，显示代码示例、提供商芯片和使用图表" />
 </Frame>
 
 <Note>
@@ -16,7 +16,7 @@ description: "通过 InsForge 模型网关调用 OpenAI、Anthropic、Google 等
 
 ```mermaid
 graph TB
-    Dashboard[InsForge Dashboard] --> Key[Active OpenRouter Key]
+    Dashboard[Yarah Dashboard] --> Key[Active OpenRouter Key]
     Dashboard --> Catalog[OpenRouter Model Catalog]
     Dashboard --> Metrics[OpenRouter Usage Overview]
 
@@ -38,7 +38,7 @@ graph TB
 
 ### OpenAI 兼容的 API
 
-将任何 OpenAI SDK 或 `openai` 兼容的库指向 `https://<project>.insforge.dev/v1`，它就能工作。`/v1/chat/completions`、`/v1/embeddings` 和 `/v1/models` 都表现得像上游规范。
+将任何 OpenAI SDK 或 `openai` 兼容的库指向 `https://<project>.yarah.dev/v1`，它就能工作。`/v1/chat/completions`、`/v1/embeddings` 和 `/v1/models` 都表现得像上游规范。
 
 ### 流式处理
 

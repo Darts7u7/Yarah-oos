@@ -11,7 +11,7 @@ import {
   type DatabaseBackupsResponse,
   type DatabaseBackupConfigResponse,
   type UpdateDatabaseBackupConfig,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { AppError, isPgErrorLike } from '@/utils/errors.js';
 import { DatabaseManager } from '@/infra/database/database.manager.js';
 import { appConfig } from '@/infra/config/app.config.js';
@@ -24,7 +24,7 @@ import logger from '@/utils/logger.js';
 // otherwise it is written to `<STORAGE_DIR>/_database_backups/<key>`.
 const BACKUP_BUCKET = '_database_backups';
 const MAX_STDERR_LENGTH = 4000;
-const RESTORE_APPLICATION_NAME = 'insforge-backup-restore';
+const RESTORE_APPLICATION_NAME = 'yarah-backup-restore';
 const RESTORE_LOCK_POLL_INTERVAL_MS = 5_000;
 const RESTORE_LOCK_WAIT_TIMEOUT_MS = 30_000;
 const SCHEDULER_TICK_MS = 60_000;

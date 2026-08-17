@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Insforge Authentication API
+  title: Yarah Authentication API
   version: 2.0.0
   description: Authentication endpoints with separated auth and profile tables
 
@@ -320,8 +320,8 @@ paths:
                   format: uri
                   description: >-
                     Used for link-based email verification. The email link always
-                    opens an InsForge backend endpoint first; after the token is
-                    verified, InsForge redirects the browser to this URL. This URL
+                    opens an Yarah backend endpoint first; after the token is
+                    verified, Yarah redirects the browser to this URL. This URL
                     must be included in allowedRedirectUrls. Recommended: use your
                     app's sign-in page.
       responses:
@@ -513,7 +513,7 @@ paths:
         Authenticates with a password or email OTP and returns an access token.
         Existing password clients may omit `method`; it defaults to `password`.
 
-        With `method: otp`, InsForge verifies and consumes the 6-digit sign-in
+        With `method: otp`, Yarah verifies and consumes the 6-digit sign-in
         code. If the email is new and public signups are enabled, it then creates
         a verified passwordless user. If public signups are disabled, a valid
         code for an unknown email is consumed and the request returns 403.
@@ -793,7 +793,7 @@ paths:
   /api/auth/admin/sessions/exchange:
     post:
       summary: Exchange cloud provider authorization code for admin session
-      description: Verifies an authorization code/JWT from from Insforge Cloud platform and issues an internal admin session token with project_admin role
+      description: Verifies an authorization code/JWT from from Yarah Cloud platform and issues an internal admin session token with project_admin role
       tags:
         - Admin
       requestBody:
@@ -807,7 +807,7 @@ paths:
               properties:
                 code:
                   type: string
-                  description: Authorization code or JWT from the Insforge
+                  description: Authorization code or JWT from the Yarah
                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
       responses:
         '200':
@@ -835,7 +835,7 @@ paths:
   /api/auth/admin/refresh:
     post:
       summary: Refresh admin dashboard access token
-      description: Uses the dashboard-only httpOnly `insforge_admin_refresh_token` cookie with an `X-CSRF-Token` header.
+      description: Uses the dashboard-only httpOnly `yarah_admin_refresh_token` cookie with an `X-CSRF-Token` header.
       tags:
         - Admin
       parameters:
@@ -869,7 +869,7 @@ paths:
     post:
       summary: Logout admin dashboard session
       description: |
-        Clears the dashboard-only `insforge_admin_refresh_token` cookie.
+        Clears the dashboard-only `yarah_admin_refresh_token` cookie.
 
         If a valid admin refresh cookie is present, the request must include the `X-CSRF-Token`
         header returned from admin login, admin session exchange, or admin refresh. Missing, expired,
@@ -981,7 +981,7 @@ paths:
   /api/auth/email/send-verification:
     post:
       summary: Send email verification (code or link based on config)
-      description: Send email verification using the method configured in auth settings (verifyEmailMethod). When method is 'code', sends a 6-digit numeric code. When method is 'link', sends a browser verification link that goes through an InsForge backend endpoint first. Prevents user enumeration by returning success even if email doesn't exist.
+      description: Send email verification using the method configured in auth settings (verifyEmailMethod). When method is 'code', sends a 6-digit numeric code. When method is 'link', sends a browser verification link that goes through an Yarah backend endpoint first. Prevents user enumeration by returning success even if email doesn't exist.
       tags:
         - Client
       requestBody:
@@ -1002,8 +1002,8 @@ paths:
                   format: uri
                   description: >-
                     Used for link-based email verification. The email link always
-                    opens an InsForge backend endpoint first; after the token is
-                    verified, InsForge redirects the browser to this URL. This URL
+                    opens an Yarah backend endpoint first; after the token is
+                    verified, Yarah redirects the browser to this URL. This URL
                     must be included in allowedRedirectUrls. Recommended: use your
                     app's sign-in page.
       responses:
@@ -1033,14 +1033,14 @@ paths:
         stored, validated `redirectTo` URL with the verification result.
 
         Redirect query params:
-        - Success: `insforge_status=success&insforge_type=verify_email`
-        - Error: `insforge_status=error&insforge_type=verify_email&insforge_error=...`
-        - `insforge_status`: `success` or `error`
-        - `insforge_type`: always `verify_email`
-        - `insforge_error`: present only on error, human-readable message
+        - Success: `yarah_status=success&yarah_type=verify_email`
+        - Error: `yarah_status=error&yarah_type=verify_email&yarah_error=...`
+        - `yarah_status`: `success` or `error`
+        - `yarah_type`: always `verify_email`
+        - `yarah_error`: present only on error, human-readable message
 
         Recommended handling: use your sign-in page as `redirectTo`. When the
-        redirect arrives with `insforge_status=success`, show a confirmation message
+        redirect arrives with `yarah_status=success`, show a confirmation message
         and ask the user to sign in with their email and password.
       tags:
         - Client
@@ -1129,7 +1129,7 @@ paths:
   /api/auth/email/send-reset-password:
     post:
       summary: Send password reset (code or link based on config)
-      description: Send password reset email using the method configured in auth settings (resetPasswordMethod). When method is 'code', sends a 6-digit numeric code for two-step flow. When method is 'link', sends a browser reset link that goes through an InsForge backend endpoint first. Prevents user enumeration by returning success even if email doesn't exist.
+      description: Send password reset email using the method configured in auth settings (resetPasswordMethod). When method is 'code', sends a 6-digit numeric code for two-step flow. When method is 'link', sends a browser reset link that goes through an Yarah backend endpoint first. Prevents user enumeration by returning success even if email doesn't exist.
       tags:
         - Client
       requestBody:
@@ -1150,7 +1150,7 @@ paths:
                   format: uri
                   description: >-
                     Used for link-based password reset. The email link always
-                    opens an InsForge backend endpoint first; InsForge then
+                    opens an Yarah backend endpoint first; Yarah then
                     redirects the browser to this URL with the reset token in
                     the query string. This URL must be included in
                     allowedRedirectUrls. Recommended: use your app's dedicated
@@ -1232,14 +1232,14 @@ paths:
         stored, validated `redirectTo` URL with the reset token in the query string.
 
         Redirect query params:
-        - Ready: `token=...&insforge_status=ready&insforge_type=reset_password`
-        - Error: `insforge_status=error&insforge_type=reset_password&insforge_error=...`
-        - `token`: present only when `insforge_status=ready`
-        - `insforge_status`: `ready` or `error`
-        - `insforge_type`: always `reset_password`
-        - `insforge_error`: present only on error, human-readable message
+        - Ready: `token=...&yarah_status=ready&yarah_type=reset_password`
+        - Error: `yarah_status=error&yarah_type=reset_password&yarah_error=...`
+        - `token`: present only when `yarah_status=ready`
+        - `yarah_status`: `ready` or `error`
+        - `yarah_type`: always `reset_password`
+        - `yarah_error`: present only on error, human-readable message
 
-        Your app should render the reset-password form only when `insforge_status=ready`
+        Your app should render the reset-password form only when `yarah_status=ready`
         and `token` is present.
       tags:
         - Client
@@ -1535,7 +1535,7 @@ paths:
           schema:
             type: string
             format: uri
-          description: URL to redirect after authentication (receives insforge_code parameter)
+          description: URL to redirect after authentication (receives yarah_code parameter)
         - name: code_challenge
           in: query
           required: false
@@ -1566,10 +1566,10 @@ paths:
     post:
       summary: Exchange OAuth code for tokens (PKCE)
       description: |
-        Exchange the insforge_code (received from OAuth callback) for access and refresh tokens.
+        Exchange the yarah_code (received from OAuth callback) for access and refresh tokens.
 
         This endpoint is used for PKCE flow in mobile/desktop/server clients:
-        1. After OAuth callback, your redirect_uri receives `insforge_code` parameter
+        1. After OAuth callback, your redirect_uri receives `yarah_code` parameter
         2. Call this endpoint with the code and your original code_verifier
         3. Receive access token and refresh token in response
 
@@ -1599,7 +1599,7 @@ paths:
               properties:
                 code:
                   type: string
-                  description: The insforge_code received from OAuth callback redirect
+                  description: The yarah_code received from OAuth callback redirect
                   example: "abc123..."
                 code_verifier:
                   type: string
@@ -1639,7 +1639,7 @@ paths:
   /api/auth/oauth/shared/callback/{state}:
     get:
       summary: Shared OAuth callback handler
-      description: Handles OAuth callbacks from InsForge Cloud shared OAuth
+      description: Handles OAuth callbacks from Yarah Cloud shared OAuth
       tags:
         - Client
       parameters:
@@ -1680,7 +1680,7 @@ paths:
         OAuth callback endpoint for provider-specific flows (most providers use GET).
 
         Response varies based on the original OAuth initiation:
-        - With code_challenge (PKCE): Redirects with `insforge_code` for exchange endpoint
+        - With code_challenge (PKCE): Redirects with `yarah_code` for exchange endpoint
         - Without code_challenge (web): Redirects with `access_token` and sets httpOnly cookie
       tags:
         - Client
@@ -1711,7 +1711,7 @@ paths:
         '302':
           description: |
             Redirect to application.
-            - PKCE flow: redirect_uri?insforge_code={code}&user_id={id}&email={email}&name={name}
+            - PKCE flow: redirect_uri?yarah_code={code}&user_id={id}&email={email}&name={name}
             - Web flow: redirect_uri?access_token={token}&user_id={id}&email={email}&name={name}&csrf_token={csrf}
           headers:
             Location:
@@ -1726,7 +1726,7 @@ paths:
         OAuth callback endpoint for providers that use POST (e.g., Apple with form_post response mode).
 
         Response varies based on the original OAuth initiation:
-        - With code_challenge (PKCE): Redirects with `insforge_code` for exchange endpoint
+        - With code_challenge (PKCE): Redirects with `yarah_code` for exchange endpoint
         - Without code_challenge (web): Redirects with `access_token` and sets httpOnly cookie
       tags:
         - Client
@@ -1759,7 +1759,7 @@ paths:
         '302':
           description: |
             Redirect to application.
-            - PKCE flow: redirect_uri?insforge_code={code}&user_id={id}&email={email}&name={name}
+            - PKCE flow: redirect_uri?yarah_code={code}&user_id={id}&email={email}&name={name}
             - Web flow: redirect_uri?access_token={token}&user_id={id}&email={email}&name={name}&csrf_token={csrf}
           headers:
             Location:
@@ -1970,7 +1970,7 @@ paths:
           schema:
             type: string
             format: uri
-          description: URL to redirect after authentication (receives insforge_code parameter)
+          description: URL to redirect after authentication (receives yarah_code parameter)
         - name: code_challenge
           in: query
           required: false

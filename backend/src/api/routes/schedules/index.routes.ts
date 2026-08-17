@@ -9,7 +9,7 @@ import {
   updateScheduleRequestSchema,
   getSchedulesConfigResponseSchema,
   updateSchedulesConfigRequestSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const router = Router();
 const scheduleService = ScheduleService.getInstance();

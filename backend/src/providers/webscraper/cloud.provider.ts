@@ -4,7 +4,7 @@ import { appConfig } from '@/infra/config/app.config.js';
 import { isCloudEnvironment } from '@/utils/environment.js';
 import { TokenManager } from '@/infra/security/token.manager.js';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import {
   apifyConnectionSchema,
   type ApifyConnection,
@@ -39,7 +39,7 @@ export class CloudWebscraperProvider implements WebscraperProvider {
 
   private throwUnsupported(): never {
     throw new AppError(
-      'Apify integration is only available on Insforge Cloud, not in self-hosted mode.',
+      'Apify integration is only available on Yarah Cloud, not in self-hosted mode.',
       501,
       ERROR_CODES.INTERNAL_ERROR
     );

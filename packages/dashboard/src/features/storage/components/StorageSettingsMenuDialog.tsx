@@ -20,16 +20,16 @@ import {
   MenuDialogSideNavHeader,
   MenuDialogSideNavTitle,
   MenuDialogTitle,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import {
   updateStorageConfigRequestSchema,
   type StorageConfigSchema,
   type UpdateStorageConfigRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { useStorageConfig } from '#features/storage/hooks/useStorageConfig';
 import { useS3GatewayConfig } from '#features/storage/hooks/useS3AccessKeys';
 import { S3SettingsPanel } from './S3SettingsPanel';
-import { isInsForgeCloudProject } from '#lib/utils/utils';
+import { isYarahCloudProject } from '#lib/utils/utils';
 
 type StorageSettingsTab = 'general' | 's3';
 
@@ -87,7 +87,7 @@ export function StorageSettingsMenuDialog({ open, onOpenChange }: StorageSetting
   // visible for discoverability — when the gateway is unavailable it renders
   // a "not configured" state instead of the panel, failing closed on query
   // errors or older backends without the field.
-  const isCloud = isInsForgeCloudProject();
+  const isCloud = isYarahCloudProject();
   // Deferred until the dialog is open — no gateway-config request on mount.
   const gatewayConfigQuery = useS3GatewayConfig({ enabled: open });
   const s3Available = isCloud || gatewayConfigQuery.data?.available === true;
@@ -187,11 +187,11 @@ export function StorageSettingsMenuDialog({ open, onOpenChange }: StorageSetting
                   <p className="max-w-md text-[13px] leading-[18px] text-muted-foreground">
                     {t('storage.s3BackendNotConfiguredDescription', {
                       defaultValue:
-                        'The S3-compatible gateway needs an S3-backed storage provider. Point InsForge at any S3-compatible store — or run the bundled MinIO/RustFS overlay — via environment variables, then restart the backend.',
+                        'The S3-compatible gateway needs an S3-backed storage provider. Point Yarah at any S3-compatible store — or run the bundled MinIO/RustFS overlay — via environment variables, then restart the backend.',
                     })}
                   </p>
                   <a
-                    href="https://docs.insforge.dev/deployment/self-host-storage"
+                    href="https://docs.yarah.dev/deployment/self-host-storage"
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 text-[13px] font-medium text-primary hover:underline"

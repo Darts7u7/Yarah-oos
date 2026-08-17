@@ -1,4 +1,4 @@
-# InsForge API Response Format Examples
+# Yarah API Response Format Examples
 
 All API responses now follow a consistent format with `success` field and proper structure.
 
@@ -358,7 +358,7 @@ All API responses now follow a consistent format with `success` field and proper
 {
   "success": true,
   "data": {
-    "app_name": "My InsForge App",
+    "app_name": "My Yarah App",
     "app_description": "Backend as a Service",
     "created_at": "2024-01-01T00:00:00.000Z"
   },
@@ -390,7 +390,7 @@ All API responses now follow a consistent format with `success` field and proper
 {
   "success": true,
   "data": {
-    "app_name": "My InsForge App",
+    "app_name": "My Yarah App",
     "app_description": "Backend as a Service",
     "mcp_tools": {
       "database": {
@@ -419,7 +419,7 @@ All API responses now follow a consistent format with `success` field and proper
   "success": true,
   "data": {
     "status": "ok",
-    "service": "Insforge Backend",
+    "service": "Yarah Backend",
     "timestamp": "2024-01-01T00:00:00.000Z"
   }
 }

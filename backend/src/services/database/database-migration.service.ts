@@ -8,7 +8,7 @@ import {
   type DryRunMigrationResponse,
   type MigrationRiskFactor,
   type MigrationRiskLevel,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { AppError, isPgErrorLike } from '@/utils/errors.js';
 import { DatabaseManager } from '@/infra/database/database.manager.js';
 import {

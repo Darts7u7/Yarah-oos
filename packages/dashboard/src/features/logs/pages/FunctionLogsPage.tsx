@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink } from 'lucide-react';
-import { Tabs, Tab } from '@insforge/ui';
+import { Tabs, Tab } from '@yarahdev/ui';
 import { useLogs } from '#features/logs/hooks/useLogs';
 import { EmptyState, TableHeader, DataGridEmptyState } from '#components';
 import {
@@ -13,7 +13,7 @@ import {
   SeverityFilterDropdown,
 } from '#features/logs/components';
 import { formatTime } from '#lib/utils/utils';
-import { LogSchema } from '@insforge/shared-schemas';
+import { LogSchema } from '@yarahdev/shared-schemas';
 import { usePageSize } from '#lib/hooks/usePageSize';
 
 type FunctionLogType = 'runtime' | 'build';

@@ -4,7 +4,7 @@ import type {
   LogSchema,
   GetLogsResponse,
   LogStatsSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export interface BuildLogEntry {
   level: string;

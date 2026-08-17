@@ -4,7 +4,7 @@ import {
   StorageBucketSchema,
   ListObjectsResponseSchema,
   type DeleteObjectsResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 /** Server cap on keys per batch-delete request (see deleteObjectsRequestSchema). */
 const DELETE_OBJECTS_MAX_KEYS = 1000;

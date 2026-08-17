@@ -1,20 +1,20 @@
 {
-  "name": "@insforge/ui",
+  "name": "@yarahdev/ui",
   "version": "0.1.7",
-  "author": "InsForge",
-  "description": "React UI component library, design tokens, and Tailwind preset for InsForge apps",
+  "author": "Yarah",
+  "description": "React UI component library, design tokens, and Tailwind preset for Yarah apps",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/InsForge/InsForge/tree/main/packages/ui",
+  "homepage": "https://github.com/Yarah/Yarah/tree/main/packages/ui",
   "bugs": {
-    "url": "https://github.com/InsForge/InsForge/issues"
+    "url": "https://github.com/Yarah/Yarah/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/InsForge/InsForge.git",
+    "url": "https://github.com/Yarah/Yarah.git",
     "directory": "packages/ui"
   },
   "keywords": [
-    "insforge",
+    "yarah",
     "react",
     "ui",
     "component-library",

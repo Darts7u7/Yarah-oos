@@ -1,9 +1,9 @@
 ---
 title: "Self-hosted storage backends"
-description: "Configure InsForge Storage for self-hosting: bring your own S3-compatible store, run a bundled MinIO or RustFS, and enable the S3-compatible gateway."
+description: "Configure Yarah Storage for self-hosting: bring your own S3-compatible store, run a bundled MinIO or RustFS, and enable the S3-compatible gateway."
 ---
 
-Self-hosted InsForge stores files on the **local filesystem** by default (`STORAGE_DIR`, a Docker volume). That works out of the box, but an S3 backend adds presigned or proxied transfers, multipart uploads, and — most importantly — enables the [S3-compatible gateway](/core-concepts/storage/s3-compatibility) at `/storage/v1/s3`, so `aws` CLI, rclone, boto3, and Terraform can talk to your InsForge Storage directly.
+Self-hosted Yarah stores files on the **local filesystem** by default (`STORAGE_DIR`, a Docker volume). That works out of the box, but an S3 backend adds presigned or proxied transfers, multipart uploads, and — most importantly — enables the [S3-compatible gateway](/core-concepts/storage/s3-compatibility) at `/storage/v1/s3`, so `aws` CLI, rclone, boto3, and Terraform can talk to your Yarah Storage directly.
 
 You have three options:
 
@@ -19,7 +19,7 @@ Set these in your `.env` (all production compose files pass them through to the 
 
 ```env
 # Required — any S3-compatible store
-S3_BUCKET=my-insforge-bucket
+S3_BUCKET=my-yarah-bucket
 S3_REGION=us-east-1
 S3_ACCESS_KEY_ID=...
 S3_SECRET_ACCESS_KEY=...
@@ -50,7 +50,7 @@ Provider notes:
 
 ## Bundled MinIO
 
-Run MinIO next to InsForge with a single overlay. In a `deploy/setup.sh` checkout, append it to `COMPOSE_FILE` in your `.env`:
+Run MinIO next to Yarah with a single overlay. In a `deploy/setup.sh` checkout, append it to `COMPOSE_FILE` in your `.env`:
 
 ```env
 COMPOSE_FILE=deploy/docker-compose/docker-compose.yml:docker-compose.minio.yml
@@ -110,12 +110,12 @@ With any S3 backend configured, the gateway is live at `<your-backend-url>/stora
 
 ```ini
 # ~/.aws/credentials
-[insforge]
+[yarah]
 aws_access_key_id = INSF...
 aws_secret_access_key = ...
 
 # ~/.aws/config
-[profile insforge]
+[profile yarah]
 region = us-east-1            # must match the backend's S3_REGION
 endpoint_url = https://your-domain.example/storage/v1/s3
 s3 =
@@ -123,9 +123,9 @@ s3 =
 ```
 
 ```bash
-aws --profile insforge s3 mb s3://my-bucket
-aws --profile insforge s3 cp ./photo.jpg s3://my-bucket/photo.jpg
-aws --profile insforge s3 sync ./dist s3://my-bucket/dist
+aws --profile yarah s3 mb s3://my-bucket
+aws --profile yarah s3 cp ./photo.jpg s3://my-bucket/photo.jpg
+aws --profile yarah s3 sync ./dist s3://my-bucket/dist
 ```
 
 Uploads made through the gateway appear immediately in the REST API and Dashboard. See [S3-compatible gateway](/core-concepts/storage/s3-compatibility) for supported operations and limits.
@@ -147,4 +147,4 @@ The `AWS_*` variables (`AWS_S3_BUCKET`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_
 
 ### Upgrading from an `AWS_*` configuration
 
-Older versions of `deploy/docker-compose/docker-compose.yml` did not pass storage variables at all, and the deployment guide recommended hand-adding `AWS_S3_BUCKET` (and friends) to the `insforge` service. If you did that: the current compose file passes only the `S3_*` names. Before adopting it, rename the variables in your `.env` to `S3_BUCKET` / `S3_REGION` / `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` — or keep your hand-edited `environment` block. The backend itself still honors `AWS_*` as fallbacks, so any value that reaches the container keeps working; the risk is only a compose file that no longer forwards them, which would silently fall back to local storage.
+Older versions of `deploy/docker-compose/docker-compose.yml` did not pass storage variables at all, and the deployment guide recommended hand-adding `AWS_S3_BUCKET` (and friends) to the `yarah` service. If you did that: the current compose file passes only the `S3_*` names. Before adopting it, rename the variables in your `.env` to `S3_BUCKET` / `S3_REGION` / `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` — or keep your hand-edited `environment` block. The backend itself still honors `AWS_*` as fallbacks, so any value that reaches the container keeps working; the risk is only a compose file that no longer forwards them, which would silently fall back to local storage.

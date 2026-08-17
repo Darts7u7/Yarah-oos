@@ -3,7 +3,7 @@ import type {
   ListEmailTemplatesResponse,
   UpdateEmailTemplateRequest,
   EmailTemplateSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class EmailTemplateService {
   async getTemplates(): Promise<ListEmailTemplatesResponse> {

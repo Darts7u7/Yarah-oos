@@ -1,4 +1,4 @@
-# InsForge Realtime - Agent Documentation
+# Yarah Realtime - Agent Documentation
 
 ## Use Realtime For
 
@@ -117,24 +117,24 @@ Use `realtime.channel_name()` in subscribe policies because `realtime.channels` 
 ```typescript
 import { createClient } from '@insforge/sdk';
 
-const insforge = createClient({
-  baseUrl: 'https://your-project.insforge.app',
+const yarah = createClient({
+  baseUrl: 'https://your-project.apps.yarah.dev',
   anonKey: 'your-anon-key'
 });
 
-insforge.realtime.on('error', ({ channel, code, message }) => {
+yarah.realtime.on('error', ({ channel, code, message }) => {
   console.error(channel, code, message);
 });
 
-await insforge.realtime.connect();
+await yarah.realtime.connect();
 
-const response = await insforge.realtime.subscribe(`order:${orderId}`);
+const response = await yarah.realtime.subscribe(`order:${orderId}`);
 
 if (!response.ok) {
   throw new Error(response.error.message);
 }
 
-insforge.realtime.on('status_changed', (payload) => {
+yarah.realtime.on('status_changed', (payload) => {
   console.log(payload.status);
   console.log(payload.meta.messageId);
 });
@@ -144,15 +144,15 @@ insforge.realtime.on('status_changed', (payload) => {
 
 | Task | Method |
 |------|--------|
-| Connect | `await insforge.realtime.connect()` |
-| Subscribe | `await insforge.realtime.subscribe(channel)` |
-| Publish | `await insforge.realtime.publish(channel, event, payload)` |
-| Listen | `insforge.realtime.on(event, callback)` |
-| Listen once | `insforge.realtime.once(event, callback)` |
-| Remove listener | `insforge.realtime.off(event, callback)` |
-| Unsubscribe | `insforge.realtime.unsubscribe(channel)` |
-| Disconnect | `insforge.realtime.disconnect()` |
-| List local subscriptions | `insforge.realtime.getSubscribedChannels()` |
+| Connect | `await yarah.realtime.connect()` |
+| Subscribe | `await yarah.realtime.subscribe(channel)` |
+| Publish | `await yarah.realtime.publish(channel, event, payload)` |
+| Listen | `yarah.realtime.on(event, callback)` |
+| Listen once | `yarah.realtime.once(event, callback)` |
+| Remove listener | `yarah.realtime.off(event, callback)` |
+| Unsubscribe | `yarah.realtime.unsubscribe(channel)` |
+| Disconnect | `yarah.realtime.disconnect()` |
+| List local subscriptions | `yarah.realtime.getSubscribedChannels()` |
 
 Client publish requires a successful subscription to the same channel first.
 
@@ -163,7 +163,7 @@ Use this only when the SDK is not available.
 ```typescript
 import { io } from 'socket.io-client';
 
-const socket = io('https://your-project.insforge.app', {
+const socket = io('https://your-project.apps.yarah.dev', {
   auth: {
     token: '<user-jwt-or-anon-token>'
   }
@@ -228,9 +228,9 @@ Headers:
 
 | Header | Meaning |
 |--------|---------|
-| `X-InsForge-Event` | Event name |
-| `X-InsForge-Channel` | Resolved channel name |
-| `X-InsForge-Message-Id` | Message UUID |
+| `X-Yarah-Event` | Event name |
+| `X-Yarah-Channel` | Resolved channel name |
+| `X-Yarah-Message-Id` | Message UUID |
 
 Webhook delivery counts appear in message history as `whAudienceCount` and `whDeliveredCount`.
 

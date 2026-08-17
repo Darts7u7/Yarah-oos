@@ -1,13 +1,13 @@
 ---
 title: "Model Gateway"
 sidebarTitle: "Overview"
-description: "Call any LLM through one OpenAI-compatible endpoint, with InsForge-managed provider keys, OpenRouter routing, and per-project usage tracking and quotas."
+description: "Call any LLM through one OpenAI-compatible endpoint, with Yarah-managed provider keys, OpenRouter routing, and per-project usage tracking and quotas."
 ---
 
-Use the Model Gateway to call chat, streaming, and embedding models through one OpenAI-compatible endpoint. InsForge holds the provider keys, tracks usage per project, and routes traffic through [OpenRouter](https://openrouter.ai), so your application code never sees Anthropic, OpenAI, or Mistral credentials directly.
+Use the Model Gateway to call chat, streaming, and embedding models through one OpenAI-compatible endpoint. Yarah holds the provider keys, tracks usage per project, and routes traffic through [OpenRouter](https://openrouter.ai), so your application code never sees Anthropic, OpenAI, or Mistral credentials directly.
 
 <Frame caption="One OpenAI-compatible endpoint with per-provider access, ready-to-copy code, and usage tracking.">
-  <img src="/images/model-gateway-overview.png" alt="InsForge dashboard Model Gateway overview showing code samples, provider chips, and usage charts" />
+  <img src="/images/model-gateway-overview.png" alt="Yarah dashboard Model Gateway overview showing code samples, provider chips, and usage charts" />
 </Frame>
 
 <Note>
@@ -16,7 +16,7 @@ Use the Model Gateway to call chat, streaming, and embedding models through one 
 
 ```mermaid
 graph TB
-    Dashboard[InsForge Dashboard] --> Key[Active OpenRouter Key]
+    Dashboard[Yarah Dashboard] --> Key[Active OpenRouter Key]
     Dashboard --> Catalog[OpenRouter Model Catalog]
     Dashboard --> Metrics[OpenRouter Usage Overview]
 
@@ -38,7 +38,7 @@ graph TB
 
 ### OpenAI-compatible API
 
-Point any OpenAI SDK or `openai`-compatible library at `https://<project>.insforge.dev/v1` and it works. `/v1/chat/completions`, `/v1/embeddings`, and `/v1/models` all behave like the upstream spec.
+Point any OpenAI SDK or `openai`-compatible library at `https://<project>.yarah.dev/v1` and it works. `/v1/chat/completions`, `/v1/embeddings`, and `/v1/models` all behave like the upstream spec.
 
 ### Streaming
 

@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { aiService } from '#features/ai/services/ai.service';
 import { AI_OVERVIEW_QUERY_KEY } from '#features/ai/hooks/useAIOverview';
-import { useToast } from '@insforge/ui';
-import type { OpenRouterKey } from '@insforge/shared-schemas';
+import { useToast } from '@yarahdev/ui';
+import type { OpenRouterKey } from '@yarahdev/shared-schemas';
 
 export const OPENROUTER_KEY_QUERY_KEY = ['openrouter-key'] as const;
 

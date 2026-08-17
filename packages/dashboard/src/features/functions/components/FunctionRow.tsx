@@ -1,5 +1,5 @@
-import { CopyButton } from '@insforge/ui';
-import { FunctionSchema } from '@insforge/shared-schemas';
+import { CopyButton } from '@yarahdev/ui';
+import { FunctionSchema } from '@yarahdev/shared-schemas';
 import { getBackendUrl } from '#lib/utils/utils';
 import { ListRow, ListRowCell } from '#components';
 import { format, formatDistance } from 'date-fns';

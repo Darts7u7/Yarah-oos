@@ -31,7 +31,7 @@ vi.mock('../../src/utils/logger', () => ({
 
 import { AuthConfigService } from '../../src/services/auth/auth-config.service';
 import { logger } from '../../src/utils/logger';
-import { allowedRedirectUrlsRegex } from '@insforge/shared-schemas';
+import { allowedRedirectUrlsRegex } from '@yarahdev/shared-schemas';
 
 /**
  * Helper: stub `getAuthConfig` to return the given allowedRedirectUrls.

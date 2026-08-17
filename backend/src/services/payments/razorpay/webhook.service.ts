@@ -17,7 +17,7 @@ import type {
   RazorpayWebhookPayload,
 } from '@/providers/payments/razorpay.provider.js';
 import type { RazorpayEnvironment } from '@/types/payments.js';
-import { ERROR_CODES, type RazorpayWebhookResponse } from '@insforge/shared-schemas';
+import { ERROR_CODES, type RazorpayWebhookResponse } from '@yarahdev/shared-schemas';
 
 export type RazorpayWebhookProcessingStatus = 'pending' | 'processed' | 'failed' | 'ignored';
 
@@ -83,7 +83,7 @@ export class RazorpayWebhookService {
     const isValid = provider.verifyWebhookSignature(rawBodyBuffer, signature, webhookSecret);
     if (!isValid) {
       throw new AppError(
-        `Invalid Razorpay webhook signature. Confirm the Razorpay Dashboard webhook secret matches the ${environment} InsForge webhook setup and the webhook URL points to /api/webhooks/razorpay/${environment}.`,
+        `Invalid Razorpay webhook signature. Confirm the Razorpay Dashboard webhook secret matches the ${environment} Yarah webhook setup and the webhook URL points to /api/webhooks/razorpay/${environment}.`,
         400,
         ERROR_CODES.INVALID_INPUT
       );

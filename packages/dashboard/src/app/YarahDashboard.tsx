@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '#lib/contexts/AuthContext';
 import { AppRoutes } from '#router/AppRoutes';
-import { ToastProvider } from '@insforge/ui';
+import { ToastProvider } from '@yarahdev/ui';
 import { DashboardEventsProvider } from '#lib/contexts/DashboardEventsContext';
 import { PostHogAnalyticsProvider } from '#lib/analytics/posthog';
 import { SQLEditorProvider } from '#features/database/contexts/SQLEditorContext';
@@ -11,7 +11,7 @@ import { DashboardHostProvider, DashboardProjectProvider } from '#lib/config/Das
 import { setDashboardBackendUrl } from '#lib/config/runtime';
 import { advisorService } from '#features/dashboard/services/advisor.service';
 import type {
-  InsForgeDashboardProps,
+  YarahDashboardProps,
   DashboardAdvisorIssuesQuery,
   DashboardAdvisorSuppressRequest,
 } from '#types';
@@ -20,7 +20,7 @@ function normalizeBackendUrl(url?: string) {
   return url?.replace(/\/$/, '') || undefined;
 }
 
-export function InsForgeDashboard(props: InsForgeDashboardProps) {
+export function YarahDashboard(props: YarahDashboardProps) {
   const {
     project,
     backendUrl,
@@ -140,7 +140,7 @@ export function InsForgeDashboard(props: InsForgeDashboardProps) {
   setDashboardBackendUrl(host.backendUrl);
 
   return (
-    <div className="insforge-dashboard flex h-full min-h-0 min-w-0 flex-col">
+    <div className="yarah-dashboard flex h-full min-h-0 min-w-0 flex-col">
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
           <DashboardHostProvider value={host}>

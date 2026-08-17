@@ -2,12 +2,12 @@ import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/rea
 import { DEFAULT_DATABASE_SCHEMA } from '#features/database/helpers';
 import { tableService } from '#features/database/services/table.service';
 import { databaseTableQueryKeys } from '#features/database/queryKeys';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 import {
   ColumnSchema,
   GetTableSchemaResponse,
   UpdateTableSchemaRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export function useTables(schemaName: string = DEFAULT_DATABASE_SCHEMA) {
   const queryClient = useQueryClient();

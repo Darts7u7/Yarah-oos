@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import type { PaymentEnvironment, PaymentProvider } from '@insforge/shared-schemas';
+import type { PaymentEnvironment, PaymentProvider } from '@yarahdev/shared-schemas';
 import { PaymentsSidebar } from './PaymentsSidebar';
 import { PaymentsSettingsDialog } from './PaymentsSettingsDialog';
 import { getLocalStorageJSON, setLocalStorageJSON } from '#lib/utils/local-storage';
 
-const PAYMENTS_SELECTION_STORAGE_KEY = 'insforge.payments.selection';
+const PAYMENTS_SELECTION_STORAGE_KEY = 'yarah.payments.selection';
 
 interface PaymentSelection {
   provider: PaymentProvider;

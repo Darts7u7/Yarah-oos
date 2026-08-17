@@ -14,9 +14,9 @@ import {
   Switch,
   cn,
   useToast,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { useUsers } from '#features/auth/hooks/useUsers';
-import { emailSchema } from '@insforge/shared-schemas';
+import { emailSchema } from '@yarahdev/shared-schemas';
 import { z } from 'zod';
 
 interface User {

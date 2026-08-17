@@ -28,7 +28,7 @@ if (!isCloudEnvironment()) {
     fs.mkdirSync(logsDir, { recursive: true });
     transports.push(
       new winston.transports.File({
-        filename: path.join(logsDir, 'insforge.logs.jsonl'),
+        filename: path.join(logsDir, 'yarah.logs.jsonl'),
         // Rotate so the file cannot grow unbounded; LocalFileProvider only
         // reads the base file, which `tailable` keeps as the newest one.
         maxsize: 20 * 1024 * 1024,

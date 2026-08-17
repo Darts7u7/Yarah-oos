@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Insforge AI API
+  title: Yarah AI API
   version: 1.0.0
   description: Model Gateway helper APIs for OpenRouter key provisioning, model discovery, and deprecated compatibility proxy routes
 
@@ -8,7 +8,7 @@ paths:
   /api/ai/config:
     get:
       summary: Get Model Gateway credential configuration
-      description: Returns masked OpenRouter API and management key status for self-hosted deployments. Cloud-hosted credentials are managed by InsForge Cloud.
+      description: Returns masked OpenRouter API and management key status for self-hosted deployments. Cloud-hosted credentials are managed by Yarah Cloud.
       tags:
         - Admin
       security:
@@ -21,7 +21,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ModelGatewayConfig'
         '400':
-          description: Configuration is managed by InsForge Cloud
+          description: Configuration is managed by Yarah Cloud
         '401':
           description: Unauthorized
         '500':
@@ -47,7 +47,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ModelGatewayConfig'
         '400':
-          description: Invalid payload or configuration is managed by InsForge Cloud
+          description: Invalid payload or configuration is managed by Yarah Cloud
         '401':
           description: Unauthorized
         '500':

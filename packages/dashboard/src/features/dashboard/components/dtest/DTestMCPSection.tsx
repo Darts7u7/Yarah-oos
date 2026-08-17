@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CopyButton, cn } from '@insforge/ui';
+import { CopyButton, cn } from '@yarahdev/ui';
 import {
   MCP_AGENTS,
   GenerateInstallCommand,
@@ -17,11 +17,11 @@ function buildMcpDeeplink(agentId: string, apiKey: string, appUrl: string): stri
   const configString = JSON.stringify(config);
   if (agentId === 'cursor') {
     const base64Config = btoa(configString);
-    return `cursor://anysphere.cursor-deeplink/mcp/install?name=insforge&config=${encodeURIComponent(base64Config)}`;
+    return `cursor://anysphere.cursor-deeplink/mcp/install?name=yarah&config=${encodeURIComponent(base64Config)}`;
   }
   if (agentId === 'qoder') {
     const base64Config = btoa(encodeURIComponent(configString));
-    return `qoder://aicoding.aicoding-deeplink/mcp/add?name=insforge&config=${encodeURIComponent(base64Config)}`;
+    return `qoder://aicoding.aicoding-deeplink/mcp/add?name=yarah&config=${encodeURIComponent(base64Config)}`;
   }
   return null;
 }
@@ -57,9 +57,9 @@ interface DTestMCPSectionProps {
 
 function buildQuickStartPrompt(agent: MCPAgent, installBody: string) {
   if (agent.id === 'mcp') {
-    return `I'm using InsForge as my backend platform. Please add the following MCP configuration to enable the InsForge MCP server:\n\n${installBody}\n\nThen ${MCP_VERIFY_CONNECTION_PROMPT.replace(/^I'm using InsForge as my backend platform, /i, '')}`;
+    return `I'm using Yarah as my backend platform. Please add the following MCP configuration to enable the Yarah MCP server:\n\n${installBody}\n\nThen ${MCP_VERIFY_CONNECTION_PROMPT.replace(/^I'm using Yarah as my backend platform, /i, '')}`;
   }
-  return `I'm using InsForge as my backend platform. Please run this command to install the InsForge MCP server:\n\n${installBody}\n\nThen ${MCP_VERIFY_CONNECTION_PROMPT.replace(/^I'm using InsForge as my backend platform, /i, '')}`;
+  return `I'm using Yarah as my backend platform. Please run this command to install the Yarah MCP server:\n\n${installBody}\n\nThen ${MCP_VERIFY_CONNECTION_PROMPT.replace(/^I'm using Yarah as my backend platform, /i, '')}`;
 }
 
 export function DTestMCPSection({
@@ -101,7 +101,7 @@ export function DTestMCPSection({
         <section className="flex flex-col rounded border border-[var(--alpha-8)] bg-card p-6">
           <Step
             number={1}
-            title={t('overview.installInsForgeMcp', { defaultValue: 'Install InsForge MCP' })}
+            title={t('overview.installYarahMcp', { defaultValue: 'Install Yarah MCP' })}
             description={t('overview.installOneClick', { defaultValue: 'Install in one click' })}
           >
             <InstallDeeplinkButton agent={agent} deeplink={deeplink} />
@@ -128,7 +128,7 @@ export function DTestMCPSection({
         <QuickStartPromptCard
           subtitle={t('overview.pasteMcpSubtitle', {
             agent: agent.displayName,
-            defaultValue: 'Paste this into {{agent}} to setup InsForge MCP',
+            defaultValue: 'Paste this into {{agent}} to setup Yarah MCP',
           })}
           prompt={quickStartPrompt}
         />
@@ -148,7 +148,7 @@ export function DTestMCPSection({
                 ? t('overview.addMcpConfigurationTitle', {
                     defaultValue: 'Add MCP Configuration',
                   })
-                : t('overview.installInsForgeMcp', { defaultValue: 'Install InsForge MCP' })
+                : t('overview.installYarahMcp', { defaultValue: 'Install Yarah MCP' })
             }
             description={
               isMcpJson
@@ -157,7 +157,7 @@ export function DTestMCPSection({
                   })
                 : t('overview.runInstallCommand', {
                     defaultValue:
-                      'Run the following command in terminal to install InsForge MCP Server',
+                      'Run the following command in terminal to install Yarah MCP Server',
                   })
             }
           >

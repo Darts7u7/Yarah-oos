@@ -1,9 +1,9 @@
 ---
 title: "Database migrations"
-description: "Track Postgres schema changes as timestamped SQL files in git and apply them forward-only with the InsForge CLI, recording history for every project."
+description: "Track Postgres schema changes as timestamped SQL files in git and apply them forward-only with the Yarah CLI, recording history for every project."
 ---
 
-Migrations are versioned SQL files in `migrations/` applied with `@insforge/cli`. Each successful run is recorded in `system.custom_migrations`. The workflow is forward-only.
+Migrations are versioned SQL files in `migrations/` applied with `@yarah/cli`. Each successful run is recorded in `system.custom_migrations`. The workflow is forward-only.
 
 ## Concepts
 
@@ -14,9 +14,9 @@ A migration is one SQL file prefixed with a 14-digit UTC timestamp: `<YYYYMMDDHH
 Link the backend, then create a file.
 
 ```bash
-npx @insforge/cli login
-npx @insforge/cli link
-npx @insforge/cli db migrations new create-employees-table
+npx @yarah/cli login
+npx @yarah/cli link
+npx @yarah/cli db migrations new create-employees-table
 ```
 
 Write the SQL.
@@ -33,8 +33,8 @@ create table if not exists public.employees (
 Apply pending migrations and check history.
 
 ```bash
-npx @insforge/cli db migrations up --all
-npx @insforge/cli db migrations list
+npx @yarah/cli db migrations up --all
+npx @yarah/cli db migrations list
 ```
 
 Target a single file with `up <version>`, or apply everything pending up to and including a target with `up --to <version>`.

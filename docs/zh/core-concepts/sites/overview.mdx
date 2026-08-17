@@ -1,13 +1,13 @@
 ---
 title: "网站"
 sidebarTitle: "Overview"
-description: "从 InsForge 项目直接部署前端应用，由 Vercel 提供底层支持，实现自动构建、预览分支、自定义域名与全球 CDN，前后端配置集中管理。"
+description: "从 Yarah 项目直接部署前端应用，由 Vercel 提供底层支持，实现自动构建、预览分支、自定义域名与全球 CDN，前后端配置集中管理。"
 ---
 
-使用 InsForge Sites 来部署属于您的项目的面向浏览器的应用。InsForge CLI 通过 InsForge 上传您的前端源，它创建一个 Vercel 生产部署。仪表板跟踪 URL、状态、部署历史、环境变量和域。
+使用 Yarah Sites 来部署属于您的项目的面向浏览器的应用。Yarah CLI 通过 Yarah 上传您的前端源，它创建一个 Vercel 生产部署。仪表板跟踪 URL、状态、部署历史、环境变量和域。
 
 <Frame caption="Sites 仪表板：状态、域、环境变量和部署历史。">
-  <img src="/images/dashboard-sites.png" alt="InsForge Sites 仪表板" />
+  <img src="/images/dashboard-sites.png" alt="Yarah Sites 仪表板" />
 </Frame>
 
 <Note>
@@ -16,7 +16,7 @@ description: "从 InsForge 项目直接部署前端应用，由 Vercel 提供底
 
 ```mermaid
 flowchart TB
-    CLI[InsForge CLI] --> API[InsForge deployment API]
+    CLI[Yarah CLI] --> API[Yarah deployment API]
     Dashboard[Dashboard] --> API
 
     API --> Source[Frontend source upload]
@@ -44,24 +44,24 @@ flowchart TB
 
 ### CLI 部署
 
-从您的应用源目录部署。CLI 上传源树，跳过仅本地文件（如 `node_modules`、`.git`、构建输出和 `.env` 文件），然后通过 InsForge 启动 Vercel 构建。
+从您的应用源目录部署。CLI 上传源树，跳过仅本地文件（如 `node_modules`、`.git`、构建输出和 `.env` 文件），然后通过 Yarah 启动 Vercel 构建。
 
 ```bash
-npx @insforge/cli deployments deploy ./frontend
+npx @yarah/cli deployments deploy ./frontend
 ```
 
 ### 框架构建
 
-部署 React、Vue、Svelte、Next.js、静态网站和其他前端项目。InsForge 将源文件发送到 Vercel，其中框架检测和项目文件（如 `package.json` 和 `vercel.json`）决定应用的构建方式。
+部署 React、Vue、Svelte、Next.js、静态网站和其他前端项目。Yarah 将源文件发送到 Vercel，其中框架检测和项目文件（如 `package.json` 和 `vercel.json`）决定应用的构建方式。
 
 ### 环境变量
 
 从仪表板管理提供商环境变量。仅对安全暴露在浏览器代码中的值使用公开前缀，如 `VITE_` 或 `NEXT_PUBLIC_`。
 
 ```bash
-npx @insforge/cli deployments env list
-npx @insforge/cli deployments env set VITE_INSFORGE_URL https://your-project.region.insforge.app
-npx @insforge/cli deployments env set VITE_INSFORGE_ANON_KEY ik_xxx
+npx @yarah/cli deployments env list
+npx @yarah/cli deployments env set VITE_YARAH_URL https://your-project.region.apps.yarah.dev
+npx @yarah/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
 ```
 
 ### 部署历史
@@ -69,25 +69,25 @@ npx @insforge/cli deployments env set VITE_INSFORGE_ANON_KEY ik_xxx
 从部署日志页面查看以前的运行、同步 Vercel 状态、检查元数据和取消正在进行的部署。
 
 ```bash
-npx @insforge/cli deployments list
-npx @insforge/cli deployments status deployment_123 --sync
-npx @insforge/cli deployments cancel deployment_123
+npx @yarah/cli deployments list
+npx @yarah/cli deployments status deployment_123 --sync
+npx @yarah/cli deployments cancel deployment_123
 ```
 
 ### 域
 
-每个就绪的部署都获得一个默认 URL `https://<appkey>.insforge.site`。您也可以在 `https://<slug>.insforge.site` 设置一个 InsForge 管理的 slug。对于自定义域，在仪表板中添加域并配置它返回的 DNS 记录，通常是子域的 CNAME。
+每个就绪的部署都获得一个默认 URL `https://<appkey>.yarah.site`。您也可以在 `https://<slug>.yarah.site` 设置一个 Yarah 管理的 slug。对于自定义域，在仪表板中添加域并配置它返回的 DNS 记录，通常是子域的 CNAME。
 
 ## 使用它进行部署
 
 <CardGroup cols={2}>
   <Card title="CLI 快速入门" icon="terminal" href="/quickstart">
-    连接您的项目并从您的应用目录运行 InsForge CLI 命令。
+    连接您的项目并从您的应用目录运行 Yarah CLI 命令。
   </Card>
 </CardGroup>
 
 ## 下一步
 
 - 设置 [CLI](/quickstart) 并连接您的项目。
-- 从仪表板或使用 `npx @insforge/cli deployments env set` 添加浏览器安全环境变量。
-- 运行 `npx @insforge/cli deployments deploy ./frontend`。
+- 从仪表板或使用 `npx @yarah/cli deployments env set` 添加浏览器安全环境变量。
+- 运行 `npx @yarah/cli deployments deploy ./frontend`。

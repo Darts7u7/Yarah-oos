@@ -5,7 +5,7 @@ import {
   ColumnType,
   type DatabaseSchemaInfo,
   type ForeignKeySchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { z } from 'zod';
 
 export const DEFAULT_DATABASE_SCHEMA = 'public' as const;

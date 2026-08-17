@@ -11,7 +11,7 @@ import {
   createServiceSchema,
   updateServiceSchema,
   updateComputeConfigSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { ComputeConfigService } from '@/services/compute/compute-config.service.js';
 import { AuditService } from '@/services/logs/audit.service.js';
 import { dashboardEventService } from '@/services/dashboard/dashboard-event.service.js';
@@ -60,13 +60,13 @@ router.put(
   computeWriteLimiter,
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      // Cloud-managed projects run compute through InsForge's own Fly account, so a
+      // Cloud-managed projects run compute through Yarah's own Fly account, so a
       // project admin storing their own token here would move their containers off the
       // control plane that bills and quotas them. The dashboard already hides this on
       // cloud; the API has to say no too, or the gate is decoration.
       if (isCloudEnvironment()) {
         throw new AppError(
-          'Compute credentials are managed by InsForge on cloud projects.',
+          'Compute credentials are managed by Yarah on cloud projects.',
           403,
           ERROR_CODES.FORBIDDEN
         );

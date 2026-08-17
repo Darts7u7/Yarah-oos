@@ -1,6 +1,6 @@
 ---
 title: 函數API參考
-description: "透過 InsForge REST API 從任何語言呼叫無伺服器 Edge Function，傳遞 JSON 負載並取得型別化回應與錯誤訊息。"
+description: "透過 Yarah REST API 從任何語言呼叫無伺服器 Edge Function，傳遞 JSON 負載並取得型別化回應與錯誤訊息。"
 ---
 
 ## 概述
@@ -50,7 +50,7 @@ ANY /functions/{slug}
 ### 範例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/functions/hello-world" \
+curl -X POST "https://your-app.apps.yarah.dev/functions/hello-world" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John"
@@ -82,7 +82,7 @@ GET /api/functions
 ### 範例
 
 ```bash
-curl "https://your-app.insforge.app/api/functions" \
+curl "https://your-app.apps.yarah.dev/api/functions" \
   -H "Authorization: Bearer admin-jwt-token-or-api-key"
 ```
 
@@ -124,7 +124,7 @@ GET /api/functions/{slug}
 ### 範例
 
 ```bash
-curl "https://your-app.insforge.app/api/functions/hello-world" \
+curl "https://your-app.apps.yarah.dev/api/functions/hello-world" \
   -H "Authorization: Bearer admin-jwt-token-or-api-key"
 ```
 
@@ -149,7 +149,7 @@ curl "https://your-app.insforge.app/api/functions/hello-world" \
 ### 建立函數
 
 <Note>
-目前，InsForge只支援在Deno環境中執行的JavaScript/TypeScript函數。
+目前，Yarah只支援在Deno環境中執行的JavaScript/TypeScript函數。
 </Note>
 
 ```
@@ -169,7 +169,7 @@ POST /api/functions
 ### 範例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/functions" \
+curl -X POST "https://your-app.apps.yarah.dev/api/functions" \
   -H "Authorization: Bearer admin-jwt-token-or-api-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -217,7 +217,7 @@ PUT /api/functions/{slug}
 ### 範例
 
 ```bash
-curl -X PUT "https://your-app.insforge.app/api/functions/hello-world" \
+curl -X PUT "https://your-app.apps.yarah.dev/api/functions/hello-world" \
   -H "Authorization: Bearer admin-jwt-token-or-api-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -253,7 +253,7 @@ DELETE /api/functions/{slug}
 ### 範例
 
 ```bash
-curl -X DELETE "https://your-app.insforge.app/api/functions/old-function" \
+curl -X DELETE "https://your-app.apps.yarah.dev/api/functions/old-function" \
   -H "Authorization: Bearer admin-jwt-token-or-api-key"
 ```
 

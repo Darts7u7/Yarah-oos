@@ -1,14 +1,14 @@
 ---
 title: "Razorpay 金流"
 sidebarTitle: "Razorpay"
-description: "將 Razorpay 訂單、訂閱、手動 Webhook 與 Webhook 履行整合至 InsForge，於 Postgres 中安全記錄付款事件。"
+description: "將 Razorpay 訂單、訂閱、手動 Webhook 與 Webhook 履行整合至 Yarah，於 Postgres 中安全記錄付款事件。"
 ---
 
 如果您需要使用 Razorpay Orders、Razorpay Checkout、Items、Plans 和 Subscriptions，請使用 Razorpay 整合。Razorpay 不像 Stripe Checkout 那樣是託管的重新導向流程。您的後端建立服務商物件，您的前端開啟 Razorpay Checkout 指令碼，接著由您的後端驗證回傳的簽章。
 
 ## Razorpay 模型
 
-| Razorpay 概念 | 在 InsForge 中的意義 |
+| Razorpay 概念 | 在 Yarah 中的意義 |
 |------------------|---------------------|
 | Item | 帶金額的可銷售單位。鏡像同步至 `payments.razorpay_items`。 |
 | Plan | 圍繞某個 Item 建立的週期性訂閱定義。鏡像同步至 `payments.razorpay_plans`。 |
@@ -17,20 +17,20 @@ description: "將 Razorpay 訂單、訂閱、手動 Webhook 與 Webhook 履行�
 | Subscription | 與某個 Plan 綁定的 Razorpay 訂閱。鏡像同步至 `payments.razorpay_subscriptions`。 |
 | Webhook event | 存放於 `payments.webhook_events` 中且 `provider = 'razorpay'` 的已驗證服務商事件。 |
 
-Razorpay 沒有相當於 Stripe Billing Portal 的功能。InsForge 提供後端路由，在依據 `payments.razorpay_subscriptions` 的 RLS `UPDATE` 政策檢查呼叫方之後，用於取消、暫停與恢復訂閱。
+Razorpay 沒有相當於 Stripe Billing Portal 的功能。Yarah 提供後端路由，在依據 `payments.razorpay_subscriptions` 的 RLS `UPDATE` 政策檢查呼叫方之後，用於取消、暫停與恢復訂閱。
 
-對於一次性產品，建立 Razorpay Order 時只需提供金額、幣別和 receipt 即可。不過，仍建議為可銷售的產品建立 Razorpay Item，這樣在同步之後，產品目錄就能在 InsForge 與 Razorpay 中可見。請將 Order 視為一次付款嘗試，而非您的產品目錄。
+對於一次性產品，建立 Razorpay Order 時只需提供金額、幣別和 receipt 即可。不過，仍建議為可銷售的產品建立 Razorpay Item，這樣在同步之後，產品目錄就能在 Yarah 與 Razorpay 中可見。請將 Order 視為一次付款嘗試，而非您的產品目錄。
 
 ## 設定
 
-在 Dashboard -> Payments -> Settings 中或透過管理 API 設定 `test` 與 `live` 的 Razorpay Key ID 與 Key Secret。若尚不存在 Webhook 簽署密鑰，InsForge 會自動產生一個。
+在 Dashboard -> Payments -> Settings 中或透過管理 API 設定 `test` 與 `live` 的 Razorpay Key ID 與 Key Secret。若尚不存在 Webhook 簽署密鑰，Yarah 會自動產生一個。
 
 Razorpay 的 Webhook 必須在 Razorpay Dashboard 中手動建立。一般的 Razorpay 商戶 API 金鑰不支援自動註冊 Webhook。
 
 1. 開啟 Dashboard -> Payments -> Settings -> Webhooks。
 2. 複製 Razorpay Webhook URL 與 Webhook Secret。
 3. 在 Razorpay Dashboard 中，使用複製的 URL 與密鑰建立一個 Webhook。
-4. 選擇 InsForge 處理的事件。
+4. 選擇 Yarah 處理的事件。
 5. 儲存 Webhook 並完成一次測試付款以確認送達。
 
 Razorpay 只能將 Webhook 投遞到公開的 HTTPS URL。Localhost URL 需要借助公開通道或已部署的後端。
@@ -59,10 +59,10 @@ Razorpay 只能將 Webhook 投遞到公開的 HTTPS URL。Localhost URL 需要�
 
 ## 一次性訂單
 
-首先建立一個由應用程式擁有的待處理訂單（pending order）。接著使用目前的 InsForge 使用者權杖建立一個 Razorpay Order。
+首先建立一個由應用程式擁有的待處理訂單（pending order）。接著使用目前的 Yarah 使用者權杖建立一個 Razorpay Order。
 
 ```typescript
-const { data, error } = await insforge.payments.razorpay.createOrder('test', {
+const { data, error } = await yarah.payments.razorpay.createOrder('test', {
   amount: 50000,
   currency: 'INR',
   receipt: 'order_123',
@@ -81,7 +81,7 @@ if (error) throw error;
 在 Razorpay Checkout 回傳 `razorpay_order_id`、`razorpay_payment_id` 和 `razorpay_signature` 之後，請在後端驗證簽章：
 
 ```typescript
-await insforge.payments.razorpay.verifyOrder('test', {
+await yarah.payments.razorpay.verifyOrder('test', {
   orderId: response.razorpay_order_id,
   paymentId: response.razorpay_payment_id,
   signature: response.razorpay_signature
@@ -95,7 +95,7 @@ await insforge.payments.razorpay.verifyOrder('test', {
 在建立訂閱之前，請先建立或同步一個 Razorpay Plan。Plan 與 Stripe 的 Price 並非同一回事，它是圍繞 Razorpay Item 建立的週期性定義。
 
 ```typescript
-const { data, error } = await insforge.payments.razorpay.createSubscription('test', {
+const { data, error } = await yarah.payments.razorpay.createSubscription('test', {
   planId: 'plan_123',
   totalCount: 12,
   subject: { type: 'team', id: 'team_123' },
@@ -108,7 +108,7 @@ if (error) throw error;
 該 SDK 封裝了 `POST /api/payments/razorpay/{environment}/subscriptions`。回應中包含 `checkoutOptions.subscription_id`。請使用該訂閱 ID 開啟 Razorpay Checkout。在 Checkout 回傳 `razorpay_subscription_id`、`razorpay_payment_id` 和 `razorpay_signature` 之後，驗證該筆授權付款：
 
 ```typescript
-await insforge.payments.razorpay.verifySubscription('test', {
+await yarah.payments.razorpay.verifySubscription('test', {
   subscriptionId: response.razorpay_subscription_id,
   paymentId: response.razorpay_payment_id,
   signature: response.razorpay_signature
@@ -118,12 +118,12 @@ await insforge.payments.razorpay.verifySubscription('test', {
 透過後端路由管理訂閱：
 
 ```typescript
-await insforge.payments.razorpay.cancelSubscription('test', 'sub_123', {
+await yarah.payments.razorpay.cancelSubscription('test', 'sub_123', {
   cancelAtCycleEnd: false
 });
 
-await insforge.payments.razorpay.pauseSubscription('test', 'sub_123');
-await insforge.payments.razorpay.resumeSubscription('test', 'sub_123');
+await yarah.payments.razorpay.pauseSubscription('test', 'sub_123');
+await yarah.payments.razorpay.resumeSubscription('test', 'sub_123');
 ```
 
 建立訂閱時會評估 `payments.razorpay_subscriptions` 上的 `INSERT` 政策。取消、暫停與恢復操作則會評估同一張表上的 `UPDATE` 政策。PostgreSQL 也會對 `INSERT/UPDATE ... RETURNING` 回傳的資料列套用 `SELECT` 政策，因此當政策檢查需要回傳該資料列時，請確保同一主體（subject）對呼叫方可見。僅授予使用者政策檢查所需的資料表存取權限；對服務商的實際變更操作仍透過後端執行。

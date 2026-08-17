@@ -1,13 +1,13 @@
 ---
 title: "Puerta de enlace de modelos"
 sidebarTitle: "Overview"
-description: "Llama a cualquier LLM a través de la puerta de enlace de modelos de InsForge con una clave OpenRouter administrada, cuotas por proyecto y facturación unificada."
+description: "Llama a cualquier LLM a través de la puerta de enlace de modelos de Yarah con una clave OpenRouter administrada, cuotas por proyecto y facturación unificada."
 ---
 
-Utilice la puerta de enlace de modelos para llamar a modelos de chat, transmisión e incrustación a través de un único punto final compatible con OpenAI. InsForge mantiene las claves del proveedor, realiza un seguimiento del uso por proyecto e enruta el tráfico a través de [OpenRouter](https://openrouter.ai), por lo que el código de su aplicación nunca ve directamente las credenciales de Anthropic, OpenAI o Mistral.
+Utilice la puerta de enlace de modelos para llamar a modelos de chat, transmisión e incrustación a través de un único punto final compatible con OpenAI. Yarah mantiene las claves del proveedor, realiza un seguimiento del uso por proyecto e enruta el tráfico a través de [OpenRouter](https://openrouter.ai), por lo que el código de su aplicación nunca ve directamente las credenciales de Anthropic, OpenAI o Mistral.
 
 <Frame caption="Un punto final compatible con OpenAI con acceso por proveedor, código listo para copiar y seguimiento de uso.">
-  <img src="/images/model-gateway-overview.png" alt="Descripción general de la puerta de enlace de modelos del panel de InsForge que muestra ejemplos de código, fichas de proveedores y gráficos de uso" />
+  <img src="/images/model-gateway-overview.png" alt="Descripción general de la puerta de enlace de modelos del panel de Yarah que muestra ejemplos de código, fichas de proveedores y gráficos de uso" />
 </Frame>
 
 <Note>
@@ -16,7 +16,7 @@ Utilice la puerta de enlace de modelos para llamar a modelos de chat, transmisi�
 
 ```mermaid
 graph TB
-    Dashboard[InsForge Dashboard] --> Key[Active OpenRouter Key]
+    Dashboard[Yarah Dashboard] --> Key[Active OpenRouter Key]
     Dashboard --> Catalog[OpenRouter Model Catalog]
     Dashboard --> Metrics[OpenRouter Usage Overview]
 
@@ -38,7 +38,7 @@ graph TB
 
 ### API compatible con OpenAI
 
-Apunte cualquier SDK de OpenAI o biblioteca compatible con `openai` a `https://<project>.insforge.dev/v1` y funcionará. `/v1/chat/completions`, `/v1/embeddings` y `/v1/models` se comportan como la especificación ascendente.
+Apunte cualquier SDK de OpenAI o biblioteca compatible con `openai` a `https://<project>.yarah.dev/v1` y funcionará. `/v1/chat/completions`, `/v1/embeddings` y `/v1/models` se comportan como la especificación ascendente.
 
 ### Transmisión
 

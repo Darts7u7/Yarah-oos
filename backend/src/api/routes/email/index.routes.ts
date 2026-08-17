@@ -2,7 +2,7 @@ import { Router, Response, NextFunction } from 'express';
 import { AuthRequest, verifyUser } from '@/api/middlewares/auth.js';
 import { EmailService } from '@/services/email/email.service.js';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES, sendRawEmailRequestSchema } from '@insforge/shared-schemas';
+import { ERROR_CODES, sendRawEmailRequestSchema } from '@yarahdev/shared-schemas';
 import { successResponse } from '@/utils/response.js';
 
 const router = Router();

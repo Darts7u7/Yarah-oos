@@ -1,4 +1,4 @@
-import type { PresenceMember, PresenceSnapshot } from '@insforge/shared-schemas';
+import type { PresenceMember, PresenceSnapshot } from '@yarahdev/shared-schemas';
 
 interface PresenceEntry {
   member: PresenceMember;

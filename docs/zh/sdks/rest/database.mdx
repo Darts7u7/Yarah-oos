@@ -1,6 +1,6 @@
 ---
 title: 数据库 API 参考
-description: 通过 InsForge REST API 实现 PostgREST 风格的 Postgres 操作：查询、插入、更新、删除、筛选、排序、分页与 RPC 调用。
+description: 通过 Yarah REST API 实现 PostgREST 风格的 Postgres 操作：查询、插入、更新、删除、筛选、排序、分页与 RPC 调用。
 ---
 
 ## 概述
@@ -53,15 +53,15 @@ GET /api/database/records/{tableName}
 
 ```bash
 # Get all posts
-curl "https://your-app.insforge.app/api/database/records/posts" \
+curl "https://your-app.apps.yarah.dev/api/database/records/posts" \
   -H "Authorization: Bearer your-jwt-token"
 
 # Get posts with filters
-curl "https://your-app.insforge.app/api/database/records/posts?status=eq.published&order=createdAt.desc&limit=10" \
+curl "https://your-app.apps.yarah.dev/api/database/records/posts?status=eq.published&order=createdAt.desc&limit=10" \
   -H "Authorization: Bearer your-jwt-token"
 
 # Select specific columns
-curl "https://your-app.insforge.app/api/database/records/posts?select=id,title,author" \
+curl "https://your-app.apps.yarah.dev/api/database/records/posts?select=id,title,author" \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
@@ -71,7 +71,7 @@ curl "https://your-app.insforge.app/api/database/records/posts?select=id,title,a
 [
   {
     "id": "248373e1-0aea-45ce-8844-5ef259203749",
-    "title": "Getting Started with InsForge",
+    "title": "Getting Started with Yarah",
     "content": "This is a guide to help you get started...",
     "createdAt": "2025-07-18T05:37:24.338Z",
     "updatedAt": "2025-07-18T05:37:24.338Z"
@@ -110,7 +110,7 @@ POST /api/database/records/{tableName}
 
 ```bash
 # Create a single record
-curl -X POST "https://your-app.insforge.app/api/database/records/posts" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/records/posts" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -H "Prefer: return=representation" \
@@ -121,7 +121,7 @@ curl -X POST "https://your-app.insforge.app/api/database/records/posts" \
   }]'
 
 # Create multiple records
-curl -X POST "https://your-app.insforge.app/api/database/records/posts" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/records/posts" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -H "Prefer: return=representation" \
@@ -176,7 +176,7 @@ PATCH /api/database/records/{tableName}
 
 ```bash
 # Update a single record by ID
-curl -X PATCH "https://your-app.insforge.app/api/database/records/posts?id=eq.248373e1-0aea-45ce-8844-5ef259203749" \
+curl -X PATCH "https://your-app.apps.yarah.dev/api/database/records/posts?id=eq.248373e1-0aea-45ce-8844-5ef259203749" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -H "Prefer: return=representation" \
@@ -186,7 +186,7 @@ curl -X PATCH "https://your-app.insforge.app/api/database/records/posts?id=eq.24
   }'
 
 # Update multiple records
-curl -X PATCH "https://your-app.insforge.app/api/database/records/posts?status=eq.draft" \
+curl -X PATCH "https://your-app.apps.yarah.dev/api/database/records/posts?status=eq.draft" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{"status": "archived"}'
@@ -230,11 +230,11 @@ DELETE /api/database/records/{tableName}
 
 ```bash
 # Delete by ID
-curl -X DELETE "https://your-app.insforge.app/api/database/records/posts?id=eq.248373e1-0aea-45ce-8844-5ef259203749" \
+curl -X DELETE "https://your-app.apps.yarah.dev/api/database/records/posts?id=eq.248373e1-0aea-45ce-8844-5ef259203749" \
   -H "Authorization: Bearer your-jwt-token"
 
 # Delete with Prefer header to see deleted records
-curl -X DELETE "https://your-app.insforge.app/api/database/records/posts?status=eq.archived" \
+curl -X DELETE "https://your-app.apps.yarah.dev/api/database/records/posts?status=eq.archived" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Prefer: return=representation"
 ```
@@ -299,26 +299,26 @@ curl -X DELETE "https://your-app.insforge.app/api/database/records/posts?status=
 
 ```bash
 # Page 1 (first 20 records)
-curl "https://your-app.insforge.app/api/database/records/posts?limit=20&offset=0"
+curl "https://your-app.apps.yarah.dev/api/database/records/posts?limit=20&offset=0"
 
 # Page 2 (next 20 records)
-curl "https://your-app.insforge.app/api/database/records/posts?limit=20&offset=20"
+curl "https://your-app.apps.yarah.dev/api/database/records/posts?limit=20&offset=20"
 ```
 
 ### 复杂过滤条件
 
 ```bash
 # Multiple conditions
-curl "https://your-app.insforge.app/api/database/records/posts?status=eq.published&author_id=eq.123&order=createdAt.desc"
+curl "https://your-app.apps.yarah.dev/api/database/records/posts?status=eq.published&author_id=eq.123&order=createdAt.desc"
 
 # Search with pattern
-curl "https://your-app.insforge.app/api/database/records/users?email=ilike.*@company.com"
+curl "https://your-app.apps.yarah.dev/api/database/records/users?email=ilike.*@company.com"
 
 # In list
-curl "https://your-app.insforge.app/api/database/records/orders?status=in.(pending,processing)"
+curl "https://your-app.apps.yarah.dev/api/database/records/orders?status=in.(pending,processing)"
 
 # Null check
-curl "https://your-app.insforge.app/api/database/records/tasks?completed_at=is.null"
+curl "https://your-app.apps.yarah.dev/api/database/records/tasks?completed_at=is.null"
 ```
 
 ### Upsert（插入或更新）
@@ -340,7 +340,7 @@ POST /api/database/records/{tableName}
 
 ```bash
 # Upsert: insert or update on conflict
-curl -X POST "https://your-app.insforge.app/api/database/records/user_settings" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/records/user_settings" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -H "Prefer: resolution=merge-duplicates,return=representation" \
@@ -384,13 +384,13 @@ POST /api/database/rpc/{functionName}
 
 ```bash
 # Call a function with parameters
-curl -X POST "https://your-app.insforge.app/api/database/rpc/get_user_stats" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/rpc/get_user_stats" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{"user_id": "123e4567-e89b-12d3-a456-426614174000"}'
 
 # Call a function without parameters
-curl -X POST "https://your-app.insforge.app/api/database/rpc/get_total_count" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/rpc/get_total_count" \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
@@ -430,7 +430,7 @@ GET /api/database/functions
 ### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/database/functions" \
+curl "https://your-app.apps.yarah.dev/api/database/functions" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key"
 ```
 
@@ -462,7 +462,7 @@ GET /api/database/indexes
 ### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/database/indexes" \
+curl "https://your-app.apps.yarah.dev/api/database/indexes" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key"
 ```
 
@@ -494,7 +494,7 @@ GET /api/database/policies
 ### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/database/policies" \
+curl "https://your-app.apps.yarah.dev/api/database/policies" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key"
 ```
 
@@ -526,7 +526,7 @@ GET /api/database/triggers
 ### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/database/triggers" \
+curl "https://your-app.apps.yarah.dev/api/database/triggers" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key"
 ```
 
@@ -549,7 +549,7 @@ curl "https://your-app.insforge.app/api/database/triggers" \
 
 ## 列出数据库迁移
 
-获取成功执行的自定义迁移历史记录。InsForge 会将这些记录存储在 `system.custom_migrations` 中，但该接口只返回迁移的元数据和已执行的语句。**需要管理员身份验证。**
+获取成功执行的自定义迁移历史记录。Yarah 会将这些记录存储在 `system.custom_migrations` 中，但该接口只返回迁移的元数据和已执行的语句。**需要管理员身份验证。**
 
 ```
 GET /api/database/migrations
@@ -558,7 +558,7 @@ GET /api/database/migrations
 ### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/database/migrations" \
+curl "https://your-app.apps.yarah.dev/api/database/migrations" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key"
 ```
 
@@ -593,14 +593,14 @@ POST /api/database/migrations
 
 | 字段 | 类型 | 是否必需 | 描述 |
 |-------|------|----------|-------------|
-| `version` | string | 是 | 数字形式的迁移版本号（最多 64 位）。可以是 Drizzle 风格的顺序前缀（例如 `0001`），也可以是 `YYYYMMDDHHmmss` 格式的时间戳。版本号按数字大小比较。InsForge CLI 会为本地迁移文件名生成 14 位的 UTC 时间戳。 |
+| `version` | string | 是 | 数字形式的迁移版本号（最多 64 位）。可以是 Drizzle 风格的顺序前缀（例如 `0001`），也可以是 `YYYYMMDDHHmmss` 格式的时间戳。版本号按数字大小比较。Yarah CLI 会为本地迁移文件名生成 14 位的 UTC 时间戳。 |
 | `name` | string | 是 | 迁移名称，只能使用小写字母、数字和连字符 |
 | `sql` | string | 是 | 要解析并执行的 SQL 文本 |
 
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/database/migrations" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/migrations" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -625,7 +625,7 @@ curl -X POST "https://your-app.insforge.app/api/database/migrations" \
 ```
 
 <Warning>
-请勿在自定义迁移中包含 `BEGIN`、`COMMIT` 或 `ROLLBACK`。InsForge 会在自己的事务中执行该迁移。
+请勿在自定义迁移中包含 `BEGIN`、`COMMIT` 或 `ROLLBACK`。Yarah 会在自己的事务中执行该迁移。
 </Warning>
 
 ---
@@ -648,7 +648,7 @@ POST /api/database/advance/rawsql
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/database/advance/rawsql" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/advance/rawsql" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -693,7 +693,7 @@ POST /api/database/advance/rawsql/unrestricted
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/database/advance/rawsql/unrestricted" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/advance/rawsql/unrestricted" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -740,7 +740,7 @@ POST /api/database/advance/export
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/database/advance/export" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/advance/export" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -781,7 +781,7 @@ POST /api/database/advance/import
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/database/advance/import" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/advance/import" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key" \
   -F "file=@backup.sql" \
   -F "truncate=false"
@@ -820,14 +820,14 @@ POST /api/database/advance/bulk-upsert
 
 ```bash
 # Import from CSV
-curl -X POST "https://your-app.insforge.app/api/database/advance/bulk-upsert" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/advance/bulk-upsert" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key" \
   -F "file=@data.csv" \
   -F "table=posts" \
   -F "upsertKey=id"
 
 # Import from JSON
-curl -X POST "https://your-app.insforge.app/api/database/advance/bulk-upsert" \
+curl -X POST "https://your-app.apps.yarah.dev/api/database/advance/bulk-upsert" \
   -H "Authorization: Bearer admin-jwt-token-Or-API-Key" \
   -F "file=@data.json" \
   -F "table=posts"

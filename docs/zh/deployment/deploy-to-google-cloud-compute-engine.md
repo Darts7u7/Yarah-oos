@@ -1,14 +1,14 @@
 ---
-title: "将 InsForge 部署到 Google Cloud Compute Engine"
-description: "使用 Docker Compose 在 GCP Compute Engine 虚拟机上自托管 InsForge，涵盖防火墙、SSH、自定义域名与 HTTPS 配置的分步指南。"
+title: "将 Yarah 部署到 Google Cloud Compute Engine"
+description: "使用 Docker Compose 在 GCP Compute Engine 虚拟机上自托管 Yarah，涵盖防火墙、SSH、自定义域名与 HTTPS 配置的分步指南。"
 ---
 
-# 将 InsForge 部署到 Google Cloud Compute Engine
+# 将 Yarah 部署到 Google Cloud Compute Engine
 
-本指南将带你使用 Docker Compose 在 Google Cloud Compute Engine 上部署 InsForge。
+本指南将带你使用 Docker Compose 在 Google Cloud Compute Engine 上部署 Yarah。
 
 <Note>
-  本云端部署指南由社区维护，可能滞后于最新的 InsForge 版本。最权威、始终保持最新的配置位于 [InsForge 仓库](https://github.com/InsForge/InsForge) 中的 `deploy/docker-compose/` 目录。
+  本云端部署指南由社区维护，可能滞后于最新的 Yarah 版本。最权威、始终保持最新的配置位于 [Yarah 仓库](https://github.com/Yarah/Yarah) 中的 `deploy/docker-compose/` 目录。
 </Note>
 
 ## 📋 前置条件
@@ -26,7 +26,7 @@ description: "使用 Docker Compose 在 GCP Compute Engine 虚拟机上自托管
 1. **登录 Google Cloud 控制台**，访问 [console.cloud.google.com](https://console.cloud.google.com)
 2. **点击顶部导航栏中的“选择项目”**
 3. **点击“新建项目”**
-4. **输入项目名称**（例如 `insforge-deployment`）
+4. **输入项目名称**（例如 `yarah-deployment`）
 5. **点击“创建”**
 6. **等待项目创建完成**
 
@@ -43,7 +43,7 @@ description: "使用 Docker Compose 在 GCP Compute Engine 虚拟机上自托管
 1. 导航到 **Compute Engine** → **VM instances**
 2. 点击 **“Create Instance”**
 3. 配置你的实例：
-   - **名称**：`insforge-server`（或你偏好的名称）
+   - **名称**：`yarah-server`（或你偏好的名称）
    - **区域（Region）**：选择靠近你用户的区域
    - **可用区（Zone）**：选择一个可用区（例如 us-central1-a）
    - **机器配置**：
@@ -66,13 +66,13 @@ description: "使用 Docker Compose 在 GCP Compute Engine 虚拟机上自托管
 
 | 名称 | 方向 | 目标 | 协议/端口 | 来源过滤器 |
 |------|-----------|---------|-----------------|----------------|
-| insforge-ssh | Ingress | insforge-server | tcp:22 | 你的 IP 地址 |
-| insforge-http | Ingress | insforge-server | tcp:80 | 0.0.0.0/0 |
-| insforge-https | Ingress | insforge-server | tcp:443 | 0.0.0.0/0 |
-| insforge-app | Ingress | insforge-server | tcp:7130 | 0.0.0.0/0 |
-| insforge-deno | Ingress | insforge-server | tcp:7133 | 0.0.0.0/0 |
-| insforge-postgrest | Ingress | insforge-server | tcp:5430 | 0.0.0.0/0 |
-| insforge-postgres | Ingress | insforge-server | tcp:5432 | 0.0.0.0/0（仅在外部需要访问时） |
+| yarah-ssh | Ingress | yarah-server | tcp:22 | 你的 IP 地址 |
+| yarah-http | Ingress | yarah-server | tcp:80 | 0.0.0.0/0 |
+| yarah-https | Ingress | yarah-server | tcp:443 | 0.0.0.0/0 |
+| yarah-app | Ingress | yarah-server | tcp:7130 | 0.0.0.0/0 |
+| yarah-deno | Ingress | yarah-server | tcp:7133 | 0.0.0.0/0 |
+| yarah-postgrest | Ingress | yarah-server | tcp:5430 | 0.0.0.0/0 |
+| yarah-postgres | Ingress | yarah-server | tcp:5432 | 0.0.0.0/0（仅在外部需要访问时） |
 
 > ⚠️ **安全提示**：在生产环境中，应将 PostgreSQL（5432）限制为特定 IP 地址访问，或完全移除外部访问权限。建议使用反向代理（nginx），仅对外暴露 80/443 端口。
 
@@ -83,7 +83,7 @@ description: "使用 Docker Compose 在 GCP Compute Engine 虚拟机上自托管
 
 ```bash
 # Use gcloud CLI to SSH (if you have gcloud SDK installed locally)
-gcloud compute ssh insforge-server --zone=your-zone
+gcloud compute ssh yarah-server --zone=your-zone
 ```
 
 ### 3. 安装依赖项
@@ -144,12 +144,12 @@ docker ps
 sudo apt install git -y
 ```
 
-### 4. 部署 InsForge
+### 4. 部署 Yarah
 
 #### 4.1 获取仓库
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh | sh -s ~/insforge
+curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 会 checkout 这个栈要读的文件，并把 `JWT_SECRET`、`ENCRYPTION_KEY`、`ROOT_ADMIN_PASSWORD`、`POSTGRES_PASSWORD` 生成到 `.env`。不启动任何东西。
@@ -157,7 +157,7 @@ curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup
 #### 4.2 创建环境配置
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 nano .env
 ```
 
@@ -181,7 +181,7 @@ GOOGLE_CLIENT_SECRET=
 
 > 💡 请把 `.env` 备份到安全的地方。迁移或恢复这个实例靠的就是里面的密钥。
 
-#### 4.3 启动 InsForge 服务
+#### 4.3 启动 Yarah 服务
 
 ```bash
 # Pull Docker images and start services
@@ -202,11 +202,11 @@ docker compose ps
 # You should see 4 running services:
 # - postgres
 # - postgrest
-# - insforge
+# - yarah
 # - deno
 ```
 
-### 5. 访问你的 InsForge 实例
+### 5. 访问你的 Yarah 实例
 
 #### 5.1 测试后端 API
 
@@ -219,7 +219,7 @@ curl http://your-external-ip:7130/api/health
 {
   "status": "ok",
   "version": "2.1.7",
-  "service": "Insforge OSS Backend",
+  "service": "Yarah OSS Backend",
   "timestamp": "2025-10-17T..."
 }
 ```
@@ -237,7 +237,7 @@ http://your-external-ip:7130
 
 1. 在 Google Cloud 控制台中，进入 **VPC network** → **External IP addresses**
 2. 点击 **Reserve Static Address**
-3. **名称**：`insforge-ip`
+3. **名称**：`yarah-ip`
 4. **类型**：Regional 或 Global（对于虚拟机实例请选择 Regional）
 5. **区域**：与你的虚拟机实例相同
 6. **点击 Reserve**
@@ -259,7 +259,7 @@ sudo apt install nginx -y
 创建 Nginx 配置：
 
 ```bash
-sudo nano /etc/nginx/sites-available/insforge
+sudo nano /etc/nginx/sites-available/yarah
 ```
 
 添加以下配置：
@@ -305,7 +305,7 @@ server {
 启用该配置：
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/insforge /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/yarah /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -325,7 +325,7 @@ sudo certbot --nginx -d api.yourdomain.com -d app.yourdomain.com
 使用 HTTPS 地址更新你的 `.env` 文件：
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 nano .env
 ```
 
@@ -351,7 +351,7 @@ docker compose up -d
 docker compose logs -f
 
 # Specific service
-docker compose logs -f insforge
+docker compose logs -f yarah
 docker compose logs -f postgres
 docker compose logs -f deno
 ```
@@ -368,10 +368,10 @@ docker compose down
 docker compose restart
 ```
 
-### 更新 InsForge
+### 更新 Yarah
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 git pull origin main
 
 # Pick up any files this release added to the sparse checkout
@@ -383,8 +383,8 @@ docker compose pull && docker compose up -d
 ### 备份数据库
 
 ```bash
-# Create backup (run from ~/insforge)
-docker compose exec postgres pg_dump -U postgres insforge > backup_$(date +%Y%m%d_%H%M%S).sql
+# Create backup (run from ~/yarah)
+docker compose exec postgres pg_dump -U postgres yarah > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Store backup in Google Cloud Storage (optional)
 # First, install Google Cloud CLI and authenticate
@@ -496,9 +496,9 @@ effective_cache_size = 3GB
 
 ## 🆘 支持与资源
 
-- **文档**：[https://docs.insforge.dev](https://docs.insforge.dev)
-- **GitHub Issues**：[https://github.com/insforge/insforge/issues](https://github.com/insforge/insforge/issues)
-- **Discord 社区**：[https://discord.com/invite/MPxwj5xVvW](https://discord.com/invite/MPxwj5xVvW)
+- **文档**：[https://docs.yarah.dev](https://docs.yarah.dev)
+- **GitHub Issues**：[https://github.com/yarah/yarah/issues](https://github.com/yarah/yarah/issues)
+- **Discord 社区**：[https://yarah.dev/community](https://yarah.dev/community)
 
 ## 📝 成本估算
 
@@ -515,6 +515,6 @@ effective_cache_size = 3GB
 
 ---
 
-**恭喜！🎉** 你的 InsForge 实例现已在 Google Cloud Compute Engine 上运行。你可以开始通过将 AI 智能体连接到你的后端平台来构建应用程序。
+**恭喜！🎉** 你的 Yarah 实例现已在 Google Cloud Compute Engine 上运行。你可以开始通过将 AI 智能体连接到你的后端平台来构建应用程序。
 
 有关其他生产环境部署策略，请查看我们的[部署指南](/deployment/deployment-security-guide)。

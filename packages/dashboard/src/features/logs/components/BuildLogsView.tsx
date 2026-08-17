@@ -9,7 +9,7 @@ import {
 } from '#features/logs/services/log.service';
 import { LogsDataGrid, type LogsColumnDef } from './LogsDataGrid';
 import { DataGridEmptyState } from '#components';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 import { usePageSize } from '#lib/hooks/usePageSize';
 
 interface BuildLogsViewProps {

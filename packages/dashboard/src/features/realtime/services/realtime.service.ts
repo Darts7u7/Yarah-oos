@@ -11,7 +11,7 @@ import type {
   RlsPolicy,
   RealtimePermissionsResponse,
   UpdateRealtimeConfigRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export type { RealtimeChannel, RealtimeMessage, RlsPolicy, RealtimePermissionsResponse };
 

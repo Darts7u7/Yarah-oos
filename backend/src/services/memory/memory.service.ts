@@ -8,7 +8,7 @@ import {
   type MemoryKind,
   type RememberResult,
   type RecalledMemory,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const EMBED_MODEL = 'openai/text-embedding-3-small';
 const EMBED_DIMENSIONS = 1536;
@@ -135,7 +135,7 @@ Skip transient details: what commands ran, intermediate errors that were fixed, 
 Examples:
 ✅ {"kind":"reference","title":"Stripe webhook secret","content":"The staging Stripe webhook signing secret is in 1Password vault acme-infra, item stripe-staging."}
 ✅ {"kind":"decision","title":"tags as text[]","content":"snippets.tags uses a Postgres text[] column with a GIN index instead of a join table, chosen because tags are read-mostly and need no metadata."}
-✅ {"kind":"fact","title":"insert format","content":"InsForge SDK inserts must be array-wrapped: .insert([{...}]); a bare object fails."}
+✅ {"kind":"fact","title":"insert format","content":"Yarah SDK inserts must be array-wrapped: .insert([{...}]); a bare object fails."}
 ❌ {"title":"ran migration","content":"Applied the migration and it succeeded."}   // transient
 ❌ {"title":"fixed test","content":"Fixed a flaky test by adding a retry."}            // transient, recoverable from code`,
       transcript

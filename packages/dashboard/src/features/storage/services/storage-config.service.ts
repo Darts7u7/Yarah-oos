@@ -1,5 +1,5 @@
 import { apiClient } from '#lib/api/client';
-import { StorageConfigSchema, UpdateStorageConfigRequest } from '@insforge/shared-schemas';
+import { StorageConfigSchema, UpdateStorageConfigRequest } from '@yarahdev/shared-schemas';
 
 /** Client-side service for interacting with the storage configuration API. */
 export class StorageConfigService {

@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import { EmptyStateIllustration } from '#components';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 
 interface DatabaseEmptyStateProps {
   title: string;

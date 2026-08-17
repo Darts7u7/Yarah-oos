@@ -1,4 +1,4 @@
-import type { ApifyConfig } from '@insforge/shared-schemas';
+import type { ApifyConfig } from '@yarahdev/shared-schemas';
 import { SecretService } from '@/services/secrets/secret.service.js';
 import logger from '@/utils/logger.js';
 

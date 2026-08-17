@@ -379,7 +379,7 @@ GRANT UPDATE ON payments.razorpay_subscriptions TO project_admin;
 CREATE TABLE IF NOT EXISTS payments.razorpay_orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   environment TEXT NOT NULL CHECK (environment IN ('test', 'live')),
-  -- initialized and failed are InsForge-local lifecycle states; created,
+  -- initialized and failed are Yarah-local lifecycle states; created,
   -- attempted, and paid mirror Razorpay order statuses.
   status TEXT NOT NULL DEFAULT 'initialized' CHECK (
     status IN ('initialized', 'created', 'attempted', 'paid', 'failed')
@@ -540,7 +540,7 @@ FOR EACH ROW EXECUTE FUNCTION system.update_updated_at();
 
 GRANT SELECT ON payments.customer_mappings TO project_admin;
 
--- InsForge transaction projection. Provider-native tables and webhook events
+-- Yarah transaction projection. Provider-native tables and webhook events
 -- remain the source of truth; this table is optimized for dashboard/reporting.
 CREATE TABLE IF NOT EXISTS payments.transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

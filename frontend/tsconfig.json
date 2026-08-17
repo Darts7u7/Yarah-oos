@@ -16,7 +16,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@insforge/dashboard": ["../packages/dashboard/src"],
+      "@yarahdev/dashboard": ["../packages/dashboard/src"],
       "#app/*": ["../packages/dashboard/src/app/*"],
       "#assets/*": ["../packages/dashboard/src/assets/*"],
       "#components": ["../packages/dashboard/src/components/index.ts"],
@@ -28,8 +28,8 @@
       "#router/*": ["../packages/dashboard/src/router/*"],
       "#types": ["../packages/dashboard/src/types/index.ts"],
       "#types/*": ["../packages/dashboard/src/types/*"],
-      "@insforge/shared-schemas": ["../packages/shared-schemas/src"],
-      "@insforge/ui": ["../packages/ui/src"]
+      "@yarahdev/shared-schemas": ["../packages/shared-schemas/src"],
+      "@yarahdev/ui": ["../packages/ui/src"]
     }
   },
   "include": ["src", "../packages/dashboard"],

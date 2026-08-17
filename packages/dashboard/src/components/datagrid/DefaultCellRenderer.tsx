@@ -1,8 +1,8 @@
-import { ColumnType } from '@insforge/shared-schemas';
+import { ColumnType } from '@yarahdev/shared-schemas';
 import type { ConvertedValue, DataGridRowType } from './datagridTypes';
 import { RenderCellProps } from 'react-data-grid';
 import { formatValueForDisplay, isEmptyValue } from '#lib/utils/utils';
-import { Badge, cn } from '@insforge/ui';
+import { Badge, cn } from '@yarahdev/ui';
 import IdCell from './IdCell';
 
 // Generic cell renderer factory

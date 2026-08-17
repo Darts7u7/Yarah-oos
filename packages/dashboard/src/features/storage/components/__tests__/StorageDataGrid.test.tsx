@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import type { StorageFileSchema } from '@insforge/shared-schemas';
+import type { StorageFileSchema } from '@yarahdev/shared-schemas';
 import i18n from '#lib/i18n';
 import { createStorageColumns } from '#features/storage/components/StorageDataGrid';
 

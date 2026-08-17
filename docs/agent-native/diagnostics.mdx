@@ -1,10 +1,10 @@
 ---
 title: "Diagnostics & advisor"
 sidebarTitle: "Diagnostics & advisor"
-description: "Use insforge diagnose so the agent can read backend health, advisor findings, RLS warnings, and error logs, then apply the fix without a dashboard."
+description: "Use yarah diagnose so the agent can read backend health, advisor findings, RLS warnings, and error logs, then apply the fix without a dashboard."
 ---
 
-When something breaks, an agent should not have to guess. `npx @insforge/cli diagnose` turns the backend's own signals into something an agent can fetch and act on directly: advisor findings with remediations, database health checks, instance metrics, and aggregated error logs. Each finding comes with a fix, so "what is wrong" and "what to do about it" arrive together. The agent pulls all of this itself, with no dashboard in the loop, which is what lets it close security gaps like a permissive RLS policy before they leak data.
+When something breaks, an agent should not have to guess. `npx @yarah/cli diagnose` turns the backend's own signals into something an agent can fetch and act on directly: advisor findings with remediations, database health checks, instance metrics, and aggregated error logs. Each finding comes with a fix, so "what is wrong" and "what to do about it" arrive together. The agent pulls all of this itself, with no dashboard in the loop, which is what lets it close security gaps like a permissive RLS policy before they leak data.
 
 <Frame caption="A Backend Advisor finding: the problem, the affected table, and a remediation the agent can copy and apply.">
   <img src="/images/backend-advisor.png" alt="Backend Advisor finding: a permissive RLS policy on public.messages with a Copy Remediation button" />
@@ -15,8 +15,8 @@ When something breaks, an agent should not have to guess. `npx @insforge/cli dia
 Run `diagnose` with no subcommand for everything at once:
 
 ```bash
-npx @insforge/cli diagnose
-npx @insforge/cli diagnose --json
+npx @yarah/cli diagnose
+npx @yarah/cli diagnose --json
 ```
 
 The report bundles the advisor scan, database health, instance metrics, and recent error logs into one output. In `--json` mode the agent gets it all as structured data.
@@ -26,8 +26,8 @@ The report bundles the advisor scan, database health, instance metrics, and rece
 The advisor scans for security, performance, and health issues and writes a remediation for each one. The dashboard shows the findings with a "Copy Remediation" button, but the agent does not need the dashboard: it fetches the same scan directly with `--json` and applies the fix itself, so a security issue gets closed without waiting for a human to notice it.
 
 ```bash
-npx @insforge/cli diagnose advisor
-npx @insforge/cli diagnose advisor --json
+npx @yarah/cli diagnose advisor
+npx @yarah/cli diagnose advisor --json
 ```
 
 A typical finding is a permissive RLS policy that exposes a table to anonymous users. The advisor names the table, the severity, and the SQL to fix it. The agent reads the finding, applies the remediation as a [migration](/core-concepts/database/migrations), and re-scans to confirm it cleared.
@@ -46,18 +46,18 @@ Each part of the report is also available on its own:
 For raw logs from a single source, use the top-level command:
 
 ```bash
-npx @insforge/cli logs function.logs
-npx @insforge/cli logs postgres.logs
+npx @yarah/cli logs function.logs
+npx @yarah/cli logs postgres.logs
 ```
 
-Sources include `insforge.logs`, `postgREST.logs`, `postgres.logs`, `function.logs`, and `function-deploy.logs`.
+Sources include `yarah.logs`, `postgREST.logs`, `postgres.logs`, `function.logs`, and `function-deploy.logs`.
 
 ## Let the agent interpret it
 
 `diagnose --ai` hands the collected diagnostic data to a model and returns a plain-language analysis:
 
 ```bash
-npx @insforge/cli diagnose --ai "why did write latency spike after the last deploy?"
+npx @yarah/cli diagnose --ai "why did write latency spike after the last deploy?"
 ```
 
 This is the difference between dumping a stack trace and explaining the fix. The agent asks a question about the live backend and gets an answer grounded in the actual signals.

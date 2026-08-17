@@ -1,5 +1,5 @@
 // Storage-related type definitions
-import { StorageBucketSchema } from '@insforge/shared-schemas';
+import { StorageBucketSchema } from '@yarahdev/shared-schemas';
 
 // Base storage record from database
 export interface StorageRecord {

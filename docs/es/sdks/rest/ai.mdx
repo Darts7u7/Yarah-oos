@@ -1,11 +1,11 @@
 ---
 title: Referencia de IA REST
-description: Integración HTTP directa de OpenRouter y endpoints auxiliares para la puerta de enlace de modelos de InsForge desde cualquier cliente REST o backend.
+description: Integración HTTP directa de OpenRouter y endpoints auxiliares para la puerta de enlace de modelos de Yarah desde cualquier cliente REST o backend.
 ---
 
 ## Descripción General
 
-Las nuevas integraciones de IA deben llamar directamente a OpenRouter utilizando la clave de OpenRouter proporcionada por InsForge. Las rutas proxy de IA de InsForge (para chat, generación de imágenes e incrustaciones) son puntos finales de compatibilidad deprecados.
+Las nuevas integraciones de IA deben llamar directamente a OpenRouter utilizando la clave de OpenRouter proporcionada por Yarah. Las rutas proxy de IA de Yarah (para chat, generación de imágenes e incrustaciones) son puntos finales de compatibilidad deprecados.
 
 Utiliza el panel de control para copiar la clave OpenRouter activa a una variable de entorno `OPENROUTER_API_KEY` solo para servidor.
 
@@ -69,11 +69,11 @@ curl "https://openrouter.ai/api/v1/models?output_modalities=all"
 OpenRouter posee la forma actual de solicitud y respuesta para llamadas del modelo de IA. Consulta la documentación de la API de OpenRouter para parámetros específicos del modelo, modalidades admitidas, complementos y puntos finales de generación de video.
 </Note>
 
-## Puntos Finales Auxiliares del Administrador de InsForge
+## Puntos Finales Auxiliares del Administrador de Yarah
 
 Estos puntos finales ayudan al panel de control a mostrar la clave del modelo activa, el catálogo de modelos y la descripción general de uso. Requieren autenticación de administrador.
 
-Utiliza un token de portador JWT de administrador o un token de portador de clave de API de InsForge en el encabezado `Authorization`.
+Utiliza un token de portador JWT de administrador o un token de portador de clave de API de Yarah en el encabezado `Authorization`.
 
 ### Obtener Modelos Disponibles
 
@@ -82,13 +82,13 @@ GET /api/ai/models
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/models" \
+curl "https://your-app.apps.yarah.dev/api/ai/models" \
   -H "Authorization: Bearer <ADMIN_JWT_TOKEN>"
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/models" \
-  -H "Authorization: Bearer <INSFORGE_API_KEY>"
+curl "https://your-app.apps.yarah.dev/api/ai/models" \
+  -H "Authorization: Bearer <YARAH_API_KEY>"
 ```
 
 <Warning>
@@ -120,13 +120,13 @@ GET /api/ai/openrouter/api-key
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/openrouter/api-key" \
+curl "https://your-app.apps.yarah.dev/api/ai/openrouter/api-key" \
   -H "Authorization: Bearer <ADMIN_JWT_TOKEN>"
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/openrouter/api-key" \
-  -H "Authorization: Bearer <INSFORGE_API_KEY>"
+curl "https://your-app.apps.yarah.dev/api/ai/openrouter/api-key" \
+  -H "Authorization: Bearer <YARAH_API_KEY>"
 ```
 
 ```json
@@ -147,18 +147,18 @@ GET /api/ai/overview
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/overview" \
+curl "https://your-app.apps.yarah.dev/api/ai/overview" \
   -H "Authorization: Bearer <ADMIN_JWT_TOKEN>"
 ```
 
 ```bash
-curl "https://your-app.insforge.app/api/ai/overview" \
-  -H "Authorization: Bearer <INSFORGE_API_KEY>"
+curl "https://your-app.apps.yarah.dev/api/ai/overview" \
+  -H "Authorization: Bearer <YARAH_API_KEY>"
 ```
 
 Devuelve series de tiempo de uso y actividad de OpenRouter a nivel de clave cuando la clave activa tiene acceso a la actividad.
 
-## Rutas de Proxy de InsForge Deprecadas
+## Rutas de Proxy de Yarah Deprecadas
 
 Las siguientes rutas aún existen para aplicaciones existentes, pero el código nuevo debe usar OpenRouter directamente.
 
@@ -174,7 +174,7 @@ Las siguientes rutas aún existen para aplicaciones existentes, pero el código 
 POST /api/ai/chat/completion
 ```
 
-Esta ruta valida una solicitud con forma de InsForge, la reenvía a OpenRouter y devuelve una respuesta con forma de InsForge. No expone la superficie completa de la API de OpenRouter.
+Esta ruta valida una solicitud con forma de Yarah, la reenvía a OpenRouter y devuelve una respuesta con forma de Yarah. No expone la superficie completa de la API de OpenRouter.
 
 ### Proxy de Imagen Heredada
 
@@ -182,7 +182,7 @@ Esta ruta valida una solicitud con forma de InsForge, la reenvía a OpenRouter y
 POST /api/ai/image/generation
 ```
 
-Esta ruta reenvía una solicitud de imagen con forma de InsForge a completaciones de chat de OpenRouter con salida de imagen. Se retiene solo para compatibilidad.
+Esta ruta reenvía una solicitud de imagen con forma de Yarah a completaciones de chat de OpenRouter con salida de imagen. Se retiene solo para compatibilidad.
 
 ### Proxy de Incrustaciones Heredado
 
@@ -190,4 +190,4 @@ Esta ruta reenvía una solicitud de imagen con forma de InsForge a completacione
 POST /api/ai/embeddings
 ```
 
-Esta ruta reenvía una solicitud de incrustación con forma de InsForge a OpenRouter. Prefiere el punto final de incrustaciones directo de OpenRouter para código nuevo.
+Esta ruta reenvía una solicitud de incrustación con forma de Yarah a OpenRouter. Prefiere el punto final de incrustaciones directo de OpenRouter para código nuevo.

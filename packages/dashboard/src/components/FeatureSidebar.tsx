@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
   SearchInput,
   cn,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 
 interface FeatureSidebarProps {
   title: string;

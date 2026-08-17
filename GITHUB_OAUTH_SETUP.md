@@ -15,7 +15,7 @@ This document will guide you through the steps to create and configure a GitHub 
 
 On the "Register a new OAuth application" page, you need to fill in the following information:
 
-*   **Application name**: Give your application a descriptive name, such as `Insforge Dev Login`.
+*   **Application name**: Give your application a descriptive name, such as `Yarah Dev Login`.
 *   **Homepage URL**: Your application's homepage URL. In development environment, you can set it to `http://localhost:7130` or your frontend development server address.
 *   **Application description** (optional): Provide a brief description of your application.
 *   **Authorization callback URL**: This is the URL where GitHub will redirect users after authorization. For local development, make sure to set it to:

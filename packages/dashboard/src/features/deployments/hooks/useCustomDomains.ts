@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { deploymentsService } from '#features/deployments/services/deployments.service';
-import { useToast } from '@insforge/ui';
-import { isInsForgeCloudProject } from '#lib/utils/utils';
+import { useToast } from '@yarahdev/ui';
+import { isYarahCloudProject } from '#lib/utils/utils';
 
 const QUERY_KEY = ['deployments', 'custom-domains'];
 
@@ -15,7 +15,7 @@ export function useCustomDomains() {
   const { t } = useTranslation('chrome');
   const queryClient = useQueryClient();
   const { showToast } = useToast();
-  const isCloudProject = isInsForgeCloudProject();
+  const isCloudProject = isYarahCloudProject();
 
   const {
     data: domains = [],

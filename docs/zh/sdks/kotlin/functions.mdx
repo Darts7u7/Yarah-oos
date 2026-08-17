@@ -1,6 +1,6 @@
 ---
 title: 函数 SDK 参考
-description: 使用 InsForge Kotlin SDK 调用无服务器边缘函数，从 Android 与 Kotlin 多平台应用发送带类型的请求、处理响应并集成到业务逻辑中。
+description: 使用 Yarah Kotlin SDK 调用无服务器边缘函数，从 Android 与 Kotlin 多平台应用发送带类型的请求、处理响应并集成到业务逻辑中。
 ---
 
 import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
@@ -99,8 +99,8 @@ val contentType = response.contentType()
 
 ```kotlin
 // Initialize client with service role key for admin operations
-val adminClient = createInsforgeClient(
-    baseUrl = "https://your-app.insforge.app",
+val adminClient = createYarahClient(
+    baseUrl = "https://your-app.apps.yarah.dev",
     anonKey = "your-service-role-key"  // Use service role key or api key, not anon key
 ) {
     install(Functions)
@@ -136,7 +136,7 @@ println("Code: ${details.code}")
 ### createFunction()
 
 <Note>
-目前，InsForge 仅支持在 Deno 环境中运行的 JavaScript/TypeScript 函数。
+目前，Yarah 仅支持在 Deno 环境中运行的 JavaScript/TypeScript 函数。
 </Note>
 
 创建新函数。
@@ -199,12 +199,12 @@ client.functions.deleteFunction("old-function")
 ## 错误处理
 
 ```kotlin
-import dev.insforge.exceptions.InsforgeHttpException
+import dev.yarah.exceptions.YarahHttpException
 
 try {
     val response = client.functions.invoke<MyResponse>("my-function")
     println("Success: $response")
-} catch (e: InsforgeHttpException) {
+} catch (e: YarahHttpException) {
     println("HTTP Error ${e.statusCode}: ${e.message}")
     println("Error code: ${e.error}")
     e.nextActions?.let { actions ->

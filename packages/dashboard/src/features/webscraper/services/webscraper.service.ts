@@ -1,7 +1,7 @@
 import { apiClient } from '#lib/api/client';
-import type { ApifyConfig } from '@insforge/shared-schemas';
+import type { ApifyConfig } from '@yarahdev/shared-schemas';
 
-// Apify-specific connection shape kept local (not in @insforge/shared-schemas) —
+// Apify-specific connection shape kept local (not in @yarahdev/shared-schemas) —
 // the connector catalog grows by adding providers, not shared types.
 export interface ApifyConnection {
   apifyUsername: string | null;

@@ -1,4 +1,4 @@
-import { ERROR_CODES, type PosthogConfig } from '@insforge/shared-schemas';
+import { ERROR_CODES, type PosthogConfig } from '@yarahdev/shared-schemas';
 import { SecretService } from '@/services/secrets/secret.service.js';
 import logger from '@/utils/logger.js';
 

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { Database } from 'lucide-react';
-import { EmptyState } from '@insforge/ui';
+import { EmptyState } from '@yarahdev/ui';
 
 describe('EmptyState', () => {
   it('renders title, description, and a working action button', async () => {

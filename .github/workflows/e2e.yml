@@ -19,13 +19,13 @@ jobs:
           cat > .env << EOF
           POSTGRES_USER=postgres
           POSTGRES_PASSWORD=postgres
-          POSTGRES_DB=insforge
-          DATABASE_URL=postgresql://postgres:postgres@postgres:5432/insforge
+          POSTGRES_DB=yarah
+          DATABASE_URL=postgresql://postgres:postgres@postgres:5432/yarah
           JWT_SECRET=test-secret-key-for-ci-cd-pipeline
           ROOT_ADMIN_USERNAME=admin
           ROOT_ADMIN_PASSWORD=test-admin-password-for-ci
           TEST_API_BASE=http://localhost:7130/api
-          INSFORGE_DISABLE_WRITE_RATE_LIMIT=1
+          YARAH_DISABLE_WRITE_RATE_LIMIT=1
           EOF
 
       - name: Start Docker Compose services
@@ -36,17 +36,17 @@ jobs:
           echo "Waiting for PostgreSQL..."
           timeout 60 bash -c 'until docker compose exec -T postgres pg_isready -U postgres; do sleep 2; done'
 
-      - name: Wait for InsForge backend to be ready
+      - name: Wait for Yarah backend to be ready
         run: |
-          echo "Waiting for InsForge backend..."
+          echo "Waiting for Yarah backend..."
           timeout 180 bash -c 'until curl -f http://localhost:7130/api/health 2>/dev/null; do echo "Waiting..."; sleep 5; done'
           echo "Backend is ready!"
 
       - name: Install test dependencies in container
-        run: docker compose exec -T insforge apk add --no-cache bash curl jq postgresql-client
+        run: docker compose exec -T yarah apk add --no-cache bash curl jq postgresql-client
 
       - name: Run E2E tests
-        run: docker compose exec -T insforge npm run test:e2e
+        run: docker compose exec -T yarah npm run test:e2e
 
       - name: Show container logs on failure
         if: failure()
@@ -54,8 +54,8 @@ jobs:
           echo "=== PostgreSQL logs ==="
           docker compose logs postgres
           echo ""
-          echo "=== InsForge backend logs ==="
-          docker compose logs insforge
+          echo "=== Yarah backend logs ==="
+          docker compose logs yarah
           echo ""
           echo "=== PostgREST logs ==="
           docker compose logs postgrest

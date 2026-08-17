@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 const configMock = {
   cloud: { projectId: undefined as string | undefined, apiHost: 'https://x' },
   app: { jwtSecret: 's'.repeat(32), logLevel: 'error' },
-  server: { logsDir: '/tmp/insforge-webscraper-test-logs' },
+  server: { logsDir: '/tmp/yarah-webscraper-test-logs' },
 };
 vi.mock('../../src/infra/config/app.config', () => ({ config: configMock, appConfig: configMock }));
 
@@ -99,7 +99,7 @@ describe('WebscraperService.setApifyToken', () => {
     configMock.cloud.projectId = undefined;
   });
 
-  // The point of verifying first is that Apify — not InsForge — decides whether
+  // The point of verifying first is that Apify — not Yarah — decides whether
   // the pasted string is a usable token. Storing it before asking would leave a
   // dead credential behind that 401s on every later read, so the order is the
   // behaviour, not an implementation detail.

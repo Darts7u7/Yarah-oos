@@ -13,12 +13,12 @@ import {
 import { getFeatureFlag } from '#lib/analytics/posthog';
 import { FEATURE_FLAGS } from '#lib/analytics/constants';
 
-interface InstallInsForgePageProps {
+interface InstallYarahPageProps {
   onSelectClient: (id: ClientId) => void;
   onDismiss: () => void;
 }
 
-export function InstallInsForgePage({ onSelectClient, onDismiss }: InstallInsForgePageProps) {
+export function InstallYarahPage({ onSelectClient, onDismiss }: InstallYarahPageProps) {
   const { t } = useTranslation('chrome');
   const mcpVsCliVariant = getFeatureFlag(FEATURE_FLAGS.MCP_VS_CLI);
   const gridEntries = CODING_AGENT_GRID_IDS.map((id) => CLIENT_ENTRIES[id]).filter((entry) => {
@@ -40,7 +40,7 @@ export function InstallInsForgePage({ onSelectClient, onDismiss }: InstallInsFor
         {/* Title row */}
         <div className="flex items-center justify-between">
           <h1 className="text-[28px] font-medium leading-10 text-foreground">
-            {t('overview.installInsForge', { defaultValue: 'Install InsForge' })}
+            {t('overview.installYarah', { defaultValue: 'Install Yarah' })}
           </h1>
           <button
             type="button"
@@ -52,7 +52,7 @@ export function InstallInsForgePage({ onSelectClient, onDismiss }: InstallInsFor
           </button>
         </div>
 
-        {/* Section 1: Use InsForge with CLI — hidden for mcp-vs-cli=mcp */}
+        {/* Section 1: Use Yarah with CLI — hidden for mcp-vs-cli=mcp */}
         {showCliPrompt && <DTestInstallCliSection />}
 
         {/* Section 2: Install in Agent */}

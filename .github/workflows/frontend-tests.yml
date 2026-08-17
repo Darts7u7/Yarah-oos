@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Run dashboard unit tests
-        run: npm --workspace @insforge/dashboard run test:unit
+        run: npm --workspace @yarahdev/dashboard run test:unit
 
   dashboard-component-tests:
     name: Dashboard Component Tests
@@ -47,7 +47,7 @@ jobs:
         run: npm ci
 
       - name: Run dashboard component tests
-        run: npm --workspace @insforge/dashboard run test:component
+        run: npm --workspace @yarahdev/dashboard run test:component
 
   ui-unit-tests:
     name: UI Unit Tests
@@ -67,7 +67,7 @@ jobs:
         run: npm ci
 
       - name: Run UI unit tests
-        run: npm --workspace @insforge/ui run test:unit
+        run: npm --workspace @yarahdev/ui run test:unit
 
   ui-component-tests:
     name: UI Component Tests
@@ -87,7 +87,7 @@ jobs:
         run: npm ci
 
       - name: Run UI component tests
-        run: npm --workspace @insforge/ui run test:component
+        run: npm --workspace @yarahdev/ui run test:component
 
   dashboard-e2e-tests:
     name: Dashboard E2E Tests
@@ -115,7 +115,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run dashboard E2E tests
-        run: npm --workspace @insforge/dashboard run test:ui
+        run: npm --workspace @yarahdev/dashboard run test:ui
 
       - name: Upload Playwright artifacts
         if: failure()

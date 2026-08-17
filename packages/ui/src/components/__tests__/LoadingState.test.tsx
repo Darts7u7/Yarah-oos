@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { LoadingState } from '@insforge/ui';
+import { LoadingState } from '@yarahdev/ui';
 
 describe('LoadingState', () => {
   it('renders the default message with a spinner', () => {

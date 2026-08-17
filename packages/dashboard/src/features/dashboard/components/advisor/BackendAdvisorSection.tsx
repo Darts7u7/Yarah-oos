@@ -15,7 +15,7 @@ import type {
   DashboardAdvisorSeverity,
 } from '#types';
 import { useDashboardHost } from '#lib/config/DashboardHostContext';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 import { useCopyToClipboard } from '#lib/hooks/useCopyToClipboard';
 import { EmptyState, PaginationControls } from '#components';
 import { AdvisoryItem } from './AdvisoryItem';

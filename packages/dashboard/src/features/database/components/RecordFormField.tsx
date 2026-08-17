@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { Control, Controller, FieldError, UseFormReturn, UseFormSetValue } from 'react-hook-form';
 import { Calendar, Clock, Link2, X } from 'lucide-react';
-import { Button, Input, cn } from '@insforge/ui';
+import { Button, Input, cn } from '@yarahdev/ui';
 import {
   BooleanCellEditor,
   DateCellEditor,
@@ -11,7 +11,7 @@ import {
   type DatabaseRecord,
   type ConvertedValue,
 } from '#components';
-import { ColumnSchema, ColumnType, type ForeignKeySchema } from '@insforge/shared-schemas';
+import { ColumnSchema, ColumnType, type ForeignKeySchema } from '@yarahdev/shared-schemas';
 import { convertValueForColumn, formatValueForDisplay } from '#lib/utils/utils';
 import { LinkRecordDialog } from './LinkRecordDialog';
 import { isValid, parseISO } from 'date-fns';

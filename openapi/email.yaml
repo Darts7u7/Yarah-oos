@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Insforge Email API
+  title: Yarah Email API
   version: 1.0.0
   description: Custom email sending endpoints for sending raw HTML emails
 

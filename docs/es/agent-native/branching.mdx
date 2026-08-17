@@ -1,10 +1,10 @@
 ---
 title: "Ramificación de backend"
 sidebarTitle: "Branching"
-description: "Crea una copia aislada de tu proyecto InsForge para probar cambios de esquema, configuración y migraciones antes de fusionar a la rama de producción."
+description: "Crea una copia aislada de tu proyecto Yarah para probar cambios de esquema, configuración y migraciones antes de fusionar a la rama de producción."
 ---
 
-Una rama es un subproyecto con su propio Postgres, configuración de autenticación, almacenamiento, funciones perimetrales, plantillas de correo electrónico, canales en tiempo real y programaciones. Fusione de nuevo cuando esté listo o restablezca e intente de nuevo. Disponible en InsForge OSS 2.1.0+.
+Una rama es un subproyecto con su propio Postgres, configuración de autenticación, almacenamiento, funciones perimetrales, plantillas de correo electrónico, canales en tiempo real y programaciones. Fusione de nuevo cuando esté listo o restablezca e intente de nuevo. Disponible en Yarah OSS 2.1.0+.
 
 ## Conceptos
 
@@ -15,22 +15,22 @@ Cada rama se ejecuta en su propia instancia EC2, restaurada desde el padre en el
 Cree una rama con `full` (esquema + datos) o `schema-only` (más rápido, tablas de usuario vacías).
 
 ```bash
-npx @insforge/cli branch create feat-billing --mode full
-npx @insforge/cli branch list
+npx @yarah/cli branch create feat-billing --mode full
+npx @yarah/cli branch list
 ```
 
 Obtenga una vista previa del SQL de fusión antes de aplicar.
 
 ```bash
-npx @insforge/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
-npx @insforge/cli branch merge feat-billing
+npx @yarah/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
+npx @yarah/cli branch merge feat-billing
 ```
 
 Revierta a la instantánea de creación o elimine la rama.
 
 ```bash
-npx @insforge/cli branch reset feat-billing
-npx @insforge/cli branch delete feat-billing
+npx @yarah/cli branch reset feat-billing
+npx @yarah/cli branch delete feat-billing
 ```
 
 ## Casos de uso específicos
@@ -43,4 +43,4 @@ Las fusiones se bloquean en conflictos. Resuelva en la rama o restablezca e inte
 
 - [Migraciones de base de datos](/core-concepts/database/migrations) para archivos SQL de solo avance.
 - [Descripción general de la base de datos](/core-concepts/database/overview) para lo que se ejecuta bajo cada rama.
-- [Referencia de CLI](https://github.com/InsForge/InsForge) para el conjunto completo de banderas `branch`.
+- [Referencia de CLI](https://github.com/Yarah/Yarah) para el conjunto completo de banderas `branch`.

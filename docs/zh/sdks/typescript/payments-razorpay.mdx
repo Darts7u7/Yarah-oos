@@ -1,6 +1,6 @@
 ---
 title: Razorpay 支付 SDK
-description: 使用 InsForge TypeScript SDK 从应用创建 Razorpay 订单与订阅、验证 Webhook 签名，并将支付状态同步到 Postgres 数据库。
+description: 使用 Yarah TypeScript SDK 从应用创建 Razorpay 订单与订阅、验证 Webhook 签名，并将支付状态同步到 Postgres 数据库。
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
@@ -11,13 +11,13 @@ import Installation from '/snippets/sdk-installation.mdx';
 
 TypeScript SDK 为生成的应用前端公开 Razorpay 运行时助手：
 
-- `insforge.payments.razorpay.createOrder(...)`
-- `insforge.payments.razorpay.verifyOrder(...)`
-- `insforge.payments.razorpay.createSubscription(...)`
-- `insforge.payments.razorpay.verifySubscription(...)`
-- `insforge.payments.razorpay.cancelSubscription(...)`
-- `insforge.payments.razorpay.pauseSubscription(...)`
-- `insforge.payments.razorpay.resumeSubscription(...)`
+- `yarah.payments.razorpay.createOrder(...)`
+- `yarah.payments.razorpay.verifyOrder(...)`
+- `yarah.payments.razorpay.createSubscription(...)`
+- `yarah.payments.razorpay.verifySubscription(...)`
+- `yarah.payments.razorpay.cancelSubscription(...)`
+- `yarah.payments.razorpay.pauseSubscription(...)`
+- `yarah.payments.razorpay.resumeSubscription(...)`
 
 Razorpay 不返回托管的 Checkout URL。后端创建 Razorpay 订单或订阅并返回 `checkoutOptions`。浏览器加载 Razorpay Checkout 并使用这些选项打开它。
 
@@ -30,8 +30,8 @@ Razorpay 不返回托管的 Checkout URL。后端创建 Razorpay 订单或订阅
 ```typescript
 import { createClient } from '@insforge/sdk';
 
-const insforge = createClient({
-  baseUrl: 'https://your-project.insforge.app',
+const yarah = createClient({
+  baseUrl: 'https://your-project.apps.yarah.dev',
   anonKey: 'your-anon-key'
 });
 
@@ -43,7 +43,7 @@ declare global {
 
 ```
 
-SDK 使用当前 InsForge 用户令牌调用 Razorpay 运行时路由。不要使用提供商密钥调用这些路由。
+SDK 使用当前 Yarah 用户令牌调用 Razorpay 运行时路由。不要使用提供商密钥调用这些路由。
 
 ## 加载 Razorpay Checkout
 
@@ -66,9 +66,9 @@ function loadRazorpayCheckout(): Promise<void> {
 
 ## 一次性订单
 
-首先创建一个应用拥有的待处理订单。然后通过 InsForge 创建 Razorpay 订单：
+首先创建一个应用拥有的待处理订单。然后通过 Yarah 创建 Razorpay 订单：
 
-Razorpay 订单可以是仅金额的，但为一次性可售产品创建 Razorpay 商品是一个好做法，因为同步的商品使目录在 InsForge 和 Razorpay 中可见。将订单视为付款尝试。
+Razorpay 订单可以是仅金额的，但为一次性可售产品创建 Razorpay 商品是一个好做法，因为同步的商品使目录在 Yarah 和 Razorpay 中可见。将订单视为付款尝试。
 
 ```typescript
 type CreateRazorpayOrderResponse = {
@@ -94,7 +94,7 @@ type CreateRazorpayOrderResponse = {
 };
 
 const { data: orderResponse, error } =
-  await insforge.payments.razorpay.createOrder('test', {
+  await yarah.payments.razorpay.createOrder('test', {
     amount: 50000,
     currency: 'INR',
     receipt: order.id,
@@ -126,7 +126,7 @@ const checkout = new RazorpayCheckout({
     razorpay_payment_id: string;
     razorpay_signature: string;
   }) => {
-    const { error } = await insforge.payments.razorpay.verifyOrder('test', {
+    const { error } = await yarah.payments.razorpay.verifyOrder('test', {
       orderId: response.razorpay_order_id,
       paymentId: response.razorpay_payment_id,
       signature: response.razorpay_signature
@@ -143,7 +143,7 @@ checkout.open();
 
 ## 订阅
 
-首先创建或同步一个 Razorpay 计划。然后通过 InsForge 创建订阅：
+首先创建或同步一个 Razorpay 计划。然后通过 Yarah 创建订阅：
 
 ```typescript
 type CreateRazorpaySubscriptionResponse = {
@@ -166,7 +166,7 @@ type CreateRazorpaySubscriptionResponse = {
 };
 
 const { data: subscriptionResponse, error } =
-  await insforge.payments.razorpay.createSubscription('test', {
+  await yarah.payments.razorpay.createSubscription('test', {
     planId: 'plan_123',
     totalCount: 12,
     subject: { type: 'team', id: teamId },
@@ -196,7 +196,7 @@ const checkout = new RazorpayCheckout({
     razorpay_payment_id: string;
     razorpay_signature: string;
   }) => {
-    const { error } = await insforge.payments.razorpay.verifySubscription('test', {
+    const { error } = await yarah.payments.razorpay.verifySubscription('test', {
       subscriptionId: response.razorpay_subscription_id,
       paymentId: response.razorpay_payment_id,
       signature: response.razorpay_signature
@@ -214,13 +214,13 @@ checkout.open();
 Razorpay 不提供 Stripe 计费门户的等价物。使用后端路由进行订阅管理：
 
 ```typescript
-await insforge.payments.razorpay.cancelSubscription('test', 'sub_123', {
+await yarah.payments.razorpay.cancelSubscription('test', 'sub_123', {
   cancelAtCycleEnd: false
 });
 
-await insforge.payments.razorpay.pauseSubscription('test', 'sub_123');
+await yarah.payments.razorpay.pauseSubscription('test', 'sub_123');
 
-await insforge.payments.razorpay.resumeSubscription('test', 'sub_123');
+await yarah.payments.razorpay.resumeSubscription('test', 'sub_123');
 ```
 
 订阅创建检查 `payments.razorpay_subscriptions` 上的 `INSERT` 策略。取消、暂停和恢复检查同一表上的 `UPDATE` 策略。PostgreSQL 还将 `SELECT` 策略应用于 `INSERT/UPDATE ... RETURNING` 返回的行，因此当策略探测需要返回行时，为同一计费主体添加匹配的 `SELECT` 可见性。在为共享主体公开这些控件之前，添加应用特定的 RLS 或服务器端成员资格检查。

@@ -10,7 +10,7 @@ import {
   ERROR_CODES,
   getRealtimeConfigResponseSchema,
   updateRealtimeConfigRequestSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const router = Router();
 const messageService = RealtimeMessageService.getInstance();

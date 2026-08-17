@@ -3,7 +3,7 @@ import { verifyAdmin, AuthRequest } from '@/api/middlewares/auth.js';
 import { successResponse } from '@/utils/response.js';
 import { DatabaseAdvisorService } from '@/services/database/database-advisor.service.js';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 import { SUPPRESSION_SCOPES, SUPPRESSION_REASONS } from '@/types/advisor.js';
 

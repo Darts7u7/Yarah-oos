@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { UpdateDatabaseBackupConfig } from '@insforge/shared-schemas';
-import { useToast } from '@insforge/ui';
+import type { UpdateDatabaseBackupConfig } from '@yarahdev/shared-schemas';
+import { useToast } from '@yarahdev/ui';
 import { backupService } from '#features/database/services/backup.service';
 import { useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
 

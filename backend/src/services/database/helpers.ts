@@ -5,7 +5,7 @@ import {
   type ForeignKeySchema,
   type OnDeleteActionSchema,
   type OnUpdateActionSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import type { ForeignKeyRow } from '@/types/database.js';
 import { validateIdentifier, validateSchemaName, validateTableName } from '@/utils/validations.js';
 

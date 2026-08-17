@@ -17,7 +17,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { getSignedUrl as getCloudFrontSignedUrl } from '@aws-sdk/cloudfront-signer';
 import { Readable } from 'stream';
-import { UploadStrategyResponse, DownloadStrategyResponse } from '@insforge/shared-schemas';
+import { UploadStrategyResponse, DownloadStrategyResponse } from '@yarahdev/shared-schemas';
 import {
   StorageProvider,
   ObjectMetadata,

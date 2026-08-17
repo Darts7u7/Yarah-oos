@@ -25,7 +25,7 @@ import {
   type ListStripeProductsResponse,
   type MutateStripeProductResponse,
   type UpdateStripeProductRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class StripeProductService {
   private static instance: StripeProductService;

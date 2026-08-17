@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "Ejecute funciones perimetrales TypeScript sin servidor sobre Deno con invocación HTTP, cron, activadores de base de datos, secretos y variables de entorno."
 ---
 
-Utilice InsForge Edge Functions para ejecutar TypeScript en [Deno](https://deno.com), implementado cerca de sus usuarios para baja latencia. Las funciones se pueden invocar bajo demanda desde cualquier cliente, encadenarse desde activadores de base de datos o programarse para ejecutarse en una expresión cron. El tiempo de ejecución incluye búsqueda estándar, respuestas de transmisión e importaciones ESM listos para usar.
+Utilice Yarah Edge Functions para ejecutar TypeScript en [Deno](https://deno.com), implementado cerca de sus usuarios para baja latencia. Las funciones se pueden invocar bajo demanda desde cualquier cliente, encadenarse desde activadores de base de datos o programarse para ejecutarse en una expresión cron. El tiempo de ejecución incluye búsqueda estándar, respuestas de transmisión e importaciones ESM listos para usar.
 
 <Note>
   **¿Necesita un proceso que permanezca activo?** Utilice [Compute](/core-concepts/compute/overview) para trabajadores en cola, bucles de inferencia de IA y cualquier cosa con estado. Edge Functions son para solicitud/respuesta y trabajos de corta duración.
@@ -16,7 +16,7 @@ graph TB
     Schedule[Cron Schedule] --> Fn
     Trigger[Database Trigger] --> Fn
 
-    Fn --> SDK[InsForge SDK]
+    Fn --> SDK[Yarah SDK]
     SDK --> DB[(Database)]
     SDK --> Storage[Storage]
     SDK --> Gateway[Model Gateway]
@@ -35,11 +35,11 @@ graph TB
 
 ### Activadores HTTP
 
-Cada función es accesible en `https://<project>.insforge.dev/functions/<name>`. Búsqueda estándar de entrada, salida estándar `Response`. La transmisión, JSON, redirecciones y websockets funcionan.
+Cada función es accesible en `https://<project>.yarah.dev/functions/<name>`. Búsqueda estándar de entrada, salida estándar `Response`. La transmisión, JSON, redirecciones y websockets funcionan.
 
 ### Calendarios
 
-Adjunte una expresión cron a una función e InsForge la invoca a tiempo, con reintentos en caso de fallo. Vea [Schedules](/core-concepts/functions/schedules) para la sintaxis cron y el modelo de ejecución.
+Adjunte una expresión cron a una función e Yarah la invoca a tiempo, con reintentos en caso de fallo. Vea [Schedules](/core-concepts/functions/schedules) para la sintaxis cron y el modelo de ejecución.
 
 ### Activadores de base de datos
 
@@ -53,14 +53,14 @@ La diferencia está en cómo se almacena y protege cada valor. Los **secretos** 
 
 ```bash
 # un secreto protegido con expiración
-npx @insforge/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
+npx @yarah/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
 # lea de vuelta el valor descifrado
-npx @insforge/cli secrets get STRIPE_SECRET_KEY
+npx @yarah/cli secrets get STRIPE_SECRET_KEY
 ```
 
 ### Registros
 
-Los registros estructurados se capturan por invocación, consultables por estado, duración y nombre de función. La herramienta InsForge MCP `get-function-logs` permite que su agente diagnostique fallos sin salir del editor.
+Los registros estructurados se capturan por invocación, consultables por estado, duración y nombre de función. La herramienta Yarah MCP `get-function-logs` permite que su agente diagnostique fallos sin salir del editor.
 
 ### Biblioteca estándar de Deno
 

@@ -8,7 +8,7 @@ import {
   rememberRequestSchema,
   recallRequestSchema,
   memoryIndexRequestSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const router = Router();
 const memoryService = MemoryService.getInstance();

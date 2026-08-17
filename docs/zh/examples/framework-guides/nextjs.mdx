@@ -1,19 +1,19 @@
 ---
 title: Next.js
-description: 了解如何创建 InsForge 项目并使用 Cursor、Claude 等 AI 工具构建 Next.js 全栈应用，涵盖身份验证、Postgres 数据库、存储与实时功能。
+description: 了解如何创建 Yarah 项目并使用 Cursor、Claude 等 AI 工具构建 Next.js 全栈应用，涵盖身份验证、Postgres 数据库、存储与实时功能。
 ---
 
-了解如何创建 InsForge 项目并使用 AI 工具（如 Cursor）构建 Next.js 应用程序。
+了解如何创建 Yarah 项目并使用 AI 工具（如 Cursor）构建 Next.js 应用程序。
 
-## 1. 创建 InsForge 项目
+## 1. 创建 Yarah 项目
 
-在 [insforge.dev](https://insforge.dev) 创建新的 InsForge 项目。
+在 [yarah.dev](https://yarah.dev) 创建新的 Yarah 项目。
 
-## 2. 连接 InsForge
+## 2. 连接 Yarah
 
 两个部分：
 
-- **CLI 链接** — 查看[快速开始](/quickstart)以运行 `npx @insforge/cli link --project-id <your-project-id>` 以便代理可以读取您的项目 ID 和密钥。
+- **CLI 链接** — 查看[快速开始](/quickstart)以运行 `npx @yarah/cli link --project-id <your-project-id>` 以便代理可以读取您的项目 ID 和密钥。
 - **MCP 设置** — 查看 [MCP 设置](/mcp-setup) 以了解每个编辑器的配置（Cursor、Claude Code、Windsurf、Codex、VS Code）。
 
 配置好两者后，代理可以读取模式、运行查询和从您的编辑器部署代码。
@@ -24,9 +24,9 @@ description: 了解如何创建 InsForge 项目并使用 Cursor、Claude 等 AI 
 
 ```
 Create a new Next.js app with TypeScript and Tailwind CSS 3.4.
-Install the InsForge SDK and set up the client configuration.
+Install the Yarah SDK and set up the client configuration.
 
-In my InsForge database, create a sports table with id and name columns.
+In my Yarah database, create a sports table with id and name columns.
 Add sample data: basketball, soccer, and tennis. Make it publicly readable.
 
 Create a page at /sports that fetches and displays all sports from the database.
@@ -38,13 +38,13 @@ Create a page at /sports that fetches and displays all sports from the database.
 
 您的 AI 助手将自动创建这样的文件。您无需手动触摸它们。
 
-**InsForge 客户端** 在 `lib/insforge.ts`:
+**Yarah 客户端** 在 `lib/yarah.ts`:
 
-```typescript lib/insforge.ts
+```typescript lib/yarah.ts
 import { createClient } from '@insforge/sdk';
 
-export const insforge = createClient({
-  baseUrl: 'https://your-project.us-east.insforge.app',
+export const yarah = createClient({
+  baseUrl: 'https://your-project.us-east.apps.yarah.dev',
   anonKey: 'your-anon-key',
 });
 ```
@@ -52,10 +52,10 @@ export const insforge = createClient({
 **运动页面** 在 `app/sports/page.tsx`:
 
 ```typescript app/sports/page.tsx
-import { insforge } from '@/lib/insforge';
+import { yarah } from '@/lib/yarah';
 
 export default async function SportsPage() {
-  const { data: sports, error } = await insforge.database
+  const { data: sports, error } = await yarah.database
     .from('sports')
     .select();
 
@@ -126,11 +126,11 @@ Store favorites in a user_favorites table with user_id and sport_id.
 ```
 
 ```
-Add images to each sport using InsForge Storage.
+Add images to each sport using Yarah Storage.
 Allow users to upload sport images and display them in the grid.
 ```
 
 ```
 Add an AI chat feature that can answer questions about sports.
-Use InsForge AI with streaming responses.
+Use Yarah AI with streaming responses.
 ```

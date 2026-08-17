@@ -21,7 +21,7 @@ export function QoderDeeplinkGenerator({
     const configString = JSON.stringify(config);
     // Qoder requires: JSON.stringify -> encodeURIComponent -> btoa -> encodeURIComponent
     const base64Config = btoa(encodeURIComponent(configString));
-    return `qoder://aicoding.aicoding-deeplink/mcp/add?name=insforge&config=${encodeURIComponent(base64Config)}`;
+    return `qoder://aicoding.aicoding-deeplink/mcp/add?name=yarah&config=${encodeURIComponent(base64Config)}`;
   }, [apiKey, os]);
 
   const handleOpenInQoder = useCallback(() => {

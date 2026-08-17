@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { storageService, type ListObjectsParams } from '#features/storage/services/storage.service';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 export function useStorageObjects() {
   const { t } = useTranslation('chrome');

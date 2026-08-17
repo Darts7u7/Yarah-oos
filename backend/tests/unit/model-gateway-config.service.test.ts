@@ -4,7 +4,7 @@ import {
   ModelGatewayConfigUpdateError,
 } from '../../src/services/ai/model-gateway-config.service.js';
 import { AppError } from '../../src/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 type ConfigServiceSecretStore = ConstructorParameters<typeof ModelGatewayConfigService>[0];
 

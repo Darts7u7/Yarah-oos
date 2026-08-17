@@ -99,12 +99,12 @@ export const stripeIdempotencyKeySchema = z
   .min(1, 'Idempotency key is required')
   .max(200, 'Idempotency key must be 200 characters or fewer');
 
-function hasNoReservedInsForgeMetadata(metadata: Record<string, string> | undefined) {
-  return !Object.keys(metadata ?? {}).some((key) => key.startsWith('insforge_'));
+function hasNoReservedYarahMetadata(metadata: Record<string, string> | undefined) {
+  return !Object.keys(metadata ?? {}).some((key) => key.startsWith('yarah_'));
 }
 
-function hasNoReservedInsForgeNotes(notes: Record<string, string> | undefined) {
-  return !Object.keys(notes ?? {}).some((key) => key.startsWith('insforge_'));
+function hasNoReservedYarahNotes(notes: Record<string, string> | undefined) {
+  return !Object.keys(notes ?? {}).some((key) => key.startsWith('yarah_'));
 }
 
 const currencySchema = z
@@ -361,9 +361,9 @@ const createRazorpayPlanFields = {
 export const createRazorpayPlanBodySchema = z
   .object(createRazorpayPlanFields)
   .strict()
-  .refine((value) => hasNoReservedInsForgeNotes(value.notes), {
+  .refine((value) => hasNoReservedYarahNotes(value.notes), {
     path: ['notes'],
-    message: 'Notes keys starting with insforge_ are reserved',
+    message: 'Notes keys starting with yarah_ are reserved',
   });
 
 export const createRazorpayPlanRequestSchema = z
@@ -372,9 +372,9 @@ export const createRazorpayPlanRequestSchema = z
     ...createRazorpayPlanFields,
   })
   .strict()
-  .refine((value) => hasNoReservedInsForgeNotes(value.notes), {
+  .refine((value) => hasNoReservedYarahNotes(value.notes), {
     path: ['notes'],
-    message: 'Notes keys starting with insforge_ are reserved',
+    message: 'Notes keys starting with yarah_ are reserved',
   });
 
 export const mutateRazorpayItemResponseSchema = z.object({
@@ -410,9 +410,9 @@ export const createCheckoutSessionBodySchema = z
     path: ['subject'],
     message: 'Subscription checkout requires a billing subject',
   })
-  .refine((value) => hasNoReservedInsForgeMetadata(value.metadata), {
+  .refine((value) => hasNoReservedYarahMetadata(value.metadata), {
     path: ['metadata'],
-    message: 'Metadata keys starting with insforge_ are reserved',
+    message: 'Metadata keys starting with yarah_ are reserved',
   });
 
 export const createCheckoutSessionRequestSchema = z
@@ -425,9 +425,9 @@ export const createCheckoutSessionRequestSchema = z
     path: ['subject'],
     message: 'Subscription checkout requires a billing subject',
   })
-  .refine((value) => hasNoReservedInsForgeMetadata(value.metadata), {
+  .refine((value) => hasNoReservedYarahMetadata(value.metadata), {
     path: ['metadata'],
-    message: 'Metadata keys starting with insforge_ are reserved',
+    message: 'Metadata keys starting with yarah_ are reserved',
   });
 
 export const createCheckoutSessionResponseSchema = z.object({
@@ -450,9 +450,9 @@ const createRazorpayOrderFields = {
 export const createRazorpayOrderBodySchema = z
   .object(createRazorpayOrderFields)
   .strict()
-  .refine((value) => hasNoReservedInsForgeNotes(value.notes), {
+  .refine((value) => hasNoReservedYarahNotes(value.notes), {
     path: ['notes'],
-    message: 'Notes keys starting with insforge_ are reserved',
+    message: 'Notes keys starting with yarah_ are reserved',
   });
 
 export const createRazorpayOrderRequestSchema = z
@@ -461,9 +461,9 @@ export const createRazorpayOrderRequestSchema = z
     ...createRazorpayOrderFields,
   })
   .strict()
-  .refine((value) => hasNoReservedInsForgeNotes(value.notes), {
+  .refine((value) => hasNoReservedYarahNotes(value.notes), {
     path: ['notes'],
-    message: 'Notes keys starting with insforge_ are reserved',
+    message: 'Notes keys starting with yarah_ are reserved',
   });
 
 export const createRazorpayOrderResponseSchema = z.object({
@@ -523,9 +523,9 @@ export const createRazorpaySubscriptionBodySchema = z
   .refine(hasSubscriptionEnd, {
     message: 'Either totalCount or endAt is required',
   })
-  .refine((value) => hasNoReservedInsForgeNotes(value.notes), {
+  .refine((value) => hasNoReservedYarahNotes(value.notes), {
     path: ['notes'],
-    message: 'Notes keys starting with insforge_ are reserved',
+    message: 'Notes keys starting with yarah_ are reserved',
   });
 
 export const createRazorpaySubscriptionRequestSchema = z
@@ -537,9 +537,9 @@ export const createRazorpaySubscriptionRequestSchema = z
   .refine(hasSubscriptionEnd, {
     message: 'Either totalCount or endAt is required',
   })
-  .refine((value) => hasNoReservedInsForgeNotes(value.notes), {
+  .refine((value) => hasNoReservedYarahNotes(value.notes), {
     path: ['notes'],
-    message: 'Notes keys starting with insforge_ are reserved',
+    message: 'Notes keys starting with yarah_ are reserved',
   });
 
 export const createRazorpaySubscriptionResponseSchema = z.object({

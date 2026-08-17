@@ -292,7 +292,7 @@ describe('ApifyConfigService.deleteToken against reserved-secret semantics', () 
   // Regression: setToken() stores with isReserved: true, and the default
   // deleteSecretByKey() filters those rows out. Disconnect matched zero rows,
   // discarded the `false`, answered 204 — and the admin kept a live Apify
-  // credential in InsForge they believed they had revoked.
+  // credential in Yarah they believed they had revoked.
   it('really removes the reserved token it stored', async () => {
     const { service, store } = makeBehaviouralService();
     await service.setToken('apify_api_stored12345678');

@@ -1,6 +1,6 @@
 ---
 title: 存储API参考
-description: 通过 InsForge REST API 从任意语言管理文件存储与存储桶：上传、下载、删除、列表、签名 URL 生成以及桶权限配置的完整 HTTP 端点参考。
+description: 通过 Yarah REST API 从任意语言管理文件存储与存储桶：上传、下载、删除、列表、签名 URL 生成以及桶权限配置的完整 HTTP 端点参考。
 ---
 
 ## 概览
@@ -25,7 +25,7 @@ Content-Type: application/json
 
 ## 使用上传策略上传对象
 
-InsForge支持两种类型的存储后端：
+Yarah支持两种类型的存储后端：
 1. **本地存储**：文件存储在本地文件系统上。用于开发或低容量生产。
 2. **S3兼容**：文件存储在S3兼容对象存储上。用于高容量生产。
 
@@ -40,7 +40,7 @@ InsForge支持两种类型的存储后端：
 
 根据存储后端获取最优上传策略（直接或预签名URL）。
 上传策略API根据存储后端返回最优上传方法：
-- **本地存储**：直接上传到InsForge API
+- **本地存储**：直接上传到Yarah API
 - **S3兼容**：预签名URL用于直接上传到S3
 
 ```
@@ -60,7 +60,7 @@ POST /api/storage/buckets/{bucketName}/upload-strategy
 #### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/storage/buckets/avatars/upload-strategy" \
+curl -X POST "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/upload-strategy" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -129,7 +129,7 @@ POST /api/storage/buckets/{bucketName}/objects/{objectKey}/confirm-upload
 #### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/storage/buckets/avatars/objects/profile-photo.jpg/confirm-upload" \
+curl -X POST "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects/profile-photo.jpg/confirm-upload" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -175,7 +175,7 @@ PUT /api/storage/buckets/{bucketName}/objects/{objectKey}
 ### 示例
 
 ```bash
-curl -X PUT "https://your-app.insforge.app/api/storage/buckets/avatars/objects/users/profile.jpg" \
+curl -X PUT "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects/users/profile.jpg" \
   -H "Authorization: Bearer your-jwt-token" \
   -F "file=@/path/to/image.jpg"
 ```
@@ -206,7 +206,7 @@ POST /api/storage/buckets/{bucketName}/objects
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/storage/buckets/uploads/objects" \
+curl -X POST "https://your-app.apps.yarah.dev/api/storage/buckets/uploads/objects" \
   -H "Authorization: Bearer your-jwt-token" \
   -F "file=@/path/to/document.pdf"
 ```
@@ -228,7 +228,7 @@ curl -X POST "https://your-app.insforge.app/api/storage/buckets/uploads/objects"
 
 ## 使用下载策略下载对象
 
-InsForge支持两种类型的存储后端：
+Yarah支持两种类型的存储后端：
 1. **本地存储**：文件存储在本地文件系统上。用于开发或低容量生产。
 2. **S3兼容**：文件存储在S3兼容对象存储上。用于高容量生产。
 
@@ -241,7 +241,7 @@ InsForge支持两种类型的存储后端：
 根据存储后端和桶可见性获取最优下载策略（直接URL或预签名URL）。
 
 下载策略API根据存储后端和桶可见性返回最优下载方法：
-- **本地存储**：从InsForge API直接下载
+- **本地存储**：从Yarah API直接下载
 - **S3兼容**：S3的预签名URL。
 
 ```
@@ -261,7 +261,7 @@ GET /api/storage/buckets/{bucketName}/download-strategy/objects/{objectKey}
 #### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/storage/buckets/avatars/download-strategy/objects/profile.jpg" \
+curl "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/download-strategy/objects/profile.jpg" \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
@@ -301,7 +301,7 @@ GET /api/storage/buckets/{bucketName}/objects/{objectKey}
 ### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/storage/buckets/avatars/objects/users/profile.jpg" \
+curl "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects/users/profile.jpg" \
   -H "Authorization: Bearer your-jwt-token" \
   -o profile.jpg
 ```
@@ -323,7 +323,7 @@ DELETE /api/storage/buckets/{bucketName}/objects/{objectKey}
 ### 示例
 
 ```bash
-curl -X DELETE "https://your-app.insforge.app/api/storage/buckets/avatars/objects/users/profile.jpg" \
+curl -X DELETE "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects/users/profile.jpg" \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
@@ -358,11 +358,11 @@ GET /api/storage/buckets/{bucketName}/objects
 
 ```bash
 # Filter by prefix
-curl "https://your-app.insforge.app/api/storage/buckets/avatars/objects?prefix=users/&limit=50" \
+curl "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects?prefix=users/&limit=50" \
   -H "Authorization: Bearer your-jwt-token"
 
 # Search by key
-curl "https://your-app.insforge.app/api/storage/buckets/avatars/objects?search=profile" \
+curl "https://your-app.apps.yarah.dev/api/storage/buckets/avatars/objects?search=profile" \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
@@ -409,7 +409,7 @@ GET /api/storage/buckets
 ### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/storage/buckets" \
+curl "https://your-app.apps.yarah.dev/api/storage/buckets" \
   -H "Authorization: Bearer admin-jwt-token"
 ```
 
@@ -437,7 +437,7 @@ POST /api/storage/buckets
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/storage/buckets" \
+curl -X POST "https://your-app.apps.yarah.dev/api/storage/buckets" \
   -H "Authorization: Bearer admin-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -470,7 +470,7 @@ PATCH /api/storage/buckets/{bucketName}
 ### 示例
 
 ```bash
-curl -X PATCH "https://your-app.insforge.app/api/storage/buckets/user-uploads" \
+curl -X PATCH "https://your-app.apps.yarah.dev/api/storage/buckets/user-uploads" \
   -H "Authorization: Bearer admin-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{"isPublic": true}'
@@ -495,7 +495,7 @@ DELETE /api/storage/buckets/{bucketName}
 ### 示例
 
 ```bash
-curl -X DELETE "https://your-app.insforge.app/api/storage/buckets/old-uploads" \
+curl -X DELETE "https://your-app.apps.yarah.dev/api/storage/buckets/old-uploads" \
   -H "Authorization: Bearer admin-jwt-token"
 ```
 

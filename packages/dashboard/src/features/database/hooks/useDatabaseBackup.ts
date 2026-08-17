@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { DatabaseBackup } from '@insforge/shared-schemas';
+import type { DatabaseBackup } from '@yarahdev/shared-schemas';
 import { backupService } from '#features/database/services/backup.service';
 import { useDashboardHost, useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
 import type { DashboardBackup, DashboardBackupInfo, DashboardInstanceInfo } from '#types';

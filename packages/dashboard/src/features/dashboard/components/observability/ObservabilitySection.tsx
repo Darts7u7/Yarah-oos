@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowDownToLine, ArrowUpFromLine, Cpu, HardDrive, MemoryStick } from 'lucide-react';
-import { Button } from '@insforge/ui';
+import { Button } from '@yarahdev/ui';
 import { useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
-import { isInsForgeCloudProject } from '#lib/utils/utils';
+import { isYarahCloudProject } from '#lib/utils/utils';
 import { useProjectMetrics } from '#features/dashboard/hooks/useProjectMetrics';
 import { aggregateMetricSeries } from '#features/dashboard/utils/aggregateMetricSeries';
 import type { DashboardMetricDataPoint, DashboardMetricName, DashboardMetricsRange } from '#types';
@@ -226,7 +226,7 @@ export function ObservabilitySection() {
   // Same pair of signals the settings dialog gates its Compute tab on
   // (ProjectSettingsMenuDialog's canUseCloudHost) — the CTA must not show
   // when the tab it promises would fall back to Project Information.
-  const canOpenComputeSettings = isCloudHostingMode && isInsForgeCloudProject();
+  const canOpenComputeSettings = isCloudHostingMode && isYarahCloudProject();
   const [range, setRange] = useState<DashboardMetricsRange>('1h');
   const [computeSettingsOpen, setComputeSettingsOpen] = useState(false);
   const { data, isLoading, isUnavailable, error } = useProjectMetrics(range);

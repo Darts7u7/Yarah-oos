@@ -22,7 +22,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { useSearchParams } from 'react-router-dom';
 import {
   SelectionClearButton,

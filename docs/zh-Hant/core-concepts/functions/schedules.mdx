@@ -1,6 +1,6 @@
 ---
 title: "排程：cron 觸發的函式"
-description: "使用 pg_cron 在 InsForge 上以 cron 排程觸發資料庫函式與 Edge Function，定期執行清理、聚合與通知任務。"
+description: "使用 pg_cron 在 Yarah 上以 cron 排程觸發資料庫函式與 Edge Function，定期執行清理、聚合與通知任務。"
 ---
 
 排程在定期 cron 運算式上呼叫函式。[pg_cron](https://github.com/citusdata/pg_cron) 在每個刻度處向函式 URL 傳送 HTTP 請求並記錄結果。
@@ -27,7 +27,7 @@ description: "使用 pg_cron 在 InsForge 上以 cron 排程觸發資料庫函�
 select schedules.create_job(
   name       => 'daily-cleanup',
   schedule   => '0 0 * * *',
-  url        => 'https://myapp.functions.insforge.app/cleanup',
+  url        => 'https://myapp.functions.apps.yarah.dev/cleanup',
   headers    => jsonb_build_object('Authorization', 'Bearer ${{secrets.CRON_TOKEN}}')
 );
 ```

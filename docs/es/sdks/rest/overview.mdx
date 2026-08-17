@@ -1,14 +1,14 @@
 ---
-title: Descripción general de la API REST de InsForge
-description: Accede directamente a todos los servicios de InsForge a través de HTTP con cualquier lenguaje, utilizando claves de API, JWT y convenciones REST estándar.
+title: Descripción general de la API REST de Yarah
+description: Accede directamente a todos los servicios de Yarah a través de HTTP con cualquier lenguaje, utilizando claves de API, JWT y convenciones REST estándar.
 ---
 
-La API REST de InsForge proporciona acceso HTTP directo a todos los servicios de InsForge. Úsalo cuando necesites integración con lenguajes o plataformas sin un SDK oficial.
+La API REST de Yarah proporciona acceso HTTP directo a todos los servicios de Yarah. Úsalo cuando necesites integración con lenguajes o plataformas sin un SDK oficial.
 
 ## URL Base
 
 ```
-https://your-app.insforge.app
+https://your-app.apps.yarah.dev
 ```
 
 ## Autenticación
@@ -25,17 +25,17 @@ Authorization: Bearer your-jwt-token-or-anon-key
 
 ```bash
 # Register a new user
-curl -X POST https://your-app.insforge.app/api/auth/users \
+curl -X POST https://your-app.apps.yarah.dev/api/auth/users \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "securepassword123"}'
 
 # Sign in and get token
-curl -X POST https://your-app.insforge.app/api/auth/sessions \
+curl -X POST https://your-app.apps.yarah.dev/api/auth/sessions \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "securepassword123"}'
 
 # Use the token for authenticated requests
-curl https://your-app.insforge.app/api/database/records/posts \
+curl https://your-app.apps.yarah.dev/api/database/records/posts \
   -H "Authorization: Bearer your-jwt-token"
 ```
 

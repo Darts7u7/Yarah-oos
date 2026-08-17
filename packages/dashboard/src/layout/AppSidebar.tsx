@@ -12,9 +12,9 @@ import {
 } from '#navigation/menuItems';
 import { Link, useLocation, matchPath } from 'react-router-dom';
 import { ExternalLink, PanelLeftOpen, PanelRightOpen } from 'lucide-react';
-import { isInsForgeCloudProject } from '#lib/utils/utils';
+import { isYarahCloudProject } from '#lib/utils/utils';
 import { useAiEntitlement } from '#lib/hooks/useAiEntitlement';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, cn } from '@insforge/ui';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, cn } from '@yarahdev/ui';
 import { ProjectSettingsMenuDialog } from '#features/dashboard/components';
 import { LanguageSelect } from '#components';
 import { getFeatureFlag } from '#lib/analytics/posthog';
@@ -31,7 +31,7 @@ export default function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebar
   const { pathname } = useLocation();
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
 
-  const isCloud = isInsForgeCloudProject();
+  const isCloud = isYarahCloudProject();
   const host = useDashboardHost();
   const { t } = useTranslation('chrome');
   const { mode: hostMode, onOpenWhatsNew } = host;

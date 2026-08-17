@@ -1,19 +1,19 @@
 ---
 title: "分析"
 sidebarTitle: "Overview"
-description: "InsForge 分析由 PostHog 驅動，追蹤應用事件、使用者留存與漏斗指標，協助團隊做出資料導向的產品決策與優化。"
+description: "Yarah 分析由 PostHog 驅動，追蹤應用事件、使用者留存與漏斗指標，協助團隊做出資料導向的產品決策與優化。"
 ---
 
-使用 InsForge 分析來瞭解人們如何實際使用您的應用程式：頁面流量、保留和工作階段回放，所有這些都透過將 PostHog 專案連接到您的 InsForge 後端來進行。連接後，儀表板在您的 PostHog 資料上呈現流量、使用者保留和工作階段回放頁面，無需離開 InsForge。
+使用 Yarah 分析來瞭解人們如何實際使用您的應用程式：頁面流量、保留和工作階段回放，所有這些都透過將 PostHog 專案連接到您的 Yarah 後端來進行。連接後，儀表板在您的 PostHog 資料上呈現流量、使用者保留和工作階段回放頁面，無需離開 Yarah。
 
 只需點擊一次連接 PostHog，將設定提示放入您的編碼代理中，以便它執行 PostHog 嚮導並在您的前端安裝 PostHog SDK，然後分析頁面開始填充。
 
 <Frame caption="分析儀表板：隨著時間推移的 KPI 加上按頁面、國家和裝置的細分。">
-  <img src="/images/dashboard-analytics.png" alt="InsForge 分析儀表板顯示訪客 KPI、訪客趨勢圖表以及頂級頁面、國家和裝置細分" />
+  <img src="/images/dashboard-analytics.png" alt="Yarah 分析儀表板顯示訪客 KPI、訪客趨勢圖表以及頂級頁面、國家和裝置細分" />
 </Frame>
 
 <Note>
-  PostHog 仍然是事件、儀表板、見解和錄製的真實來源。InsForge 為日常檢查呈現一個集中的子集，然後對於超出其範圍的任何內容都深入連結到 PostHog。
+  PostHog 仍然是事件、儀表板、見解和錄製的真實來源。Yarah 為日常檢查呈現一個集中的子集，然後對於超出其範圍的任何內容都深入連結到 PostHog。
 </Note>
 
 ```mermaid
@@ -46,17 +46,17 @@ flowchart TB
 
 ### 一鍵 PostHog 連接
 
-從儀表板中的分析頁面連接 PostHog。InsForge 為您配置或連結 PostHog 專案，儲存認證到伺服器端，並在連接成功後解鎖流量、保留和工作階段回放頁面。
+從儀表板中的分析頁面連接 PostHog。Yarah 為您配置或連結 PostHog 專案，儲存認證到伺服器端，並在連接成功後解鎖流量、保留和工作階段回放頁面。
 
 ### 透過 PostHog 嚮導的 SDK 設定
 
 連接後，空狀態會提示您一個設定提示，您可以將其貼到您的編碼代理中：
 
 ```
-I want to add product analytics to this project. Read the current directory and use the InsForge skill to set up PostHog analytics by running `npx @insforge/cli posthog setup`.
+I want to add product analytics to this project. Read the current directory and use the Yarah skill to set up PostHog analytics by running `npx @yarah/cli posthog setup`.
 ```
 
-`@insforge/cli posthog setup` 將您的 InsForge 專案連結到 PostHog，然後列印官方 [PostHog 嚮導](https://posthog.com/docs/libraries/wizard) 命令 (`npx -y @posthog/wizard@latest`) 供您（或您的代理）接下來執行。嚮導檢測您的框架，安裝正確的 PostHog SDK，並放入初始化程式碼，以便頁面瀏覽、自動擷取事件和工作階段錄製開始流動。
+`@yarah/cli posthog setup` 將您的 Yarah 專案連結到 PostHog，然後列印官方 [PostHog 嚮導](https://posthog.com/docs/libraries/wizard) 命令 (`npx -y @posthog/wizard@latest`) 供您（或您的代理）接下來執行。嚮導檢測您的框架，安裝正確的 PostHog SDK，並放入初始化程式碼，以便頁面瀏覽、自動擷取事件和工作階段錄製開始流動。
 
 ### 流量
 
@@ -72,7 +72,7 @@ I want to add product analytics to this project. Read the current directory and 
 
 ### 設定和中斷連接
 
-分析設定對話（側邊欄中的齒輪圖示）讓管理員審查連結的 PostHog 專案，直接跳轉到 PostHog，並在需要時中斷連接。中斷連接只會中斷 InsForge ↔ PostHog 連結；您的 PostHog 專案、事件和錄製保持不變。
+分析設定對話（側邊欄中的齒輪圖示）讓管理員審查連結的 PostHog 專案，直接跳轉到 PostHog，並在需要時中斷連接。中斷連接只會中斷 Yarah ↔ PostHog 連結；您的 PostHog 專案、事件和錄製保持不變。
 
 ## 概念
 
@@ -97,8 +97,8 @@ I want to add product analytics to this project. Read the current directory and 
     在嚮導設定的基礎上擷取自訂事件。
   </Card>
 
-  <Card title="InsForge CLI" icon="terminal" href="/quickstart">
-    `npx @insforge/cli posthog setup` 將您的 InsForge 專案連結到 PostHog，然後列印嚮導命令。
+  <Card title="Yarah CLI" icon="terminal" href="/quickstart">
+    `npx @yarah/cli posthog setup` 將您的 Yarah 專案連結到 PostHog，然後列印嚮導命令。
   </Card>
 </CardGroup>
 

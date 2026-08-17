@@ -1,5 +1,5 @@
-import { InsForgeDashboard } from '@insforge/dashboard';
+import { YarahDashboard } from '@yarahdev/dashboard';
 
 export function SelfHostingDashboard() {
-  return <InsForgeDashboard mode="self-hosting" />;
+  return <YarahDashboard mode="self-hosting" />;
 }

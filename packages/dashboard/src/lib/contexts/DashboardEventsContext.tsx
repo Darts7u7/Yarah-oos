@@ -1,6 +1,6 @@
 import { type ReactNode, useCallback, useEffect, useRef } from 'react';
 import { useQueryClient, type QueryKey } from '@tanstack/react-query';
-import type { DashboardDataUpdateEvent, DashboardEvent } from '@insforge/shared-schemas';
+import type { DashboardDataUpdateEvent, DashboardEvent } from '@yarahdev/shared-schemas';
 import { useAuth } from './AuthContext';
 import { databaseTableQueryKeys } from '#features/database/queryKeys';
 import { parseDatabaseTableReference } from '#features/database/helpers';

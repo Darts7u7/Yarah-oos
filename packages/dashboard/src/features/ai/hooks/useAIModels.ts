@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { aiService } from '#features/ai/services/ai.service';
-import { ModalitySchema, AIModelSchema } from '@insforge/shared-schemas';
+import { ModalitySchema, AIModelSchema } from '@yarahdev/shared-schemas';
 import { filterModelsByModalities, type ModelOption, toModelOption } from '#features/ai/helpers';
 
 interface UseAIModelsOptions {

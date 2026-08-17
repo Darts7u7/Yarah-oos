@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@insforge/ui';
-import type { PaymentProvider } from '@insforge/shared-schemas';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@yarahdev/ui';
+import type { PaymentProvider } from '@yarahdev/shared-schemas';
 import RazorpayIcon from '#assets/logos/razorpay-icon.png';
 import StripeIcon from '#assets/logos/stripe-icon.svg';
 

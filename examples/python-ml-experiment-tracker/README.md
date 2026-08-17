@@ -1,16 +1,16 @@
 # ML Experiment Tracker
 
-A command-line tool for logging and browsing ML experiments. Each run records hyperparameters, metrics, and notes in a PostgreSQL database managed by InsForge. A local web dashboard lets you visualize runs and compare results without leaving your machine.
+A command-line tool for logging and browsing ML experiments. Each run records hyperparameters, metrics, and notes in a PostgreSQL database managed by Yarah. A local web dashboard lets you visualize runs and compare results without leaving your machine.
 
-> **Note:** This project was built as an example application to demonstrate using [InsForge](https://insforge.com) as a backend-as-a-service. InsForge handles auth, the database, and the REST API — this tool is a thin CLI and dashboard on top of it.
+> **Note:** This project was built as an example application to demonstrate using [Yarah](https://yarah.com) as a backend-as-a-service. Yarah handles auth, the database, and the REST API — this tool is a thin CLI and dashboard on top of it.
 
 ---
 
 ## Prerequisites
 
 - **Python 3.10+**
-- **Docker** (to run InsForge locally)
-- **InsForge** running on `http://localhost:7130` — see the [InsForge docs](https://insforge.com/docs) for the quickstart Docker command
+- **Docker** (to run Yarah locally)
+- **Yarah** running on `http://localhost:7130` — see the [Yarah docs](https://yarah.com/docs) for the quickstart Docker command
 
 ---
 
@@ -44,15 +44,15 @@ This installs the `tracker` command on your PATH.
 
 ## Setup
 
-### 1. Start InsForge
+### 1. Start Yarah
 
-InsForge must be running before any `tracker` command will work. A typical local start looks like:
+Yarah must be running before any `tracker` command will work. A typical local start looks like:
 
 ```bash
-docker run -p 7130:7130 insforge/insforge
+docker run -p 7130:7130 yarah/yarah
 ```
 
-Refer to the InsForge documentation for your exact Docker command and any environment variables (database URL, secret key, etc.).
+Refer to the Yarah documentation for your exact Docker command and any environment variables (database URL, secret key, etc.).
 
 ### 2. Register an account
 
@@ -71,13 +71,13 @@ tracker login
 
 ### 4. Create the database tables
 
-Table creation requires admin access in InsForge. Run `tracker init` to check whether the tables already exist:
+Table creation requires admin access in Yarah. Run `tracker init` to check whether the tables already exist:
 
 ```bash
 tracker init
 ```
 
-If the `experiments` and `runs` tables are missing, the command prints the SQL you need to run. To run it via the dashboard, open `http://localhost:7130` in your browser after starting InsForge, navigate to the SQL editor, and paste and execute the SQL below. Alternatively, submit it through the InsForge admin API.
+If the `experiments` and `runs` tables are missing, the command prints the SQL you need to run. To run it via the dashboard, open `http://localhost:7130` in your browser after starting Yarah, navigate to the SQL editor, and paste and execute the SQL below. Alternatively, submit it through the Yarah admin API.
 
 ```sql
 CREATE TABLE IF NOT EXISTS experiments (
@@ -117,8 +117,8 @@ tracker register
 # Log in (saves tokens to ~/.config/ml-tracker/config.json)
 tracker login
 
-# Point at a non-default InsForge instance
-tracker login --server http://my-insforge-host:7130
+# Point at a non-default Yarah instance
+tracker login --server http://my-yarah-host:7130
 ```
 
 ### Logging runs
@@ -199,7 +199,7 @@ tracker serve --port 9000
 tracker serve --no-browser
 ```
 
-The dashboard runs at `http://127.0.0.1:8765` by default and proxies all API requests to InsForge using your saved credentials. It handles token refresh automatically. Stop it with `Ctrl+C`.
+The dashboard runs at `http://127.0.0.1:8765` by default and proxies all API requests to Yarah using your saved credentials. It handles token refresh automatically. Stop it with `Ctrl+C`.
 
 > You must be logged in (`tracker login`) before starting the dashboard, otherwise API requests will return an auth error.
 
@@ -207,6 +207,6 @@ The dashboard runs at `http://127.0.0.1:8765` by default and proxies all API req
 
 ## Configuration
 
-The CLI stores its config at `~/.config/ml-tracker/config.json` (mode `0600`). You can override the InsForge server URL at login time with `--server`; the value is persisted for subsequent commands.
+The CLI stores its config at `~/.config/ml-tracker/config.json` (mode `0600`). You can override the Yarah server URL at login time with `--server`; the value is persisted for subsequent commands.
 
 Default server URL: `http://localhost:7130`

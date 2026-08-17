@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, Skeleton } from '@insforge/ui';
+import { Badge, Button, Skeleton } from '@yarahdev/ui';
 import {
   Braces,
   CheckCircle,
@@ -33,7 +33,7 @@ import { useApiKey, useMetadata } from '#lib/hooks/useMetadata';
 import { useDashboardProject, useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
 import { useCloudProjectInfo } from '#lib/hooks/useCloudProjectInfo';
 import { useMcpUsage } from '#features/logs/hooks/useMcpUsage';
-import { getBackendUrl, isInsForgeCloudProject } from '#lib/utils/utils';
+import { getBackendUrl, isYarahCloudProject } from '#lib/utils/utils';
 import { useUsers } from '#features/auth';
 import { CLISection, MCPSection } from '#features/dashboard/components/connect';
 import { useOpenConnectDialog } from '#layout/ConnectDialogContext';
@@ -308,7 +308,7 @@ function DashboardLoadingState() {
   return (
     <main className="h-full min-h-0 min-w-0 overflow-y-auto bg-semantic-0">
       <div className="flex min-w-0 flex-col lg:flex-row">
-        <section className="insforge-dashboard-home-sidebar min-w-0 shrink-0 border-b border-[var(--alpha-8)] px-10 py-10 lg:border-r lg:border-b-0">
+        <section className="yarah-dashboard-home-sidebar min-w-0 shrink-0 border-b border-[var(--alpha-8)] px-10 py-10 lg:border-r lg:border-b-0">
           <div className="mx-auto flex w-full max-w-[400px] flex-col gap-12">
             <div className="flex flex-col gap-12">
               <div className="flex items-center gap-2">
@@ -374,7 +374,7 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const openConnectDialog = useOpenConnectDialog();
   const isCloudHostingMode = useIsCloudHostingMode();
-  const isCloudProject = isInsForgeCloudProject();
+  const isCloudProject = isYarahCloudProject();
   const canShowCliGettingStarted = isCloudProject && isCloudHostingMode;
   const {
     metadata,
@@ -554,7 +554,7 @@ export default function DashboardPage() {
   return (
     <main className="h-full min-h-0 min-w-0 overflow-y-auto bg-semantic-0">
       <div className="flex min-w-0 flex-col lg:flex-row">
-        <section className="insforge-dashboard-home-sidebar lg:h-full min-w-0 shrink-0 lg:overflow-y-auto border-b border-[var(--alpha-8)] px-10 py-10 lg:border-r lg:border-b-0">
+        <section className="yarah-dashboard-home-sidebar lg:h-full min-w-0 shrink-0 lg:overflow-y-auto border-b border-[var(--alpha-8)] px-10 py-10 lg:border-r lg:border-b-0">
           <div className="mx-auto flex w-full max-w-[400px] flex-col gap-12">
             <div className="flex flex-col gap-12">
               <div className="flex items-center gap-2">

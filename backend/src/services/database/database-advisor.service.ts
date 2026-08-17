@@ -1,6 +1,6 @@
 import { DatabaseManager } from '@/infra/database/database.manager.js';
 import { AppError, hasPgErrorCode } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 import { PoolClient } from 'pg';
 import type {

@@ -1,6 +1,6 @@
-# Contributing to InsForge
+# Contributing to Yarah
 
-Thank you for your interest in contributing to InsForge. This guide will help you get started with the contribution process.
+Thank you for your interest in contributing to Yarah. This guide will help you get started with the contribution process.
 
 ## Table of Contents
 - [Code of Conduct](#code-of-conduct)
@@ -19,7 +19,7 @@ This project and everyone participating in it is governed by our Code of Conduct
 
 ## Project Structure
 
-The InsForge monorepo is organized as follows:
+The Yarah monorepo is organized as follows:
 
 - `/backend` - Core backend service with Express.js, PostgreSQL, and Better Auth integration
 - `/frontend` - React-based admin dashboard for managing databases, users, and storage
@@ -39,8 +39,8 @@ Before you start development, ensure you have the following:
 1. Fork the repository to your GitHub account
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/InsForge/InsForge.git
-   cd insforge
+   git clone https://github.com/Yarah/Yarah.git
+   cd yarah
    ```
 3. Install Docker
 4. Open Docker App
@@ -67,7 +67,7 @@ We follow an **issue-first workflow**: open or find an issue, get it assigned to
 
 1. **Find or open an issue** for the work. If one doesn't exist, open a new issue describing the bug or feature first.
 2. **Claim it.** Comment on the issue asking for it to be assigned to you (for example, "I'd like to work on this" or "please assign this to me"). Our repo maintainer agent, **章北海 (Zhang Beihai)**, will assign you automatically if it can.
-   - Each contributor may hold **at most 3 open assigned issues at a time, across all InsForge repositories** (not per repo). Finish or release one before claiming another. To release an issue, comment "unassign me" on it.
+   - Each contributor may hold **at most 3 open assigned issues at a time, across all Yarah repositories** (not per repo). Finish or release one before claiming another. To release an issue, comment "unassign me" on it.
    - If the agent can't assign you (some accounts lack the required access), a maintainer will assign you manually.
 3. **Wait until the issue is assigned to you** before opening your PR, and **link the issue from the PR** (for example, "Closes #123").
 

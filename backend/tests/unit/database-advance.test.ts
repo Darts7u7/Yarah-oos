@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { DatabaseAdvanceService } from '../../src/services/database/database-advance.service';
 import { AppError } from '../../src/utils/errors';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 describe('DatabaseAdvanceService - sanitizeQuery', () => {
   const service = DatabaseAdvanceService.getInstance();

@@ -7,7 +7,7 @@ import {
   type ExportDatabaseJsonData,
   type ImportDatabaseResponse,
   type BulkUpsertResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 import {
   checkSqlExecutionGuards,

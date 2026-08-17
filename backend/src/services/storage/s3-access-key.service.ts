@@ -10,7 +10,7 @@ import {
   type S3AccessKeySchema,
   type S3AccessKeyWithSecretSchema,
   type CreateS3AccessKeyRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const ACCESS_KEY_ID_CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const ACCESS_KEY_ID_RANDOM_LEN = 16;

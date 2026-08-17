@@ -1,5 +1,5 @@
 import { Eye, EyeOff } from 'lucide-react';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 import { useTranslation } from 'react-i18next';
 
 interface ShowPasswordButtonProps {

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import '#lib/i18n';
 import { StorageSettingsMenuDialog } from '#features/storage/components/StorageSettingsMenuDialog';
-import type { S3GatewayConfigSchema } from '@insforge/shared-schemas';
+import type { S3GatewayConfigSchema } from '@yarahdev/shared-schemas';
 
 const storageSettingsMocks = vi.hoisted(() => ({
   isCloudProject: false,
@@ -44,7 +44,7 @@ vi.mock('#features/storage/hooks/useS3AccessKeys', () => ({
 }));
 
 vi.mock('#lib/utils/utils', () => ({
-  isInsForgeCloudProject: () => storageSettingsMocks.isCloudProject,
+  isYarahCloudProject: () => storageSettingsMocks.isCloudProject,
 }));
 
 // The panel pulls in its own hooks/services; the dialog's tab behavior is what
@@ -95,7 +95,7 @@ describe('StorageSettingsMenuDialog — S3 tab', () => {
     expect(screen.getByText('Storage backend not configured')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /self-hosted storage guide/i })).toHaveAttribute(
       'href',
-      'https://docs.insforge.dev/deployment/self-host-storage'
+      'https://docs.yarah.dev/deployment/self-host-storage'
     );
     expect(screen.queryByTestId('s3-settings-panel')).not.toBeInTheDocument();
   });

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
-import { Button, ConfirmDialog, Skeleton } from '@insforge/ui';
+import { Button, ConfirmDialog, Skeleton } from '@yarahdev/ui';
 import { EnvVarRow } from '#features/deployments/components/EnvVarRow';
 import { EnvVarDialog } from '#features/deployments/components/EnvVarDialog';
 import EnvVarsEmptyState from '#features/deployments/components/EnvVarsEmptyState';
 import { useDeploymentEnvVars } from '#features/deployments/hooks/useDeploymentEnvVars';
-import type { DeploymentEnvVar } from '@insforge/shared-schemas';
+import type { DeploymentEnvVar } from '@yarahdev/shared-schemas';
 
 export default function DeploymentEnvVarsPage() {
   const { t } = useTranslation('chrome');

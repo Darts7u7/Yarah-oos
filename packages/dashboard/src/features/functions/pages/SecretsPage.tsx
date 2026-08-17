@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ConfirmDialog, Input, Skeleton } from '@insforge/ui';
+import { Button, ConfirmDialog, Input, Skeleton } from '@yarahdev/ui';
 import { TableHeader } from '#components';
 import { SecretRow } from '#features/functions/components/SecretRow';
 import SecretEmptyState from '#features/functions/components/SecretEmptyState';

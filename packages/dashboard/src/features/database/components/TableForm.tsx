@@ -4,7 +4,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, Plus, X, Link, MoveRight } from 'lucide-react';
-import { Button, Input, useToast } from '@insforge/ui';
+import { Button, Input, useToast } from '@yarahdev/ui';
 import { Alert, AlertDescription } from '#components';
 import { tableService } from '#features/database/services/table.service';
 import {
@@ -15,7 +15,7 @@ import {
 } from '#features/database/schema';
 import { TableFormColumn } from './TableFormColumn';
 import { ForeignKeyPopover } from './ForeignKeyPopover';
-import { ColumnType, TableSchema, UpdateTableSchemaRequest } from '@insforge/shared-schemas';
+import { ColumnType, TableSchema, UpdateTableSchemaRequest } from '@yarahdev/shared-schemas';
 import { parseDatabaseTableReference, SYSTEM_FIELDS } from '#features/database/helpers';
 import { databaseTableQueryKeys } from '#features/database/queryKeys';
 

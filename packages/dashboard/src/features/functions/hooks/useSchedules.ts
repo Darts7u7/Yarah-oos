@@ -7,9 +7,9 @@ import type {
   CreateScheduleResponse,
   UpdateScheduleRequest,
   UpdateScheduleResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { scheduleService } from '#features/functions/services/schedule.service';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 const SCHEDULES_QUERY_KEY = ['schedules'];
 

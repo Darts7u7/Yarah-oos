@@ -6,7 +6,7 @@ import {
   type ChatMessageSchema,
   type ToolCall,
   type UrlCitationAnnotation,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 import { ChatCompletionOptions } from '@/types/ai.js';
 import { AppError } from '@/utils/errors.js';

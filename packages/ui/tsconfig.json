@@ -17,7 +17,7 @@
     "noFallthroughCasesInSwitch": true,
     "rootDir": "./src",
     "paths": {
-      "@insforge/ui": ["./src/index.ts"]
+      "@yarahdev/ui": ["./src/index.ts"]
     }
   },
   "include": ["src"]

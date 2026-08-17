@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { AlertCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
-import type { PaymentCustomer } from '@insforge/shared-schemas';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, cn } from '@insforge/ui';
+import type { PaymentCustomer } from '@yarahdev/shared-schemas';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, cn } from '@yarahdev/ui';
 import {
   Alert,
   AlertDescription,

@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   cn,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { Avatar, AvatarFallback, LanguageSelect, Separator, ThemeSelect } from '#components';
 import { useTheme } from '#lib/contexts/ThemeContext';
 import { useAuth } from '#lib/contexts/AuthContext';
@@ -21,8 +21,8 @@ import { githubService } from '#features/dashboard/services/github.service';
 // Import SVG icons
 import DiscordIcon from '#assets/logos/discord.svg?react';
 import GitHubIcon from '#assets/logos/github.svg?react';
-import InsForgeLogoLight from '#assets/logos/insforge_light.svg';
-import InsForgeLogoDark from '#assets/logos/insforge_dark.svg';
+import YarahLogoLight from '#assets/logos/yarah_light.svg';
+import YarahLogoDark from '#assets/logos/yarah_dark.svg';
 
 export default function AppHeader() {
   const { t } = useTranslation('chrome');
@@ -109,10 +109,10 @@ export default function AppHeader() {
       <div className="h-12 w-full bg-semantic-2 border-b border-[var(--alpha-8)] z-50 flex items-center justify-between px-6">
         {/* Logo */}
 
-        <a href="https://insforge.dev" target="_blank" rel="noopener noreferrer">
+        <a href="https://yarah.dev" target="_blank" rel="noopener noreferrer">
           <img
-            src={resolvedTheme === 'light' ? InsForgeLogoLight : InsForgeLogoDark}
-            alt="Insforge Logo"
+            src={resolvedTheme === 'light' ? YarahLogoLight : YarahLogoDark}
+            alt="Yarah Logo"
             className="h-7 w-auto"
           />
         </a>
@@ -130,7 +130,7 @@ export default function AppHeader() {
             <DiscordIcon className="h-5 w-5" />
           </a>
           <a
-            href="https://github.com/InsForge/InsForge"
+            href="https://github.com/Yarah/Yarah"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 p-2 text-gray-600 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white transition-colors duration-200"

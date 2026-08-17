@@ -21,7 +21,7 @@ export interface ComputeOutletContext {
   /**
    * Opens the compute settings dialog, which the layout owns. Absent on cloud, where
    * there is no dialog: the socket is not mountable and the Fly credentials belong to
-   * InsForge, not the project.
+   * Yarah, not the project.
    */
   openSettings?: (provider?: string) => void;
 }

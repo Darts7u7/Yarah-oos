@@ -98,7 +98,7 @@ describe('TokenManager refresh CSRF tokens', () => {
       {
         sub: userId,
         type: 'refresh',
-        iss: 'insforge',
+        iss: 'yarah',
       },
       process.env.JWT_SECRET ?? '',
       {
@@ -115,7 +115,7 @@ describe('TokenManager refresh CSRF tokens', () => {
       {
         sub: userId,
         type: 'refresh',
-        iss: 'insforge',
+        iss: 'yarah',
         csrfNonce: 'nonce',
       },
       process.env.JWT_SECRET ?? '',

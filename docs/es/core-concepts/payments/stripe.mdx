@@ -1,16 +1,16 @@
 ---
 title: "Pagos de Stripe"
 sidebarTitle: "Stripe"
-description: "Integra Stripe Checkout, Billing Portal, sincronización de catálogo de productos y cumplimiento de webhooks con InsForge para gestionar pagos y suscripciones."
+description: "Integra Stripe Checkout, Billing Portal, sincronización de catálogo de productos y cumplimiento de webhooks con Yarah para gestionar pagos y suscripciones."
 ---
 
 Utilice la integración de Stripe cuando desee Stripe Checkout alojado, Stripe Products y Prices, Stripe Subscriptions y el Billing Portal alojado.
 
-InsForge almacena claves secretas de Stripe en el lado del servidor, crea sesiones de Checkout y Billing Portal desde su aplicación, administra automáticamente el punto final del webhook de Stripe cuando su backend es accesible, refleja el estado de Stripe en el esquema `payments` y registra eventos de webhook verificados.
+Yarah almacena claves secretas de Stripe en el lado del servidor, crea sesiones de Checkout y Billing Portal desde su aplicación, administra automáticamente el punto final del webhook de Stripe cuando su backend es accesible, refleja el estado de Stripe en el esquema `payments` y registra eventos de webhook verificados.
 
 ## Modelo de Stripe
 
-| Concepto de Stripe | Tabla o API de InsForge |
+| Concepto de Stripe | Tabla o API de Yarah |
 |----------------|-----------------------|
 | Product | `payments.stripe_products` |
 | Price | `payments.stripe_prices` |
@@ -26,20 +26,20 @@ InsForge almacena claves secretas de Stripe en el lado del servidor, crea sesion
 Configure las claves secretas de Stripe `test` y `live` en Dashboard -> Payments -> Settings, CLI o API de administrador.
 
 ```bash
-npx @insforge/cli payments stripe status
-npx @insforge/cli payments stripe config set --environment test sk_test_xxx
-npx @insforge/cli payments stripe sync --environment test
-npx @insforge/cli payments stripe webhooks configure --environment test
+npx @yarah/cli payments stripe status
+npx @yarah/cli payments stripe config set --environment test sk_test_xxx
+npx @yarah/cli payments stripe sync --environment test
+npx @yarah/cli payments stripe webhooks configure --environment test
 ```
 
-Después de conectar una clave, InsForge valida la cuenta, almacena la clave en el almacén de secretos, intenta crear el punto final del webhook de Stripe administrado y ejecuta la sincronización para Productos, Precios, Clientes y Suscripciones.
+Después de conectar una clave, Yarah valida la cuenta, almacena la clave en el almacén de secretos, intenta crear el punto final del webhook de Stripe administrado y ejecuta la sincronización para Productos, Precios, Clientes y Suscripciones.
 
 ## Checkout
 
-Cree sesiones de checkout desde código frontend con el token de usuario actual de InsForge.
+Cree sesiones de checkout desde código frontend con el token de usuario actual de Yarah.
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'payment',
   lineItems: [{ priceId: 'price_123', quantity: 1 }],
   successUrl: `${window.location.origin}/checkout/success`,
@@ -58,7 +58,7 @@ if (data?.checkoutSession.url) {
 Para Checkout de suscripción, pase un sujeto de facturación. El sujeto es el propietario de facturación propio de su aplicación, como un usuario, equipo, espacio de trabajo, organización, inquilino o grupo.
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'subscription',
   subject: { type: 'team', id: teamId },
   lineItems: [{ priceId: 'price_monthly_123', quantity: 1 }],
@@ -74,14 +74,14 @@ if (data?.checkoutSession.url) {
 }
 ```
 
-Checkout inserta una fila en `payments.stripe_checkout_sessions` usando el token de InsForge del llamador. Agregue políticas de RLS para que los usuarios solo puedan crear sesiones para sujetos a los que se les permite facturar. PostgreSQL aplica políticas `SELECT` a las filas devueltas por `INSERT ... RETURNING` y búsquedas idempotentes, por lo que los reintentos también necesitan una política `SELECT` coincidente para el mismo sujeto e clave de idempotencia.
+Checkout inserta una fila en `payments.stripe_checkout_sessions` usando el token de Yarah del llamador. Agregue políticas de RLS para que los usuarios solo puedan crear sesiones para sujetos a los que se les permite facturar. PostgreSQL aplica políticas `SELECT` a las filas devueltas por `INSERT ... RETURNING` y búsquedas idempotentes, por lo que los reintentos también necesitan una política `SELECT` coincidente para el mismo sujeto e clave de idempotencia.
 
 ## Portal de facturación
 
 Utilice el Billing Portal alojado para una asignación de cliente de Stripe existente.
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCustomerPortalSession('test', {
+const { data, error } = await yarah.payments.stripe.createCustomerPortalSession('test', {
   subject: { type: 'team', id: teamId },
   returnUrl: `${window.location.origin}/billing`
 });
@@ -103,9 +103,9 @@ La creación del portal requiere un usuario autenticado y una fila `payments.cus
 
 ## Webhooks y cumplimiento
 
-Los webhooks de Stripe se administran automáticamente cuando el backend tiene una URL pública. InsForge escucha los eventos necesarios para mantener actualizados los intentos de checkout, clientes, suscripciones, reembolsos y proyecciones de transacciones.
+Los webhooks de Stripe se administran automáticamente cuando el backend tiene una URL pública. Yarah escucha los eventos necesarios para mantener actualizados los intentos de checkout, clientes, suscripciones, reembolsos y proyecciones de transacciones.
 
-Stripe también recomienda cumplir con los pedidos de Checkout desde webhooks en lugar de desde la URL de éxito. En InsForge, adjunte activadores de cumplimiento a `payments.webhook_events`.
+Stripe también recomienda cumplir con los pedidos de Checkout desde webhooks en lugar de desde la URL de éxito. En Yarah, adjunte activadores de cumplimiento a `payments.webhook_events`.
 
 ```sql
 CREATE OR REPLACE FUNCTION public.fulfill_stripe_order()
@@ -134,9 +134,9 @@ CREATE TRIGGER fulfill_stripe_order_from_webhook
 
 ### Pedido de eventos
 
-Los eventos webhook se verifican y procesan de forma independiente. InsForge confirma cada fila derivada de un evento antes de marcar ese evento como `processed`, pero Stripe no da garantía de ordenamiento entre eventos: `invoice.paid` puede procesarse antes de `checkout.session.completed`, por lo que las filas creadas por otro evento (como `payments.customer_mappings`) pueden no existir cuando se dispare su activador.
+Los eventos webhook se verifican y procesan de forma independiente. Yarah confirma cada fila derivada de un evento antes de marcar ese evento como `processed`, pero Stripe no da garantía de ordenamiento entre eventos: `invoice.paid` puede procesarse antes de `checkout.session.completed`, por lo que las filas creadas por otro evento (como `payments.customer_mappings`) pueden no existir cuando se dispare su activador.
 
-Para eventos de suscripción, primero resuelva el sujeto de facturación de la carga útil del evento — InsForge marca `insforge_subject_type` e `insforge_subject_id` en metadatos de suscripción en el checkout, y Stripe lo captura en facturas generadas por suscripción como `parent.subscription_details.metadata`. Verifique `invoice.metadata` a continuación, luego recurra a `payments.customer_mappings` (el mismo orden que InsForge usa internamente):
+Para eventos de suscripción, primero resuelva el sujeto de facturación de la carga útil del evento — Yarah marca `yarah_subject_type` e `yarah_subject_id` en metadatos de suscripción en el checkout, y Stripe lo captura en facturas generadas por suscripción como `parent.subscription_details.metadata`. Verifique `invoice.metadata` a continuación, luego recurra a `payments.customer_mappings` (el mismo orden que Yarah usa internamente):
 
 ```sql
 CREATE OR REPLACE FUNCTION public.grant_subscription_access()
@@ -150,13 +150,13 @@ BEGIN
      AND NEW.processing_status = 'processed' THEN
     v_subject_type := COALESCE(
       NEW.payload -> 'data' -> 'object' -> 'parent'
-        -> 'subscription_details' -> 'metadata' ->> 'insforge_subject_type',
-      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'insforge_subject_type'
+        -> 'subscription_details' -> 'metadata' ->> 'yarah_subject_type',
+      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'yarah_subject_type'
     );
     v_subject_id := COALESCE(
       NEW.payload -> 'data' -> 'object' -> 'parent'
-        -> 'subscription_details' -> 'metadata' ->> 'insforge_subject_id',
-      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'insforge_subject_id'
+        -> 'subscription_details' -> 'metadata' ->> 'yarah_subject_id',
+      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'yarah_subject_id'
     );
 
     IF v_subject_id IS NULL THEN

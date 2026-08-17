@@ -1,14 +1,14 @@
 ---
-title: "Self-Host InsForge on Dokploy"
-description: "Self-host InsForge on Dokploy as a Compose application, with the Postgres image built from the repo so its config always matches the release."
+title: "Self-Host Yarah on Dokploy"
+description: "Self-host Yarah on Dokploy as a Compose application, with the Postgres image built from the repo so its config always matches the release."
 ---
 
-# Self-Host InsForge on Dokploy
+# Self-Host Yarah on Dokploy
 
-This guide walks through self-hosting the InsForge platform on [Dokploy](https://dokploy.com), an open-source PaaS you run on your own server.
+This guide walks through self-hosting the Yarah platform on [Dokploy](https://dokploy.com), an open-source PaaS you run on your own server.
 
 <Note>
-  **This deploys InsForge itself, not the app you built.** If you just want to take your app live, use [Sites](/core-concepts/sites/overview) instead.
+  **This deploys Yarah itself, not the app you built.** If you just want to take your app live, use [Sites](/core-concepts/sites/overview) instead.
 </Note>
 
 ## Prerequisites
@@ -41,7 +41,7 @@ ROOT_ADMIN_PASSWORD=<strong password>
 
 Postgres reads `POSTGRES_PASSWORD` only when it initializes the cluster. Changing it later does not change the database password.
 
-Everything else is optional; [`.env.example`](https://github.com/insforge/insforge/blob/main/.env.example) lists every supported variable with its default.
+Everything else is optional; [`.env.example`](https://github.com/yarah/yarah/blob/main/.env.example) lists every supported variable with its default.
 
 ## 3. Add a domain
 
@@ -49,19 +49,19 @@ Nothing is published to the host, so the stack is only reachable once you route 
 
 | Field | Value |
 | --- | --- |
-| Service Name | `insforge` |
+| Service Name | `yarah` |
 | Container Port | `7130` |
 
 Then add the matching URLs to the environment:
 
 ```env
-API_BASE_URL=https://insforge.example.com
-VITE_API_BASE_URL=https://insforge.example.com
+API_BASE_URL=https://yarah.example.com
+VITE_API_BASE_URL=https://yarah.example.com
 ```
 
 These have to match the URL browsers use, or the dashboard will call the wrong origin.
 
-Only `insforge` needs a domain. Postgres, PostgREST and the Deno runtime stay on Dokploy's internal network.
+Only `yarah` needs a domain. Postgres, PostgREST and the Deno runtime stay on Dokploy's internal network.
 
 ## 4. Deploy
 
@@ -81,6 +81,6 @@ Object storage defaults to the container filesystem on a Docker volume. Dokploy 
 
 ## Why Postgres is built rather than pulled
 
-InsForge's Postgres needs three files from this repository: `postgresql.conf`, which loads the `insforge_pg_utils` extension that row-level security on managed tables depends on, plus two init scripts.
+Yarah's Postgres needs three files from this repository: `postgresql.conf`, which loads the `yarah_pg_utils` extension that row-level security on managed tables depends on, plus two init scripts.
 
 Dokploy re-clones `code/` on every deploy, so a bind mount pointing into the repository goes stale — [its docs](https://docs.dokploy.com/docs/core/troubleshooting/volumes-mounts) require File Mounts created in the UI and referenced as `../files/`, which is manual setup for every install. Building the image at deploy time puts the current files in it instead, with nothing to configure, and the configuration cannot fall behind the code the way a prebuilt image can.

@@ -1,6 +1,6 @@
 ---
 title: 电子邮件 SDK 参考
-description: 使用 InsForge TypeScript SDK 从应用发送自定义事务性电子邮件，支持模板、附件、自定义 SMTP 与托管发件服务，适配 Node、浏览器与边缘运行时。
+description: 使用 Yarah TypeScript SDK 从应用发送自定义事务性电子邮件，支持模板、附件、自定义 SMTP 与托管发件服务，适配 Node、浏览器与边缘运行时。
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
@@ -22,7 +22,7 @@ import Installation from '/snippets/sdk-installation.mdx';
 - `replyTo` (string, optional) - 回复电子邮件地址，必须是有效的电子邮件地址
 
 <Note>
-默认情况下，邮件从 `noreply@<你的项目>.send.insforge.dev` 发出，这是 InsForge Cloud 为你的每个项目预置并验证的专属子域，因此无需任何域名配置。`from` 字段只设置显示在该地址旁的显示名；使用默认发件服务时，你无法更改发件地址或域名。若要从自己的域名发信，请配置[自定义 SMTP](/core-concepts/messaging/custom-smtp)。启用自定义 SMTP 后，`from` 字段会被完全忽略，发件人名称和电子邮件均取自你的 SMTP 配置，以防止通过你的服务器进行欺骗。
+默认情况下，邮件从 `noreply@<你的项目>.send.yarah.dev` 发出，这是 Yarah Cloud 为你的每个项目预置并验证的专属子域，因此无需任何域名配置。`from` 字段只设置显示在该地址旁的显示名；使用默认发件服务时，你无法更改发件地址或域名。若要从自己的域名发信，请配置[自定义 SMTP](/core-concepts/messaging/custom-smtp)。启用自定义 SMTP 后，`from` 字段会被完全忽略，发件人名称和电子邮件均取自你的 SMTP 配置，以防止通过你的服务器进行欺骗。
 </Note>
 
 ### 返回
@@ -37,7 +37,7 @@ import Installation from '/snippets/sdk-installation.mdx';
 ### 示例
 
 ```javascript
-const { data, error } = await insforge.emails.send({
+const { data, error } = await yarah.emails.send({
   to: ['user1@example.com', 'user2@example.com'],
   cc: 'manager@example.com',
   from: 'Acme Support Team',

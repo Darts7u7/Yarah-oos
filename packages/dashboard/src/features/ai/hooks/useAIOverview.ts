@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { aiService } from '#features/ai/services/ai.service';
-import type { AIOverview } from '@insforge/shared-schemas';
+import type { AIOverview } from '@yarahdev/shared-schemas';
 
 export const AI_OVERVIEW_QUERY_KEY = ['ai-overview'] as const;
 

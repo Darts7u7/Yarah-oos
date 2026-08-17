@@ -1,19 +1,19 @@
 ---
-title: "Web Scraper 概觀：InsForge 的 Apify 整合"
+title: "Web Scraper 概觀：Yarah 的 Apify 整合"
 sidebarTitle: "Overview"
-description: "將 Apify 連接到 InsForge，讓編碼代理依需求執行擷取工具、管理 actor 與執行紀錄，並把資料集寫入應用程式。"
+description: "將 Apify 連接到 Yarah，讓編碼代理依需求執行擷取工具、管理 actor 與執行紀錄，並把資料集寫入應用程式。"
 ---
 
-使用 InsForge Web Scraper 讓您的編碼代理即時存取外部資料：只需連接一次您自己的 Apify 帳號，您的代理就可以依需求執行擷取工具（Apify 稱之為 actor），同時儀表板會顯示您的 actor、執行歷程和擷取到的資料集，不需要離開 InsForge。
+使用 Yarah Web Scraper 讓您的編碼代理即時存取外部資料：只需連接一次您自己的 Apify 帳號，您的代理就可以依需求執行擷取工具（Apify 稱之為 actor），同時儀表板會顯示您的 actor、執行歷程和擷取到的資料集，不需要離開 Yarah。
 
-連接一次 Apify，然後將擷取提示貼到您的編碼代理中。代理會使用您由 InsForge 代管的 Apify 權杖進行身分驗證，為工作挑選合適的 actor，並回傳結果。
+連接一次 Apify，然後將擷取提示貼到您的編碼代理中。代理會使用您由 Yarah 代管的 Apify 權杖進行身分驗證，為工作挑選合適的 actor，並回傳結果。
 
 <Frame caption="Web Scraper 儀表板：已連接的 actor 及其最近一次執行時間與總執行次數。">
-  <img src="/images/dashboard-webscraper.png" alt="InsForge Web Scraper 儀表板顯示 Actors 分頁，其中包含已連接的 Apify actor、它們的最近執行時間與執行次數" />
+  <img src="/images/dashboard-webscraper.png" alt="Yarah Web Scraper 儀表板顯示 Actors 分頁，其中包含已連接的 Apify actor、它們的最近執行時間與執行次數" />
 </Frame>
 
 <Note>
-  Apify 始終是 actor、執行紀錄與資料集的權威來源。InsForge 呈現用於日常檢查的精簡子集，對於超出此範圍的內容，則深層連結至 Apify 主控台。Web Scraper 整合在 InsForge Cloud 與自架部署上皆可使用；兩者只是連接 Apify 的方式不同。
+  Apify 始終是 actor、執行紀錄與資料集的權威來源。Yarah 呈現用於日常檢查的精簡子集，對於超出此範圍的內容，則深層連結至 Apify 主控台。Web Scraper 整合在 Yarah Cloud 與自架部署上皆可使用；兩者只是連接 Apify 的方式不同。
 </Note>
 
 ```mermaid
@@ -47,18 +47,18 @@ flowchart TB
 
 ### 連接 Apify
 
-在儀表板中的 Web Scraper 頁面連接 Apify。接下來的流程取決於 InsForge 執行在哪裡。
+在儀表板中的 Web Scraper 頁面連接 Apify。接下來的流程取決於 Yarah 執行在哪裡。
 
-在 InsForge Cloud 上只需一鍵：InsForge 會引導您完成 Apify OAuth 流程，在伺服器端儲存憑證，並持續為您刷新存取權杖。
+在 Yarah Cloud 上只需一鍵：Yarah 會引導您完成 Apify OAuth 流程，在伺服器端儲存憑證，並持續為您刷新存取權杖。
 
-自架部署前面沒有 OAuth 中介，因此需要您自備憑證。在 Apify 主控台的 **Settings → Integrations** 中建立一個 API 權杖，將其貼到 Web Scraper 頁面，InsForge 會將它加密存放在您自己後端的祕密儲存中。使用 CLI 的 `insforge webscraper apify connect --token <token>` 也能完成同樣的事。
+自架部署前面沒有 OAuth 中介，因此需要您自備憑證。在 Apify 主控台的 **Settings → Integrations** 中建立一個 API 權杖，將其貼到 Web Scraper 頁面，Yarah 會將它加密存放在您自己後端的祕密儲存中。使用 CLI 的 `yarah webscraper apify connect --token <token>` 也能完成同樣的事。
 
 不論採用哪一種方式，權杖都不會出現在您的程式碼庫或前端產物中；代理與函式會在需要時向後端取得即時權杖。
 
 <Warning>
   自架時，請簽發一個權限範圍盡量收窄的 Apify 權杖，而不是涵蓋整個帳號的權杖。`GET
   /api/webscraper/apify/token` 會將已儲存的權杖原樣回傳給管理員呼叫方，代理路徑正是藉此登入
-  Apify CLI；因此該權杖在 Apify 上能做的事，等同於一個 InsForge 管理員金鑰能做的事。
+  Apify CLI；因此該權杖在 Apify 上能做的事，等同於一個 Yarah 管理員金鑰能做的事。
 </Warning>
 
 ### 透過您的編碼代理進行擷取
@@ -66,10 +66,10 @@ flowchart TB
 連接完成後，空白狀態畫面會提供一段擷取提示，您可以將其貼到您的編碼代理中：
 
 ```
-Use the insforge webscraper apify skill to scrape <what you want> and return the results.
+Use the yarah webscraper apify skill to scrape <what you want> and return the results.
 ```
 
-在此提示背後，`npx @insforge/cli webscraper apify login` 會取得您由 InsForge 代管的 Apify 權杖，以無頭方式（不需要瀏覽器 OAuth）對本機 Apify CLI 進行身分驗證，並安裝 Apify 代理技能。之後，代理會從 Apify Store 挑選一個 actor、啟動執行，並讀回結果。
+在此提示背後，`npx @yarah/cli webscraper apify login` 會取得您由 Yarah 代管的 Apify 權杖，以無頭方式（不需要瀏覽器 OAuth）對本機 Apify CLI 進行身分驗證，並安裝 Apify 代理技能。之後，代理會從 Apify Store 挑選一個 actor、啟動執行，並讀回結果。
 
 ### Actors
 
@@ -89,7 +89,7 @@ Use the insforge webscraper apify skill to scrape <what you want> and return the
 
 ### 設定與中斷連接
 
-Web Scraper 設定對話框（側邊欄中的齒輪圖示）會顯示已連接的 Apify 帳號、方案與資料保留原則，並提供連結至 Apify 主控台，同時讓管理員可以中斷連接。中斷連接僅會停止 InsForge 使用您的 Apify 憑證；在自架部署上，它會直接從您的祕密儲存中刪除已保存的 API 權杖。您的 Apify 帳號、actor 與資料集將維持完整，您隨時都可以重新連接。
+Web Scraper 設定對話框（側邊欄中的齒輪圖示）會顯示已連接的 Apify 帳號、方案與資料保留原則，並提供連結至 Apify 主控台，同時讓管理員可以中斷連接。中斷連接僅會停止 Yarah 使用您的 Apify 憑證；在自架部署上，它會直接從您的祕密儲存中刪除已保存的 API 權杖。您的 Apify 帳號、actor 與資料集將維持完整，您隨時都可以重新連接。
 
 ## 概念
 
@@ -106,8 +106,8 @@ Web Scraper 設定對話框（側邊欄中的齒輪圖示）會顯示已連接�
 ## 以此為基礎進行開發
 
 <CardGroup cols={2}>
-  <Card title="InsForge CLI" icon="terminal" href="/quickstart">
-    `npx @insforge/cli webscraper apify connect` 會將您的專案連結至 Apify，然後登入您的本機代理。
+  <Card title="Yarah CLI" icon="terminal" href="/quickstart">
+    `npx @yarah/cli webscraper apify connect` 會將您的專案連結至 Apify，然後登入您的本機代理。
   </Card>
 
   <Card title="Apify Store" icon="store" href="https://apify.com/store">

@@ -1,13 +1,13 @@
 ---
 title: Puerta de enlace de modelos
-description: Construye funciones de IA desde Swift con el SDK de InsForge usando la clave de OpenRouter provisionada, cuotas por proyecto y llamadas a modelos LLM.
+description: Construye funciones de IA desde Swift con el SDK de Yarah usando la clave de OpenRouter provisionada, cuotas por proyecto y llamadas a modelos LLM.
 ---
 
 ## Descripción general
 
-InsForge proporciona una clave de API de OpenRouter para proyectos de la Puerta de enlace de modelos. Las nuevas aplicaciones Swift deben llamar a OpenRouter directamente desde código seguro del lado del servidor, una API de backend u otro límite seguro. No incruste la clave de OpenRouter en un binario de aplicación iOS, macOS, tvOS o watchOS.
+Yarah proporciona una clave de API de OpenRouter para proyectos de la Puerta de enlace de modelos. Las nuevas aplicaciones Swift deben llamar a OpenRouter directamente desde código seguro del lado del servidor, una API de backend u otro límite seguro. No incruste la clave de OpenRouter en un binario de aplicación iOS, macOS, tvOS o watchOS.
 
-Los métodos anteriores del SDK de IA de Swift de InsForge están obsoletos y son envoltorios de compatibilidad. Utilice el SDK de InsForge para base de datos, autenticación, almacenamiento, funciones y tiempo real; utilice OpenRouter para llamadas de modelo.
+Los métodos anteriores del SDK de IA de Swift de Yarah están obsoletos y son envoltorios de compatibilidad. Utilice el SDK de Yarah para base de datos, autenticación, almacenamiento, funciones y tiempo real; utilice OpenRouter para llamadas de modelo.
 
 ## Arquitectura recomendada
 
@@ -72,13 +72,13 @@ func sendPrompt(_ prompt: String, sessionToken: String) async throws -> ChatResp
 
 Utilice un token de sesión de aplicación u otra credencial con alcance de usuario para su ruta de backend. No envíe nunca la clave de OpenRouter desde un cliente de Swift.
 
-## Métodos de IA de InsForge heredados
+## Métodos de IA de Yarah heredados
 
 Estos métodos del SDK de Swift están obsoletos para nuevas integraciones de IA:
 
-- `insforge.ai.chatCompletion(...)`
-- `insforge.ai.generateEmbeddings(...)`
-- `insforge.ai.generateImage(...)`
-- `insforge.ai.listModels()`
+- `yarah.ai.chatCompletion(...)`
+- `yarah.ai.generateEmbeddings(...)`
+- `yarah.ai.generateImage(...)`
+- `yarah.ai.listModels()`
 
-Se dirigen al proxy de IA de InsForge obsoleto. Las nuevas integraciones deben utilizar la clave de OpenRouter del panel de control y seguir la documentación actual de la API de OpenRouter para parámetros de modelo y capacidades.
+Se dirigen al proxy de IA de Yarah obsoleto. Las nuevas integraciones deben utilizar la clave de OpenRouter del panel de control y seguir la documentación actual de la API de OpenRouter para parámetros de modelo y capacidades.

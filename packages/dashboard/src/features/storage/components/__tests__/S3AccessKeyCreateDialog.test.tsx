@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { S3AccessKeyWithSecretSchema } from '@insforge/shared-schemas';
+import type { S3AccessKeyWithSecretSchema } from '@yarahdev/shared-schemas';
 import { describe, expect, it, vi } from 'vitest';
 import { S3AccessKeyCreateDialog } from '#features/storage/components/S3AccessKeyCreateDialog';
 

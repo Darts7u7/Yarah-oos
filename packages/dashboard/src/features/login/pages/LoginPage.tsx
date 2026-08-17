@@ -20,7 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from '#components';
-import { Button, Input } from '@insforge/ui';
+import { Button, Input } from '@yarahdev/ui';
 import { useAuth } from '#lib/contexts/AuthContext';
 import { loginFormSchema, LoginForm } from '#lib/utils/schemaValidations';
 
@@ -77,7 +77,7 @@ export default function LoginPage() {
             <Lock className="h-8 w-8 text-[rgb(var(--inverse))]" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            {t('loginPage.title', { defaultValue: 'Insforge Admin' })}
+            {t('loginPage.title', { defaultValue: 'Yarah Admin' })}
           </h1>
           <p className="text-sm text-muted-foreground mt-2">
             {t('loginPage.subtitle', { defaultValue: 'Sign in to access your dashboard' })}
@@ -172,7 +172,7 @@ export default function LoginPage() {
         <div className="mt-8 text-center">
           <p className="text-xs text-muted-foreground">
             {t('loginPage.footer', {
-              defaultValue: 'Insforge - Self-hosted Backend as a Service',
+              defaultValue: 'Yarah - Self-hosted Backend as a Service',
             })}
           </p>
         </div>

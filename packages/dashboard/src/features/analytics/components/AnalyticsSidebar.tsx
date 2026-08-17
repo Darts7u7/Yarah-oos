@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from 'lucide-react';
-import type { PosthogConnection } from '@insforge/shared-schemas';
+import type { PosthogConnection } from '@yarahdev/shared-schemas';
 import {
   FeatureSidebar,
   type FeatureSidebarHeaderButton,

@@ -1,7 +1,7 @@
 import express, { type ErrorRequestHandler } from 'express';
 import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { AppError } from '../../src/utils/errors.js';
 
 const environmentMock = vi.hoisted(() => ({ isCloud: false }));
@@ -304,7 +304,7 @@ describe('AI config routes', () => {
         : await request(app).put('/api/ai/config').send(body);
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toContain('managed by InsForge Cloud');
+    expect(response.body.message).toContain('managed by Yarah Cloud');
   });
 });
 

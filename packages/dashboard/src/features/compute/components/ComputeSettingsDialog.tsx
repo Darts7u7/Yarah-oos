@@ -16,7 +16,7 @@ import {
   MenuDialogSideNavHeader,
   MenuDialogSideNavTitle,
   MenuDialogTitle,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { computeProviderLabel } from '#features/compute/constants';
 import { FlyCredentialsForm } from './FlyCredentialsForm';
 

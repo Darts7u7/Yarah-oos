@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, Play, Pause } from 'lucide-react';
-import { Button } from '@insforge/ui';
+import { Button } from '@yarahdev/ui';
 import { useServiceLogs } from '#features/compute/hooks/useComputeServices';
 
 interface ServiceLogsProps {

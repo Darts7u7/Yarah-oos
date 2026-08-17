@@ -1,6 +1,6 @@
 ---
 title: "Cronogramas: funciones activadas por cron"
-description: "Ejecuta una función sin servidor de InsForge en un cronograma cron usando pg_cron para automatizar tareas recurrentes, jobs y procesos en segundo plano."
+description: "Ejecuta una función sin servidor de Yarah en un cronograma cron usando pg_cron para automatizar tareas recurrentes, jobs y procesos en segundo plano."
 ---
 
 Los cronogramas invocan funciones en una expresión cron recurrente. [pg_cron](https://github.com/citusdata/pg_cron) envía una solicitud HTTP a la URL de la función en cada marca y registra el resultado.
@@ -27,7 +27,7 @@ Crear a través del panel o SQL:
 select schedules.create_job(
   name       => 'daily-cleanup',
   schedule   => '0 0 * * *',
-  url        => 'https://myapp.functions.insforge.app/cleanup',
+  url        => 'https://myapp.functions.apps.yarah.dev/cleanup',
   headers    => jsonb_build_object('Authorization', 'Bearer ${{secrets.CRON_TOKEN}}')
 );
 ```

@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import logger from '@/utils/logger.js';
-import type { WebhookMessage } from '@insforge/shared-schemas';
+import type { WebhookMessage } from '@yarahdev/shared-schemas';
 
 export interface WebhookResult {
   url: string;
@@ -36,9 +36,9 @@ export class WebhookSender {
           timeout: this.timeout,
           headers: {
             'Content-Type': 'application/json',
-            'X-InsForge-Event': message.eventName,
-            'X-InsForge-Channel': message.channel,
-            'X-InsForge-Message-Id': message.messageId,
+            'X-Yarah-Event': message.eventName,
+            'X-Yarah-Channel': message.channel,
+            'X-Yarah-Message-Id': message.messageId,
           },
         });
 

@@ -15,11 +15,11 @@ jobs:
 
     services:
       postgres:
-        image: ghcr.io/insforge/postgres:v15.13.2
+        image: ghcr.io/darts7u7/postgres:v15.13.2
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: insforge
+          POSTGRES_DB: yarah
         ports:
           - 5432:5432
         options: >-

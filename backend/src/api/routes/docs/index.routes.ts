@@ -12,7 +12,7 @@ import {
   docTypeSchema,
   sdkFeatureSchema,
   sdkLanguageSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -100,7 +100,7 @@ async function processSnippets(content: string, docsRoot: string): Promise<strin
 // Legacy documentation map for GET /api/docs/:docType endpoint
 // Only contains keys defined in DocTypeSchema for type safety
 export const LEGACY_DOCS_MAP: Record<DocTypeSchema, string> = {
-  instructions: '../.agents/docs/insforge-instructions-sdk.md',
+  instructions: '../.agents/docs/yarah-instructions-sdk.md',
   'db-sdk': 'sdks/typescript/database.mdx',
   'auth-sdk': 'sdks/typescript/auth.mdx',
   'storage-sdk': 'sdks/typescript/storage.mdx',

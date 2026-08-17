@@ -1,4 +1,4 @@
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // End-to-end through the REAL DenoSubhostingProvider running the REAL

@@ -314,8 +314,8 @@ export const addCustomDomainRequestSchema = z.object({
       /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i,
       'Invalid domain format (e.g. myapp.com or www.myapp.com)'
     )
-    .refine((domain) => !domain.toLowerCase().endsWith('.insforge.site'), {
-      message: 'Domains ending with .insforge.site are reserved by InsForge',
+    .refine((domain) => !domain.toLowerCase().endsWith('.yarah.site'), {
+      message: 'Domains ending with .yarah.site are reserved by Yarah',
     }),
 });
 

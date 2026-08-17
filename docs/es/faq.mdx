@@ -1,14 +1,14 @@
 ---
-title: "FAQ de InsForge: base de datos, esquemas y edge functions"
+title: "FAQ de Yarah: base de datos, esquemas y edge functions"
 sidebarTitle: "Preguntas frecuentes"
-description: "Respuestas sobre llamadas a la base de datos, edge functions, custom compute, consultas a esquemas no públicos desde el SDK y RLS en InsForge."
+description: "Respuestas sobre llamadas a la base de datos, edge functions, custom compute, consultas a esquemas no públicos desde el SDK y RLS en Yarah."
 ---
 
 <AccordionGroup>
   <Accordion title="¿Leer o escribir en la base de datos es una edge function? ¿Qué diferencia hay entre llamadas a la base de datos, edge functions y custom compute?">
     No. Cuando lees o escribes una tabla no se ejecuta ninguna función, así que no es una edge function.
 
-    En InsForge tu código habla con el backend de tres formas distintas, y es fácil confundirlas:
+    En Yarah tu código habla con el backend de tres formas distintas, y es fácil confundirlas:
 
     | | Cómo se activa | ¿Sigue en ejecución? | Para qué sirve |
     |----|----------------|----------------------|----------------|
@@ -16,7 +16,7 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     | **Edge Function** | Una petición HTTP, una programación cron o un trigger de base de datos | No, se ejecuta una vez y termina | Endpoints propios, webhooks, lógica de triggers, llamar a servicios externos |
     | **Custom Compute** | Tú inicias un proceso de larga duración | Sí, se mantiene activo | Workers de cola, bucles de inferencia de IA, websockets, cualquier cosa con estado |
 
-    **Llamada a la base de datos.** Defines una tabla y InsForge te da al instante un conjunto de endpoints REST (como `GET /api/database/records/{table}`) y un SDK tipado. Llamar a `select` o `insert` lee y escribe la base de datos directamente, sin nada que desplegar y sin nada en ejecución. Es todo lo que necesitas para el CRUD normal. Consulta [Base de datos](/core-concepts/database/overview).
+    **Llamada a la base de datos.** Defines una tabla y Yarah te da al instante un conjunto de endpoints REST (como `GET /api/database/records/{table}`) y un SDK tipado. Llamar a `select` o `insert` lee y escribe la base de datos directamente, sin nada que desplegar y sin nada en ejecución. Es todo lo que necesitas para el CRUD normal. Consulta [Base de datos](/core-concepts/database/overview).
 
     **Edge Function.** Úsala cuando la API autogenerada no basta y quieres tu propia lógica de servidor: un webhook de pago, un auth hook, código que se dispara cuando una fila se `INSERT`a, `UPDATE`a o `DELETE`a, o un trabajo programado. La clave es que se ejecuta una vez por petición o evento y luego termina. Consulta [Edge Functions](/core-concepts/functions/overview).
 
@@ -26,7 +26,7 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
   </Accordion>
 
   <Accordion title="¿Cómo consulto una tabla en un schema distinto de `public`?">
-    Por defecto todas tus tablas están en `public`. Solo tienes otro schema si creaste uno tú mismo con `CREATE SCHEMA` (los schemas internos de InsForge, como `auth` y `storage`, no están expuestos a la API de datos, así que `.schema()` y `?schema=` no pueden alcanzarlos; como project admin todavía puedes leerlos con SQL directo, por ejemplo `insforge db query` o el editor SQL del dashboard). Una vez que tienes uno, puedes leerlo y escribirlo desde el dashboard, la REST API, la CLI y el SDK.
+    Por defecto todas tus tablas están en `public`. Solo tienes otro schema si creaste uno tú mismo con `CREATE SCHEMA` (los schemas internos de Yarah, como `auth` y `storage`, no están expuestos a la API de datos, así que `.schema()` y `?schema=` no pueden alcanzarlos; como project admin todavía puedes leerlos con SQL directo, por ejemplo `yarah db query` o el editor SQL del dashboard). Una vez que tienes uno, puedes leerlo y escribirlo desde el dashboard, la REST API, la CLI y el SDK.
 
     Los ejemplos de abajo usan un schema que creaste llamado `my_schema`.
 
@@ -50,7 +50,7 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     **CLI.** La CLI lee y escribe cualquier schema con `db query`, solo cualifica la tabla con el schema:
 
     ```bash
-    insforge db query "SELECT * FROM my_schema.mytable"
+    yarah db query "SELECT * FROM my_schema.mytable"
     ```
 
     **SDK.** Encadena `.schema()` antes del constructor de consultas (compatible con `@insforge/sdk`). Se traduce a la misma cabecera `Accept-Profile` / `Content-Profile`, así que lecturas, escrituras y RPC se enrutan al schema que indiques:
@@ -99,12 +99,12 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
 
     ```bash
     # puntual, mediante la CLI
-    insforge db query "ALTER TABLE public.mytable DISABLE ROW LEVEL SECURITY"
+    yarah db query "ALTER TABLE public.mytable DISABLE ROW LEVEL SECURITY"
 
     # o registrarlo como una migración
-    npx @insforge/cli db migrations new disable-rls-on-mytable
+    npx @yarah/cli db migrations new disable-rls-on-mytable
     # coloca la sentencia ALTER TABLE en el archivo .sql generado y luego:
-    npx @insforge/cli db migrations up --all
+    npx @yarah/cli db migrations up --all
     ```
 
     También puedes ejecutarlo desde el editor SQL del dashboard, la herramienta `run-raw-sql` de MCP, o el endpoint REST de SQL directo (`POST /api/database/advance/rawsql/unrestricted`).
@@ -116,13 +116,13 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     </Warning>
   </Accordion>
 
-  <Accordion title="¿InsForge tiene una `service_role` key / `INSFORGE_SERVICE_ROLE_KEY`?">
-    No con ese nombre. El equivalente en InsForge es la **API Key** de tu proyecto (empieza por `ik_`), la clave de administrador con acceso total. Cada proyecto tiene dos claves:
+  <Accordion title="¿Yarah tiene una `service_role` key / `YARAH_SERVICE_ROLE_KEY`?">
+    No con ese nombre. El equivalente en Yarah es la **API Key** de tu proyecto (empieza por `ik_`), la clave de administrador con acceso total. Cada proyecto tiene dos claves:
 
     - **Anon Key**: pública, para el navegador. Las peticiones se ejecutan con el rol `anon`, limitadas por RLS. Es la que provoca `permission denied for schema storage`.
     - **API Key**: clave de administrador con acceso total, solo para el servidor. Omite RLS.
 
-    Encuentra la API Key en el panel, en **Project Settings → General** (la fila **API Key**, marcada con "acceso total... no la expongas en tu frontend"), o ejecuta `npx @insforge/cli secrets get API_KEY`.
+    Encuentra la API Key en el panel, en **Project Settings → General** (la fila **API Key**, marcada con "acceso total... no la expongas en tu frontend"), o ejecuta `npx @yarah/cli secrets get API_KEY`.
 
     Úsala desde código de servidor de confianza a través de `createAdminClient`, nunca desde el navegador:
 
@@ -130,8 +130,8 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     import { createAdminClient } from '@insforge/sdk'
 
     const admin = createAdminClient({
-      baseUrl: process.env.INSFORGE_URL,
-      apiKey: process.env.INSFORGE_API_KEY, // clave admin (ik_...), omite RLS
+      baseUrl: process.env.YARAH_URL,
+      apiKey: process.env.YARAH_API_KEY, // clave admin (ik_...), omite RLS
     })
 
     const { data, error } = await admin.storage
@@ -152,11 +152,11 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     3. Haz clic en **Invite Member**, introduce su email y elige un rol:
        - **Administrator** tiene control total: gestionar proyectos, además de invitar, eliminar y cambiar los roles de otros miembros.
        - **Developer** tiene acceso normal a los proyectos de la organización, pero no puede gestionar miembros.
-    4. Reciben una invitación por email válida durante 7 días. Cuando inician sesión en InsForge **con esa misma dirección de email** y la aceptan, se unen a la organización con el rol que elegiste.
+    4. Reciben una invitación por email válida durante 7 días. Cuando inician sesión en Yarah **con esa misma dirección de email** y la aceptan, se unen a la organización con el rol que elegiste.
 
     Para añadir otro administrador en concreto, elige el rol **Administrator** al invitar, o cambia su rol más tarde desde la lista de Members. Solo los Administrators pueden invitar o gestionar miembros.
 
-    Transferir la organización por completo a un nuevo **Owner** es una acción distinta de invitar miembros. Para hacerlo, abre **Organization Settings** y usa **Transfer Ownership** (solo el owner actual puede iniciarlo, y el destinatario debe ser un usuario verificado de InsForge que acepte la solicitud enviada por email).
+    Transferir la organización por completo a un nuevo **Owner** es una acción distinta de invitar miembros. Para hacerlo, abre **Organization Settings** y usa **Transfer Ownership** (solo el owner actual puede iniciarlo, y el destinatario debe ser un usuario verificado de Yarah que acepte la solicitud enviada por email).
   </Accordion>
 
   <Accordion title="¿Por qué se pausó mi proyecto y cómo evito que se pause?">
@@ -178,7 +178,7 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
   </Accordion>
 
   <Accordion title="¿Cómo autentico la CLI sin navegador?">
-    `npx @insforge/cli login` abre un navegador para iniciar sesión. En una máquina sin interfaz, un servidor remoto o CI, usa una user API key en su lugar. No hace falta navegador.
+    `npx @yarah/cli login` abre un navegador para iniciar sesión. En una máquina sin interfaz, un servidor remoto o CI, usa una user API key en su lugar. No hace falta navegador.
 
     La forma más rápida es el prompt de configuración del dashboard, que inicia sesión y vincula el proyecto por ti:
 
@@ -197,8 +197,8 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     El prompt rellena un comando de login limitado a tu cuenta, seguido del comando de vinculación:
 
     ```bash
-    npx @insforge/cli login --user-api-key <your-user-api-key>
-    npx @insforge/cli link --project-id <your-project-id>
+    npx @yarah/cli login --user-api-key <your-user-api-key>
+    npx @yarah/cli link --project-id <your-project-id>
     ```
 
     Si solo necesitas la key, por ejemplo para ejecutar la CLI en CI, abre el menú de tu cuenta y ve a **Profile → API Keys**, luego crea una key (ponle una caducidad, o **Never**). Guárdala como secreto de CI y ejecuta `login --user-api-key` con ella. Añade `--json` para una salida legible por máquina.
@@ -207,20 +207,20 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
   </Accordion>
 
   <Accordion title="¿Qué es FLY_API_TOKEN?">
-    Es una variable de entorno que solo defines cuando alojas InsForge por tu cuenta (self-hosting) y quieres usar [Custom Compute](/core-concepts/compute/overview). Custom Compute ejecuta tus contenedores de larga duración en [Fly.io](https://fly.io), así que una instancia autoalojada necesita tu propia cuenta de Fly: define `FLY_API_TOKEN` (un token de la API de Fly creado con `fly tokens create org`) y `FLY_ORG` (el slug de tu organización de Fly, obtenido con `fly orgs list`) en tu `.env` y reinicia. Ambos son obligatorios y, hasta que se definan, los endpoints de compute devuelven `503 COMPUTE_NOT_CONFIGURED`.
+    Es una variable de entorno que solo defines cuando alojas Yarah por tu cuenta (self-hosting) y quieres usar [Custom Compute](/core-concepts/compute/overview). Custom Compute ejecuta tus contenedores de larga duración en [Fly.io](https://fly.io), así que una instancia autoalojada necesita tu propia cuenta de Fly: define `FLY_API_TOKEN` (un token de la API de Fly creado con `fly tokens create org`) y `FLY_ORG` (el slug de tu organización de Fly, obtenido con `fly orgs list`) en tu `.env` y reinicia. Ambos son obligatorios y, hasta que se definan, los endpoints de compute devuelven `503 COMPUTE_NOT_CONFIGURED`.
 
-    En InsForge Cloud nunca tocas esto. El compute está gestionado por nosotros, y el resto de la plataforma (base de datos, autenticación, Storage, edge functions) no necesita ningún token de Fly.
+    En Yarah Cloud nunca tocas esto. El compute está gestionado por nosotros, y el resto de la plataforma (base de datos, autenticación, Storage, edge functions) no necesita ningún token de Fly.
   </Accordion>
 
   <Accordion title="¿Este asistente puede ayudarme con algo específico de mi propio proyecto?">
-    En realidad no. Este asistente responde a partir de la documentación pública de InsForge, así que no puede ver tu proyecto: no puede depurar un error, leer tus datos ni revisar tu configuración. Lleva cualquier cosa específica de tu propio proyecto a tu agente de programación. Conectado a InsForge a través de la CLI o MCP, tu agente puede leer tu backend en vivo, el esquema, los datos y los logs, y depurar el problema directamente. Solo descríbelo con tus propias palabras. Para un informe de salud y errores que puedes ejecutar tú mismo, usa `npx @insforge/cli diagnose`. Consulta [Diagnostics & advisor](/agent-native/diagnostics).
+    En realidad no. Este asistente responde a partir de la documentación pública de Yarah, así que no puede ver tu proyecto: no puede depurar un error, leer tus datos ni revisar tu configuración. Lleva cualquier cosa específica de tu propio proyecto a tu agente de programación. Conectado a Yarah a través de la CLI o MCP, tu agente puede leer tu backend en vivo, el esquema, los datos y los logs, y depurar el problema directamente. Solo descríbelo con tus propias palabras. Para un informe de salud y errores que puedes ejecutar tú mismo, usa `npx @yarah/cli diagnose`. Consulta [Diagnostics & advisor](/agent-native/diagnostics).
   </Accordion>
 
   <Accordion title="¿Cómo obtengo la cadena de conexión (connection string) de Postgres de mi base de datos?">
     Cada proyecto cloud tiene una cadena de conexión de Postgres directa, útil para `psql`, un GUI de base de datos, un ORM (Prisma, Drizzle) o un servicio externo como [Better Auth](/integrations/better-auth) que necesita su propio Postgres. Imprímela con la CLI:
 
     ```bash
-    npx @insforge/cli db connection-string
+    npx @yarah/cli db connection-string
     ```
 
     También puedes obtenerla desde el dashboard, en **Project Settings → Connect → Connection String** (solo para proyectos cloud).
@@ -228,7 +228,7 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     Devuelve una URL con esta forma:
 
     ```text
-    postgresql://postgres:<password>@<appkey>.<region>.database.insforge.app:5432/insforge?sslmode=require
+    postgresql://postgres:<password>@<appkey>.<region>.database.apps.yarah.dev:5432/yarah?sslmode=require
     ```
 
     Añade `--json` para obtener `{ "connectionURL": "..." }` en scripts. El comando funciona **solo para proyectos cloud**: en una instancia autoalojada Postgres queda expuesto directamente por tu configuración de `docker-compose`, así que usa las credenciales de Postgres locales (los valores `DATABASE_URL` / `POSTGRES_*` de tu `.env`) en su lugar.
@@ -236,8 +236,8 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     La cadena se conecta con el rol privilegiado `postgres`, por lo que no está limitada por row-level security e incluye la contraseña de ese rol. Trátala como un secreto: mantenla en el servidor y nunca la envíes al navegador.
   </Accordion>
 
-  <Accordion title="¿Cómo importo o cargo una base de datos Postgres existente en InsForge?">
-    Restaura tu base de datos existente sobre la cadena de conexión de Postgres de tu proyecto (la misma URL de la pregunta anterior). Las herramientas cliente estándar de PostgreSQL —`pg_dump`, `pg_restore` y `psql`— se conectan a ella directamente, así que importar es un simple «volcar y restaurar» (dump-then-restore). No interviene ningún comando especial de InsForge.
+  <Accordion title="¿Cómo importo o cargo una base de datos Postgres existente en Yarah?">
+    Restaura tu base de datos existente sobre la cadena de conexión de Postgres de tu proyecto (la misma URL de la pregunta anterior). Las herramientas cliente estándar de PostgreSQL —`pg_dump`, `pg_restore` y `psql`— se conectan a ella directamente, así que importar es un simple «volcar y restaurar» (dump-then-restore). No interviene ningún comando especial de Yarah.
 
     1. Vuelca tu base de datos local (u otra):
 
@@ -249,20 +249,20 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     pg_dump your_local_db > local.sql
     ```
 
-    2. Obtén tu cadena de conexión de InsForge (solo para proyectos cloud):
+    2. Obtén tu cadena de conexión de Yarah (solo para proyectos cloud):
 
     ```bash
-    npx @insforge/cli db connection-string
+    npx @yarah/cli db connection-string
     ```
 
-    3. Restaura en InsForge:
+    3. Restaura en Yarah:
 
     ```bash
     # Volcado en formato personalizado
-    pg_restore --no-owner --single-transaction -d "postgresql://postgres:<password>@<appkey>.<region>.database.insforge.app:5432/insforge?sslmode=require" local.dump
+    pg_restore --no-owner --single-transaction -d "postgresql://postgres:<password>@<appkey>.<region>.database.apps.yarah.dev:5432/yarah?sslmode=require" local.dump
 
     # ...o un archivo SQL plano
-    psql --single-transaction "postgresql://postgres:<password>@<appkey>.<region>.database.insforge.app:5432/insforge?sslmode=require" < local.sql
+    psql --single-transaction "postgresql://postgres:<password>@<appkey>.<region>.database.apps.yarah.dev:5432/yarah?sslmode=require" < local.sql
     ```
 
     Algunas cosas a tener en cuenta:
@@ -272,17 +272,17 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     - Esto funciona **solo para proyectos cloud**. En una instancia autoalojada, restaura contra tus credenciales de Postgres locales (los valores `DATABASE_URL` / `POSTGRES_*` de tu `.env`).
     - Una restauración escribe en tu base de datos en vivo y puede sobrescribir objetos existentes. Haz primero una copia de seguridad manual — consulta [Copias de seguridad y restauración de la base de datos](/core-concepts/database/backups).
     - `--single-transaction` ejecuta el restore como una sola transacción, así que si alguna sentencia falla (un objeto en conflicto, una extensión o rol que falta, un error de restricción) toda la importación se revierte en lugar de dejar la base de datos a medio restaurar.
-    - Las tablas importadas **no** obtienen el acceso gestionado de InsForge automáticamente. Un restore directo se salta los permisos de los roles `anon` / `authenticated` y la seguridad a nivel de fila (RLS) que InsForge aplica, así que las tablas importadas **no** son accesibles a través de la API REST ni del SDK —y las reglas de acceso de tu volcado de origen no llevan la protección RLS de InsForge— hasta que concedas acceso y añadas políticas de RLS a cada tabla (consulta [Base de datos](/core-concepts/database/overview)). Si prefieres versionar los cambios de esquema en git, consulta [Migraciones de base de datos](/core-concepts/database/migrations).
+    - Las tablas importadas **no** obtienen el acceso gestionado de Yarah automáticamente. Un restore directo se salta los permisos de los roles `anon` / `authenticated` y la seguridad a nivel de fila (RLS) que Yarah aplica, así que las tablas importadas **no** son accesibles a través de la API REST ni del SDK —y las reglas de acceso de tu volcado de origen no llevan la protección RLS de Yarah— hasta que concedas acceso y añadas políticas de RLS a cada tabla (consulta [Base de datos](/core-concepts/database/overview)). Si prefieres versionar los cambios de esquema en git, consulta [Migraciones de base de datos](/core-concepts/database/migrations).
   </Accordion>
 
   <Accordion title="¿Cómo doy de baja o elimino un sitio desplegado?">
-    Por ahora no hay una forma autoservicio de dar de baja un [Site](/core-concepts/sites/overview) desplegado: no existe un comando `deployments delete` ni una acción en el dashboard para ello. Los sitios desplegados se alojan de forma externa, así que incluso eliminar tu proyecto (`npx @insforge/cli projects delete --project <id>`) borra tus recursos de backend —base de datos, Storage y backend branches— pero *no* quita el sitio alojado.
+    Por ahora no hay una forma autoservicio de dar de baja un [Site](/core-concepts/sites/overview) desplegado: no existe un comando `deployments delete` ni una acción en el dashboard para ello. Los sitios desplegados se alojan de forma externa, así que incluso eliminar tu proyecto (`npx @yarah/cli projects delete --project <id>`) borra tus recursos de backend —base de datos, Storage y backend branches— pero *no* quita el sitio alojado.
 
-    En la práctica esto rara vez importa. Si de verdad necesitas dar de baja un sitio desplegado, escríbele al equipo de InsForge en [Discord](https://discord.com/invite/DvBtaEc9Jz).
+    En la práctica esto rara vez importa. Si de verdad necesitas dar de baja un sitio desplegado, escríbele al equipo de Yarah en [Discord](https://discord.com/invite/DvBtaEc9Jz).
 
     Dos acciones relacionadas que *no* son lo mismo que eliminar un sitio en vivo:
 
-    - **Cancelar una compilación en curso:** `npx @insforge/cli deployments cancel <id>` detiene un despliegue en progreso; no da de baja un sitio que ya está en vivo.
-    - **Reemplazar lo que está en vivo:** vuelve a desplegar sobre el mismo sitio con `npx @insforge/cli deployments deploy ./frontend` — el despliegue ready más reciente sirve la URL.
+    - **Cancelar una compilación en curso:** `npx @yarah/cli deployments cancel <id>` detiene un despliegue en progreso; no da de baja un sitio que ya está en vivo.
+    - **Reemplazar lo que está en vivo:** vuelve a desplegar sobre el mismo sitio con `npx @yarah/cli deployments deploy ./frontend` — el despliegue ready más reciente sirve la URL.
   </Accordion>
 </AccordionGroup>

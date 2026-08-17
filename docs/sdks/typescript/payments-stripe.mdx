@@ -1,6 +1,6 @@
 ---
 title: Stripe Payments SDK
-description: Create Stripe Checkout sessions, open the Billing Portal, and manage subscriptions from your TypeScript frontend with the InsForge SDK payments.stripe helpers.
+description: Create Stripe Checkout sessions, open the Billing Portal, and manage subscriptions from your TypeScript frontend with the Yarah SDK payments.stripe helpers.
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
@@ -11,14 +11,14 @@ import Installation from '/snippets/sdk-installation.mdx';
 
 The TypeScript SDK exposes Stripe runtime helpers for generated app frontends:
 
-- `insforge.payments.stripe.createCheckoutSession(...)`
-- `insforge.payments.stripe.createCustomerPortalSession(...)`
+- `yarah.payments.stripe.createCheckoutSession(...)`
+- `yarah.payments.stripe.createCustomerPortalSession(...)`
 
 Stripe secret keys, catalog management, webhook setup, and payment monitoring are admin operations. Configure them from the dashboard or CLI before using the SDK.
 
 ```bash
-npx @insforge/cli payments stripe status
-npx @insforge/cli payments stripe catalog --environment test
+npx @yarah/cli payments stripe status
+npx @yarah/cli payments stripe catalog --environment test
 ```
 
 <Note>
@@ -26,11 +26,11 @@ npx @insforge/cli payments stripe catalog --environment test
   tables, webhook projections, and fulfillment patterns.
 </Note>
 
-The SDK methods require the current InsForge user token. Anonymous InsForge tokens can be used for guest one-time checkout, but an InsForge API key is not a substitute because the backend needs user context for local session rows.
+The SDK methods require the current Yarah user token. Anonymous Yarah tokens can be used for guest one-time checkout, but an Yarah API key is not a substitute because the backend needs user context for local session rows.
 
 ## createCheckoutSession()
 
-Create a Stripe Checkout Session through the InsForge backend.
+Create a Stripe Checkout Session through the Yarah backend.
 
 ### Parameters
 
@@ -47,7 +47,7 @@ Create a Stripe Checkout Session through the InsForge backend.
 | `idempotencyKey` | `string` | No | Stable key for retry-safe Checkout creation |
 
 <Warning>
-  Metadata keys starting with `insforge_` are reserved.
+  Metadata keys starting with `yarah_` are reserved.
 </Warning>
 
 ### Returns
@@ -81,7 +81,7 @@ Create a Stripe Checkout Session through the InsForge backend.
 ### One-time checkout
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'payment',
   lineItems: [{ priceId: 'price_123', quantity: 1 }],
   successUrl: `${window.location.origin}/checkout/success`,
@@ -103,12 +103,12 @@ if (data?.checkoutSession.url) {
 
 For anonymous one-time purchases, omit `subject` and pass `customerEmail` when available.
 
-If one-time checkout includes a `subject` and there is no existing Stripe customer mapping yet, InsForge lets Stripe create the customer during Checkout and backfills the subject mapping from the completion webhook.
+If one-time checkout includes a `subject` and there is no existing Stripe customer mapping yet, Yarah lets Stripe create the customer during Checkout and backfills the subject mapping from the completion webhook.
 
 ### Subscription checkout
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'subscription',
   subject: { type: 'team', id: teamId },
   lineItems: [{ priceId: 'price_monthly_123', quantity: 1 }],
@@ -171,7 +171,7 @@ Create a Stripe Billing Portal Session for a mapped billing subject.
 ### Example
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCustomerPortalSession('test', {
+const { data, error } = await yarah.payments.stripe.createCustomerPortalSession('test', {
   subject: { type: 'team', id: teamId },
   returnUrl: `${window.location.origin}/billing`
 });
@@ -193,7 +193,7 @@ Customer portal sessions require an authenticated user and an existing customer 
 
 ## Authorization and RLS
 
-The SDK methods call runtime routes using the current InsForge token. The backend inserts local session rows using the caller context:
+The SDK methods call runtime routes using the current Yarah token. The backend inserts local session rows using the caller context:
 
 - `payments.stripe_checkout_sessions` for Checkout attempts
 - `payments.stripe_customer_portal_sessions` for Billing Portal attempts
@@ -226,5 +226,5 @@ Pass `'test'` as the first SDK argument while developing. Only switch to `'live'
 
 <Warning>
   Never put Stripe secret keys in frontend code or public deployment environment
-  variables. Configure Stripe keys through the InsForge dashboard or CLI.
+  variables. Configure Stripe keys through the Yarah dashboard or CLI.
 </Warning>

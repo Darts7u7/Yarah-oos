@@ -1,14 +1,14 @@
 ---
-title: "将 InsForge 自托管到 Coolify"
-description: "在 Coolify 上以 Docker Compose 资源部署 InsForge 后端，Postgres 镜像从仓库构建，配置始终与所部署的版本一致。"
+title: "将 Yarah 自托管到 Coolify"
+description: "在 Coolify 上以 Docker Compose 资源部署 Yarah 后端，Postgres 镜像从仓库构建，配置始终与所部署的版本一致。"
 ---
 
-# 将 InsForge 自托管到 Coolify
+# 将 Yarah 自托管到 Coolify
 
-本指南介绍如何在 [Coolify](https://coolify.io) 上自托管 InsForge 平台。Coolify 是一个跑在你自己服务器上的开源 PaaS。
+本指南介绍如何在 [Coolify](https://coolify.io) 上自托管 Yarah 平台。Coolify 是一个跑在你自己服务器上的开源 PaaS。
 
 <Note>
-  **这里部署的是 InsForge 本身，而不是你用它构建的应用。** 如果你只想让自己的应用上线，请用 [Sites](/core-concepts/sites/overview)。
+  **这里部署的是 Yarah 本身，而不是你用它构建的应用。** 如果你只想让自己的应用上线，请用 [Sites](/core-concepts/sites/overview)。
 </Note>
 
 ## 前置条件
@@ -43,20 +43,20 @@ ROOT_ADMIN_PASSWORD=<strong password>
 
 Postgres 只在初始化数据簇时读 `POSTGRES_PASSWORD`。之后再改不会改变数据库密码。
 
-其余都是可选的；[`.env.example`](https://github.com/insforge/insforge/blob/main/.env.example) 列出了所有支持的变量及其默认值。
+其余都是可选的；[`.env.example`](https://github.com/yarah/yarah/blob/main/.env.example) 列出了所有支持的变量及其默认值。
 
 ## 3. 分配域名
 
-Coolify 不会暴露没有发布端口的 compose 服务。在资源的 **insforge** 服务下分配你的域名并把端口设为 `7130`，然后把对应的地址加进环境变量：
+Coolify 不会暴露没有发布端口的 compose 服务。在资源的 **yarah** 服务下分配你的域名并把端口设为 `7130`，然后把对应的地址加进环境变量：
 
 ```env
-API_BASE_URL=https://insforge.example.com
-VITE_API_BASE_URL=https://insforge.example.com
+API_BASE_URL=https://yarah.example.com
+VITE_API_BASE_URL=https://yarah.example.com
 ```
 
 这两个必须和浏览器实际访问的地址一致，否则面板会请求错误的源。
 
-只有 `insforge` 需要域名。Postgres、PostgREST 和 Deno 运行时都留在内部网络里。
+只有 `yarah` 需要域名。Postgres、PostgREST 和 Deno 运行时都留在内部网络里。
 
 ## 4. 部署
 
@@ -76,6 +76,6 @@ VITE_API_BASE_URL=https://insforge.example.com
 
 ## 为什么 Postgres 是构建而不是拉取
 
-InsForge 的 Postgres 需要仓库里的三个文件：`postgresql.conf`（它预加载 `insforge_pg_utils` 扩展，托管表上的行级安全依赖这个扩展）以及两个 init 脚本。
+Yarah 的 Postgres 需要仓库里的三个文件：`postgresql.conf`（它预加载 `yarah_pg_utils` 扩展，托管表上的行级安全依赖这个扩展）以及两个 init 脚本。
 
 Coolify 会把文件类型的 bind mount 创建成目录（[coollabsio/coolify#3375](https://github.com/coollabsio/coolify/issues/3375)），所以挂载这条路走不通——Postgres 起不来。改为在部署时构建镜像，把当前的文件放进去，这也意味着配置不会像预构建镜像那样落后于代码。

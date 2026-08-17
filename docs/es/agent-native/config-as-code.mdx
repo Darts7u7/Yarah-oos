@@ -1,36 +1,36 @@
 ---
 title: Configuración como código
-description: Gestiona configuración de autenticación, SMTP, almacenamiento y despliegue de InsForge de forma declarativa desde insforge.toml usando la CLI con plan y apply.
+description: Gestiona configuración de autenticación, SMTP, almacenamiento y despliegue de Yarah de forma declarativa desde yarah.toml usando la CLI con plan y apply.
 ---
 
 ## Descripción general
 
-`insforge.toml` es una instantánea de control de versiones declarativa de un subconjunto de la configuración de su proyecto: política de autenticación, URL de redirección permitidas, reglas de contraseña, SMTP, tamaño de carga de almacenamiento, retención en tiempo real y programación, y subdominio de implementación. La CLI proporciona tres comandos que funcionan con este archivo:
+`yarah.toml` es una instantánea de control de versiones declarativa de un subconjunto de la configuración de su proyecto: política de autenticación, URL de redirección permitidas, reglas de contraseña, SMTP, tamaño de carga de almacenamiento, retención en tiempo real y programación, y subdominio de implementación. La CLI proporciona tres comandos que funcionan con este archivo:
 
-- **`config plan`**: diferencie `insforge.toml` con el proyecto vinculado. Muestra qué cambiaría.
+- **`config plan`**: diferencie `yarah.toml` con el proyecto vinculado. Muestra qué cambiaría.
 - **`config apply`**: inserte el diff en el proyecto en vivo. Control de capacidad por cambio, secretos resueltos por entorno, modo de ejecución en seco.
-- **`config export`**: extraiga el estado del proyecto actual y escriba un nuevo `insforge.toml`. Útil para arrancar desde un proyecto existente.
+- **`config export`**: extraiga el estado del proyecto actual y escriba un nuevo `yarah.toml`. Útil para arrancar desde un proyecto existente.
 
-Usted mantiene **un** `insforge.toml` en su repositorio. Para aplicarlo a un entorno diferente (staged, producción, backend local de un compañero de equipo, o instancia autohospedada), apunte la CLI a un proyecto diferente (revinculación o use `--project-id`). Los secretos se leen de variables de entorno a través de referencias `env(...)`, por lo que el archivo en sí permanece libre de credenciales y puede ser confirmado de forma segura.
+Usted mantiene **un** `yarah.toml` en su repositorio. Para aplicarlo a un entorno diferente (staged, producción, backend local de un compañero de equipo, o instancia autohospedada), apunte la CLI a un proyecto diferente (revinculación o use `--project-id`). Los secretos se leen de variables de entorno a través de referencias `env(...)`, por lo que el archivo en sí permanece libre de credenciales y puede ser confirmado de forma segura.
 
-Esto funciona de la misma manera en los proyectos de InsForge Cloud y en implementaciones OSS autohospedadas.
+Esto funciona de la misma manera en los proyectos de Yarah Cloud y en implementaciones OSS autohospedadas.
 
 <Note>
-  Todos los ejemplos usan `npx @insforge/cli`. No instale la CLI globalmente.
+  Todos los ejemplos usan `npx @yarah/cli`. No instale la CLI globalmente.
 </Note>
 
 ## Resumen de comandos
 
 | Comando | Propósito |
 |---------|---------|
-| `config plan` | Mostrar diferencia entre `insforge.toml` y estado del proyecto en vivo |
-| `config apply` | Aplicar `insforge.toml` al proyecto en vivo |
+| `config plan` | Mostrar diferencia entre `yarah.toml` y estado del proyecto en vivo |
+| `config apply` | Aplicar `yarah.toml` al proyecto en vivo |
 | `config apply --dry-run` | Imprimir el plan sin aplicar |
 | `config apply --auto-approve` | Omitir el mensaje de confirmación interactivo (requerido en modo `--json`) |
-| `config export` | Extraer configuración activa y escribir `insforge.toml` |
-| `config export --force` | Sobrescribir un `insforge.toml` existente sin confirmación |
+| `config export` | Extraer configuración activa y escribir `yarah.toml` |
+| `config export --force` | Sobrescribir un `yarah.toml` existente sin confirmación |
 
-`config plan` y `config apply` leen `insforge.toml`; pase `--file <path>` si se encuentra en otro lugar. `config export` escribe el archivo; pase `--out <path>` para escribirlo en una ubicación personalizada.
+`config plan` y `config apply` leen `yarah.toml`; pase `--file <path>` si se encuentra en otro lugar. `config export` escribe el archivo; pase `--out <path>` para escribirlo en una ubicación personalizada.
 
 ## Flujo de trabajo recomendado
 
@@ -39,27 +39,27 @@ Esto funciona de la misma manera en los proyectos de InsForge Cloud y en impleme
     Si ya ha configurado el proyecto a través del panel, exporte una vez para obtener un archivo de trabajo:
 
     ```bash
-    npx @insforge/cli config export
+    npx @yarah/cli config export
     ```
 
-    Esto escribe `insforge.toml` reflejando el estado del backend actual.
+    Esto escribe `yarah.toml` reflejando el estado del backend actual.
   </Step>
 
   <Step title="Confirmarlo">
-    Verifique `insforge.toml` en control de versiones. Los secretos se hacen referencia a través de `env(...)`, por lo que el archivo es seguro.
+    Verifique `yarah.toml` en control de versiones. Los secretos se hacen referencia a través de `env(...)`, por lo que el archivo es seguro.
   </Step>
 
   <Step title="Editar y planificar">
     Cambie el TOML, luego obtenga una vista previa de la diferencia antes de aplicar:
 
     ```bash
-    npx @insforge/cli config plan
+    npx @yarah/cli config plan
     ```
   </Step>
 
   <Step title="Aplicar">
     ```bash
-    npx @insforge/cli config apply
+    npx @yarah/cli config apply
     ```
 
     Revise el plan renderizado y confirme. En CI, pase `--auto-approve` y `--json`.
@@ -69,14 +69,14 @@ Esto funciona de la misma manera en los proyectos de InsForge Cloud y en impleme
     Para insertar la misma configuración en almacenamiento provisional o un backend autohospedado, apunte la CLI al otro proyecto y vuelva a ejecutar aplicar:
 
     ```bash
-    npx @insforge/cli --project-id <staging-project-id> config apply
+    npx @yarah/cli --project-id <staging-project-id> config apply
     ```
 
     Los secretos que difieren entre entornos (contraseña SMTP, etc.) se resuelven por entorno desde el shell local, por lo que el TOML no necesita cambiar.
   </Step>
 </Steps>
 
-## Qué cubre `insforge.toml`
+## Qué cubre `yarah.toml`
 
 El archivo refleja un subconjunto curado de la configuración del proyecto, las partes que son útiles para administrar de forma declarativa. Cualquier cosa que no esté en esta lista aún vive en el panel y la API.
 
@@ -137,22 +137,22 @@ subdomain = "acme-prod"
 ## `config plan`
 
 ```bash
-npx @insforge/cli config plan
-npx @insforge/cli config plan --file ./config/insforge.toml
-npx @insforge/cli --json config plan
+npx @yarah/cli config plan
+npx @yarah/cli config plan --file ./config/yarah.toml
+npx @yarah/cli --json config plan
 ```
 
-`plan` lee `insforge.toml`, obtiene el estado activo a través de `/api/metadata` y los puntos finales de configuración opcionales para almacenamiento, tiempo real y programaciones, luego imprime una diferencia renderizada. También etiqueta cualquier sección que el backend activo aún no expose (versiones autohospedadas más antiguas, etc.). Aplicar omitirá esos en lugar de fallar la ejecución completa.
+`plan` lee `yarah.toml`, obtiene el estado activo a través de `/api/metadata` y los puntos finales de configuración opcionales para almacenamiento, tiempo real y programaciones, luego imprime una diferencia renderizada. También etiqueta cualquier sección que el backend activo aún no expose (versiones autohospedadas más antiguas, etc.). Aplicar omitirá esos en lugar de fallar la ejecución completa.
 
 Use `plan` antes de cada `apply` en sesiones interactivas y como puerta de CI para detectar desviaciones no intencionadas.
 
 ## `config apply`
 
 ```bash
-npx @insforge/cli config apply
-npx @insforge/cli config apply --dry-run
-npx @insforge/cli config apply --auto-approve
-npx @insforge/cli --json config apply --auto-approve
+npx @yarah/cli config apply
+npx @yarah/cli config apply --dry-run
+npx @yarah/cli config apply --auto-approve
+npx @yarah/cli --json config apply --auto-approve
 ```
 
 `apply` ejecuta la misma diferencia que `plan`, luego recorre el conjunto de cambios:
@@ -165,19 +165,19 @@ Banderas:
 
 - `--dry-run` imprime el plan y sale sin aplicar.
 - `--auto-approve` omite la confirmación interactiva. Requerido cuando se establece `--json`, ya que no hay TTY para el símbolo del sistema.
-- `--file <path>` anula la ubicación predeterminada `./insforge.toml`.
+- `--file <path>` anula la ubicación predeterminada `./yarah.toml`.
 
 ## `config export`
 
 ```bash
-npx @insforge/cli config export
-npx @insforge/cli config export --out ./config/insforge.toml
-npx @insforge/cli config export --force
+npx @yarah/cli config export
+npx @yarah/cli config export --out ./config/yarah.toml
+npx @yarah/cli config export --force
 ```
 
 `export` extrae la superficie configurable del proyecto activo y la escribe en un archivo TOML. Úsalo para:
 
-- Arrancar un `insforge.toml` desde un proyecto que ha estado configurando a través del panel.
+- Arrancar un `yarah.toml` desde un proyecto que ha estado configurando a través del panel.
 - Diff ediciones manuales contra el estado actual del backend exportando a un archivo temporal y comparando.
 - Snapshot de configuración antes de un cambio arriesgado para que pueda reaplicar la snapshot si necesita revertir.
 
@@ -196,7 +196,7 @@ password = "env(SENDGRID_API_KEY)"
 
 En el momento de la aplicación, la CLI lee `SENDGRID_API_KEY` del entorno local, valida que esté presente y envía el valor resuelto al backend. El TOML en sí nunca contiene el secreto, por lo que se puede confirmar.
 
-Esto es lo que permite que un `insforge.toml` se aplique limpiamente a múltiples entornos: los backends de desarrollo y producción difieren solo en **cuál** `SENDGRID_API_KEY` está en el alcance cuando ejecuta `apply`.
+Esto es lo que permite que un `yarah.toml` se aplique limpiamente a múltiples entornos: los backends de desarrollo y producción difieren solo en **cuál** `SENDGRID_API_KEY` está en el alcance cuando ejecuta `apply`.
 
 Los refs `env(...)` en un TOML que es el destino de `apply` reenvían la contraseña resuelta en cada ejecución. Esa es la única forma en que la CLI puede decirle al backend "el secreto puede haberse rotado, actualice". Los campos sin una ref `env(...)` se tratan como preservar existentes.
 
@@ -205,8 +205,8 @@ Los refs `env(...)` en un TOML que es el destino de `apply` reenvían la contras
 - **Control de versiones para la configuración del proyecto.** Las URL de redirección, la política de registro, la política de contraseña, el modo de verificación de correo electrónico, SMTP, el tamaño de carga de almacenamiento y las ventanas de retención viven en un archivo que su equipo revisa a través de PR.
 - **Paridad multiambiental.** Un TOML, aplicado a desarrollo, almacenamiento provisional y producción, mantiene los ajustes de proyecto compatibles alineados en todas partes. Los valores específicos del entorno (subdominio, credenciales SMTP) fluyen a través de anulaciones `--project-id` y refs `env(...)`.
 - **Cambios de configuración impulsados por CI.** Ejecute `config apply --auto-approve --json` desde su canalización de implementación. Combine con `config plan` como puerta de PR para que los revisores vean qué cambiará la fusión en producción.
-- **Recuperación ante desastres.** Un `insforge.toml` confirmado es una instantánea de configuración conocida. Vuelva a aplicarlo después de restaurar un proyecto para que los ajustes de autenticación, SMTP, almacenamiento, retención e implementación vuelvan a la forma esperada en segundos.
-- **Desarrollo OSS autohospedado y local.** Ejecute `npx @insforge/cli link --api-base-url http://localhost:7130 --api-key <local-key>` contra una pila docker-compose, luego apunte los comandos de configuración de la CLI a su instancia OSS local de la misma manera que apuntaría a cloud.
+- **Recuperación ante desastres.** Un `yarah.toml` confirmado es una instantánea de configuración conocida. Vuelva a aplicarlo después de restaurar un proyecto para que los ajustes de autenticación, SMTP, almacenamiento, retención e implementación vuelvan a la forma esperada en segundos.
+- **Desarrollo OSS autohospedado y local.** Ejecute `npx @yarah/cli link --api-base-url http://localhost:7130 --api-key <local-key>` contra una pila docker-compose, luego apunte los comandos de configuración de la CLI a su instancia OSS local de la misma manera que apuntaría a cloud.
 
 ## Solución de problemas
 

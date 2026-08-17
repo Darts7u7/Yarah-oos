@@ -15,7 +15,7 @@ import {
   createS3AccessKeyRequestSchema,
   uploadStrategyRequestSchema,
   confirmUploadRequestSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { dashboardEventService } from '@/services/dashboard/dashboard-event.service.js';
 import { AuditService } from '@/services/logs/audit.service.js';
 import { S3AccessKeyService } from '@/services/storage/s3-access-key.service.js';

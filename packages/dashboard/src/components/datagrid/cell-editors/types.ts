@@ -1,4 +1,4 @@
-import { ColumnType } from '@insforge/shared-schemas';
+import { ColumnType } from '@yarahdev/shared-schemas';
 
 /**
  * Base props for all cell editors

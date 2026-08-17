@@ -1,6 +1,6 @@
 # Documentation Asset Guidelines
 
-To keep the InsForge repository fast to clone, easy to maintain, and efficient for contributors, all documentation media assets should be reviewed and optimized before being committed.
+To keep the Yarah repository fast to clone, easy to maintain, and efficient for contributors, all documentation media assets should be reviewed and optimized before being committed.
 
 ## Asset Size Expectations
 

@@ -37,7 +37,7 @@ module.exports = async function (request) {
   }
 
   const client = createClient({
-    baseUrl: Deno.env.get('INSFORGE_INTERNAL_URL') || 'http://insforge:7130',
+    baseUrl: Deno.env.get('YARAH_INTERNAL_URL') || 'http://yarah:7130',
     edgeFunctionToken: userToken,
   });
 

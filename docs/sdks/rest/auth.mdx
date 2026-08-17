@@ -44,12 +44,12 @@ POST /api/auth/users
 | `email` | string | Yes | User email address |
 | `password` | string | Yes | Password (must meet configured requirements) |
 | `name` | string | No | User display name |
-| `redirectTo` | string | No | Used for link-based email verification. The email link always opens an InsForge backend endpoint first; after the token is verified, InsForge redirects the browser to this URL with the verification result. Required when `verifyEmailMethod` is `link`. This URL must be included in `allowedRedirectUrls`. Recommended: use your app's sign-in page. |
+| `redirectTo` | string | No | Used for link-based email verification. The email link always opens an Yarah backend endpoint first; after the token is verified, Yarah redirects the browser to this URL with the verification result. Required when `verifyEmailMethod` is `link`. This URL must be included in `allowedRedirectUrls`. Recommended: use your app's sign-in page. |
 
 ### Example (Web Client)
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/users" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/users" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -62,7 +62,7 @@ curl -X POST "https://your-app.insforge.app/api/auth/users" \
 ### Example (Non-Web Client)
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/users?client_type=mobile" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/users?client_type=mobile" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -142,7 +142,7 @@ POST /api/auth/sessions
 ### Example (Web Client)
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/sessions" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/sessions" \
   -H "Content-Type: application/json" \
   -d '{
     "method": "password",
@@ -154,7 +154,7 @@ curl -X POST "https://your-app.insforge.app/api/auth/sessions" \
 ### Example (Non-Web Client)
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/sessions?client_type=mobile" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/sessions?client_type=mobile" \
   -H "Content-Type: application/json" \
   -d '{
     "method": "password",
@@ -221,7 +221,7 @@ POST /api/auth/email/send-otp
 | `email` | string | Yes | Email address that receives the sign-in code |
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/send-otp" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/send-otp" \
   -H "Content-Type: application/json" \
   -d '{ "email": "user@example.com" }'
 ```
@@ -250,7 +250,7 @@ POST /api/auth/sessions
 | `name` | string | No | Profile name used only if verification creates a new user |
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/sessions?client_type=server" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/sessions?client_type=server" \
   -H "Content-Type: application/json" \
   -d '{
     "method": "otp",
@@ -264,7 +264,7 @@ The response uses the same session shape and `client_type` behavior as password 
 
 <Note>
 - Codes expire after 5 minutes, can be used once, and are consumed after three failed attempts.
-- InsForge does not create a user when the code is sent. If the email is new, a verified passwordless user is created only after successful verification.
+- Yarah does not create a user when the code is sent. If the email is new, a verified passwordless user is created only after successful verification.
 - Verifying a code for an existing unverified account clears its stored password, leaving the account passwordless.
 - If public signups are disabled, an existing user can still sign in. A valid code for an unknown email is consumed and returns HTTP 403.
 </Note>
@@ -300,7 +300,7 @@ POST /api/auth/refresh
 ### Example (Web Client)
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/refresh" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/refresh" \
   -H "X-CSRF-Token: abc123..." \
   --cookie "refresh_token=..."
 ```
@@ -308,7 +308,7 @@ curl -X POST "https://your-app.insforge.app/api/auth/refresh" \
 ### Example (Non-Web Client)
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/refresh?client_type=mobile" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/refresh?client_type=mobile" \
   -H "Content-Type: application/json" \
   -d '{
     "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
@@ -368,7 +368,7 @@ POST /api/auth/logout
 ### Example
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/logout"
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/logout"
 ```
 
 ### Response
@@ -399,7 +399,7 @@ GET /api/auth/sessions/current
 ### Example
 
 ```bash
-curl "https://your-app.insforge.app/api/auth/sessions/current" \
+curl "https://your-app.apps.yarah.dev/api/auth/sessions/current" \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
@@ -434,7 +434,7 @@ PATCH /api/auth/profiles/current
 ### Example
 
 ```bash
-curl -X PATCH "https://your-app.insforge.app/api/auth/profiles/current" \
+curl -X PATCH "https://your-app.apps.yarah.dev/api/auth/profiles/current" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -470,7 +470,7 @@ GET /api/auth/profiles/{userId}
 ### Example
 
 ```bash
-curl "https://your-app.insforge.app/api/auth/profiles/123e4567-e89b-12d3-a456-426614174000"
+curl "https://your-app.apps.yarah.dev/api/auth/profiles/123e4567-e89b-12d3-a456-426614174000"
 ```
 
 ### Response
@@ -500,12 +500,12 @@ POST /api/auth/email/send-verification
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `email` | string | Yes | User email address |
-| `redirectTo` | string | No | Used for link-based email verification. The email link always opens an InsForge backend endpoint first; after the token is verified, InsForge redirects the browser to this URL with the verification result. Required when `verifyEmailMethod` is `link`. This URL must be included in `allowedRedirectUrls`. Recommended: use your app's sign-in page. |
+| `redirectTo` | string | No | Used for link-based email verification. The email link always opens an Yarah backend endpoint first; after the token is verified, Yarah redirects the browser to this URL with the verification result. Required when `verifyEmailMethod` is `link`. This URL must be included in `allowedRedirectUrls`. Recommended: use your app's sign-in page. |
 
 ### Example
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/send-verification" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/send-verification" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -551,18 +551,18 @@ That browser-oriented GET flow verifies the token on the backend and redirects t
 
 Handle the browser redirect like this:
 
-- Success: `?insforge_status=success&insforge_type=verify_email`
-- Error: `?insforge_status=error&insforge_type=verify_email&insforge_error=...`
-- `insforge_status`: Result of the browser link flow. For verification, values are `success` or `error`.
-- `insforge_type`: Flow identifier. For verification links this is always `verify_email`.
-- `insforge_error`: Present only when `insforge_status=error`. Human-readable error message for display or logging.
-- Recommended handling: use your sign-in page as `redirectTo`. When `insforge_status=success`, show a confirmation message and ask the user to sign in with their email and password.
-- If `redirectTo` is not allowlisted, InsForge returns a `400` error whose message includes the rejected URL and whose `nextActions` tells you to add it to `allowedRedirectUrls`.
+- Success: `?yarah_status=success&yarah_type=verify_email`
+- Error: `?yarah_status=error&yarah_type=verify_email&yarah_error=...`
+- `yarah_status`: Result of the browser link flow. For verification, values are `success` or `error`.
+- `yarah_type`: Flow identifier. For verification links this is always `verify_email`.
+- `yarah_error`: Present only when `yarah_status=error`. Human-readable error message for display or logging.
+- Recommended handling: use your sign-in page as `redirectTo`. When `yarah_status=success`, show a confirmation message and ask the user to sign in with their email and password.
+- If `redirectTo` is not allowlisted, Yarah returns a `400` error whose message includes the rejected URL and whose `nextActions` tells you to add it to `allowedRedirectUrls`.
 
 ### Example (Web Client)
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/verify" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/verify" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -573,7 +573,7 @@ curl -X POST "https://your-app.insforge.app/api/auth/email/verify" \
 ### Example (Non-Web Client)
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/verify?client_type=mobile" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/verify?client_type=mobile" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -624,12 +624,12 @@ POST /api/auth/email/send-reset-password
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `email` | string | Yes | User email address |
-| `redirectTo` | string | No | Used for link-based password reset. The email link always opens an InsForge backend endpoint first; InsForge then redirects the browser to this URL with the reset `token` in the query string so your app can render its own reset-password page. Required when `resetPasswordMethod` is `link`. This URL must be included in `allowedRedirectUrls`. Recommended: use your app's dedicated reset-password page. |
+| `redirectTo` | string | No | Used for link-based password reset. The email link always opens an Yarah backend endpoint first; Yarah then redirects the browser to this URL with the reset `token` in the query string so your app can render its own reset-password page. Required when `resetPasswordMethod` is `link`. This URL must be included in `allowedRedirectUrls`. Recommended: use your app's dedicated reset-password page. |
 
 ### Example
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/send-reset-password" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/send-reset-password" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -653,7 +653,7 @@ POST /api/auth/email/exchange-reset-password-token
 ### Example
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/exchange-reset-password-token" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/exchange-reset-password-token" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -686,13 +686,13 @@ That browser-oriented GET flow validates the token on the backend and redirects 
 
 Handle the browser redirect like this:
 
-- Ready to reset: `?token=...&insforge_status=ready&insforge_type=reset_password`
-- Error: `?insforge_status=error&insforge_type=reset_password&insforge_error=...`
-- `token`: Present only when `insforge_status=ready`. Pass this value to `POST /api/auth/email/reset-password` as `otp`.
-- `insforge_status`: Result of the browser link flow. For reset links, values are `ready` or `error`.
-- `insforge_type`: Flow identifier. For reset links this is always `reset_password`.
-- `insforge_error`: Present only when `insforge_status=error`. Human-readable error message for display or logging.
-- Your app should only render the reset-password form when `insforge_status=ready` and `token` is present.
+- Ready to reset: `?token=...&yarah_status=ready&yarah_type=reset_password`
+- Error: `?yarah_status=error&yarah_type=reset_password&yarah_error=...`
+- `token`: Present only when `yarah_status=ready`. Pass this value to `POST /api/auth/email/reset-password` as `otp`.
+- `yarah_status`: Result of the browser link flow. For reset links, values are `ready` or `error`.
+- `yarah_type`: Flow identifier. For reset links this is always `reset_password`.
+- `yarah_error`: Present only when `yarah_status=error`. Human-readable error message for display or logging.
+- Your app should only render the reset-password form when `yarah_status=ready` and `token` is present.
 
 ### Request Body
 
@@ -704,7 +704,7 @@ Handle the browser redirect like this:
 ### Example
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/reset-password" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/reset-password" \
   -H "Content-Type: application/json" \
   -d '{
     "newPassword": "newSecurePassword123",
@@ -725,7 +725,7 @@ curl -X POST "https://your-app.insforge.app/api/auth/email/reset-password" \
 ## Native ID Token Sign-In
 
 Exchange an ID token from Google or Apple's native AuthenticationServices framework for an
-InsForge session:
+Yarah session:
 
 ```
 POST /api/auth/id-token?client_type=mobile
@@ -748,12 +748,12 @@ POST /api/auth/id-token?client_type=mobile
 
 For native Sign in with Apple, generate a high-entropy raw nonce and attach its lowercase
 SHA-256 hex digest to the `ASAuthorizationAppleIDRequest`. Send the original raw nonce with the
-returned identity token. InsForge hashes it before comparing it with Apple's signed `nonce`
+returned identity token. Yarah hashes it before comparing it with Apple's signed `nonce`
 claim. If Apple returns a name on first authorization, send the display name in the same request;
 later authorizations may omit it.
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/id-token?client_type=mobile" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/id-token?client_type=mobile" \
   -H "Content-Type: application/json" \
   -d '{
     "provider": "apple",
@@ -763,13 +763,13 @@ curl -X POST "https://your-app.insforge.app/api/auth/id-token?client_type=mobile
   }'
 ```
 
-InsForge verifies Apple's signature, issuer, expiry, subject, nonce, and token audience. The
+Yarah verifies Apple's signature, issuer, expiry, subject, nonce, and token audience. The
 audience is selected exclusively from the project's Apple OAuth configuration; the sign-in
 request cannot override it. Configure the native App ID (normally the iOS bundle identifier) in
 `nativeClientIds` while retaining `clientId` for the browser/service OAuth client when needed:
 
 ```bash
-curl -X PUT "https://your-app.insforge.app/api/auth/oauth/apple/config" \
+curl -X PUT "https://your-app.apps.yarah.dev/api/auth/oauth/apple/config" \
   -H "Authorization: Bearer ADMIN_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -777,10 +777,10 @@ curl -X PUT "https://your-app.insforge.app/api/auth/oauth/apple/config" \
   }'
 ```
 
-Apple private-relay addresses are supported. InsForge finds returning accounts by Apple's stable
+Apple private-relay addresses are supported. Yarah finds returning accounts by Apple's stable
 subject before inspecting profile claims, so a returning user can sign in when optional profile
 data is absent. Creating or email-linking a new account requires a verified email from the Apple
-identity token; InsForge never creates a fabricated placeholder address.
+identity token; Yarah never creates a fabricated placeholder address.
 
 Google keeps its existing request shape:
 
@@ -795,8 +795,8 @@ Google keeps its existing request shape:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `user` | object | Authenticated InsForge user, including `id`, `email`, verification state, providers, profile, metadata, and timestamps. |
-| `accessToken` | string | InsForge access token for authenticated API requests. |
+| `user` | object | Authenticated Yarah user, including `id`, `email`, verification state, providers, profile, metadata, and timestamps. |
+| `accessToken` | string | Yarah access token for authenticated API requests. |
 | `refreshToken` | string | Returned for `mobile`, `desktop`, and `server` clients. Omitted for web clients. |
 | `csrfToken` | string | Returned for web clients alongside the HTTP-only refresh-token cookie. |
 
@@ -808,8 +808,8 @@ Google keeps its existing request shape:
     "emailVerified": true,
     "providers": ["apple"]
   },
-  "accessToken": "INSFORGE_ACCESS_TOKEN",
-  "refreshToken": "INSFORGE_REFRESH_TOKEN"
+  "accessToken": "YARAH_ACCESS_TOKEN",
+  "refreshToken": "YARAH_REFRESH_TOKEN"
 }
 ```
 
@@ -854,7 +854,7 @@ GET /api/auth/oauth/custom/{key}
 <Note>
   Extra query params are forwarded as provider-specific hints only when they do not collide with
   server-owned OAuth fields. Do not pass `client_id`, `redirect_uri`, `code_challenge`, `state`,
-  `response_type`, or `scope`; InsForge/provider-generated values win and colliding client
+  `response_type`, or `scope`; Yarah/provider-generated values win and colliding client
   values are ignored.
 </Note>
 
@@ -880,12 +880,12 @@ CODE_VERIFIER=$(openssl rand -base64 32 | tr -d '=' | tr '/+' '_-')
 # Generate code_challenge (SHA256 hash of code_verifier, Base64 URL-encoded)
 CODE_CHALLENGE=$(echo -n $CODE_VERIFIER | openssl dgst -sha256 -binary | base64 | tr -d '=' | tr '/+' '_-')
 
-curl "https://your-app.insforge.app/api/auth/oauth/google?redirect_uri=https://myapp.com/callback&code_challenge=$CODE_CHALLENGE&prompt=select_account"
+curl "https://your-app.apps.yarah.dev/api/auth/oauth/google?redirect_uri=https://myapp.com/callback&code_challenge=$CODE_CHALLENGE&prompt=select_account"
 ```
 
 ```bash
 # Custom provider example
-curl "https://your-app.insforge.app/api/auth/oauth/custom/acme?redirect_uri=https://myapp.com/callback&code_challenge=$CODE_CHALLENGE"
+curl "https://your-app.apps.yarah.dev/api/auth/oauth/custom/acme?redirect_uri=https://myapp.com/callback&code_challenge=$CODE_CHALLENGE"
 ```
 
 ### Response
@@ -901,11 +901,11 @@ curl "https://your-app.insforge.app/api/auth/oauth/custom/acme?redirect_uri=http
 After the user authenticates with the provider, they will be redirected to your `redirect_uri` with an authorization code:
 
 ```
-https://myapp.com/callback?insforge_code=abc123...
+https://myapp.com/callback?yarah_code=abc123...
 ```
 
 <Note>
-The `insforge_code` is a temporary authorization code that must be exchanged for tokens using the `/api/auth/oauth/exchange` endpoint.
+The `yarah_code` is a temporary authorization code that must be exchanged for tokens using the `/api/auth/oauth/exchange` endpoint.
 </Note>
 
 ---
@@ -928,13 +928,13 @@ POST /api/auth/oauth/exchange
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `code` | string | Yes | The `insforge_code` received in the callback |
+| `code` | string | Yes | The `yarah_code` received in the callback |
 | `code_verifier` | string | Yes | The original code_verifier used to generate the code_challenge |
 
 ### Example
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/oauth/exchange?client_type=mobile" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/oauth/exchange?client_type=mobile" \
   -H "Content-Type: application/json" \
   -d '{
     "code": "abc123...",
@@ -974,19 +974,19 @@ let codeVerifier = generateRandomString(length: 43)
 let codeChallenge = sha256(codeVerifier).base64URLEncoded()
 
 // 2. Initiate OAuth flow
-let authURL = "https://your-app.insforge.app/api/auth/oauth/google" +
+let authURL = "https://your-app.apps.yarah.dev/api/auth/oauth/google" +
     "?redirect_uri=myapp://callback" +
     "&code_challenge=\(codeChallenge)"
 
 // 3. Open browser/WebView and wait for callback
 // User completes authentication...
 
-// 4. Handle callback with insforge_code
-// myapp://callback?insforge_code=abc123...
+// 4. Handle callback with yarah_code
+// myapp://callback?yarah_code=abc123...
 
 // 5. Exchange code for tokens
 let response = POST("/api/auth/oauth/exchange?client_type=mobile", body: {
-    "code": insforgeCode,
+    "code": yarahCode,
     "code_verifier": codeVerifier
 })
 
@@ -1008,7 +1008,7 @@ GET /api/auth/public-config
 ### Example
 
 ```bash
-curl "https://your-app.insforge.app/api/auth/public-config"
+curl "https://your-app.apps.yarah.dev/api/auth/public-config"
 ```
 
 ### Response
@@ -1049,7 +1049,7 @@ GET /api/auth/users/{userId}
 ### Delete Users
 
 ```bash
-curl -X DELETE "https://your-app.insforge.app/api/auth/users" \
+curl -X DELETE "https://your-app.apps.yarah.dev/api/auth/users" \
   -H "Authorization: Bearer admin-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{"userIds": ["user-id-1", "user-id-2"]}'
@@ -1072,7 +1072,7 @@ GET /api/auth/config
 #### Example
 
 ```bash
-curl "https://your-app.insforge.app/api/auth/config" \
+curl "https://your-app.apps.yarah.dev/api/auth/config" \
   -H "Authorization: Bearer admin-jwt-token"
 ```
 
@@ -1100,7 +1100,7 @@ curl "https://your-app.insforge.app/api/auth/config" \
 - Exact entries must match exactly, such as `https://myapp.com/dashboard`.
 - Wildcards are supported only in the host portion, such as `https://*.myapp.com/callback`.
 - Deep links are allowed when explicitly listed, such as `com.example.app:/oauth2redirect` or `myapp://auth/callback`.
-- If `allowedRedirectUrls` is empty, InsForge allows all redirects for developer convenience. This is insecure for production and should be avoided outside local development.
+- If `allowedRedirectUrls` is empty, Yarah allows all redirects for developer convenience. This is insecure for production and should be avoided outside local development.
 
 ### Update Auth Configuration
 
@@ -1127,7 +1127,7 @@ PUT /api/auth/config
 #### Example
 
 ```bash
-curl -X PUT "https://your-app.insforge.app/api/auth/config" \
+curl -X PUT "https://your-app.apps.yarah.dev/api/auth/config" \
   -H "Authorization: Bearer admin-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1149,12 +1149,12 @@ POST /api/auth/admin/sessions/exchange
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `code` | string | Yes | Authorization code or JWT from Insforge Cloud |
+| `code` | string | Yes | Authorization code or JWT from Yarah Cloud |
 
 #### Example
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/admin/sessions/exchange" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/admin/sessions/exchange" \
   -H "Content-Type: application/json" \
   -d '{"code": "eyJhbGciOiJIUzI1NiIs..."}'
 ```
@@ -1192,7 +1192,7 @@ GET /api/auth/admin/sessions/current
 ### Refresh Admin Session
 
 Refresh a dashboard admin access token. This endpoint uses the dashboard-only
-`insforge_admin_refresh_token` httpOnly cookie and does not share the app/user
+`yarah_admin_refresh_token` httpOnly cookie and does not share the app/user
 refresh cookie.
 
 ```
@@ -1200,9 +1200,9 @@ POST /api/auth/admin/refresh
 ```
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/admin/refresh" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/admin/refresh" \
   -H "X-CSRF-Token: abc123..." \
-  --cookie "insforge_admin_refresh_token=..."
+  --cookie "yarah_admin_refresh_token=..."
 ```
 
 ### Logout Admin Session

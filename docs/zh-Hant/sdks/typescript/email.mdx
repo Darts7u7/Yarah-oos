@@ -1,6 +1,6 @@
 ---
 title: 電子郵件 SDK 參考
-description: "使用 InsForge TypeScript SDK 從應用程式傳送自訂交易電子郵件，支援樣板變數、附件與自訂 SMTP 設定。"
+description: "使用 Yarah TypeScript SDK 從應用程式傳送自訂交易電子郵件，支援樣板變數、附件與自訂 SMTP 設定。"
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
@@ -22,7 +22,7 @@ import Installation from '/snippets/sdk-installation.mdx';
 - `replyTo` (string, optional) - 回覆電子郵件地址，必須是有效的電子郵件地址
 
 <Note>
-預設情況下，郵件從 `noreply@<你的專案>.send.insforge.dev` 寄出，這是 InsForge Cloud 為您的每個專案佈建並驗證的專屬子網域，因此無需任何網域設定。`from` 欄位只設定顯示在該地址旁的顯示名稱；使用預設寄件服務時，您無法變更寄件地址或網域。若要從自己的網域寄信，請設定[自訂 SMTP](/core-concepts/messaging/custom-smtp)。啟用自訂 SMTP 後，`from` 欄位會被完全忽略，寄件者名稱和電子郵件皆取自您的 SMTP 組態，以防止透過您的伺服器進行詐騙。
+預設情況下，郵件從 `noreply@<你的專案>.send.yarah.dev` 寄出，這是 Yarah Cloud 為您的每個專案佈建並驗證的專屬子網域，因此無需任何網域設定。`from` 欄位只設定顯示在該地址旁的顯示名稱；使用預設寄件服務時，您無法變更寄件地址或網域。若要從自己的網域寄信，請設定[自訂 SMTP](/core-concepts/messaging/custom-smtp)。啟用自訂 SMTP 後，`from` 欄位會被完全忽略，寄件者名稱和電子郵件皆取自您的 SMTP 組態，以防止透過您的伺服器進行詐騙。
 </Note>
 
 ### 傳回
@@ -37,7 +37,7 @@ import Installation from '/snippets/sdk-installation.mdx';
 ### 範例
 
 ```javascript
-const { data, error } = await insforge.emails.send({
+const { data, error } = await yarah.emails.send({
   to: ['user1@example.com', 'user2@example.com'],
   cc: 'manager@example.com',
   from: 'Acme Support Team',

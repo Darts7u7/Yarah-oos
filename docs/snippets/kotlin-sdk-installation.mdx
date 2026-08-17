@@ -1,4 +1,4 @@
-1. Add InsForge dependencies to your project
+1. Add Yarah dependencies to your project
 
 <Tabs>
   <Tab title="Maven Central">
@@ -10,7 +10,7 @@
     }
 
     dependencies {
-        implementation("dev.insforge:insforge-kotlin:0.1.6")
+        implementation("dev.yarah:yarah-kotlin:0.1.6")
     }
     ```
   </Tab>
@@ -28,7 +28,7 @@
         repositories {
             mavenCentral()
             maven {
-                url = uri("https://maven.pkg.github.com/InsForge/insforge-kotlin")
+                url = uri("https://maven.pkg.github.com/Yarah/yarah-kotlin")
                 credentials {
                     username = System.getenv("GITHUB_USER") ?: ""
                     password = System.getenv("GITHUB_TOKEN") ?: ""
@@ -40,7 +40,7 @@
         build.gradle.kts:
         ```kotlin
         dependencies {
-            implementation("dev.insforge:insforge-kotlin:0.1.6")
+            implementation("dev.yarah:yarah-kotlin:0.1.6")
         }
         ```
 
@@ -64,7 +64,7 @@
         repositories {
             mavenCentral()
             maven {
-                url = uri("https://maven.pkg.github.com/InsForge/insforge-kotlin")
+                url = uri("https://maven.pkg.github.com/Yarah/yarah-kotlin")
                 credentials {
                     username = providers.gradleProperty("gpr.user").orNull ?: ""
                     password = providers.gradleProperty("gpr.token").orNull ?: ""
@@ -76,7 +76,7 @@
         build.gradle.kts:
         ```kotlin
         dependencies {
-            implementation("dev.insforge:insforge-kotlin:0.1.6")
+            implementation("dev.yarah:yarah-kotlin:0.1.6")
         }
         ```
 
@@ -88,19 +88,19 @@
   </Tab>
 </Tabs>
 
-2. Initialize InsForge SDK
+2. Initialize Yarah SDK
 
 ```kotlin
-import dev.insforge.createInsforgeClient
-import dev.insforge.auth.Auth
-import dev.insforge.database.Database
-import dev.insforge.storage.Storage
-import dev.insforge.functions.Functions
-import dev.insforge.realtime.Realtime
-import dev.insforge.ai.AI
+import dev.yarah.createYarahClient
+import dev.yarah.auth.Auth
+import dev.yarah.database.Database
+import dev.yarah.storage.Storage
+import dev.yarah.functions.Functions
+import dev.yarah.realtime.Realtime
+import dev.yarah.ai.AI
 
-val client = createInsforgeClient(
-    baseUrl = "https://your-app.insforge.app",
+val client = createYarahClient(
+    baseUrl = "https://your-app.apps.yarah.dev",
     anonKey = "your-api-key"
 ) {
     install(Auth)
@@ -120,15 +120,15 @@ val client = createInsforgeClient(
 For debugging, you can configure the SDK log level:
 
 ```kotlin
-import dev.insforge.InsforgeLogLevel
+import dev.yarah.YarahLogLevel
 
-val client = createInsforgeClient(
-    baseUrl = "https://your-app.insforge.app",
+val client = createYarahClient(
+    baseUrl = "https://your-app.apps.yarah.dev",
     anonKey = "your-api-key"
 ) {
     // DEBUG: logs request method/URL and response status
     // VERBOSE: logs full headers and request/response bodies
-    logLevel = InsforgeLogLevel.DEBUG
+    logLevel = YarahLogLevel.DEBUG
 
     install(Auth)
     install(Database)
@@ -159,7 +159,7 @@ dependencies {
 }
 ```
 
-2. Initialize InsForge SDK (With Chrome Custom Tabs and Session Storage)
+2. Initialize Yarah SDK (With Chrome Custom Tabs and Session Storage)
 
 ```kotlin
 import android.app.Activity
@@ -167,21 +167,21 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
-import dev.insforge.createInsforgeClient
-import dev.insforge.ai.AI
-import dev.insforge.auth.Auth
-import dev.insforge.auth.BrowserLauncher
-import dev.insforge.auth.ClientType
-import dev.insforge.auth.SessionStorage
-import dev.insforge.database.Database
-import dev.insforge.functions.Functions
-import dev.insforge.realtime.Realtime
-import dev.insforge.storage.Storage
+import dev.yarah.createYarahClient
+import dev.yarah.ai.AI
+import dev.yarah.auth.Auth
+import dev.yarah.auth.BrowserLauncher
+import dev.yarah.auth.ClientType
+import dev.yarah.auth.SessionStorage
+import dev.yarah.database.Database
+import dev.yarah.functions.Functions
+import dev.yarah.realtime.Realtime
+import dev.yarah.storage.Storage
 
-class InsforgeManager(private val context: Context) {
+class YarahManager(private val context: Context) {
 
-    val client = createInsforgeClient(
-        baseUrl = "https://your-app.insforge.app",
+    val client = createYarahClient(
+        baseUrl = "https://your-app.apps.yarah.dev",
         anonKey = "your-anon-key"
     ) {
         install(Auth) {
@@ -205,7 +205,7 @@ class InsforgeManager(private val context: Context) {
             // 3. config SessionStorage (use SharedPreferences)
             sessionStorage = object : SessionStorage {
                 private val prefs = context.getSharedPreferences(
-                    "insforge_auth",
+                    "yarah_auth",
                     Context.MODE_PRIVATE
                 )
 
@@ -251,7 +251,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-val Context.authDataStore: DataStore<Preferences> by preferencesDataStore(name = "insforge_auth")
+val Context.authDataStore: DataStore<Preferences> by preferencesDataStore(name = "yarah_auth")
 
 class DataStoreSessionStorage(private val context: Context) : SessionStorage {
     
@@ -274,7 +274,7 @@ class DataStoreSessionStorage(private val context: Context) : SessionStorage {
     }
 }
 
-// Then use it in your InsForge client
+// Then use it in your Yarah client
 install(Auth) {
     browserLauncher = ...
     persistSession = true

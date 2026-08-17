@@ -18,8 +18,8 @@ import {
   MenuDialogSideNavHeader,
   MenuDialogSideNavTitle,
   MenuDialogTitle,
-} from '@insforge/ui';
-import type { ModelGatewayCredentialStatus } from '@insforge/shared-schemas';
+} from '@yarahdev/ui';
+import type { ModelGatewayCredentialStatus } from '@yarahdev/shared-schemas';
 import {
   useModelGatewayConfig,
   useUpdateModelGatewayConfig,

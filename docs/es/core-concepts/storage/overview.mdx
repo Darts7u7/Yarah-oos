@@ -1,13 +1,13 @@
 ---
 title: "Almacenamiento"
 sidebarTitle: "Overview"
-description: "Almacena y sirve archivos binarios grandes con el almacenamiento de InsForge compatible con S3, URLs firmadas, políticas por fila y cubos por proyecto."
+description: "Almacena y sirve archivos binarios grandes con el almacenamiento de Yarah compatible con S3, URLs firmadas, políticas por fila y cubos por proyecto."
 ---
 
-Use InsForge para almacenar y servir archivos binarios grandes: imágenes, videos, PDF, audio, copias de seguridad, cualquier cosa que no pondría en una fila de base de datos. Cada proyecto obtiene un depósito compatible con S3. Los archivos se sirven detrás de URL firmadas, las políticas de acceso siguen el mismo modelo de seguridad a nivel de fila que la base de datos, y la API de S3 funciona con rclone, AWS CLI, Terraform y SDK en cualquier idioma.
+Use Yarah para almacenar y servir archivos binarios grandes: imágenes, videos, PDF, audio, copias de seguridad, cualquier cosa que no pondría en una fila de base de datos. Cada proyecto obtiene un depósito compatible con S3. Los archivos se sirven detrás de URL firmadas, las políticas de acceso siguen el mismo modelo de seguridad a nivel de fila que la base de datos, y la API de S3 funciona con rclone, AWS CLI, Terraform y SDK en cualquier idioma.
 
 <Frame caption="Navegador de almacenamiento: depósitos, listado de archivos y cargas, todo detrás del mismo RLS que la base de datos.">
-  <img src="/images/storage-browser.png" alt="Navegador de almacenamiento del panel de InsForge que muestra un depósito de fotos y el listado de archivos" />
+  <img src="/images/storage-browser.png" alt="Navegador de almacenamiento del panel de Yarah que muestra un depósito de fotos y el listado de archivos" />
 </Frame>
 
 <Note>
@@ -16,7 +16,7 @@ Use InsForge para almacenar y servir archivos binarios grandes: imágenes, video
 
 ```mermaid
 graph TB
-    Client[Client Application] --> SDK[InsForge SDK]
+    Client[Client Application] --> SDK[Yarah SDK]
     SDK --> StorageAPI[Storage API]
 
     StorageAPI --> S3[AWS S3]

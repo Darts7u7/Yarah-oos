@@ -1,26 +1,26 @@
 ---
 title: "Descripción general de mensajería"
 sidebarTitle: "Overview"
-description: "Envíe correos transaccionales desde su proyecto InsForge con el remitente gestionado o SMTP personalizado. SMS y push llegarán con la misma API."
+description: "Envíe correos transaccionales desde su proyecto Yarah con el remitente gestionado o SMTP personalizado. SMS y push llegarán con la misma API."
 ---
 
-InsForge Messaging envía notificaciones transaccionales desde su proyecto: recibos, resúmenes, códigos de restablecimiento de contraseña, resúmenes de notificaciones, cualquier cosa para la que de otro modo usaría SendGrid, Postmark o Twilio. El correo electrónico es el primer canal; SMS e inserción están en la hoja de ruta y compartirán la misma superficie API.
+Yarah Messaging envía notificaciones transaccionales desde su proyecto: recibos, resúmenes, códigos de restablecimiento de contraseña, resúmenes de notificaciones, cualquier cosa para la que de otro modo usaría SendGrid, Postmark o Twilio. El correo electrónico es el primer canal; SMS e inserción están en la hoja de ruta y compartirán la misma superficie API.
 
 <Note>
   **¿Solo enviar correos electrónicos de autenticación?** Los enlaces mágicos, los códigos de verificación y los restablecimientos de contraseña están integrados en [Authentication](/core-concepts/authentication/overview). Solo necesita este producto para mensajes transaccionales más allá de la autenticación.
 </Note>
 
 <Warning>
-  **¿Autohospedado?** El remitente gestionado de InsForge Cloud solo está disponible para proyectos vinculados a la nube. En una instancia autohospedada debe configurar [Custom SMTP](/core-concepts/messaging/custom-smtp) antes de que se pueda enviar cualquier correo electrónico, incluidos los de autenticación. InsForge rechaza activar la verificación obligatoria hasta que haya un proveedor disponible e impide desactivar el único proveedor SMTP mientras la verificación siga siendo obligatoria. Si un correo de verificación falla durante el registro, la API devuelve un error con instrucciones para reintentar con `POST /api/auth/email/send-verification`.
+  **¿Autohospedado?** El remitente gestionado de Yarah Cloud solo está disponible para proyectos vinculados a la nube. En una instancia autohospedada debe configurar [Custom SMTP](/core-concepts/messaging/custom-smtp) antes de que se pueda enviar cualquier correo electrónico, incluidos los de autenticación. Yarah rechaza activar la verificación obligatoria hasta que haya un proveedor disponible e impide desactivar el único proveedor SMTP mientras la verificación siga siendo obligatoria. Si un correo de verificación falla durante el registro, la API devuelve un error con instrucciones para reintentar con `POST /api/auth/email/send-verification`.
 </Warning>
 
 ```mermaid
 graph TB
-    Client[Client Application] --> SDK[InsForge SDK]
+    Client[Client Application] --> SDK[Yarah SDK]
     SDK --> API[Email API]
     API --> Service[EmailService]
     Service --> Decision{SMTP enabled?}
-    Decision -->|No| Cloud[InsForge Cloud]
+    Decision -->|No| Cloud[Yarah Cloud]
     Cloud --> SES[AWS SES]
     Decision -->|Yes| SMTP[Your SMTP server]
     SES --> Inbox[Recipient Inbox]
@@ -61,11 +61,11 @@ La misma forma `emails.send()` para correo electrónico hoy, con SMS e inserció
 
 ### Entrega administrada o use la suya
 
-Envíe a través de InsForge Cloud (AWS SES para correo electrónico hoy) para una configuración cero, o conecte su propio proveedor cuando necesite controlar la capacidad de entrega y la reputación del remitente. Ver [Custom SMTP](/core-concepts/messaging/custom-smtp).
+Envíe a través de Yarah Cloud (AWS SES para correo electrónico hoy) para una configuración cero, o conecte su propio proveedor cuando necesite controlar la capacidad de entrega y la reputación del remitente. Ver [Custom SMTP](/core-concepts/messaging/custom-smtp).
 
 ### Plantillas
 
-Seleccione una plantilla por nombre, pase las variables e InsForge renderiza y envía. Las plantillas se pueden editar por proyecto; las cuatro plantillas de autenticación (`email-verification-*`, `reset-password-*`) se envían con valores predeterminados sensatos.
+Seleccione una plantilla por nombre, pase las variables e Yarah renderiza y envía. Las plantillas se pueden editar por proyecto; las cuatro plantillas de autenticación (`email-verification-*`, `reset-password-*`) se envían con valores predeterminados sensatos.
 
 ### Seguimiento de entrega
 

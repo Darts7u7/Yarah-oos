@@ -9,7 +9,7 @@ import {
   DeploymentResult,
   isReservedFunctionSlug,
   reservedFunctionSlugMessage,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 import { Pool } from 'pg';
 import fetch from 'node-fetch';
@@ -425,7 +425,7 @@ export class FunctionService {
   // ============================================
 
   /**
-   * Get the Deno Deploy project ID for this InsForge instance
+   * Get the Deno Deploy project ID for this Yarah instance
    */
   private getDenoProjectId(): string {
     return appConfig.storage.appKey;
@@ -818,7 +818,7 @@ export class FunctionService {
 
   /**
    * Get all active secrets for function injection
-   * In cloud deployments, INSFORGE_INTERNAL_URL is replaced with INSFORGE_BASE_URL
+   * In cloud deployments, YARAH_INTERNAL_URL is replaced with YARAH_BASE_URL
    * because the internal container URL is not reachable from Deno Deploy.
    */
   private async getFunctionSecrets(): Promise<Record<string, string>> {
@@ -827,12 +827,12 @@ export class FunctionService {
       const secretMap: Record<string, string> = {};
       let baseUrlValue: string | null = null;
 
-      // First pass: collect secrets and get INSFORGE_BASE_URL value
+      // First pass: collect secrets and get YARAH_BASE_URL value
       for (const secret of secrets) {
         if (secret.isActive) {
           const value = await this.secretService.getSecretByKey(secret.key);
           if (value) {
-            if (secret.key === 'INSFORGE_BASE_URL') {
+            if (secret.key === 'YARAH_BASE_URL') {
               baseUrlValue = value;
             }
             secretMap[secret.key] = value;
@@ -841,8 +841,8 @@ export class FunctionService {
       }
 
       // Preserve OSS container-to-container routing while keeping cloud compatibility.
-      if (isCloudEnvironment() && baseUrlValue && secretMap['INSFORGE_INTERNAL_URL']) {
-        secretMap['INSFORGE_INTERNAL_URL'] = baseUrlValue;
+      if (isCloudEnvironment() && baseUrlValue && secretMap['YARAH_INTERNAL_URL']) {
+        secretMap['YARAH_INTERNAL_URL'] = baseUrlValue;
       }
 
       return secretMap;

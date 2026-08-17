@@ -1,22 +1,22 @@
 ---
 title: "Authentication"
 sidebarTitle: "Overview"
-description: "Authenticate and authorize users in InsForge with email, magic links, one-time codes, OAuth, OIDC providers, and JWT-based sessions."
+description: "Authenticate and authorize users in Yarah with email, magic links, one-time codes, OAuth, OIDC providers, and JWT-based sessions."
 ---
 
-Use InsForge Authentication to handle sign-up, login, sessions, and identity for your app. Users can sign in with email and password, magic link, one-time code, OAuth providers (Google, GitHub, Apple, and others), or any OIDC-compliant identity provider you bring. InsForge issues JSON Web Tokens on login, and every other product on the platform consumes the same token.
+Use Yarah Authentication to handle sign-up, login, sessions, and identity for your app. Users can sign in with email and password, magic link, one-time code, OAuth providers (Google, GitHub, Apple, and others), or any OIDC-compliant identity provider you bring. Yarah issues JSON Web Tokens on login, and every other product on the platform consumes the same token.
 
 <Frame caption="Configured sign-in methods: email and password, Google, and GitHub OAuth.">
-  <img src="/images/authentication-methods.png" alt="InsForge dashboard Auth Methods showing email and password, Google OAuth, and GitHub OAuth" />
+  <img src="/images/authentication-methods.png" alt="Yarah dashboard Auth Methods showing email and password, Google OAuth, and GitHub OAuth" />
 </Frame>
 
 <Note>
-  **Authentication** is checking that a user is who they say they are. **Authorization** is checking what they can do. InsForge handles the first directly and powers the second through [row-level security](/core-concepts/database/overview) policies that read the auth JWT.
+  **Authentication** is checking that a user is who they say they are. **Authorization** is checking what they can do. Yarah handles the first directly and powers the second through [row-level security](/core-concepts/database/overview) policies that read the auth JWT.
 </Note>
 
 ```mermaid
 graph TB
-    Client[Client Application] --> SDK[InsForge SDK]
+    Client[Client Application] --> SDK[Yarah SDK]
     SDK --> AuthAPI[Auth API]
 
     AuthAPI --> JWT[JWT Service]
@@ -66,11 +66,11 @@ First-class support for Google, GitHub, Apple, Microsoft, GitLab, Discord, and m
 
 ### OAuth server mode
 
-Run InsForge itself as an OAuth 2.0 / OIDC identity provider for your own downstream apps. See the [OAuth Server guide](/oauth-server) for the full setup.
+Run Yarah itself as an OAuth 2.0 / OIDC identity provider for your own downstream apps. See the [OAuth Server guide](/oauth-server) for the full setup.
 
 ### Row-level security
 
-The auth JWT flows through every InsForge SDK call automatically. Postgres RLS policies read claims from the token and decide, row by row, what the user can read and write. The same identity and the same policies apply whether the request hits the database, storage, or a realtime channel.
+The auth JWT flows through every Yarah SDK call automatically. Postgres RLS policies read claims from the token and decide, row by row, what the user can read and write. The same identity and the same policies apply whether the request hits the database, storage, or a realtime channel.
 
 ### `auth.users` in your database
 

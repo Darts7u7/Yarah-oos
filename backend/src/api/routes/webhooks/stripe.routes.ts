@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES, stripeWebhookParamsSchema } from '@insforge/shared-schemas';
+import { ERROR_CODES, stripeWebhookParamsSchema } from '@yarahdev/shared-schemas';
 import { StripeWebhookService } from '@/services/payments/stripe/webhook.service.js';
 
 const router = Router();

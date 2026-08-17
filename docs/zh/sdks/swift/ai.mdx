@@ -1,13 +1,13 @@
 ---
 title: 模型网关
-description: 使用 InsForge 预配的 OpenRouter 密钥从 Swift SDK 调用任意 LLM，为 iOS、macOS、tvOS、watchOS 构建 AI 功能。
+description: 使用 Yarah 预配的 OpenRouter 密钥从 Swift SDK 调用任意 LLM，为 iOS、macOS、tvOS、watchOS 构建 AI 功能。
 ---
 
 ## 概览
 
-InsForge 为模型网关项目提供 OpenRouter API 密钥。新的 Swift 应用应该从受信的服务端代码、后端 API 或其他安全边界直接调用 OpenRouter。不要在 iOS、macOS、tvOS 或 watchOS 应用二进制文件中嵌入 OpenRouter 密钥。
+Yarah 为模型网关项目提供 OpenRouter API 密钥。新的 Swift 应用应该从受信的服务端代码、后端 API 或其他安全边界直接调用 OpenRouter。不要在 iOS、macOS、tvOS 或 watchOS 应用二进制文件中嵌入 OpenRouter 密钥。
 
-之前的 InsForge Swift AI SDK 方法已弃用，是兼容性包装器。使用 InsForge SDK 处理数据库、身份验证、存储、函数和实时通信；使用 OpenRouter 进行模型调用。
+之前的 Yarah Swift AI SDK 方法已弃用，是兼容性包装器。使用 Yarah SDK 处理数据库、身份验证、存储、函数和实时通信；使用 OpenRouter 进行模型调用。
 
 ## 推荐架构
 
@@ -72,13 +72,13 @@ func sendPrompt(_ prompt: String, sessionToken: String) async throws -> ChatResp
 
 为后端路由使用应用会话令牌或其他用户范围的凭证。不要从 Swift 客户端发送 OpenRouter 密钥。
 
-## 遗留 InsForge AI 方法
+## 遗留 Yarah AI 方法
 
 这些 Swift SDK 方法已弃用，不应用于新的 AI 集成：
 
-- `insforge.ai.chatCompletion(...)`
-- `insforge.ai.generateEmbeddings(...)`
-- `insforge.ai.generateImage(...)`
-- `insforge.ai.listModels()`
+- `yarah.ai.chatCompletion(...)`
+- `yarah.ai.generateEmbeddings(...)`
+- `yarah.ai.generateImage(...)`
+- `yarah.ai.listModels()`
 
-它们针对已弃用的 InsForge AI 代理。新集成应使用仪表板中的 OpenRouter 密钥，并按照 OpenRouter 当前 API 文档了解模型参数和功能。
+它们针对已弃用的 Yarah AI 代理。新集成应使用仪表板中的 OpenRouter 密钥，并按照 OpenRouter 当前 API 文档了解模型参数和功能。

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ERROR_CODES, errorCodeSchema } from '@insforge/shared-schemas';
+import { ERROR_CODES, errorCodeSchema } from '@yarahdev/shared-schemas';
 
 const sharedErrorCodes = ERROR_CODES;
 

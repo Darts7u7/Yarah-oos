@@ -1,18 +1,18 @@
 ---
 title: 合作伙伴集成
-description: 了解如何通过联合品牌或白标合作伙伴计划集成 InsForge，为客户提供托管后端平台，包括收入分成、专属仪表板与定制域名支持。
+description: 了解如何通过联合品牌或白标合作伙伴计划集成 Yarah，为客户提供托管后端平台，包括收入分成、专属仪表板与定制域名支持。
 ---
 
 ## 概述
 
-InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Backend-as-a-Service）平台无缝集成到您的应用程序中。无论您是在寻找联合品牌解决方案，还是完全白标的体验，我们都有适合您的合作伙伴模式。
+Yarah 提供两种合作伙伴模式，能够将我们的后端即服务（Backend-as-a-Service）平台无缝集成到您的应用程序中。无论您是在寻找联合品牌解决方案，还是完全白标的体验，我们都有适合您的合作伙伴模式。
 
 ## 合作伙伴模式
 
 <CardGroup cols={2}>
   <Card title="联合品牌合作伙伴关系" icon="handshake">
-    非常适合希望将 InsForge 与自身服务一并提供的平台。
-    集成过程非常简单——开发者只需一键即可连接到 InsForge 平台，无需复杂的 OAuth 流程。
+    非常适合希望将 Yarah 与自身服务一并提供的平台。
+    集成过程非常简单——开发者只需一键即可连接到 Yarah 平台，无需复杂的 OAuth 流程。
   </Card>
   <Card title="白标合作伙伴关系" icon="tag">
     适合寻求对用户体验拥有完全掌控权的平台。
@@ -41,7 +41,7 @@ InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Ba
 
 <Steps>
   <Step title="申请合作伙伴关系">
-    通过我们的[合作伙伴邮箱](mailto:partnerships@insforge.dev)提交您的合作伙伴申请。
+    通过我们的[合作伙伴邮箱](mailto:partnerships@yarah.dev)提交您的合作伙伴申请。
     请注明您感兴趣的是联合品牌还是白标合作伙伴关系。
   </Step>
 
@@ -56,7 +56,7 @@ InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Ba
     所有 API 请求都必须包含您的密钥以进行身份验证：
 
     ```bash
-    curl -X POST https://api.insforge.dev/partnership/v1/YOUR_PARTNER_ID/endpoint \
+    curl -X POST https://api.yarah.dev/partnership/v1/YOUR_PARTNER_ID/endpoint \
       -H "Content-Type: application/json" \
       -H "X-Partnership-Secret: YOUR_SECRET_KEY"
     ```
@@ -70,15 +70,15 @@ InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Ba
 ## 按合作伙伴类型划分的功能
 
 ### 联合品牌功能
-在联合品牌模式下，开发者明确知道自己是 InsForge 平台的用户（通过相同的电子邮件地址关联）。登录 InsForge 平台后，开发者对通过合作伙伴创建的项目拥有完整的管理权限，并需要按照 InsForge 的计费方案付费。
+在联合品牌模式下，开发者明确知道自己是 Yarah 平台的用户（通过相同的电子邮件地址关联）。登录 Yarah 平台后，开发者对通过合作伙伴创建的项目拥有完整的管理权限，并需要按照 Yarah 的计费方案付费。
 
 合作伙伴平台可以：
-- 将用户账户（姓名、邮箱）与 InsForge 同步
-- 将项目同步到 InsForge
+- 将用户账户（姓名、邮箱）与 Yarah 同步
+- 将项目同步到 Yarah
 - 查询项目连接信息，以利用已完成的后端能力。
 
 ### 白标功能
-在白标模式下，开发者不知道 InsForge 的存在，也无法在 InsForge 平台上看到合作伙伴创建的项目。
+在白标模式下，开发者不知道 Yarah 的存在，也无法在 Yarah 平台上看到合作伙伴创建的项目。
 
 合作伙伴平台可以：
 - 创建嵌入式项目
@@ -96,7 +96,7 @@ InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Ba
   <Tab title="联合品牌 API">
 
     ### 连接用户账户
-    将用户账户信息与 InsForge 同步。
+    将用户账户信息与 Yarah 同步。
 
     ```bash
     POST /partnership/v1/:partnerId/connect-user
@@ -141,7 +141,7 @@ InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Ba
       "success": true,
       "project": {
         "id": "uuid-string",
-        "access_host": "https://project.us-east.insforge.app",
+        "access_host": "https://project.us-east.apps.yarah.dev",
         "api_key": "project-api-key",
         "status": "active"
       }
@@ -149,7 +149,7 @@ InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Ba
     ```
 
     #### 处理项目数量限制
-    注意：由于 InsForge 免费方案存在项目数量限制，来自合作伙伴平台的项目同步操作可能会失败。在这种情况下，响应内容将为：
+    注意：由于 Yarah 免费方案存在项目数量限制，来自合作伙伴平台的项目同步操作可能会失败。在这种情况下，响应内容将为：
 
     ```json
     {
@@ -158,7 +158,7 @@ InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Ba
       "candidate_projects": [
         {
           "id": "uuid-string",
-          "access_host": "https://project2.us-east.insforge.app",
+          "access_host": "https://project2.us-east.apps.yarah.dev",
           "api_key": "project-api-key",
           "status": "active"
         }
@@ -180,7 +180,7 @@ InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Ba
     {
       "project": {
         "id": "uuid-string",
-        "access_host": "https://project.us-east.insforge.app",
+        "access_host": "https://project.us-east.apps.yarah.dev",
         "api_key": "project-api-key",
         "status": "active"
       }
@@ -212,7 +212,7 @@ InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Ba
       "success": true,
       "project": {
         "id": "uuid-string",
-        "access_host": "https://project.us-east.insforge.app",
+        "access_host": "https://project.us-east.apps.yarah.dev",
         "api_key": "project-api-key",
         "status": "active"
       }
@@ -231,7 +231,7 @@ InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Ba
     {
       "project": {
         "id": "uuid-string",
-        "access_host": "https://project.us-east.insforge.app",
+        "access_host": "https://project.us-east.apps.yarah.dev",
         "api_key": "project-api-key",
         "region": "us-east",
         "instance_type": "nano",
@@ -439,34 +439,34 @@ InsForge 提供两种合作伙伴模式，能够将我们的后端即服务（Ba
 sequenceDiagram
     participant User as End User
     participant Partner as Partner Platform
-    participant InsForge as InsForge API
-    participant Dashboard as InsForge Dashboard
+    participant Yarah as Yarah API
+    participant Dashboard as Yarah Dashboard
 
     User->>Partner: Sign up/Login
-    Partner->>InsForge: POST /connect-user<br/>(name, email)
-    InsForge-->>Partner: Return user account ID
+    Partner->>Yarah: POST /connect-user<br/>(name, email)
+    Yarah-->>Partner: Return user account ID
 
     User->>Partner: Create new project
-    Partner->>InsForge: POST /sync-project<br/>(userId, project_name)
+    Partner->>Yarah: POST /sync-project<br/>(userId, project_name)
 
     alt Success
-        InsForge-->>Partner: Return project details<br/>(id, access_host, api_key)
+        Yarah-->>Partner: Return project details<br/>(id, access_host, api_key)
         Partner->>Partner: Store project credentials
         Partner->>User: Show project ready
     else Project Limit Reached
-        InsForge-->>Partner: Return error + candidate projects
+        Yarah-->>Partner: Return error + candidate projects
         Partner->>User: Show existing projects to choose
         User->>Partner: Select existing project
-        Partner->>InsForge: GET /metadata<br/>(projectId)
-        InsForge-->>Partner: Return project details
+        Partner->>Yarah: GET /metadata<br/>(projectId)
+        Yarah-->>Partner: Return project details
     end
 
     User->>Partner: Use application features
-    Partner->>InsForge: API calls using project credentials
-    InsForge-->>Partner: Return data
+    Partner->>Yarah: API calls using project credentials
+    Yarah-->>Partner: Return data
     Partner-->>User: Display results
 
-    Note over User,Dashboard: User can also access InsForge Dashboard directly
+    Note over User,Dashboard: User can also access Yarah Dashboard directly
     User->>Dashboard: Login with same email
     Dashboard->>User: Full project management access
 ```
@@ -475,7 +475,7 @@ sequenceDiagram
 // 1. Connect user account
 const connectUser = async (name: string, email: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/connect-user`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/connect-user`,
     {
       method: 'POST',
       headers: {
@@ -493,7 +493,7 @@ const connectUser = async (name: string, email: string) => {
 // 2. Create project for user
 const createProject = async (userId: string, projectName: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/${userId}/sync-project`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/${userId}/sync-project`,
     {
       method: 'POST',
       headers: {
@@ -528,42 +528,42 @@ console.log(project.api_key);
 sequenceDiagram
     participant User as End User
     participant Partner as Partner Platform
-    participant InsForge as InsForge API
+    participant Yarah as Yarah API
 
-    Note over User,InsForge: User never interacts with InsForge directly
+    Note over User,Yarah: User never interacts with Yarah directly
 
     User->>Partner: Sign up/Login to partner platform
 
     User->>Partner: Create new project
-    Partner->>InsForge: POST /sync-embedded-project<br/>(project_name, region, instance_type)
-    InsForge-->>Partner: Return project details<br/>(id, access_host, api_key, status)
+    Partner->>Yarah: POST /sync-embedded-project<br/>(project_name, region, instance_type)
+    Yarah-->>Partner: Return project details<br/>(id, access_host, api_key, status)
     Partner->>Partner: Store project credentials
     Partner->>User: Show project ready
 
     User->>Partner: Use application features
-    Partner->>InsForge: API calls using project credentials
-    InsForge-->>Partner: Return data
+    Partner->>Yarah: API calls using project credentials
+    Yarah-->>Partner: Return data
     Partner-->>User: Display results
 
     User->>Partner: Request to pause project
-    Partner->>InsForge: POST /pause<br/>(projectId)
-    InsForge-->>Partner: Return status: paused
+    Partner->>Yarah: POST /pause<br/>(projectId)
+    Yarah-->>Partner: Return status: paused
     Partner->>User: Confirm project paused
 
     User->>Partner: Request to restore project
-    Partner->>InsForge: POST /restore<br/>(projectId)
-    InsForge-->>Partner: Return status: active
+    Partner->>Yarah: POST /restore<br/>(projectId)
+    Yarah-->>Partner: Return status: active
     Partner->>User: Confirm project active
 
-    Partner->>InsForge: GET /metadata<br/>(projectId)
-    InsForge-->>Partner: Return current project status
+    Partner->>Yarah: GET /metadata<br/>(projectId)
+    Yarah-->>Partner: Return current project status
 ```
 
 ```typescript
 // 1. Create embedded project
 const createEmbeddedProject = async (projectName: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/sync-embedded-project`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/sync-embedded-project`,
     {
       method: 'POST',
       headers: {
@@ -588,7 +588,7 @@ const createEmbeddedProject = async (projectName: string) => {
 // 2. Manage project lifecycle
 const pauseProject = async (projectId: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/${projectId}/pause`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/${projectId}/pause`,
     {
       method: 'POST',
       headers: {
@@ -607,7 +607,7 @@ const pauseProject = async (projectId: string) => {
 
 const restoreProject = async (projectId: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/${projectId}/restore`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/${projectId}/restore`,
     {
       method: 'POST',
       headers: {
@@ -627,7 +627,7 @@ const restoreProject = async (projectId: string) => {
 // 3. Delete project
 const deleteProject = async (projectId: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/${projectId}`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/${projectId}`,
     {
       method: 'DELETE',
       headers: {
@@ -649,7 +649,7 @@ const deleteProject = async (projectId: string) => {
 const getPartnershipUsage = async (startDate: string, endDate: string) => {
   const params = new URLSearchParams({ start_date: startDate, end_date: endDate });
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/usage?${params}`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/usage?${params}`,
     {
       method: 'GET',
       headers: {
@@ -671,7 +671,7 @@ const getPartnershipUsage = async (startDate: string, endDate: string) => {
 ## 参数与响应参考
 
 ### 项目区域取值
-InsForge 提供全球化的部署能力。每个项目都可以部署到不同的区域：
+Yarah 提供全球化的部署能力。每个项目都可以部署到不同的区域：
 - `us-east` - 美国东海岸
 - `us-west` - 美国西海岸
 - `ap-southeast` - 亚太东南
@@ -680,7 +680,7 @@ InsForge 提供全球化的部署能力。每个项目都可以部署到不同�
 未来将根据需求添加更多区域。
 
 ### 项目实例类型取值
-根据您项目的业务需求，InsForge 提供以下资源类型：
+根据您项目的业务需求，Yarah 提供以下资源类型：
 - `nano` - 用于开发的最小资源
 - `micro` - 用于测试和开发的基础资源
 - `small` - 轻量级工作负载
@@ -718,4 +718,4 @@ InsForge 提供全球化的部署能力。每个项目都可以部署到不同�
 
 ## 下一步
 
-- 与我们的团队安排一次[技术评审](https://calendly.com/tony-chang-insforge/45min)
+- 与我们的团队安排一次[技术评审](https://calendly.com/tony-chang-yarah/45min)

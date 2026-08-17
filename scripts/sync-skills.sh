@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
-# sync-skills.sh — mirror the canonical insforge-dev skill to the per-agent copies.
+# sync-skills.sh — mirror the canonical yarah-dev skill to the per-agent copies.
 #
-# .agents/skills/insforge-dev is the single source of truth. Claude Code and
+# .agents/skills/yarah-dev is the single source of truth. Claude Code and
 # Codex each discover skills from their own directory, so we keep byte-identical
 # copies in .claude/ and .codex/. Symlinks are not an option: Windows checkouts
 # don't preserve them (they become plain text files), and Prettier errors on
 # explicitly-passed symlinks. So we generate real copies and let CI guard drift.
 #
-# Edit ONLY .agents/skills/insforge-dev, then run this script and commit all
+# Edit ONLY .agents/skills/yarah-dev, then run this script and commit all
 # three trees together.
 #
 # Usage:
@@ -20,10 +20,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-CANONICAL="$REPO_ROOT/.agents/skills/insforge-dev"
+CANONICAL="$REPO_ROOT/.agents/skills/yarah-dev"
 COPIES=(
-  "$REPO_ROOT/.claude/skills/insforge-dev"
-  "$REPO_ROOT/.codex/skills/insforge-dev"
+  "$REPO_ROOT/.claude/skills/yarah-dev"
+  "$REPO_ROOT/.codex/skills/yarah-dev"
 )
 
 CHECK=0
@@ -54,7 +54,7 @@ done
 
 if [[ "$CHECK" -eq 1 ]]; then
   if [[ "$status" -eq 0 ]]; then
-    echo "insforge-dev skill copies are in sync with .agents/"
+    echo "yarah-dev skill copies are in sync with .agents/"
   else
     echo "Run 'scripts/sync-skills.sh' and commit the result." >&2
   fi

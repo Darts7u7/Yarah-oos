@@ -2,11 +2,11 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import fs from 'fs/promises';
 import * as path from 'path';
 
-const logsDir = path.join(__dirname, 'test-insforge-logs');
+const logsDir = path.join(__dirname, 'test-yarah-logs');
 
 vi.mock('../../src/infra/config/app.config', () => ({
   appConfig: {
-    server: { logsDir: path.join(__dirname, 'test-insforge-logs') },
+    server: { logsDir: path.join(__dirname, 'test-yarah-logs') },
   },
 }));
 
@@ -74,14 +74,14 @@ const winstonTimingLog = {
 
 // Line shapes shipped by the legacy Vector sidecar
 const vectorLog = {
-  appname: 'insforge',
+  appname: 'yarah',
   timestamp: '2026-07-01T09:59:00.000Z',
   event_message: 'legacy vector line',
   metadata: { level: 'info' },
 };
 
 const vectorErrorLog = {
-  appname: 'insforge',
+  appname: 'yarah',
   timestamp: '2026-07-01T09:58:00.000Z',
   event_message: 'error - it broke',
   metadata: { level: 'error' },
@@ -104,7 +104,7 @@ describe('LocalFileProvider', () => {
 
   async function writeLogFile(lines: unknown[]) {
     await fs.writeFile(
-      path.join(logsDir, 'insforge.logs.jsonl'),
+      path.join(logsDir, 'yarah.logs.jsonl'),
       lines.map((l) => (typeof l === 'string' ? l : JSON.stringify(l))).join('\n') + '\n'
     );
   }
@@ -112,7 +112,7 @@ describe('LocalFileProvider', () => {
   it('parses winston application log lines', async () => {
     await writeLogFile([winstonAppLog]);
 
-    const { logs } = await provider.getLogsBySource('insforge.logs');
+    const { logs } = await provider.getLogsBySource('yarah.logs');
 
     expect(logs).toHaveLength(1);
     expect(logs[0].eventMessage).toBe('info - Server started');
@@ -122,7 +122,7 @@ describe('LocalFileProvider', () => {
   it('appends error and stack for winston error lines', async () => {
     await writeLogFile([winstonErrorLog]);
 
-    const { logs } = await provider.getLogsBySource('insforge.logs');
+    const { logs } = await provider.getLogsBySource('yarah.logs');
 
     expect(logs).toHaveLength(1);
     expect(logs[0].eventMessage).toContain('error - Failed to sync functions');
@@ -133,7 +133,7 @@ describe('LocalFileProvider', () => {
   it('formats winston HTTP request lines nginx-style', async () => {
     await writeLogFile([winstonRequestLog]);
 
-    const { logs } = await provider.getLogsBySource('insforge.logs');
+    const { logs } = await provider.getLogsBySource('yarah.logs');
 
     expect(logs).toHaveLength(1);
     expect(logs[0].eventMessage).toBe('GET /api/health 200 17 12ms - 127.0.0.1 - curl/8.0');
@@ -142,7 +142,7 @@ describe('LocalFileProvider', () => {
   it('renders flattened Error objects in metadata', async () => {
     await writeLogFile([winstonFlattenedErrorLog]);
 
-    const { logs } = await provider.getLogsBySource('insforge.logs');
+    const { logs } = await provider.getLogsBySource('yarah.logs');
 
     expect(logs).toHaveLength(1);
     expect(logs[0].eventMessage).toContain('error - Failed to record MCP usage');
@@ -153,7 +153,7 @@ describe('LocalFileProvider', () => {
   it('does not mistake timing metadata for an HTTP request log', async () => {
     await writeLogFile([winstonTimingLog]);
 
-    const { logs } = await provider.getLogsBySource('insforge.logs');
+    const { logs } = await provider.getLogsBySource('yarah.logs');
 
     expect(logs).toHaveLength(1);
     expect(logs[0].eventMessage).toBe('info - Query finished');
@@ -162,7 +162,7 @@ describe('LocalFileProvider', () => {
   it('still parses legacy Vector lines', async () => {
     await writeLogFile([vectorLog]);
 
-    const { logs } = await provider.getLogsBySource('insforge.logs');
+    const { logs } = await provider.getLogsBySource('yarah.logs');
 
     expect(logs).toHaveLength(1);
     expect(logs[0].eventMessage).toBe('legacy vector line');
@@ -171,7 +171,7 @@ describe('LocalFileProvider', () => {
   it('appends error details for legacy Vector error lines (metadata.level)', async () => {
     await writeLogFile([vectorErrorLog]);
 
-    const { logs } = await provider.getLogsBySource('insforge.logs');
+    const { logs } = await provider.getLogsBySource('yarah.logs');
 
     expect(logs).toHaveLength(1);
     expect(logs[0].eventMessage).toContain('Error: it broke');
@@ -181,7 +181,7 @@ describe('LocalFileProvider', () => {
   it('skips unparseable and unknown-shape lines', async () => {
     await writeLogFile(['not json', { some: 'unrelated object' }, winstonAppLog]);
 
-    const { logs } = await provider.getLogsBySource('insforge.logs');
+    const { logs } = await provider.getLogsBySource('yarah.logs');
 
     expect(logs).toHaveLength(1);
     expect(logs[0].eventMessage).toBe('info - Server started');
@@ -191,7 +191,7 @@ describe('LocalFileProvider', () => {
     await writeLogFile([winstonAppLog, winstonErrorLog]);
 
     const { logs } = await provider.getLogsBySource(
-      'insforge.logs',
+      'yarah.logs',
       100,
       '2026-07-01T10:00:30.000Z'
     );
@@ -213,6 +213,6 @@ describe('LocalFileProvider', () => {
     const { logs, total } = await provider.searchLogs('boom');
 
     expect(total).toBe(1);
-    expect(logs[0].source).toBe('insforge.logs');
+    expect(logs[0].source).toBe('yarah.logs');
   });
 });

@@ -17,8 +17,8 @@ const toastMocks = vi.hoisted(() => ({
   showToast: vi.fn(),
 }));
 
-vi.mock('@insforge/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@insforge/ui')>();
+vi.mock('@yarahdev/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@yarahdev/ui')>();
 
   return {
     ...actual,

@@ -5,7 +5,7 @@ import type { PaymentProvider, PaymentTransactionRow } from '@/types/payments.js
 import type {
   ListPaymentTransactionsRequest,
   ListPaymentTransactionsResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class PaymentTransactionService {
   private static instance: PaymentTransactionService;

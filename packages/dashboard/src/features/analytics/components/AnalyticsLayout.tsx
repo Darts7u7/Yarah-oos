@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ErrorState, LoadingState } from '#components';
 import { useDashboardHost, useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
 import { useProjectId } from '#lib/hooks/useMetadata';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 import { TimeRangeProvider } from '#features/analytics/context/TimeRangeContext';
 import { analyticsQueryKeys, useAnalyticsConnection } from '#features/analytics/hooks/useAnalytics';
 import { AnalyticsSidebar } from './AnalyticsSidebar';
@@ -13,7 +13,7 @@ import { AnalyticsSidebar } from './AnalyticsSidebar';
 export default function AnalyticsLayout() {
   const { t } = useTranslation('chrome');
   const conn = useAnalyticsConnection();
-  // Cloud only: the OAuth handoff needs the InsForge project id. Self-hosted
+  // Cloud only: the OAuth handoff needs the Yarah project id. Self-hosted
   // deployments have none by design (/metadata/project-id answers null), so
   // querying and gating on it there would error out the whole feature.
   const isCloudHosting = useIsCloudHostingMode();

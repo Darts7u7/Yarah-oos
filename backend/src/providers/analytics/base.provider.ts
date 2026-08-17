@@ -9,7 +9,7 @@ import type {
   PosthogTrendsResponse,
   PosthogWebOverviewResponse,
   PosthogWebStatsResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 /**
  * The read surface the Analytics dashboard needs, however the data is reached.

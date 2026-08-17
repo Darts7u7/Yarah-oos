@@ -1,4 +1,4 @@
-import { CopyButton } from '@insforge/ui';
+import { CopyButton } from '@yarahdev/ui';
 import { useTranslation } from 'react-i18next';
 
 interface QuickStartPromptCardProps {

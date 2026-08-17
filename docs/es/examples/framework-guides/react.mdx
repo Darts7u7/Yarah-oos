@@ -1,21 +1,21 @@
 ---
 title: React
-description: Aprende a crear un proyecto en InsForge y construir una aplicación React con IA, autenticación, base de datos Postgres y almacenamiento usando el SDK oficial.
+description: Aprende a crear un proyecto en Yarah y construir una aplicación React con IA, autenticación, base de datos Postgres y almacenamiento usando el SDK oficial.
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
 
-Aprenda cómo crear un proyecto InsForge y crear una aplicación React usando herramientas de IA como Cursor.
+Aprenda cómo crear un proyecto Yarah y crear una aplicación React usando herramientas de IA como Cursor.
 
-## 1. Crear un proyecto InsForge
+## 1. Crear un proyecto Yarah
 
-Cree un nuevo proyecto InsForge en [insforge.dev](https://insforge.dev).
+Cree un nuevo proyecto Yarah en [yarah.dev](https://yarah.dev).
 
-## 2. Conectar InsForge
+## 2. Conectar Yarah
 
 Dos partes:
 
-- **Enlace CLI** — vea el [Inicio rápido](/quickstart) para ejecutar `npx @insforge/cli link --project-id <your-project-id>` para que el agente pueda leer su ID de proyecto y claves.
+- **Enlace CLI** — vea el [Inicio rápido](/quickstart) para ejecutar `npx @yarah/cli link --project-id <your-project-id>` para que el agente pueda leer su ID de proyecto y claves.
 - **Configuración de MCP** — vea [Configuración de MCP](/mcp-setup) para la configuración por editor (Cursor, Claude Code, Windsurf, Codex, VS Code).
 
 Con ambos conectados, el agente puede leer esquemas, ejecutar consultas e implementar código desde su editor.
@@ -27,9 +27,9 @@ En Cursor o tu asistente de IA, usa este aviso:
 ```
 Create a new React app with TypeScript and Vite.
 Add Tailwind CSS 3.4 for styling.
-Install the InsForge SDK and set up the client configuration.
+Install the Yarah SDK and set up the client configuration.
 
-In my InsForge database, create a sports table with id and name columns.
+In my Yarah database, create a sports table with id and name columns.
 Add sample data: basketball, soccer, and tennis. Make it publicly readable.
 
 Create a component that fetches and displays all sports from the database.
@@ -41,13 +41,13 @@ Tu IA generará la aplicación completa incluyendo configuración de base de dat
 
 Tu asistente de IA creará automáticamente archivos como estos. No necesitas tocarlos manualmente.
 
-**Cliente InsForge** en `src/lib/insforge.ts`:
+**Cliente Yarah** en `src/lib/yarah.ts`:
 
-```typescript src/lib/insforge.ts
+```typescript src/lib/yarah.ts
 import { createClient } from '@insforge/sdk';
 
-export const insforge = createClient({
-  baseUrl: 'https://your-project.us-east.insforge.app',
+export const yarah = createClient({
+  baseUrl: 'https://your-project.us-east.apps.yarah.dev',
   anonKey: 'your-anon-key',
 });
 ```
@@ -56,7 +56,7 @@ export const insforge = createClient({
 
 ```typescript src/components/Sports.tsx
 import { useEffect, useState } from 'react';
-import { insforge } from '../lib/insforge';
+import { yarah } from '../lib/yarah';
 
 interface Sport {
   id: string;
@@ -70,7 +70,7 @@ export function Sports() {
 
   useEffect(() => {
     async function fetchSports() {
-      const { data, error } = await insforge.database
+      const { data, error } = await yarah.database
         .from('sports')
         .select();
 
@@ -160,11 +160,11 @@ Store favorites in a user_favorites table with user_id and sport_id.
 ```
 
 ```
-Add images to each sport using InsForge Storage.
+Add images to each sport using Yarah Storage.
 Allow users to upload sport images and display them in the grid.
 ```
 
 ```
 Add an AI chat feature that can answer questions about sports.
-Use InsForge AI with streaming responses.
+Use Yarah AI with streaming responses.
 ```

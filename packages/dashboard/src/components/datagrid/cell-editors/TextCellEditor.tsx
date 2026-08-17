@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import type { TextCellEditorProps } from './types';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 
 export function TextCellEditor({ value, onValueChange, onCancel, className }: TextCellEditorProps) {
   const [inputValue, setInputValue] = useState(String(value || ''));

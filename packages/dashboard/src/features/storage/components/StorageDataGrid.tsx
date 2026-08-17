@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { Button, ConfirmDialog, cn, useToast } from '@insforge/ui';
+import { Button, ConfirmDialog, cn, useToast } from '@yarahdev/ui';
 import {
   DataGrid,
   type DataGridProps,
@@ -25,7 +25,7 @@ import {
   File,
   Folder,
 } from 'lucide-react';
-import { StorageFileSchema } from '@insforge/shared-schemas';
+import { StorageFileSchema } from '@yarahdev/shared-schemas';
 import { formatTime } from '#lib/utils/utils';
 import { useStorageObjects } from '#features/storage/hooks/useStorageObjects';
 import { FilePreviewDialog } from './FilePreviewDialog';

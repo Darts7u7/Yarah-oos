@@ -1,13 +1,13 @@
 ---
 title: 模型网关
-description: 使用 OpenAI 兼容接口与 InsForge 预配的 OpenRouter 密钥，从 TypeScript 应用调用任意 LLM，构建聊天、补全、流式响应与嵌入等 AI 功能。
+description: 使用 OpenAI 兼容接口与 Yarah 预配的 OpenRouter 密钥，从 TypeScript 应用调用任意 LLM，构建聊天、补全、流式响应与嵌入等 AI 功能。
 ---
 
 ## 概述
 
-InsForge 为模型网关项目配置了 OpenRouter API 密钥。对于新的 AI 功能，请直接使用该密钥与 OpenRouter 的 OpenAI 兼容 API 一起使用，而不是已弃用的 InsForge AI 代理方法。
+Yarah 为模型网关项目配置了 OpenRouter API 密钥。对于新的 AI 功能，请直接使用该密钥与 OpenRouter 的 OpenAI 兼容 API 一起使用，而不是已弃用的 Yarah AI 代理方法。
 
-使用 InsForge 仪表板复制活动的 OpenRouter 密钥，将其存储在 `OPENROUTER_API_KEY` 中，然后从受信任的服务器端代码调用 OpenRouter。
+使用 Yarah 仪表板复制活动的 OpenRouter 密钥，将其存储在 `OPENROUTER_API_KEY` 中，然后从受信任的服务器端代码调用 OpenRouter。
 
 <Warning>
 不要在浏览器包中暴露 `OPENROUTER_API_KEY`。在 React、Next.js、Vue、Svelte 和类似应用中，将 OpenRouter 调用放在后端路由、服务器操作、函数或其他仅服务器的边界后面。
@@ -247,17 +247,17 @@ export async function POST(request: Request) {
 }
 ```
 
-## 将 InsForge 数据与 AI 结合使用
+## 将 Yarah 数据与 AI 结合使用
 
-使用 InsForge SDK 进行数据库、身份验证、存储、函数和实时操作。直接使用 OpenRouter 进行模型调用。
+使用 Yarah SDK 进行数据库、身份验证、存储、函数和实时操作。直接使用 OpenRouter 进行模型调用。
 
 ```typescript
 import { createClient } from '@insforge/sdk';
 import OpenAI from 'openai';
 
-const insforge = createClient({
-  baseUrl: process.env.INSFORGE_BASE_URL!,
-  anonKey: process.env.INSFORGE_ANON_KEY!,
+const yarah = createClient({
+  baseUrl: process.env.YARAH_BASE_URL!,
+  anonKey: process.env.YARAH_ANON_KEY!,
 });
 
 const openai = new OpenAI({
@@ -265,7 +265,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
-const { data: documents } = await insforge.database
+const { data: documents } = await yarah.database
   .from('documents')
   .select()
   .limit(5);
@@ -283,16 +283,16 @@ const completion = await openai.chat.completions.create({
 console.log(completion.choices[0]?.message?.content);
 ```
 
-## 旧版 InsForge AI 代理
+## 旧版 Yarah AI 代理
 
-之前的 InsForge AI SDK 方法已弃用：
+之前的 Yarah AI SDK 方法已弃用：
 
-- `insforge.ai.chat.completions.create()`
-- `insforge.ai.images.generate()`
-- `insforge.ai.embeddings.create()`
+- `yarah.ai.chat.completions.create()`
+- `yarah.ai.images.generate()`
+- `yarah.ai.embeddings.create()`
 
-它们映射到仍然存在以实现兼容性的后端代理路由，但新的集成应该直接使用 OpenRouter。直接路径提供了对 OpenRouter 完整和不断发展的 API 表面的访问，无需等待 InsForge SDK 包装器更新。
+它们映射到仍然存在以实现兼容性的后端代理路由，但新的集成应该直接使用 OpenRouter。直接路径提供了对 OpenRouter 完整和不断发展的 API 表面的访问，无需等待 Yarah SDK 包装器更新。
 
 ## 模型目录
 
-使用 InsForge 仪表板或 OpenRouter 模型目录来选择模型。模型 ID 使用 `provider/model` 格式，如 `openai/gpt-4o`、`anthropic/claude-3.5-haiku` 和 `google/gemini-2.5-flash-image`。
+使用 Yarah 仪表板或 OpenRouter 模型目录来选择模型。模型 ID 使用 `provider/model` 格式，如 `openai/gpt-4o`、`anthropic/claude-3.5-haiku` 和 `google/gemini-2.5-flash-image`。

@@ -1,6 +1,6 @@
 import { Readable } from 'stream';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { VercelProvider } from '../../src/providers/deployments/vercel.provider';
 import axios, { AxiosError, AxiosHeaders } from 'axios';
 

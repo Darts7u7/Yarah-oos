@@ -1,4 +1,4 @@
-import { Button } from '@insforge/ui';
+import { Button } from '@yarahdev/ui';
 import { useTranslation } from 'react-i18next';
 import { DatabaseTemplate } from '#features/database/templates';
 import { SchemaVisualizer } from '#features/visualizer/components/SchemaVisualizer';

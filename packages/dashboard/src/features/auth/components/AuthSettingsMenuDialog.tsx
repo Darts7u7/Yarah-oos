@@ -28,15 +28,15 @@ import {
   SelectTrigger,
   Switch,
   useToast,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import {
   updateAuthConfigRequestSchema,
   type AuthConfigSchema,
   type UpdateAuthConfigRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { useAuthConfig } from '#features/auth/hooks/useAuthConfig';
 import { useSmtpConfig } from '#features/auth/hooks/useSmtpConfig';
-import { isInsForgeCloudProject } from '#lib/utils/utils';
+import { isYarahCloudProject } from '#lib/utils/utils';
 
 interface AuthSettingsMenuDialogProps {
   open: boolean;
@@ -103,7 +103,7 @@ function SettingRow({ label, description, children }: SettingRowProps) {
 
 export function AuthSettingsMenuDialog({ open, onOpenChange }: AuthSettingsMenuDialogProps) {
   const { t } = useTranslation('chrome');
-  const isCloudProject = isInsForgeCloudProject();
+  const isCloudProject = isYarahCloudProject();
   const [activeSection, setActiveSection] = useState<AuthSettingsSection>('general');
   const { config, isLoading, isUpdating, updateConfig } = useAuthConfig();
   const {
@@ -410,7 +410,7 @@ export function AuthSettingsMenuDialog({ open, onOpenChange }: AuthSettingsMenuD
                       <p className="text-sm text-muted-foreground">
                         {t('auth.emailVerificationProviderRequired', {
                           defaultValue:
-                            'Email verification settings require InsForge Cloud or enabled custom SMTP.',
+                            'Email verification settings require Yarah Cloud or enabled custom SMTP.',
                         })}
                       </p>
                     ) : (

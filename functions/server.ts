@@ -72,7 +72,7 @@ async function decryptSecret(ciphertext: string, key: string): Promise<string> {
 const dbConfig = {
   user: Deno.env.get('POSTGRES_USER') || 'postgres',
   password: Deno.env.get('POSTGRES_PASSWORD') || 'postgres',
-  database: Deno.env.get('POSTGRES_DB') || 'insforge',
+  database: Deno.env.get('POSTGRES_DB') || 'yarah',
   hostname: Deno.env.get('POSTGRES_HOST') || 'postgres',
   port: parseInt(Deno.env.get('POSTGRES_PORT') || '5432', 10),
 };

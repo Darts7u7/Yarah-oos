@@ -16,11 +16,11 @@ import {
   PaymentTransaction,
   StripePrice as StripePriceResponse,
   StripeProduct as StripeProductResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const BILLING_SUBJECT_PROVIDER_ATTRIBUTE_KEYS = {
-  type: 'insforge_subject_type',
-  id: 'insforge_subject_id',
+  type: 'yarah_subject_type',
+  id: 'yarah_subject_id',
 } as const;
 
 export type StripeIdempotencyOperation = 'checkout_session' | 'customer' | 'product' | 'price';
@@ -118,7 +118,7 @@ export function buildStripeIdempotencyKey(
     return undefined;
   }
 
-  return `insforge:${environment}:${operation}:${callerKey}`;
+  return `yarah:${environment}:${operation}:${callerKey}`;
 }
 
 export function isPostgresPermissionError(error: unknown): boolean {

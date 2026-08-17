@@ -1,14 +1,14 @@
 ---
-title: "将 InsForge 部署到 AWS EC2"
-description: "在 AWS EC2 实例上使用 Docker Compose 自托管 InsForge 的分步指南，涵盖 SSH 密钥设置、安全组、自定义域名、TLS 终止与生产环境加固。"
+title: "将 Yarah 部署到 AWS EC2"
+description: "在 AWS EC2 实例上使用 Docker Compose 自托管 Yarah 的分步指南，涵盖 SSH 密钥设置、安全组、自定义域名、TLS 终止与生产环境加固。"
 ---
 
-# 将 InsForge 部署到 AWS EC2
+# 将 Yarah 部署到 AWS EC2
 
-本指南将带你使用 Docker Compose 在 AWS EC2 实例上部署 InsForge。
+本指南将带你使用 Docker Compose 在 AWS EC2 实例上部署 Yarah。
 
 <Note>
-  本云端部署指南由社区维护，可能滞后于最新的 InsForge 版本。最权威、始终保持最新的配置位于 [InsForge 仓库](https://github.com/InsForge/InsForge) 中的 `deploy/docker-compose/` 目录。
+  本云端部署指南由社区维护，可能滞后于最新的 Yarah 版本。最权威、始终保持最新的配置位于 [Yarah 仓库](https://github.com/Yarah/Yarah) 中的 `deploy/docker-compose/` 目录。
 </Note>
 
 ## 📋 前置条件
@@ -26,7 +26,7 @@ description: "在 AWS EC2 实例上使用 Docker Compose 自托管 InsForge 的�
 1. **登录 AWS 控制台**并导航到 EC2 仪表盘
 2. **点击“Launch Instance”**
 3. **配置实例：**
-   - **名称**：`insforge-server`（或你偏好的名称）
+   - **名称**：`yarah-server`（或你偏好的名称）
    - **AMI**：Ubuntu Server 24.04 LTS (HVM)，SSD 卷类型
    - **实例类型**：`t3.medium` 或更大配置（最低 2 vCPU、4 GB 内存）
      - 生产环境推荐：`t3.large`（2 vCPU、8 GB 内存）
@@ -110,12 +110,12 @@ docker ps
 sudo apt install git -y
 ```
 
-### 4. 部署 InsForge
+### 4. 部署 Yarah
 
 #### 4.1 获取仓库
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh | sh -s ~/insforge
+curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 会 checkout 这个栈要读的文件，并把 `JWT_SECRET`、`ENCRYPTION_KEY`、`ROOT_ADMIN_PASSWORD`、`POSTGRES_PASSWORD` 生成到 `.env`。不启动任何东西。
@@ -123,7 +123,7 @@ curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup
 #### 4.2 创建环境配置
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 nano .env
 ```
 
@@ -147,7 +147,7 @@ GOOGLE_CLIENT_SECRET=
 
 > 💡 请把 `.env` 备份到安全的地方。迁移或恢复这个实例靠的就是里面的密钥。
 
-#### 4.3 启动 InsForge 服务
+#### 4.3 启动 Yarah 服务
 
 ```bash
 # Pull Docker images and start services
@@ -168,11 +168,11 @@ docker compose ps
 # You should see 4 running services:
 # - postgres
 # - postgrest
-# - insforge
+# - yarah
 # - deno
 ```
 
-### 5. 访问你的 InsForge 实例
+### 5. 访问你的 Yarah 实例
 
 #### 5.1 测试后端 API
 
@@ -185,7 +185,7 @@ curl http://your-ec2-ip:7130/api/health
 {
   "status": "ok",
   "version": "2.1.7",
-  "service": "Insforge OSS Backend",
+  "service": "Yarah OSS Backend",
   "timestamp": "2025-10-17T..."
 }
 ```
@@ -218,7 +218,7 @@ sudo apt install nginx -y
 创建 Nginx 配置：
 
 ```bash
-sudo nano /etc/nginx/sites-available/insforge
+sudo nano /etc/nginx/sites-available/yarah
 ```
 
 添加以下配置：
@@ -264,7 +264,7 @@ server {
 启用该配置：
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/insforge /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/yarah /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -284,7 +284,7 @@ sudo certbot --nginx -d api.yourdomain.com -d app.yourdomain.com
 使用 HTTPS 地址更新你的 `.env` 文件：
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 nano .env
 ```
 
@@ -310,7 +310,7 @@ docker compose up -d
 docker compose logs -f
 
 # Specific service
-docker compose logs -f insforge
+docker compose logs -f yarah
 docker compose logs -f postgres
 docker compose logs -f deno
 ```
@@ -327,12 +327,12 @@ docker compose down
 docker compose restart
 ```
 
-### 更新 InsForge
+### 更新 Yarah
 
-更新是拉镜像加重启——但 checkout 同样重要：Postgres 的配置和 Deno 函数都是从它读的。请在 `~/insforge` 下运行以下命令：
+更新是拉镜像加重启——但 checkout 同样重要：Postgres 的配置和 Deno 函数都是从它读的。请在 `~/yarah` 下运行以下命令：
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 git pull origin main
 
 # Pick up any files this release added to the sparse checkout
@@ -343,14 +343,14 @@ docker compose pull && docker compose up -d
 
 ### 备份数据库
 
-请在 `~/insforge` 下运行以下命令：
+请在 `~/yarah` 下运行以下命令：
 
 ```bash
 # Create backup
-docker compose exec postgres pg_dump -U postgres insforge > backup_$(date +%Y%m%d_%H%M%S).sql
+docker compose exec postgres pg_dump -U postgres yarah > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Restore from backup
-cat backup_file.sql | docker compose exec -T postgres psql -U postgres -d insforge
+cat backup_file.sql | docker compose exec -T postgres psql -U postgres -d yarah
 ```
 
 ### 监控资源
@@ -458,9 +458,9 @@ effective_cache_size = 3GB
 
 ## 🆘 支持与资源
 
-- **文档**：[https://docs.insforge.dev](https://docs.insforge.dev)
-- **GitHub Issues**：[https://github.com/insforge/insforge/issues](https://github.com/insforge/insforge/issues)
-- **Discord 社区**：[https://discord.com/invite/MPxwj5xVvW](https://discord.com/invite/MPxwj5xVvW)
+- **文档**：[https://docs.yarah.dev](https://docs.yarah.dev)
+- **GitHub Issues**：[https://github.com/yarah/yarah/issues](https://github.com/yarah/yarah/issues)
+- **Discord 社区**：[https://yarah.dev/community](https://yarah.dev/community)
 
 ## 📝 成本估算
 
@@ -478,6 +478,6 @@ effective_cache_size = 3GB
 
 ---
 
-**恭喜！🎉** 你的 InsForge 实例现已在 AWS EC2 上运行。你可以开始通过将 AI 智能体连接到你的后端平台来构建应用程序。
+**恭喜！🎉** 你的 Yarah 实例现已在 AWS EC2 上运行。你可以开始通过将 AI 智能体连接到你的后端平台来构建应用程序。
 
 有关其他生产环境部署策略，请查看我们的[部署指南](/deployment/deployment-security-guide)。

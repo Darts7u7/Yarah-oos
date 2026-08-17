@@ -6,10 +6,10 @@ import {
   UpdateOAuthConfigRequest,
   ListOAuthConfigsResponse,
   OAuthProvidersSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { useTranslation } from 'react-i18next';
 import { oAuthConfigService } from '#features/auth/services/oauth-config.service';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 export function useOAuthConfig(selectedProvider?: OAuthProvidersSchema | null) {
   const { t } = useTranslation('chrome');

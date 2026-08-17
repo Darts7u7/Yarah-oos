@@ -24,7 +24,7 @@ import {
   DatabaseMetadataSchema,
   StorageMetadataSchema,
   OAuthProvidersSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 interface SchemaVisualizerProps {
   metadata: {

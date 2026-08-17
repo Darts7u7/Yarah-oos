@@ -1,6 +1,6 @@
 ---
 title: Razorpay Payments SDK
-description: Create Razorpay Orders, verify signatures, and manage Subscriptions from your TypeScript frontend with the InsForge SDK payments.razorpay helpers.
+description: Create Razorpay Orders, verify signatures, and manage Subscriptions from your TypeScript frontend with the Yarah SDK payments.razorpay helpers.
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
@@ -11,13 +11,13 @@ import Installation from '/snippets/sdk-installation.mdx';
 
 The TypeScript SDK exposes Razorpay runtime helpers for generated app frontends:
 
-- `insforge.payments.razorpay.createOrder(...)`
-- `insforge.payments.razorpay.verifyOrder(...)`
-- `insforge.payments.razorpay.createSubscription(...)`
-- `insforge.payments.razorpay.verifySubscription(...)`
-- `insforge.payments.razorpay.cancelSubscription(...)`
-- `insforge.payments.razorpay.pauseSubscription(...)`
-- `insforge.payments.razorpay.resumeSubscription(...)`
+- `yarah.payments.razorpay.createOrder(...)`
+- `yarah.payments.razorpay.verifyOrder(...)`
+- `yarah.payments.razorpay.createSubscription(...)`
+- `yarah.payments.razorpay.verifySubscription(...)`
+- `yarah.payments.razorpay.cancelSubscription(...)`
+- `yarah.payments.razorpay.pauseSubscription(...)`
+- `yarah.payments.razorpay.resumeSubscription(...)`
 
 Razorpay does not return a hosted Checkout URL. The backend creates a Razorpay Order or Subscription and returns `checkoutOptions`. The browser loads Razorpay Checkout and opens it with those options.
 
@@ -31,8 +31,8 @@ Razorpay does not return a hosted Checkout URL. The backend creates a Razorpay O
 ```typescript
 import { createClient } from '@insforge/sdk';
 
-const insforge = createClient({
-  baseUrl: 'https://your-project.insforge.app',
+const yarah = createClient({
+  baseUrl: 'https://your-project.apps.yarah.dev',
   anonKey: 'your-anon-key'
 });
 
@@ -44,7 +44,7 @@ declare global {
 
 ```
 
-The SDK calls Razorpay runtime routes with the current InsForge user token. Do not call these routes with provider secret keys.
+The SDK calls Razorpay runtime routes with the current Yarah user token. Do not call these routes with provider secret keys.
 
 ## Load Razorpay Checkout
 
@@ -67,9 +67,9 @@ function loadRazorpayCheckout(): Promise<void> {
 
 ## One-time order
 
-Create an app-owned pending order first. Then create the Razorpay Order through InsForge:
+Create an app-owned pending order first. Then create the Razorpay Order through Yarah:
 
-Razorpay Orders can be amount-only, but creating Razorpay Items for one-time sellable products is a good practice because synced Items make the catalog visible in InsForge and Razorpay. Treat Orders as payment attempts.
+Razorpay Orders can be amount-only, but creating Razorpay Items for one-time sellable products is a good practice because synced Items make the catalog visible in Yarah and Razorpay. Treat Orders as payment attempts.
 
 ```typescript
 type CreateRazorpayOrderResponse = {
@@ -95,7 +95,7 @@ type CreateRazorpayOrderResponse = {
 };
 
 const { data: orderResponse, error } =
-  await insforge.payments.razorpay.createOrder('test', {
+  await yarah.payments.razorpay.createOrder('test', {
     amount: 50000,
     currency: 'INR',
     receipt: order.id,
@@ -127,7 +127,7 @@ const checkout = new RazorpayCheckout({
     razorpay_payment_id: string;
     razorpay_signature: string;
   }) => {
-    const { error } = await insforge.payments.razorpay.verifyOrder('test', {
+    const { error } = await yarah.payments.razorpay.verifyOrder('test', {
       orderId: response.razorpay_order_id,
       paymentId: response.razorpay_payment_id,
       signature: response.razorpay_signature
@@ -144,7 +144,7 @@ Signature verification protects the immediate browser callback. Durable fulfillm
 
 ## Subscription
 
-Create or sync a Razorpay Plan first. Then create the subscription through InsForge:
+Create or sync a Razorpay Plan first. Then create the subscription through Yarah:
 
 ```typescript
 type CreateRazorpaySubscriptionResponse = {
@@ -167,7 +167,7 @@ type CreateRazorpaySubscriptionResponse = {
 };
 
 const { data: subscriptionResponse, error } =
-  await insforge.payments.razorpay.createSubscription('test', {
+  await yarah.payments.razorpay.createSubscription('test', {
     planId: 'plan_123',
     totalCount: 12,
     subject: { type: 'team', id: teamId },
@@ -197,7 +197,7 @@ const checkout = new RazorpayCheckout({
     razorpay_payment_id: string;
     razorpay_signature: string;
   }) => {
-    const { error } = await insforge.payments.razorpay.verifySubscription('test', {
+    const { error } = await yarah.payments.razorpay.verifySubscription('test', {
       subscriptionId: response.razorpay_subscription_id,
       paymentId: response.razorpay_payment_id,
       signature: response.razorpay_signature
@@ -215,13 +215,13 @@ checkout.open();
 Razorpay does not provide a Stripe Billing Portal equivalent. Use backend routes for subscription management:
 
 ```typescript
-await insforge.payments.razorpay.cancelSubscription('test', 'sub_123', {
+await yarah.payments.razorpay.cancelSubscription('test', 'sub_123', {
   cancelAtCycleEnd: false
 });
 
-await insforge.payments.razorpay.pauseSubscription('test', 'sub_123');
+await yarah.payments.razorpay.pauseSubscription('test', 'sub_123');
 
-await insforge.payments.razorpay.resumeSubscription('test', 'sub_123');
+await yarah.payments.razorpay.resumeSubscription('test', 'sub_123');
 ```
 
 Subscription creation checks `INSERT` policies on `payments.razorpay_subscriptions`. Cancel, pause, and resume check `UPDATE` policies on the same table. PostgreSQL also applies `SELECT` policies to rows returned by `INSERT/UPDATE ... RETURNING`, so add matching `SELECT` visibility for the same billing subject when a policy probe needs to return the row. Add app-specific RLS or server-side membership checks before exposing these controls for shared subjects.

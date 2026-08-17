@@ -4,7 +4,7 @@ import { useSchedules } from '#features/functions/hooks/useSchedules';
 import type { ScheduleFormSchema } from '#features/functions/types';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createScheduleRequestSchema, type ScheduleSchema } from '@insforge/shared-schemas';
+import { createScheduleRequestSchema, type ScheduleSchema } from '@yarahdev/shared-schemas';
 import {
   Button,
   Dialog,
@@ -18,7 +18,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { JsonCellEditor } from '#components/datagrid/cell-editors/JsonCellEditor';
 import { Alert, AlertDescription } from '#components/radix/Alert';
 import { ScrollArea } from '#components/radix/ScrollArea';

@@ -23,7 +23,7 @@ vi.mock('../../src/infra/config/app.config.js', () => ({
     app: { jwtSecret: 'jwt-secret' },
     cloud: {
       projectId: 'project-id',
-      apiHost: 'https://api.insforge.dev',
+      apiHost: 'https://api.yarah.dev',
     },
   },
 }));
@@ -69,7 +69,7 @@ describe('CloudEmailProvider request-otp support', () => {
     });
 
     expect(mocks.post).toHaveBeenCalledWith(
-      'https://api.insforge.dev/email/v1/project-id/send-with-template',
+      'https://api.yarah.dev/email/v1/project-id/send-with-template',
       {
         email: 'user@example.com',
         name: 'User',

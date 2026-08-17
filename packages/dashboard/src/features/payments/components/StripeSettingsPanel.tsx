@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle2, Eye, EyeOff, Loader2, Webhook } from 'lucide-react';
-import { Button } from '@insforge/ui';
+import { Button } from '@yarahdev/ui';
 import type {
   PaymentEnvironment,
   StripeConnection,
   StripeKeyConfig,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { useStripeConfig } from '#features/payments/hooks/useStripeConfig';
 import { useStripeSync } from '#features/payments/hooks/useStripeSync';
 import { useStripeWebhook } from '#features/payments/hooks/useStripeWebhook';
@@ -594,7 +594,7 @@ function StripeWebhookEnvironmentSection({
         isKeyConfigured
           ? t('payments.stripeWebhookManagedDescription', {
               defaultValue:
-                'InsForge creates and stores a Stripe webhook signing secret for this environment.',
+                'Yarah creates and stores a Stripe webhook signing secret for this environment.',
             })
           : t('payments.configureKeyBeforeWebhook', {
               defaultValue: 'Configure {{keyName}} before creating the webhook.',
@@ -637,7 +637,7 @@ function StripeWebhookEnvironmentSection({
                 </span>
                 <span className="text-foreground">
                   {t('payments.storedInSecretStore', {
-                    defaultValue: 'Stored in InsForge secret store',
+                    defaultValue: 'Stored in Yarah secret store',
                   })}
                 </span>
               </div>

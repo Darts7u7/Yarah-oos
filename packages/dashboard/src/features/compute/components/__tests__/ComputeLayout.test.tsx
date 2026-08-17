@@ -1,10 +1,10 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ToastProvider } from '@insforge/ui';
+import { ToastProvider } from '@yarahdev/ui';
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ServiceSchema } from '@insforge/shared-schemas';
+import type { ServiceSchema } from '@yarahdev/shared-schemas';
 
 const meta = vi.hoisted(() => ({
   value: undefined as unknown,

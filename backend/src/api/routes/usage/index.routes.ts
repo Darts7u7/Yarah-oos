@@ -9,7 +9,7 @@ import { dashboardEventService } from '@/services/dashboard/dashboard-event.serv
 import { UsageService } from '@/services/usage/usage.service.js';
 import { successResponse } from '@/utils/response.js';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 
 export const usageRouter = Router();

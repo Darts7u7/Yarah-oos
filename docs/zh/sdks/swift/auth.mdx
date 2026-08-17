@@ -1,6 +1,6 @@
 ---
 title: Swift 身份验证 SDK 参考
-description: 使用 InsForge Swift SDK 为 iOS、macOS、tvOS 和 watchOS 注册、登录、验证电子邮件、管理会话和配置 OAuth URL 方案。
+description: 使用 Yarah Swift SDK 为 iOS、macOS、tvOS 和 watchOS 注册、登录、验证电子邮件、管理会话和配置 OAuth URL 方案。
 ---
 
 import SwiftSdkInstallation from '/snippets/swift-sdk-installation.mdx';
@@ -50,7 +50,7 @@ public struct SignUpResponse: Codable, Sendable {
 ```swift
 func handleSignUp(email: String, password: String, name: String?) async {
     do {
-        let result = try await insforge.auth.signUp(
+        let result = try await yarah.auth.signUp(
             email: email,
             password: password,
             name: name
@@ -72,7 +72,7 @@ func handleSignUp(email: String, password: String, name: String?) async {
 // Called when user enters the verification code
 func handleVerifyEmail(email: String, code: String) async {
     do {
-        try await insforge.auth.verifyEmail(email: email, code: code)
+        try await yarah.auth.verifyEmail(email: email, code: code)
         // Verification successful, user can now sign in
         navigateToSignIn()
     } catch {
@@ -83,7 +83,7 @@ func handleVerifyEmail(email: String, code: String) async {
 // Called when user requests a new verification email
 func handleResendCode(email: String) async {
     do {
-        try await insforge.auth.resendVerificationEmail(email: email)
+        try await yarah.auth.resendVerificationEmail(email: email)
         showMessage("Verification email sent to \\(email)")
     } catch {
         showError("Failed to resend verification email")
@@ -93,11 +93,11 @@ func handleResendCode(email: String) async {
 
 ### 电子邮件验证
 
-对于使用电子邮件注册的用户，InsForge 后端提供三种选择：
+对于使用电子邮件注册的用户，Yarah 后端提供三种选择：
 
 1. **不需要电子邮件验证** - 用户可在注册后立即登录。`SignUpResponse` 将具有 `hasSession = true`。
 2. **基于链接的验证** - 用户必须打开其电子邮件并单击验证链接才能登录。
-3. **基于代码的验证** - InsForge 后端向用户的电子邮件发送 6 位数验证码。客户端应用需要显示验证屏幕，用户可以输入代码，然后调用 `verifyEmail(email:code:)` 完成验证。只有这样用户才能使用电子邮件和密码登录。
+3. **基于代码的验证** - Yarah 后端向用户的电子邮件发送 6 位数验证码。客户端应用需要显示验证屏幕，用户可以输入代码，然后调用 `verifyEmail(email:code:)` 完成验证。只有这样用户才能使用电子邮件和密码登录。
 
 当 `requireEmailVerification` 为 `true` 时，响应将具有：
 - `accessToken = nil`
@@ -128,7 +128,7 @@ func handleResendCode(email: String) async {
 
 ```swift
 do {
-    let result = try await insforge.auth.signIn(
+    let result = try await yarah.auth.signIn(
         email: "user@example.com",
         password: "secure_password123"
     )
@@ -159,7 +159,7 @@ do {
 
 ```swift
 do {
-    try await insforge.auth.signOut()
+    try await yarah.auth.signOut()
     print("User signed out")
 } catch {
     print("Sign out failed: \\(error)")
@@ -176,7 +176,7 @@ do {
 
 ```swift
 do {
-    if let user = try await insforge.auth.getCurrentUser() {
+    if let user = try await yarah.auth.getCurrentUser() {
         print("Email: \\(user.email)")
         print("Name: \\(user.profile?.name ?? "N/A")")
     } else {
@@ -197,7 +197,7 @@ do {
 
 ```swift
 do {
-    let result = try await insforge.auth.setProfile([
+    let result = try await yarah.auth.setProfile([
         "name": "JohnDev",
         "bio": "iOS Developer",
         "avatar_url": "https://example.com/avatar.jpg"
@@ -212,7 +212,7 @@ do {
 
 ## 密码重置
 
-InsForge 支持两种密码重置方法，在后端中配置：
+Yarah 支持两种密码重置方法，在后端中配置：
 
 - **代码方法**：用户通过电子邮件接收 6 位数代码，验证它以获取重置令牌，然后重置密码
 - **链接方法**：用户通过电子邮件接收包含重置令牌的魔法链接，然后直接重置密码
@@ -229,7 +229,7 @@ InsForge 支持两种密码重置方法，在后端中配置：
 
 ```swift
 do {
-    try await insforge.auth.sendPasswordReset(email: "user@example.com")
+    try await yarah.auth.sendPasswordReset(email: "user@example.com")
     // Show message to check email
     showMessage("If your email is registered, you will receive a password reset email.")
 } catch {
@@ -269,7 +269,7 @@ public struct ResetPasswordTokenResponse: Codable, Sendable {
 
 ```swift
 do {
-    let response = try await insforge.auth.exchangeResetPasswordToken(
+    let response = try await yarah.auth.exchangeResetPasswordToken(
         email: "user@example.com",
         code: "123456"
     )
@@ -296,7 +296,7 @@ do {
 
 ```swift
 do {
-    try await insforge.auth.resetPassword(
+    try await yarah.auth.resetPassword(
         otp: resetToken,
         newPassword: "newSecurePassword123"
     )
@@ -337,7 +337,7 @@ public enum OAuthProvider: String, Sendable {
 ### 参数
 
 - `provider` (`OAuthProvider`) - 要认证的 OAuth 提供商
-- `redirectTo` (`String`) - InsForge 身份验证后将重定向到的回调 URL
+- `redirectTo` (`String`) - Yarah 身份验证后将重定向到的回调 URL
 
 ### 返回值
 
@@ -351,7 +351,7 @@ AuthResponse
 
 ```
 1. App calls signInWithOAuthView(provider:redirectTo:)
-2. SDK fetches the OAuth authorization URL from InsForge
+2. SDK fetches the OAuth authorization URL from Yarah
 3. SDK opens in-app authentication browser (ASWebAuthenticationSession)
 4. User authenticates with the provider (Google, GitHub, etc.)
 5. SDK automatically handles callback and creates session
@@ -362,10 +362,10 @@ AuthResponse
 
 ```swift
 import SwiftUI
-import InsForge
+import Yarah
 
 struct LoginView: View {
-    let client: InsForgeClient
+    let client: YarahClient
     @State private var currentUser: User?
     @State private var errorMessage: String?
 
@@ -417,11 +417,11 @@ struct LoginView: View {
 
 ```swift
 do {
-    let result = try await insforge.auth.signIn(
+    let result = try await yarah.auth.signIn(
         email: email,
         password: password
     )
-} catch let error as InsForgeAuthError {
+} catch let error as YarahAuthError {
     switch error {
     case .invalidCredentials:
         print("Invalid email or password")

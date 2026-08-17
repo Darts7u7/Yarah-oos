@@ -9,7 +9,7 @@ import {
   ERROR_CODES,
   uploadFunctionRequestSchema,
   updateFunctionRequestSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { dashboardEventService } from '@/services/dashboard/dashboard-event.service.js';
 import { successResponse } from '@/utils/response.js';
 

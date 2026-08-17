@@ -4,7 +4,7 @@ sidebarTitle: "Branching"
 description: "Spin up an isolated child project with its own Postgres, auth, storage, and functions to test schema and config changes, then merge or reset safely."
 ---
 
-A branch is a child project with its own Postgres, auth config, storage, edge functions, email templates, realtime channels, and schedules. Merge back when ready or reset and retry. Available on InsForge OSS 2.1.0+.
+A branch is a child project with its own Postgres, auth config, storage, edge functions, email templates, realtime channels, and schedules. Merge back when ready or reset and retry. Available on Yarah OSS 2.1.0+.
 
 ## Concepts
 
@@ -15,22 +15,22 @@ Each branch runs on its own EC2 instance, restored from the parent at create tim
 Create a branch with `full` (schema + data) or `schema-only` (faster, empty user tables).
 
 ```bash
-npx @insforge/cli branch create feat-billing --mode full
-npx @insforge/cli branch list
+npx @yarah/cli branch create feat-billing --mode full
+npx @yarah/cli branch list
 ```
 
 Preview the merge SQL before applying.
 
 ```bash
-npx @insforge/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
-npx @insforge/cli branch merge feat-billing
+npx @yarah/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
+npx @yarah/cli branch merge feat-billing
 ```
 
 Roll back to the create-time snapshot, or delete the branch.
 
 ```bash
-npx @insforge/cli branch reset feat-billing
-npx @insforge/cli branch delete feat-billing
+npx @yarah/cli branch reset feat-billing
+npx @yarah/cli branch delete feat-billing
 ```
 
 ## Specific usage cases
@@ -43,4 +43,4 @@ Merges block on conflicts. Resolve on the branch or reset and retry. Quotas: 3 p
 
 - [Database migrations](/core-concepts/database/migrations) for forward-only SQL files.
 - [Database overview](/core-concepts/database/overview) for what runs under each branch.
-- [CLI reference](https://github.com/InsForge/InsForge) for the full `branch` flag set.
+- [CLI reference](https://github.com/Yarah/Yarah) for the full `branch` flag set.

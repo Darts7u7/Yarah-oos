@@ -1,4 +1,4 @@
-# InsForge Stripe Payments - Agent Documentation
+# Yarah Stripe Payments - Agent Documentation
 
 ## Use Stripe For
 
@@ -15,16 +15,16 @@ Do not build raw card collection UI. Do not use Razorpay concepts such as Orders
 1. Use `environment: "test"` unless the user explicitly approves live Stripe changes.
 2. Confirm the Stripe secret key is configured for the target environment.
 3. Confirm Product and Price IDs exist in that same environment.
-4. Confirm the backend can receive Stripe webhooks. InsForge manages the Stripe webhook endpoint when the backend is reachable.
+4. Confirm the backend can receive Stripe webhooks. Yarah manages the Stripe webhook endpoint when the backend is reachable.
 5. Treat Checkout success URLs as UX redirects only. Fulfillment must come from webhooks.
 
 Project admins configure Stripe in Dashboard -> Payments -> Settings or with the CLI:
 
 ```bash
-npx @insforge/cli payments stripe status
-npx @insforge/cli payments stripe config set --environment test sk_test_xxx
-npx @insforge/cli payments stripe sync --environment test
-npx @insforge/cli payments stripe webhooks configure --environment test
+npx @yarah/cli payments stripe status
+npx @yarah/cli payments stripe config set --environment test sk_test_xxx
+npx @yarah/cli payments stripe sync --environment test
+npx @yarah/cli payments stripe webhooks configure --environment test
 ```
 
 ## Runtime Setup
@@ -34,20 +34,20 @@ Use the TypeScript SDK from application code:
 ```typescript
 import { createClient } from '@insforge/sdk';
 
-const insforge = createClient({
-  baseUrl: 'https://your-project.insforge.app',
+const yarah = createClient({
+  baseUrl: 'https://your-project.apps.yarah.dev',
   anonKey: 'your-anon-key'
 });
 ```
 
-Checkout requires an InsForge user token. Guest one-time checkout can use an anonymous InsForge token. API keys are not a replacement because the backend needs user context for `payments.stripe_checkout_sessions`.
+Checkout requires an Yarah user token. Guest one-time checkout can use an anonymous Yarah token. API keys are not a replacement because the backend needs user context for `payments.stripe_checkout_sessions`.
 
 ## One-Time Checkout
 
 Create an app-owned pending order first, then start Checkout:
 
 ```typescript
-const { data: order, error: orderError } = await insforge
+const { data: order, error: orderError } = await yarah
   .from('orders')
   .insert([{ user_id: user.id, status: 'pending' }])
   .select()
@@ -55,7 +55,7 @@ const { data: order, error: orderError } = await insforge
 
 if (orderError) throw orderError;
 
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'payment',
   lineItems: [{ priceId: 'price_123', quantity: 1 }],
   successUrl: `${window.location.origin}/orders/${order.id}`,
@@ -78,7 +78,7 @@ For anonymous one-time purchases, omit `subject` and pass `customerEmail` when a
 Subscriptions require a billing subject. Pick a stable app owner such as user, team, organization, workspace, tenant, or group.
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'subscription',
   subject: { type: 'team', id: teamId },
   lineItems: [{ priceId: 'price_monthly_123', quantity: 1 }],
@@ -101,7 +101,7 @@ Do not let users submit arbitrary `subject.type` and `subject.id` values unless 
 Use Billing Portal after Checkout has created a customer mapping for the subject.
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCustomerPortalSession('test', {
+const { data, error } = await yarah.payments.stripe.createCustomerPortalSession('test', {
   subject: { type: 'team', id: teamId },
   returnUrl: `${window.location.origin}/billing`
 });
@@ -125,7 +125,7 @@ Portal creation requires an authenticated user and an existing `payments.custome
 
 Create triggers from verified Stripe webhook events into app-owned tables.
 
-Webhook events are verified and processed independently. InsForge commits all rows derived from an event before marking that event `processed`, but there is no ordering guarantee across events: Stripe can deliver `invoice.paid` before `checkout.session.completed`, so rows created by another event (such as `payments.customer_mappings`) may not exist yet when your trigger fires. Resolve the billing subject from the event payload first and use `payments.customer_mappings` as a fallback, exactly as the examples below do. Never let fulfillment skip silently: log or dead-letter events you cannot resolve.
+Webhook events are verified and processed independently. Yarah commits all rows derived from an event before marking that event `processed`, but there is no ordering guarantee across events: Stripe can deliver `invoice.paid` before `checkout.session.completed`, so rows created by another event (such as `payments.customer_mappings`) may not exist yet when your trigger fires. Resolve the billing subject from the event payload first and use `payments.customer_mappings` as a fallback, exactly as the examples below do. Never let fulfillment skip silently: log or dead-letter events you cannot resolve.
 
 ### One-time payments
 
@@ -156,7 +156,7 @@ CREATE TRIGGER fulfill_paid_order_from_stripe_webhook
 
 ### Subscriptions
 
-Subscription events do not carry your app's `metadata`. Resolve the billing subject from the subscription metadata embedded in the event payload — InsForge stamps `insforge_subject_type` and `insforge_subject_id` at checkout, and Stripe snapshots it onto subscription-generated invoices as `parent.subscription_details.metadata`. Check `invoice.metadata` next, then fall back to `payments.customer_mappings` (the same order InsForge uses internally):
+Subscription events do not carry your app's `metadata`. Resolve the billing subject from the subscription metadata embedded in the event payload — Yarah stamps `yarah_subject_type` and `yarah_subject_id` at checkout, and Stripe snapshots it onto subscription-generated invoices as `parent.subscription_details.metadata`. Check `invoice.metadata` next, then fall back to `payments.customer_mappings` (the same order Yarah uses internally):
 
 ```sql
 CREATE OR REPLACE FUNCTION public.grant_subscription_access()
@@ -170,13 +170,13 @@ BEGIN
      AND NEW.processing_status = 'processed' THEN
     v_subject_type := COALESCE(
       NEW.payload -> 'data' -> 'object' -> 'parent'
-        -> 'subscription_details' -> 'metadata' ->> 'insforge_subject_type',
-      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'insforge_subject_type'
+        -> 'subscription_details' -> 'metadata' ->> 'yarah_subject_type',
+      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'yarah_subject_type'
     );
     v_subject_id := COALESCE(
       NEW.payload -> 'data' -> 'object' -> 'parent'
-        -> 'subscription_details' -> 'metadata' ->> 'insforge_subject_id',
-      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'insforge_subject_id'
+        -> 'subscription_details' -> 'metadata' ->> 'yarah_subject_id',
+      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'yarah_subject_id'
     );
 
     IF v_subject_id IS NULL THEN
@@ -226,7 +226,7 @@ Use `payments.transactions` for dashboard/reporting only.
 - PostgreSQL applies `SELECT` policies to rows returned by `INSERT ... RETURNING` and idempotent retry lookups. If checkout creation is denied even though an `INSERT` policy exists, add matching `SELECT` visibility for the same billing subject and idempotency key.
 - Do not expose `payments.customers`, `payments.transactions`, `payments.stripe_subscriptions`, or `payments.stripe_subscription_items` directly to end users.
 - Do not write Stripe-managed payments tables directly. Use the Payments API, Stripe webhooks, or app-owned trigger targets.
-- Metadata keys starting with `insforge_` are reserved.
+- Metadata keys starting with `yarah_` are reserved.
 
 ## Debugging
 
@@ -283,5 +283,5 @@ LIMIT 20;
 | Checkout uses the wrong price | Verify the Price ID belongs to the selected environment. |
 | Duplicate checkout attempts | Use a stable `idempotencyKey` based on the order, cart, or billing subject. |
 | Portal returns not found | The subject has no Stripe customer mapping yet. Have the customer complete Checkout first. |
-| Payment shows in Stripe but not InsForge | Check Stripe webhook configuration and `payments.webhook_events`. |
+| Payment shows in Stripe but not Yarah | Check Stripe webhook configuration and `payments.webhook_events`. |
 | User can start checkout for another team | Add RLS or server-side membership checks for the billing subject. |

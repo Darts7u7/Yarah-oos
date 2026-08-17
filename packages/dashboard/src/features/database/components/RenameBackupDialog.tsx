@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   Input,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 
 interface RenameBackupDialogProps {
   open: boolean;

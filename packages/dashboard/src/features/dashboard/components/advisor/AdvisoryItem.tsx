@@ -1,6 +1,6 @@
 import { Check, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import type { DashboardAdvisorIssue } from '#types';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 import { useCopyToClipboard } from '#lib/hooks/useCopyToClipboard';
 import { IgnoreMenu } from './IgnoreMenu';
 import { formatRemediationPrompt } from './remediationPrompt';

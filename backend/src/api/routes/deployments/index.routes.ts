@@ -12,7 +12,7 @@ import {
   startDeploymentRequestSchema,
   updateSlugRequestSchema,
   addCustomDomainRequestSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { envVarsRouter } from './env-vars.routes.js';
 
 const router = Router();

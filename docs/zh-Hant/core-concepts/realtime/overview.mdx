@@ -1,13 +1,13 @@
 ---
 title: "即時"
 sidebarTitle: "Overview"
-description: "透過 InsForge 即時頻道推送資料庫變更、廣播訊息、線上狀態（presence）並整合 webhook 分發至下游服務。"
+description: "透過 Yarah 即時頻道推送資料庫變更、廣播訊息、線上狀態（presence）並整合 webhook 分發至下游服務。"
 ---
 
-當你的應用程式需要在不重新整理頁面的情況下更新時，可以使用 InsForge Realtime。用戶端訂閱像 `order:123` 或 `chat:room-1` 這樣的頻道，然後透過 WebSocket 接收資料庫變更、廣播與線上狀態更新。當另一個服務需要接收事件時，頻道也可以將相同的訊息分發到 webhook URL。
+當你的應用程式需要在不重新整理頁面的情況下更新時，可以使用 Yarah Realtime。用戶端訂閱像 `order:123` 或 `chat:room-1` 這樣的頻道，然後透過 WebSocket 接收資料庫變更、廣播與線上狀態更新。當另一個服務需要接收事件時，頻道也可以將相同的訊息分發到 webhook URL。
 
 <Frame caption="Realtime 控制台：頻道模式、訊息歷史、權限與保留設定。">
-  <img src="/images/dashboard-realtime.png" alt="InsForge Realtime 控制台" />
+  <img src="/images/dashboard-realtime.png" alt="Yarah Realtime 控制台" />
 </Frame>
 
 <Note>
@@ -16,7 +16,7 @@ description: "透過 InsForge 即時頻道推送資料庫變更、廣播訊息�
 
 ```mermaid
 graph TB
-    App[Client application] --> SDK[InsForge SDK]
+    App[Client application] --> SDK[Yarah SDK]
     SDK --> Channel[Realtime channel]
 
     Database[(Postgres)] --> Trigger[Database trigger]
@@ -83,14 +83,14 @@ CREATE TRIGGER order_status_realtime
 ```typescript
 const channel = `order:${orderId}`;
 
-await insforge.realtime.connect();
+await yarah.realtime.connect();
 
-const subscription = await insforge.realtime.subscribe(channel);
+const subscription = await yarah.realtime.subscribe(channel);
 if (!subscription.ok) {
   throw new Error(subscription.error.message);
 }
 
-insforge.realtime.on('status_changed', (message) => {
+yarah.realtime.on('status_changed', (message) => {
   renderOrderStatus(message.status);
 });
 ```
@@ -100,7 +100,7 @@ insforge.realtime.on('status_changed', (message) => {
 用戶端可以向已經加入的頻道發佈訊息。可用於聊天、輸入中提示、游標、協作編輯訊號，以及其他不需要從資料庫寫入開始的使用者對使用者更新。
 
 ```typescript
-await insforge.realtime.publish(`chat:${roomId}`, 'typing', {
+await yarah.realtime.publish(`chat:${roomId}`, 'typing', {
   userId,
   isTyping: true
 });
@@ -108,24 +108,24 @@ await insforge.realtime.publish(`chat:${roomId}`, 'typing', {
 
 ### Webhook
 
-當另一個服務需要接收每則訊息時，可以為頻道附加 webhook URL。InsForge 會把事件酬載發佈到每個已設定的 URL，附上包含事件名稱、頻道與訊息 ID 的標頭，重試暫時性的網路失敗，並在訊息歷史中記錄 webhook 傳送次數。
+當另一個服務需要接收每則訊息時，可以為頻道附加 webhook URL。Yarah 會把事件酬載發佈到每個已設定的 URL，附上包含事件名稱、頻道與訊息 ID 的標頭，重試暫時性的網路失敗，並在訊息歷史中記錄 webhook 傳送次數。
 
 ### 線上狀態（Presence）
 
 線上狀態（Presence）用來追蹤誰在頻道中上線。用戶端在訂閱時會收到目前的成員快照，之後會在成員上線或離線時收到 `presence:join` 與 `presence:leave` 事件。請把持久化的房間成員關係、角色與權限存放在你自己的資料表中；線上狀態只提供上線狀態。
 
 ```typescript
-const response = await insforge.realtime.subscribe(`chat:${roomId}`);
+const response = await yarah.realtime.subscribe(`chat:${roomId}`);
 
 if (response.ok) {
   renderOnlineMembers(response.presence.members);
 }
 
-insforge.realtime.on('presence:join', (message) => {
+yarah.realtime.on('presence:join', (message) => {
   addOnlineMember(message.member);
 });
 
-insforge.realtime.on('presence:leave', (message) => {
+yarah.realtime.on('presence:leave', (message) => {
   removeOnlineMember(message.member.presenceId);
 });
 ```

@@ -68,7 +68,7 @@ describe('LocaleProvider', () => {
   it('adopts the account preference from the cloud shell', async () => {
     const onRequestUserInfo = vi.fn().mockResolvedValue({
       userId: 'u1',
-      email: 't@insforge.dev',
+      email: 't@yarah.dev',
       preferredLocale: 'zh-TW',
     });
     renderWithHost({ mode: 'cloud-hosting', onRequestUserInfo });
@@ -80,7 +80,7 @@ describe('LocaleProvider', () => {
   it('reports changes back to the cloud shell and persists locally', async () => {
     const onRequestUserInfo = vi.fn().mockResolvedValue({
       userId: 'u1',
-      email: 't@insforge.dev',
+      email: 't@yarah.dev',
       preferredLocale: null,
     });
     const onUpdatePreferredLocale = vi.fn();
@@ -97,7 +97,7 @@ describe('LocaleProvider', () => {
     window.localStorage.setItem(LOCAL_STORAGE_KEYS.locale, 'zh-CN');
     const onRequestUserInfo = vi.fn().mockResolvedValue({
       userId: 'u1',
-      email: 't@insforge.dev',
+      email: 't@yarah.dev',
       preferredLocale: null,
     });
     renderWithHost({ mode: 'cloud-hosting', onRequestUserInfo });
@@ -119,7 +119,7 @@ describe('LocaleProvider', () => {
     // User picks Spanish while the shell's USER_INFO is still in flight...
     await userEvent.click(screen.getByText('set-es'));
     // ...then a stale account preference lands.
-    resolveUserInfo({ userId: 'u1', email: 't@insforge.dev', preferredLocale: 'zh-TW' });
+    resolveUserInfo({ userId: 'u1', email: 't@yarah.dev', preferredLocale: 'zh-TW' });
     await waitFor(() => expect(onRequestUserInfo).toHaveBeenCalled());
 
     expect(screen.getByTestId('locale').textContent).toBe('es');

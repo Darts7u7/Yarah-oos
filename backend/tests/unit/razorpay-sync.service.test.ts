@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { RazorpayConnection, RazorpayEnvironment } from '@insforge/shared-schemas';
+import type { RazorpayConnection, RazorpayEnvironment } from '@yarahdev/shared-schemas';
 import type { RazorpayProvider } from '../../src/providers/payments/razorpay.provider';
 
 const { mockConfigService, mockPool, mockWithPaymentSessionAdvisoryLock } = vi.hoisted(() => ({
@@ -426,8 +426,8 @@ describe('RazorpaySyncService', () => {
           currency: 'INR',
           short_url: null,
           notes: {
-            insforge_subject_type: 'team',
-            insforge_subject_id: 'team_123',
+            yarah_subject_type: 'team',
+            yarah_subject_id: 'team_123',
           },
           line_items: [],
           paid_at: 1780617600,
@@ -520,7 +520,7 @@ describe('RazorpaySyncService', () => {
           current_end: 1779840000,
           ended_at: null,
           quantity: 2,
-          notes: { insforge_subject_type: 'team', insforge_subject_id: 'team_123' },
+          notes: { yarah_subject_type: 'team', yarah_subject_id: 'team_123' },
           charge_at: 1779840000,
           start_at: 1777248000,
           end_at: null,

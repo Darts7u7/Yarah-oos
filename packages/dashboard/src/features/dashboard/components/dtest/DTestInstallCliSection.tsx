@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CopyButton, cn } from '@insforge/ui';
+import { CopyButton, cn } from '@yarahdev/ui';
 import { useProjectId } from '#lib/hooks/useMetadata';
 
 interface DTestInstallCliSectionProps {
@@ -12,7 +12,7 @@ export function DTestInstallCliSection({ className }: DTestInstallCliSectionProp
   const { projectId } = useProjectId();
 
   const command = useMemo(
-    () => `npx @insforge/cli link --project-id ${projectId ?? '<project-id>'}`,
+    () => `npx @yarah/cli link --project-id ${projectId ?? '<project-id>'}`,
     [projectId]
   );
   const canCopy = Boolean(projectId);
@@ -25,7 +25,7 @@ export function DTestInstallCliSection({ className }: DTestInstallCliSectionProp
       )}
     >
       <h2 className="text-base font-medium leading-7 text-foreground">
-        {t('overview.useInsForgeWithCli', { defaultValue: 'Use InsForge with CLI' })}
+        {t('overview.useYarahWithCli', { defaultValue: 'Use Yarah with CLI' })}
       </h2>
 
       <div className="flex flex-col gap-2 rounded border border-[var(--alpha-8)] bg-semantic-1 p-3">

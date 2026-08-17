@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { RefreshCw } from 'lucide-react';
-import { Button } from '@insforge/ui';
+import { Button } from '@yarahdev/ui';
 import { useServiceEvents } from '#features/compute/hooks/useComputeServices';
 
 interface ServiceEventsProps {

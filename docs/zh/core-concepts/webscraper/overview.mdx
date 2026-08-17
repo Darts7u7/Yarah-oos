@@ -1,19 +1,19 @@
 ---
-title: "Web Scraper 概览：InsForge 的 Apify 集成"
+title: "Web Scraper 概览：Yarah 的 Apify 集成"
 sidebarTitle: "Overview"
-description: "将 Apify 集成到 InsForge，让编码代理按需运行爬虫、管理 actor 与运行记录，并将抓取到的数据集自动同步到 Postgres 数据库或存储桶中。"
+description: "将 Apify 集成到 Yarah，让编码代理按需运行爬虫、管理 actor 与运行记录，并将抓取到的数据集自动同步到 Postgres 数据库或存储桶中。"
 ---
 
-使用 InsForge Web Scraper 让您的编码代理实时访问外部数据：只需连接一次您自己的 Apify 账户，您的代理就可以按需运行爬虫（Apify 称之为 actor），同时仪表盘会显示您的 actor、运行历史和爬取到的数据集，无需离开 InsForge。
+使用 Yarah Web Scraper 让您的编码代理实时访问外部数据：只需连接一次您自己的 Apify 账户，您的代理就可以按需运行爬虫（Apify 称之为 actor），同时仪表盘会显示您的 actor、运行历史和爬取到的数据集，无需离开 Yarah。
 
-连接一次 Apify，然后将爬取提示粘贴到您的编码代理中。代理使用您由 InsForge 托管的 Apify 令牌进行身份验证，为任务挑选合适的 actor，并返回结果。
+连接一次 Apify，然后将爬取提示粘贴到您的编码代理中。代理使用您由 Yarah 托管的 Apify 令牌进行身份验证，为任务挑选合适的 actor，并返回结果。
 
 <Frame caption="Web Scraper 仪表盘：已连接的 actor 及其最近一次运行时间和总运行次数。">
-  <img src="/images/dashboard-webscraper.png" alt="InsForge Web Scraper 仪表盘显示 Actors 标签页，其中包含已连接的 Apify actor、它们的最近运行时间和运行次数" />
+  <img src="/images/dashboard-webscraper.png" alt="Yarah Web Scraper 仪表盘显示 Actors 标签页，其中包含已连接的 Apify actor、它们的最近运行时间和运行次数" />
 </Frame>
 
 <Note>
-  Apify 始终是 actor、运行记录和数据集的权威来源。InsForge 展示了用于日常检查的一个精简子集，对于超出该范围的内容，会深链到 Apify 控制台。Web Scraper 集成在 InsForge Cloud 和自托管部署上均可使用；两者只是连接 Apify 的方式不同。
+  Apify 始终是 actor、运行记录和数据集的权威来源。Yarah 展示了用于日常检查的一个精简子集，对于超出该范围的内容，会深链到 Apify 控制台。Web Scraper 集成在 Yarah Cloud 和自托管部署上均可使用；两者只是连接 Apify 的方式不同。
 </Note>
 
 ```mermaid
@@ -47,18 +47,18 @@ flowchart TB
 
 ### 连接 Apify
 
-在仪表盘中的 Web Scraper 页面连接 Apify。接下来的流程取决于 InsForge 运行在哪里。
+在仪表盘中的 Web Scraper 页面连接 Apify。接下来的流程取决于 Yarah 运行在哪里。
 
-在 InsForge Cloud 上只需一键：InsForge 会引导您完成 Apify OAuth 流程，在服务端存储凭证，并为您持续刷新访问令牌。
+在 Yarah Cloud 上只需一键：Yarah 会引导您完成 Apify OAuth 流程，在服务端存储凭证，并为您持续刷新访问令牌。
 
-自托管部署前面没有 OAuth 中介，因此需要您自带凭证。在 Apify 控制台的 **Settings → Integrations** 中创建一个 API 令牌，将其粘贴到 Web Scraper 页面，InsForge 会把它加密存放在您自己后端的秘密存储中。使用 CLI 的 `insforge webscraper apify connect --token <token>` 也能完成同样的事。
+自托管部署前面没有 OAuth 中介，因此需要您自带凭证。在 Apify 控制台的 **Settings → Integrations** 中创建一个 API 令牌，将其粘贴到 Web Scraper 页面，Yarah 会把它加密存放在您自己后端的秘密存储中。使用 CLI 的 `yarah webscraper apify connect --token <token>` 也能完成同样的事。
 
 无论采用哪种方式，令牌都不会出现在您的代码仓库或前端产物中；代理和函数在需要时会从后端获取一个实时令牌。
 
 <Warning>
   自托管时，请签发一个权限范围尽量收窄的 Apify 令牌，而不是覆盖整个账户的令牌。`GET
   /api/webscraper/apify/token` 会把已存储的令牌原样返回给管理员调用方，代理路径正是借此登录
-  Apify CLI；因此该令牌在 Apify 上能做的事，等同于一个 InsForge 管理员密钥能做的事。
+  Apify CLI；因此该令牌在 Apify 上能做的事，等同于一个 Yarah 管理员密钥能做的事。
 </Warning>
 
 ### 通过您的编码代理进行爬取
@@ -66,10 +66,10 @@ flowchart TB
 连接完成后，空状态界面会提供一段爬取提示，您可以将其粘贴到您的编码代理中：
 
 ```
-Use the insforge webscraper apify skill to scrape <what you want> and return the results.
+Use the yarah webscraper apify skill to scrape <what you want> and return the results.
 ```
 
-在该提示背后，`npx @insforge/cli webscraper apify login` 会获取您由 InsForge 托管的 Apify 令牌，以无头方式（无需浏览器 OAuth）对本地 Apify CLI 进行身份验证，并安装 Apify 代理技能。此后，代理会从 Apify Store 中挑选一个 actor，启动运行，并读回结果。
+在该提示背后，`npx @yarah/cli webscraper apify login` 会获取您由 Yarah 托管的 Apify 令牌，以无头方式（无需浏览器 OAuth）对本地 Apify CLI 进行身份验证，并安装 Apify 代理技能。此后，代理会从 Apify Store 中挑选一个 actor，启动运行，并读回结果。
 
 ### Actors
 
@@ -89,7 +89,7 @@ Use the insforge webscraper apify skill to scrape <what you want> and return the
 
 ### 设置与断开连接
 
-Web Scraper 配置对话框（侧边栏中的齿轮图标）显示已连接的 Apify 账户、套餐和数据保留策略，链接到 Apify 控制台，并允许管理员断开连接。断开连接只会阻止 InsForge 使用您的 Apify 凭证；在自托管部署上，它会直接从您的秘密存储中删除已保存的 API 令牌。您的 Apify 账户、actor 和数据集将保持完整，您随时可以重新连接。
+Web Scraper 配置对话框（侧边栏中的齿轮图标）显示已连接的 Apify 账户、套餐和数据保留策略，链接到 Apify 控制台，并允许管理员断开连接。断开连接只会阻止 Yarah 使用您的 Apify 凭证；在自托管部署上，它会直接从您的秘密存储中删除已保存的 API 令牌。您的 Apify 账户、actor 和数据集将保持完整，您随时可以重新连接。
 
 ## 概念
 
@@ -106,8 +106,8 @@ Web Scraper 配置对话框（侧边栏中的齿轮图标）显示已连接的 A
 ## 基于此构建
 
 <CardGroup cols={2}>
-  <Card title="InsForge CLI" icon="terminal" href="/quickstart">
-    `npx @insforge/cli webscraper apify connect` 将您的项目关联到 Apify，然后登录您的本地代理。
+  <Card title="Yarah CLI" icon="terminal" href="/quickstart">
+    `npx @yarah/cli webscraper apify connect` 将您的项目关联到 Apify，然后登录您的本地代理。
   </Card>
 
   <Card title="Apify Store" icon="store" href="https://apify.com/store">

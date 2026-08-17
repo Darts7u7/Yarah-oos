@@ -14,7 +14,7 @@ import {
   DialogTitle,
   Input,
   Switch,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 
 interface BucketFormDialogProps {
   open: boolean;

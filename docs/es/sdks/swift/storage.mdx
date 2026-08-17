@@ -1,6 +1,6 @@
 ---
 title: Referencia del SDK de almacenamiento
-description: Carga, descarga y gestiona archivos con el SDK de Swift de InsForge, con cubos por proyecto, URLs firmadas y políticas de acceso a nivel de fila en Apple.
+description: Carga, descarga y gestiona archivos con el SDK de Swift de Yarah, con cubos por proyecto, URLs firmadas y políticas de acceso a nivel de fila en Apple.
 ---
 
 import SwiftSdkInstallation from '/snippets/swift-sdk-installation.mdx';
@@ -16,7 +16,7 @@ Obtenga una referencia de API de archivo para un depósito.
 ### Ejemplo
 
 ```swift
-let bucket = insforge.storage.from("images")
+let bucket = yarah.storage.from("images")
 ```
 
 ---
@@ -29,10 +29,10 @@ Crea un nuevo depósito de almacenamiento.
 
 ```swift
 // Create a public bucket
-try await insforge.storage.createBucket("avatars")
+try await yarah.storage.createBucket("avatars")
 
 // Create a private bucket
-try await insforge.storage.createBucket(
+try await yarah.storage.createBucket(
     "documents",
     options: BucketOptions(isPublic: false)
 )
@@ -43,7 +43,7 @@ try await insforge.storage.createBucket(
 Enumera todos los nombres de depósitos.
 
 ```swift
-let buckets = try await insforge.storage.listBuckets()
+let buckets = try await yarah.storage.listBuckets()
 // ["avatars", "documents", "uploads"]
 ```
 
@@ -52,7 +52,7 @@ let buckets = try await insforge.storage.listBuckets()
 Actualiza la visibilidad de un depósito.
 
 ```swift
-try await insforge.storage.updateBucket(
+try await yarah.storage.updateBucket(
     "documents",
     options: BucketOptions(isPublic: true)
 )
@@ -63,7 +63,7 @@ try await insforge.storage.updateBucket(
 Elimina un depósito.
 
 ```swift
-try await insforge.storage.deleteBucket("old-bucket")
+try await yarah.storage.deleteBucket("old-bucket")
 ```
 
 ---
@@ -83,7 +83,7 @@ Carga un archivo en el depósito.
 ```swift
 // Upload with specific path
 let imageData = UIImage(named: "photo")?.jpegData(compressionQuality: 0.8)
-let file = try await insforge.storage
+let file = try await yarah.storage
     .from("images")
     .upload(
         path: "posts/post-123/cover.jpg",
@@ -96,7 +96,7 @@ print("Key: \\(file.key)")
 
 // Upload from file URL
 let fileURL = URL(fileURLWithPath: "/path/to/document.pdf")
-let file = try await insforge.storage
+let file = try await yarah.storage
     .from("documents")
     .upload(
         path: "reports/annual-2024.pdf",
@@ -104,7 +104,7 @@ let file = try await insforge.storage
     )
 
 // Upload with auto-generated key
-let file = try await insforge.storage
+let file = try await yarah.storage
     .from("uploads")
     .upload(
         data: imageData!,
@@ -123,7 +123,7 @@ Descarga un archivo como datos.
 
 ```swift
 // Download file
-let data = try await insforge.storage
+let data = try await yarah.storage
     .from("images")
     .download(path: "posts/post-123/cover.jpg")
 
@@ -147,17 +147,17 @@ Enumera archivos en un depósito.
 
 ```swift
 // List all files
-let files = try await insforge.storage
+let files = try await yarah.storage
     .from("images")
     .list()
 
 // List with prefix filter
-let userFiles = try await insforge.storage
+let userFiles = try await yarah.storage
     .from("images")
     .list(options: ListOptions(prefix: "users/", limit: 50))
 
 // Shorthand with prefix
-let files = try await insforge.storage
+let files = try await yarah.storage
     .from("images")
     .list(prefix: "posts/", limit: 20, offset: 0)
 
@@ -177,12 +177,12 @@ Elimina un archivo del almacenamiento.
 
 ```swift
 // Delete a file
-try await insforge.storage
+try await yarah.storage
     .from("images")
     .delete(path: "posts/post-123/cover.jpg")
 
 // Delete with database cleanup
-let posts: [Post] = try await insforge.database
+let posts: [Post] = try await yarah.database
     .from("posts")
     .select("id, image_key")
     .eq("id", value: "post-123")
@@ -190,7 +190,7 @@ let posts: [Post] = try await insforge.database
 
 if let post = posts.first, let imageKey = post.imageKey {
     // Delete from storage
-    try await insforge.storage
+    try await yarah.storage
         .from("images")
         .delete(path: imageKey)
 
@@ -200,7 +200,7 @@ if let post = posts.first, let imageKey = post.imageKey {
         let imageKey: String?
     }
 
-    let _: [Post] = try await insforge.database
+    let _: [Post] = try await yarah.database
         .from("posts")
         .eq("id", value: "post-123")
         .update(PostUpdate(imageUrl: nil, imageKey: nil))
@@ -216,7 +216,7 @@ Obtener una URL pública para un archivo en un depósito público.
 ### Ejemplo
 
 ```swift
-let url = insforge.storage
+let url = yarah.storage
     .from("images")
     .getPublicURL(path: "posts/post-123/cover.jpg")
 
@@ -232,7 +232,7 @@ Obtener estrategia de carga para archivos grandes (directo o URL prefirmada).
 ### getUploadStrategy()
 
 ```swift
-let strategy = try await insforge.storage
+let strategy = try await yarah.storage
     .from("videos")
     .getUploadStrategy(
         filename: "large-video.mp4",
@@ -247,7 +247,7 @@ if strategy.method == "presigned" {
 
     // After uploading to presigned URL, confirm the upload
     if strategy.confirmRequired {
-        let file = try await insforge.storage
+        let file = try await yarah.storage
             .from("videos")
             .confirmUpload(
                 path: strategy.key,
@@ -263,7 +263,7 @@ if strategy.method == "presigned" {
 Confirma una carga prefirmada después de cargar directamente en S3.
 
 ```swift
-let file = try await insforge.storage
+let file = try await yarah.storage
     .from("videos")
     .confirmUpload(
         path: "videos/large-video.mp4",
@@ -282,7 +282,7 @@ Obtener estrategia de descarga para archivos privados (directo o URL prefirmada)
 ### getDownloadStrategy()
 
 ```swift
-let strategy = try await insforge.storage
+let strategy = try await yarah.storage
     .from("documents")
     .getDownloadStrategy(
         path: "private/confidential.pdf",

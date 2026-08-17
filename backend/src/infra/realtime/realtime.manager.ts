@@ -5,7 +5,7 @@ import { DatabaseManager } from '@/infra/database/database.manager.js';
 import { RealtimeChannelService } from '@/services/realtime/realtime-channel.service.js';
 import { RealtimeMessageService } from '@/services/realtime/realtime-message.service.js';
 import logger from '@/utils/logger.js';
-import type { RealtimeMessage, RealtimeChannel, WebhookMessage } from '@insforge/shared-schemas';
+import type { RealtimeMessage, RealtimeChannel, WebhookMessage } from '@yarahdev/shared-schemas';
 import type { DeliveryResult } from '@/types/realtime.js';
 
 /**

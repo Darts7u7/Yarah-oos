@@ -22,7 +22,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { useSchedulesConfig } from '#features/functions/hooks/useSchedulesConfig';
 
 interface FunctionsSettingsDialogProps {

@@ -14,7 +14,7 @@ import type {
   SyncRazorpayPaymentsRequest,
   SyncRazorpayPaymentsResponse,
   UpsertRazorpayConfigRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { apiClient } from '#lib/api/client';
 
 export type {
@@ -32,7 +32,7 @@ export type {
   SyncRazorpayPaymentsRequest,
   SyncRazorpayPaymentsResponse,
   UpsertRazorpayConfigRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class RazorpayService {
   async getStatus(): Promise<GetRazorpayStatusResponse> {

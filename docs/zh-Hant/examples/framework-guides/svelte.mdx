@@ -1,21 +1,21 @@
 ---
 title: Svelte
-description: "了解如何建立 InsForge 專案，並運用 AI 代理程式編碼快速建構 Svelte 應用程式，串接資料庫、身份驗證與儲存。"
+description: "了解如何建立 Yarah 專案，並運用 AI 代理程式編碼快速建構 Svelte 應用程式，串接資料庫、身份驗證與儲存。"
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
 
-了解如何建立 InsForge 專案，並使用 Cursor 等 AI 工具建構 Svelte 應用程式。
+了解如何建立 Yarah 專案，並使用 Cursor 等 AI 工具建構 Svelte 應用程式。
 
-## 1. 建立 InsForge 專案
+## 1. 建立 Yarah 專案
 
-在 [insforge.dev](https://insforge.dev) 建立一個新的 InsForge 專案。
+在 [yarah.dev](https://yarah.dev) 建立一個新的 Yarah 專案。
 
-## 2. 連接 InsForge
+## 2. 連接 Yarah
 
 分為兩部分：
 
-- **CLI 連結** — 請參閱 [快速入門](/quickstart)，執行 `npx @insforge/cli link --project-id <your-project-id>`，讓代理程式能夠讀取你的專案 ID 與金鑰。
+- **CLI 連結** — 請參閱 [快速入門](/quickstart)，執行 `npx @yarah/cli link --project-id <your-project-id>`，讓代理程式能夠讀取你的專案 ID 與金鑰。
 - **MCP 設定** — 請參閱 [MCP 設定](/mcp-setup) 以取得各編輯器（Cursor、Claude Code、Windsurf、Codex、VS Code）的設定方式。
 
 兩者都設定完成後，代理程式就能從你的編輯器讀取結構（schema）、執行查詢並部署程式碼。
@@ -27,9 +27,9 @@ import Installation from '/snippets/sdk-installation.mdx';
 ```
 Create a new Svelte app with TypeScript and Vite.
 Add Tailwind CSS 3.4 for styling.
-Install the InsForge SDK and set up the client configuration.
+Install the Yarah SDK and set up the client configuration.
 
-In my InsForge database, create a sports table with id and name columns.
+In my Yarah database, create a sports table with id and name columns.
 Add sample data: basketball, soccer, and tennis. Make it publicly readable.
 
 Create a component that fetches and displays all sports from the database.
@@ -41,13 +41,13 @@ Create a component that fetches and displays all sports from the database.
 
 你的 AI 助理會自動建立如下的檔案。你不需要手動修改它們。
 
-**InsForge 用戶端** 位於 `src/lib/insforge.ts`：
+**Yarah 用戶端** 位於 `src/lib/yarah.ts`：
 
-```typescript src/lib/insforge.ts
+```typescript src/lib/yarah.ts
 import { createClient } from '@insforge/sdk';
 
-export const insforge = createClient({
-  baseUrl: 'https://your-project.us-east.insforge.app',
+export const yarah = createClient({
+  baseUrl: 'https://your-project.us-east.apps.yarah.dev',
   anonKey: 'your-anon-key'
 });
 ```
@@ -57,7 +57,7 @@ export const insforge = createClient({
 ```svelte src/lib/components/Sports.svelte
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { insforge } from '../insforge';
+  import { yarah } from '../yarah';
 
   interface Sport {
     id: string;
@@ -70,7 +70,7 @@ export const insforge = createClient({
 
   onMount(async () => {
     try {
-      const { data, error: fetchError } = await insforge.database
+      const { data, error: fetchError } = await yarah.database
         .from('sports')
         .select();
 
@@ -148,11 +148,11 @@ Store favorites in a user_favorites table with user_id and sport_id.
 ```
 
 ```
-Add images to each sport using InsForge Storage.
+Add images to each sport using Yarah Storage.
 Allow users to upload sport images and display them in the grid.
 ```
 
 ```
 Add an AI chat feature that can answer questions about sports.
-Use InsForge AI with streaming responses.
+Use Yarah AI with streaming responses.
 ```

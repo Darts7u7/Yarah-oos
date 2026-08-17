@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Insforge Payments API
+  title: Yarah Payments API
   version: 1.0.0
   description: Provider-specific Stripe and Razorpay payment setup, runtime flows, catalog management, sync, and webhook projections
 
@@ -247,7 +247,7 @@ paths:
   /api/payments/stripe/{environment}/webhook:
     post:
       summary: Configure Managed Stripe Webhook
-      description: Create or recreate the InsForge-managed Stripe webhook endpoint for one environment.
+      description: Create or recreate the Yarah-managed Stripe webhook endpoint for one environment.
       tags:
         - Stripe Payments
       security:
@@ -667,7 +667,7 @@ paths:
   /api/payments/stripe/{environment}/transactions:
     get:
       summary: List Stripe Transactions
-      description: Admin/debug read for InsForge's Stripe transaction projection. Use app-owned fulfillment tables with RLS for end-user order, credit, or entitlement state.
+      description: Admin/debug read for Yarah's Stripe transaction projection. Use app-owned fulfillment tables with RLS for end-user order, credit, or entitlement state.
       tags:
         - Stripe Payments
       security:
@@ -1336,7 +1336,7 @@ paths:
   /api/payments/razorpay/{environment}/transactions:
     get:
       summary: List Razorpay Transactions
-      description: Admin/debug read for InsForge's Razorpay transaction projection. Use app-owned fulfillment tables with RLS for end-user order, credit, or entitlement state.
+      description: Admin/debug read for Yarah's Razorpay transaction projection. Use app-owned fulfillment tables with RLS for end-user order, credit, or entitlement state.
       tags:
         - Razorpay Payments
       security:
@@ -2867,7 +2867,7 @@ components:
         - successUrl
         - cancelUrl
       additionalProperties: false
-      description: Metadata keys starting with insforge_ are reserved and rejected.
+      description: Metadata keys starting with yarah_ are reserved and rejected.
       properties:
         mode:
           $ref: '#/components/schemas/CheckoutMode'
@@ -3024,7 +3024,7 @@ components:
         - amount
         - currency
       additionalProperties: false
-      description: Notes keys starting with insforge_ are reserved and rejected.
+      description: Notes keys starting with yarah_ are reserved and rejected.
       properties:
         amount:
           type: integer
@@ -3198,7 +3198,7 @@ components:
         - interval
         - item
       additionalProperties: false
-      description: Notes keys starting with insforge_ are reserved and rejected.
+      description: Notes keys starting with yarah_ are reserved and rejected.
       properties:
         period:
           type: string
@@ -3264,7 +3264,7 @@ components:
         - required:
             - endAt
       additionalProperties: false
-      description: Notes keys starting with insforge_ are reserved and rejected. Either totalCount or endAt is required.
+      description: Notes keys starting with yarah_ are reserved and rejected. Either totalCount or endAt is required.
       properties:
         planId:
           type: string

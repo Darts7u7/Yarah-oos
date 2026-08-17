@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RefreshIcon from '#assets/icons/refresh.svg?react';
-import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@insforge/ui';
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@yarahdev/ui';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   ConvertedValue,
@@ -16,7 +16,7 @@ import { useDatabaseSchemas, useIndexes } from '#features/database/hooks/useData
 import { useDatabaseSchemaSelection } from '#features/database/hooks/useDatabaseSchemaSelection';
 import { SQLModal, SQLCellButton } from '#features/database/components/SQLModal';
 import { DatabaseStudioSidebarPanel } from '#features/database/components/DatabaseSidebar';
-import { type DatabaseIndexesResponse } from '@insforge/shared-schemas';
+import { type DatabaseIndexesResponse } from '@yarahdev/shared-schemas';
 import { DatabaseSchemaSelect } from '#features/database/components/DatabaseSchemaSelect';
 import { usePageSize } from '#lib/hooks/usePageSize';
 import { DEFAULT_DATABASE_SCHEMA, getDatabaseSchemaInfo } from '#features/database/helpers';

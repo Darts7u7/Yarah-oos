@@ -1,18 +1,18 @@
 ---
 title: "Payments"
 sidebarTitle: "Overview"
-description: "Collect money in your app with your own Stripe or Razorpay account. Pick the provider-specific InsForge Payments integration for checkout and subscriptions."
+description: "Collect money in your app with your own Stripe or Razorpay account. Pick the provider-specific Yarah Payments integration for checkout and subscriptions."
 ---
 
-InsForge Payments lets your app collect money with your own Stripe or Razorpay account. The two providers use different payment models, so the docs are split by provider instead of describing one generic payment flow.
+Yarah Payments lets your app collect money with your own Stripe or Razorpay account. The two providers use different payment models, so the docs are split by provider instead of describing one generic payment flow.
 
 <Frame caption="Payments dashboard: provider connection, catalog, subscriptions, and transactions.">
-  <img src="/images/dashboard-payments.png" alt="InsForge Payments dashboard" />
+  <img src="/images/dashboard-payments.png" alt="Yarah Payments dashboard" />
 </Frame>
 
 <Note>
   Stripe or Razorpay remains the source of truth for charges, invoices, refunds,
-  disputes, taxes, and account-level financial operations. InsForge is not a
+  disputes, taxes, and account-level financial operations. Yarah is not a
   payment processor or merchant of record, and it does not replace the provider
   dashboard.
 </Note>
@@ -46,7 +46,7 @@ Shared tables are used only where the durable shape is useful across providers:
 | `payments.customer_mappings` | App billing subject to provider customer ID mapping. |
 | `payments.customers` | Admin/customer mirror for dashboard visibility. |
 | `payments.webhook_events` | Verified provider webhook event ledger. Use this for durable fulfillment triggers. |
-| `payments.transactions` | InsForge dashboard/reporting projection for successful, failed, and refunded payment activity. |
+| `payments.transactions` | Yarah dashboard/reporting projection for successful, failed, and refunded payment activity. |
 
 `payments.transactions` is not the fulfillment contract. It is a projection built from provider events and sync. For business logic, create app-owned tables such as `public.orders`, `public.credit_ledger`, or `public.team_entitlements`, then populate them from verified rows in `payments.webhook_events`.
 

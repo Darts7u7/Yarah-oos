@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, cn } from '@insforge/ui';
+import { Select, SelectContent, SelectItem, SelectTrigger, cn } from '@yarahdev/ui';
 import type { BooleanCellEditorProps } from './types';
 
 export function BooleanCellEditor({

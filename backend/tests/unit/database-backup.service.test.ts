@@ -3,9 +3,9 @@ import { EventEmitter } from 'node:events';
 import { PassThrough, Writable } from 'node:stream';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
-const STORAGE_DIR = '/tmp/insforge-backup-service-tests';
+const STORAGE_DIR = '/tmp/yarah-backup-service-tests';
 
 const {
   queryMock,
@@ -41,12 +41,12 @@ vi.mock('../../src/infra/config/app.config', () => ({
       s3Bucket: undefined,
       appKey: 'local',
       s3Region: 'us-east-2',
-      storageDir: '/tmp/insforge-backup-service-tests',
+      storageDir: '/tmp/yarah-backup-service-tests',
     },
     database: {
       host: 'localhost',
       port: 5432,
-      name: 'insforge',
+      name: 'yarah',
       user: 'postgres',
       password: 'postgres',
     },
@@ -231,7 +231,7 @@ describe('DatabaseBackupService', () => {
 
       expect(spawnMock).toHaveBeenCalledWith(
         'pg_dump',
-        expect.arrayContaining(['--format=custom', '-d', 'insforge']),
+        expect.arrayContaining(['--format=custom', '-d', 'yarah']),
         expect.objectContaining({ env: expect.objectContaining({ PGPASSWORD: 'postgres' }) })
       );
 
@@ -493,7 +493,7 @@ describe('DatabaseBackupService', () => {
         'pg_restore',
         expect.arrayContaining(['--clean', '--if-exists', '--single-transaction']),
         expect.objectContaining({
-          env: expect.objectContaining({ PGAPPNAME: 'insforge-backup-restore' }),
+          env: expect.objectContaining({ PGAPPNAME: 'yarah-backup-restore' }),
         })
       );
       // Terminating other sessions would crash the backend's own long-lived

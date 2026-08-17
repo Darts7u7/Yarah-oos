@@ -6,7 +6,7 @@ import { ThemeProvider } from '#lib/contexts/ThemeContext';
 import { LocaleProvider } from '#lib/contexts/LocaleContext';
 import { ConnectDialog } from '#features/dashboard/components/connect';
 import { useDashboardHost } from '#lib/config/DashboardHostContext';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 import { ConnectDialogProvider } from './ConnectDialogContext';
 import { getFeatureFlag } from '#lib/analytics/posthog';
 import { FEATURE_FLAGS, FEATURE_FLAG_VARIANTS } from '#lib/analytics/constants';

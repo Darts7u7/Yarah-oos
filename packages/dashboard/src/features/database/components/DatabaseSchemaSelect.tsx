@@ -1,6 +1,6 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@insforge/ui';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@yarahdev/ui';
 import { useTranslation } from 'react-i18next';
-import type { DatabaseSchemaInfo } from '@insforge/shared-schemas';
+import type { DatabaseSchemaInfo } from '@yarahdev/shared-schemas';
 
 interface DatabaseSchemaSelectProps {
   schemas: DatabaseSchemaInfo[];

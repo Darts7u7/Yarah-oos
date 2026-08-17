@@ -74,8 +74,8 @@ function buildSubscriptionRow(overrides: Record<string, unknown> = {}) {
     authorizationPaymentId: null,
     authorizationVerifiedAt: null,
     notes: {
-      insforge_subject_type: 'team',
-      insforge_subject_id: 'team_123',
+      yarah_subject_type: 'team',
+      yarah_subject_id: 'team_123',
     },
     providerCreatedAt: new Date('2026-01-01T00:00:00Z'),
     syncedAt: new Date('2026-01-01T00:00:00Z'),
@@ -99,8 +99,8 @@ function buildProviderSubscription(
     ended_at: null,
     quantity: 1,
     notes: {
-      insforge_subject_type: 'team',
-      insforge_subject_id: 'team_123',
+      yarah_subject_type: 'team',
+      yarah_subject_id: 'team_123',
     },
     charge_at: null,
     start_at: null,
@@ -146,8 +146,8 @@ describe('RazorpaySubscriptionService', () => {
       ended_at: null,
       quantity: 1,
       notes: {
-        insforge_subject_type: 'team',
-        insforge_subject_id: 'team_123',
+        yarah_subject_type: 'team',
+        yarah_subject_id: 'team_123',
       },
       charge_at: null,
       start_at: null,
@@ -200,8 +200,8 @@ describe('RazorpaySubscriptionService', () => {
         planId: 'plan_123',
         totalCount: 12,
         notes: expect.objectContaining({
-          insforge_subject_type: 'team',
-          insforge_subject_id: 'team_123',
+          yarah_subject_type: 'team',
+          yarah_subject_id: 'team_123',
         }),
       })
     );

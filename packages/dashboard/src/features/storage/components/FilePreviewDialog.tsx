@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Download, ExternalLink } from 'lucide-react';
-import { Button, Dialog, DialogContent, DialogDescription, DialogTitle } from '@insforge/ui';
+import { Button, Dialog, DialogContent, DialogDescription, DialogTitle } from '@yarahdev/ui';
 import { LoadingState, TypeBadge } from '#components';
 import { useStorageObjects } from '#features/storage/hooks/useStorageObjects';
-import { StorageFileSchema } from '@insforge/shared-schemas';
+import { StorageFileSchema } from '@yarahdev/shared-schemas';
 
 interface FilePreviewDialogProps {
   open: boolean;

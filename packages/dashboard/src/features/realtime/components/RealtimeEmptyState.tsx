@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Radio, Plus } from 'lucide-react';
-import { Button } from '@insforge/ui';
+import { Button } from '@yarahdev/ui';
 
 interface RealtimeEmptyStateProps {
   type: 'channels' | 'messages';

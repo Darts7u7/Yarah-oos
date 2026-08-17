@@ -9,7 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
   useToast,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import {
   DataGridEmptyState,
   SelectionClearButton,
@@ -18,7 +18,7 @@ import {
 } from '#components';
 import { UsersDataGrid, UserFormDialog } from '#features/auth/components';
 import { SortColumn } from 'react-data-grid';
-import { UserSchema } from '@insforge/shared-schemas';
+import { UserSchema } from '@yarahdev/shared-schemas';
 import { useUsers } from '#features/auth/hooks/useUsers';
 import { usePageSize } from '#lib/hooks/usePageSize';
 

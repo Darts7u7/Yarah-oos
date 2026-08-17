@@ -3,7 +3,7 @@ import { DatabaseError } from 'pg';
 import type { Request, Response } from 'express';
 import { errorMiddleware } from '@/api/middlewares/error.js';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 vi.mock('@/utils/logger.js', () => ({
   default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },

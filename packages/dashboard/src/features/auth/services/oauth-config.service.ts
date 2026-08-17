@@ -4,7 +4,7 @@ import {
   CreateOAuthConfigRequest,
   UpdateOAuthConfigRequest,
   ListOAuthConfigsResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class OAuthConfigService {
   // List all OAuth configurations

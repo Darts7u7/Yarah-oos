@@ -1,4 +1,4 @@
-import { Button } from '@insforge/ui';
+import { Button } from '@yarahdev/ui';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

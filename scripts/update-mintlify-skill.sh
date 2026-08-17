@@ -108,7 +108,7 @@ TODAY="$(date -u +%Y-%m-%d)"
   Vendored: $TODAY by scripts/update-mintlify-skill.sh
 
   This file is a VERBATIM copy of Mintlify's doc-author skill body.
-  Do not edit the prose below — local conventions go in ./INSFORGE.md
+  Do not edit the prose below — local conventions go in ./YARAH.md
   Update with: scripts/update-mintlify-skill.sh
 -->
 

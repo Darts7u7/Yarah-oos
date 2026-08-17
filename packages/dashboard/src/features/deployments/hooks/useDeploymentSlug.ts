@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { deploymentsService } from '#features/deployments/services/deployments.service';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 export function useDeploymentSlug() {
   const { t } = useTranslation('chrome');

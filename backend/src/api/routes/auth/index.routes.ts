@@ -55,7 +55,7 @@ import {
   upsertSmtpConfigRequestSchema,
   updateEmailTemplateRequestSchema,
   idTokenSignInRequestSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { SmtpConfigService } from '@/services/email/smtp-config.service.js';
 import { EmailTemplateService } from '@/services/email/email-template.service.js';
 import { EMAIL_TEMPLATE_TYPES, type EmailTemplate } from '@/types/email.js';
@@ -137,8 +137,8 @@ router.get('/email/verify-link', async (req: Request, res: Response, next: NextF
 
     return res.redirect(
       buildRedirectUrl(redirectTo, {
-        insforge_status: 'success',
-        insforge_type: 'verify_email',
+        yarah_status: 'success',
+        yarah_type: 'verify_email',
       })
     );
   } catch (error) {
@@ -148,9 +148,9 @@ router.get('/email/verify-link', async (req: Request, res: Response, next: NextF
           const message = error instanceof Error ? error.message : 'Authentication action failed';
           return res.redirect(
             buildRedirectUrl(redirectTo, {
-              insforge_status: 'error',
-              insforge_type: 'verify_email',
-              insforge_error: message,
+              yarah_status: 'error',
+              yarah_type: 'verify_email',
+              yarah_error: message,
             })
           );
         }
@@ -209,8 +209,8 @@ router.get(
       return res.redirect(
         buildRedirectUrl(redirectTo, {
           token,
-          insforge_status: 'ready',
-          insforge_type: 'reset_password',
+          yarah_status: 'ready',
+          yarah_type: 'reset_password',
         })
       );
     } catch (error) {
@@ -220,9 +220,9 @@ router.get(
             const message = error instanceof Error ? error.message : 'Authentication action failed';
             return res.redirect(
               buildRedirectUrl(redirectTo, {
-                insforge_status: 'error',
-                insforge_type: 'reset_password',
-                insforge_error: message,
+                yarah_status: 'error',
+                yarah_type: 'reset_password',
+                yarah_error: message,
               })
             );
           }

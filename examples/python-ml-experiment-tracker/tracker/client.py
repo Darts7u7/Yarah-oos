@@ -13,7 +13,7 @@ class AuthError(Exception):
 
 
 class APIError(Exception):
-    """Raised when the InsForge API returns a non-2xx response."""
+    """Raised when the Yarah API returns a non-2xx response."""
 
     def __init__(self, status_code: int, code: str, message: str) -> None:
         """Store the HTTP status code, machine-readable error code, and human-readable message."""
@@ -23,8 +23,8 @@ class APIError(Exception):
         self.message = message
 
 
-class InsForgeClient:
-    """HTTP client for the InsForge BaaS API with automatic token refresh on 401."""
+class YarahClient:
+    """HTTP client for the Yarah BaaS API with automatic token refresh on 401."""
 
     def __init__(self, config: Config | None = None) -> None:
         """Initialise the client, loading config from disk if not provided."""
@@ -38,7 +38,7 @@ class InsForgeClient:
         """Close the underlying HTTP connection pool."""
         self._http.close()
 
-    def __enter__(self) -> "InsForgeClient":
+    def __enter__(self) -> "YarahClient":
         """Support use as a context manager, returning self."""
         return self
 
@@ -116,7 +116,7 @@ class InsForgeClient:
     # ── Auth ──────────────────────────────────────────────────────────────
 
     def register(self, email: str, password: str) -> dict[str, Any]:
-        """Create a new InsForge user account and return the raw response body."""
+        """Create a new Yarah user account and return the raw response body."""
         resp = self._http.post("/api/auth/users", json={"email": email, "password": password})
         self._raise_for_error(resp)
         return resp.json()

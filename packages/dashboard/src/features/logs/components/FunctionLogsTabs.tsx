@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 
 export type FunctionLogType = 'runtime' | 'build';
 

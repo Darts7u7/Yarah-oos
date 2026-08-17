@@ -1,6 +1,6 @@
 ---
 title: 数据库 SDK 参考
-description: 使用 InsForge TypeScript SDK 对 Postgres 执行类型安全的插入、更新、删除、查询、RPC 与 PostgREST 风格筛选，支持自动生成类型。
+description: 使用 Yarah TypeScript SDK 对 Postgres 执行类型安全的插入、更新、删除、查询、RPC 与 PostgREST 风格筛选，支持自动生成类型。
 ---
 
 ## 安装
@@ -36,14 +36,14 @@ import Installation from '/snippets/sdk-installation.mdx';
 
 <CodeGroup>
 ```javascript Single insert
-const { data, error } = await insforge.database
+const { data, error } = await yarah.database
   .from('posts')
   .insert({ title: 'Hello World', content: 'My first post!' })
   .select()
 ```
 
 ```javascript Bulk insert
-const { data, error } = await insforge.database
+const { data, error } = await yarah.database
   .from('posts')
   .insert([
     { title: 'First Post', content: 'Hello everyone!' },
@@ -93,7 +93,7 @@ const { data, error } = await insforge.database
 
 <CodeGroup>
 ```javascript Update by ID
-const { data, error } = await insforge.database
+const { data, error } = await yarah.database
   .from('posts')
   .update({ title: 'Updated Title' })
   .eq('id', postId)
@@ -101,7 +101,7 @@ const { data, error } = await insforge.database
 ```
 
 ```javascript Update multiple
-const { data, error } = await insforge.database
+const { data, error } = await yarah.database
   .from('tasks')
   .update({ status: 'completed' })
   .in('id', ['task-1', 'task-2'])
@@ -148,14 +148,14 @@ const { data, error } = await insforge.database
 
 <CodeGroup>
 ```javascript Delete by ID
-const { error } = await insforge.database
+const { error } = await yarah.database
   .from('posts')
   .delete()
   .eq('id', postId)
 ```
 
 ```javascript Delete with filter
-const { error } = await insforge.database
+const { error } = await yarah.database
   .from('sessions')
   .delete()
   .lt('expires_at', new Date())
@@ -197,19 +197,19 @@ const { error } = await insforge.database
 
 <CodeGroup>
 ```javascript Get all
-const { data, error } = await insforge.database
+const { data, error } = await yarah.database
   .from('posts')
   .select()
 ```
 
 ```javascript Specific columns
-const { data, error } = await insforge.database
+const { data, error } = await yarah.database
   .from('posts')
   .select('id, title, content')
 ```
 
 ```javascript With relationships
-const { data, error } = await insforge.database
+const { data, error } = await yarah.database
   .from('posts')
   .select('*, comments(id, content)')
 ```
@@ -251,12 +251,12 @@ const { data, error } = await insforge.database
 
 <CodeGroup>
 ```javascript With parameters
-const { data, error } = await insforge.database
+const { data, error } = await yarah.database
   .rpc('get_user_stats', { user_id: '123' })
 ```
 
 ```javascript Without parameters
-const { data, error } = await insforge.database
+const { data, error } = await yarah.database
   .rpc('get_all_active_users')
 ```
 </CodeGroup>
@@ -282,7 +282,7 @@ const { data, error } = await insforge.database
 
 ```javascript
 // Example: Chain multiple filters
-const { data } = await insforge.database
+const { data } = await yarah.database
   .from('products')
   .select()
   .eq('category', 'electronics')
@@ -307,7 +307,7 @@ const { data } = await insforge.database
 
 ```javascript
 // Example: Pagination with sorting
-const { data } = await insforge.database
+const { data } = await yarah.database
   .from('posts')
   .select()
   .order('created_at', { ascending: false })
@@ -326,7 +326,7 @@ const pageSize = 10;
 const from = (page - 1) * pageSize;
 const to = from + pageSize - 1;
 
-const { data, count } = await insforge.database
+const { data, count } = await yarah.database
   .from('posts')
   .select('*', { count: 'exact' })
   .range(from, to)
@@ -350,7 +350,7 @@ console.log(`Page ${page}: ${data.length} of ${count} total`)
 ### 筛选搜索
 
 ```javascript
-const { data } = await insforge.database
+const { data } = await yarah.database
   .from('products')
   .select('id, name, price, category')
   .eq('category', 'electronics')
@@ -376,8 +376,8 @@ const { data } = await insforge.database
 结合数据库查询与 `useUser()` 或 `useAuth()` 钩子来获取用户特定的数据：
 
 ```tsx
-import { useUser } from '@insforge/react'; // or '@insforge/react-router'
-import { insforge } from './lib/insforge';
+import { useUser } from '@yarah/react'; // or '@yarah/react-router'
+import { yarah } from './lib/yarah';
 import { useEffect, useState } from 'react';
 
 function MyProfile() {
@@ -387,7 +387,7 @@ function MyProfile() {
   useEffect(() => {
     if (user) {
       // Fetch user's posts from database
-      insforge.database
+      yarah.database
         .from('posts')
         .select('*')
         .eq('user_id', user.id)

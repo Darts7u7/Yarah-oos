@@ -7,7 +7,7 @@ import LinkedIn from '#assets/logos/linkedin.svg?react';
 import Facebook from '#assets/logos/facebook.svg?react';
 import X from '#assets/logos/x.svg?react';
 import Apple from '#assets/logos/apple.svg?react';
-import type { OAuthProvidersSchema } from '@insforge/shared-schemas';
+import type { OAuthProvidersSchema } from '@yarahdev/shared-schemas';
 
 export enum AuthTab {
   USERS = 'users',

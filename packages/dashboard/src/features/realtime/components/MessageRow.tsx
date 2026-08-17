@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { CodeBlock, cn } from '@insforge/ui';
+import { CodeBlock, cn } from '@yarahdev/ui';
 import { formatTime } from '#lib/utils/utils';
 import { ListRow, ListRowCell } from '#components';
 import type { RealtimeMessage } from '#features/realtime/services/realtime.service';

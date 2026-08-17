@@ -21,7 +21,7 @@ import {
   listPaymentCustomersQuerySchema,
   listPaymentTransactionsQuerySchema,
   listStripeSubscriptionsQuerySchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const router = Router();
 const environmentRouter = Router({ mergeParams: true });

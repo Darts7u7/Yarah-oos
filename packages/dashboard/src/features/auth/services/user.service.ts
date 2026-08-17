@@ -1,5 +1,5 @@
 import { apiClient } from '#lib/api/client';
-import type { UserSchema, CreateUserResponse, DeleteUsersResponse } from '@insforge/shared-schemas';
+import type { UserSchema, CreateUserResponse, DeleteUsersResponse } from '@yarahdev/shared-schemas';
 
 export class UserService {
   /**

@@ -5,7 +5,7 @@ import {
   dryRunMigrationRequestSchema,
   type CreateMigrationResponse,
   type DatabaseMigrationsResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { verifyAdmin, AuthRequest } from '@/api/middlewares/auth.js';
 import { migrationsDryRunLimiter } from '@/api/middlewares/rate-limiters.js';
 import { AppError } from '@/utils/errors.js';

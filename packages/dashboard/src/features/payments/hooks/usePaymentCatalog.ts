@@ -8,7 +8,7 @@ import type {
   RazorpayPlan,
   StripePrice,
   StripeProduct,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { stripeService } from '#features/payments/services/stripe.service';
 import { razorpayService } from '#features/payments/services/razorpay.service';
 import { razorpayQueryKeys, stripeQueryKeys } from '#features/payments/queryKeys';

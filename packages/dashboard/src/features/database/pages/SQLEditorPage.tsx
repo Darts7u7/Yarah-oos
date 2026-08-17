@@ -11,7 +11,7 @@ import {
   TooltipContent,
   TooltipProvider,
   cn,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { CodeEditor, DataGrid, type DataGridColumn, type DataGridRow } from '#components';
 import { X, Plus, Download, FileJson, ChevronRight, HelpCircle } from 'lucide-react';
 import { convertToCSV, convertToJSON, getExportFilename } from '#lib/utils/data-export';

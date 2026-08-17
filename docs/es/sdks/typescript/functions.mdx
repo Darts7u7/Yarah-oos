@@ -1,6 +1,6 @@
 ---
 title: Referencia de SDK de Funciones
-description: Invoca funciones sin servidor de InsForge desde TypeScript con el SDK oficial para ejecutar lógica de servidor, webhooks y tareas asíncronas en tu aplicación.
+description: Invoca funciones sin servidor de Yarah desde TypeScript con el SDK oficial para ejecutar lógica de servidor, webhooks y tareas asíncronas en tu aplicación.
 ---
 
 ## Instalación
@@ -36,7 +36,7 @@ El SDK incluye automáticamente el token de autenticación del usuario que ha in
 ### Ejemplo (POST con cuerpo)
 
 ```javascript
-const { data, error } = await insforge.functions.invoke('hello-world', {
+const { data, error } = await yarah.functions.invoke('hello-world', {
   body: { name: 'World', greeting: 'Hello' }
 })
 
@@ -58,7 +58,7 @@ console.log(data)
 ### Ejemplo (solicitud GET)
 
 ```javascript
-const { data, error } = await insforge.functions.invoke('get-stats', {
+const { data, error } = await yarah.functions.invoke('get-stats', {
   method: 'GET'
 })
 
@@ -80,7 +80,7 @@ console.log(data)
 ### Ejemplo (con encabezados personalizados)
 
 ```javascript
-const { data, error } = await insforge.functions.invoke('api-endpoint', {
+const { data, error } = await yarah.functions.invoke('api-endpoint', {
   method: 'PUT',
   body: { id: '123', status: 'active' },
   headers: { 'X-Custom-Header': 'value' }
@@ -119,7 +119,7 @@ export default async function(req: Request): Promise<Response> {
 
   // Create client with anon token - no authentication needed
   const client = createClient({
-    baseUrl: Deno.env.get('INSFORGE_BASE_URL'),
+    baseUrl: Deno.env.get('YARAH_BASE_URL'),
     anonKey: Deno.env.get('ANON_KEY')
   });
 
@@ -158,7 +158,7 @@ export default async function(req: Request): Promise<Response> {
 
   // Create client with user's token for authenticated access
   const client = createClient({
-    baseUrl: Deno.env.get('INSFORGE_BASE_URL'),
+    baseUrl: Deno.env.get('YARAH_BASE_URL'),
     edgeFunctionToken: userToken
   });
 

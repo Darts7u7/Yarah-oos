@@ -10,13 +10,13 @@ import {
   DialogHeader,
   DialogTitle,
   Input,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import {
   oAuthProvidersSchema,
   type CreateCustomOAuthConfigRequest,
   type CustomOAuthConfigSchema,
   type UpdateCustomOAuthConfigRequest,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { SecretInput } from './SecretInput';
 import { useCustomOAuthConfig } from '#features/auth/hooks/useCustomOAuthConfig';
 import { getBackendUrl } from '#lib/utils/utils';

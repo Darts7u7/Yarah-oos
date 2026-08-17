@@ -1,7 +1,7 @@
 import { Response } from 'express';
 
-export const REFRESH_TOKEN_COOKIE_NAME = 'insforge_refresh_token';
-export const ADMIN_REFRESH_TOKEN_COOKIE_NAME = 'insforge_admin_refresh_token';
+export const REFRESH_TOKEN_COOKIE_NAME = 'yarah_refresh_token';
+export const ADMIN_REFRESH_TOKEN_COOKIE_NAME = 'yarah_admin_refresh_token';
 
 /**
  * Set refresh token cookie on response

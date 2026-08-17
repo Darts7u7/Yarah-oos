@@ -124,7 +124,7 @@ vi.mock('../../src/infra/config/app.config.js', () => {
 
 import { AuthService } from '../../src/services/auth/auth.service.js';
 import { AppError } from '../../src/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 const AUTH_CONFIG = {
   disableSignup: false,

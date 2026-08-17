@@ -16,8 +16,8 @@ import {
   MenuDialogSideNavHeader,
   MenuDialogSideNavTitle,
   MenuDialogTitle,
-} from '@insforge/ui';
-import type { PaymentProvider } from '@insforge/shared-schemas';
+} from '@yarahdev/ui';
+import type { PaymentProvider } from '@yarahdev/shared-schemas';
 import { PaymentProviderSelect, PAYMENT_PROVIDER_LABELS } from './PaymentProviderSelect';
 import { StripeSettingsPanel, useStripeSettings } from './StripeSettingsPanel';
 import { RazorpaySettingsPanel, useRazorpaySettings } from './RazorpaySettingsPanel';

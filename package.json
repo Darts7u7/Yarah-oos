@@ -1,7 +1,7 @@
 {
-  "name": "insforge",
+  "name": "yarah",
   "version": "2.3.1",
-  "description": "InsForge - Open source backend-as-a-service with PostgreSQL and MCP integration",
+  "description": "Yarah - Open source backend-as-a-service with PostgreSQL and MCP integration",
   "type": "module",
   "workspaces": [
     "backend",
@@ -50,7 +50,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/InsForge/InsForge.git"
+    "url": "https://github.com/Yarah/Yarah.git"
   },
   "keywords": [
     "backend-as-a-service",
@@ -58,7 +58,7 @@
     "postgresql",
     "monorepo"
   ],
-  "author": "InsForge",
+  "author": "Yarah",
   "license": "Apache-2.0",
   "overrides": {
     "express": "^4.22.0",

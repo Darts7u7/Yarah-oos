@@ -6,10 +6,10 @@ import type {
   SyncStripePaymentsEnvironmentResult,
   SyncStripePaymentsRequest,
   SyncStripePaymentsResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { stripeService } from '#features/payments/services/stripe.service';
 import { stripeQueryKeys } from '#features/payments/queryKeys';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 interface StripeSyncToast {
   type: 'success' | 'error' | 'info';

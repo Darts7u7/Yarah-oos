@@ -8,7 +8,7 @@ import {
   chatCompletionRequestSchema,
   chatCompletionResponseSchema,
   DEFAULT_MAX_TOKENS_CAP,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 describe('Tool Calling Schemas', () => {
   describe('toolFunctionSchema', () => {

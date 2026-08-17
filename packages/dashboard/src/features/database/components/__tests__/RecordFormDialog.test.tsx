@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import type { ColumnSchema } from '@insforge/shared-schemas';
+import type { ColumnSchema } from '@yarahdev/shared-schemas';
 
 const createRecord = vi.fn().mockResolvedValue(undefined);
 

@@ -1,21 +1,21 @@
 ---
 title: Nuxt
-description: Aprende a crear un proyecto en InsForge y desarrollar una aplicación Nuxt con IA, autenticación, base de datos Postgres y almacenamiento con el SDK oficial.
+description: Aprende a crear un proyecto en Yarah y desarrollar una aplicación Nuxt con IA, autenticación, base de datos Postgres y almacenamiento con el SDK oficial.
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
 
-Aprende a crear un proyecto de InsForge y a desarrollar una aplicación Nuxt utilizando herramientas de IA como Cursor.
+Aprende a crear un proyecto de Yarah y a desarrollar una aplicación Nuxt utilizando herramientas de IA como Cursor.
 
-## 1. Crear un proyecto de InsForge
+## 1. Crear un proyecto de Yarah
 
-Crea un nuevo proyecto de InsForge en [insforge.dev](https://insforge.dev).
+Crea un nuevo proyecto de Yarah en [yarah.dev](https://yarah.dev).
 
-## 2. Conectar InsForge
+## 2. Conectar Yarah
 
 Dos partes:
 
-- **Enlace de la CLI** — consulta la [Guía rápida](/quickstart) para ejecutar `npx @insforge/cli link --project-id <your-project-id>` y que el agente pueda leer el ID de tu proyecto y tus claves.
+- **Enlace de la CLI** — consulta la [Guía rápida](/quickstart) para ejecutar `npx @yarah/cli link --project-id <your-project-id>` y que el agente pueda leer el ID de tu proyecto y tus claves.
 - **Configuración de MCP** — consulta [Configuración de MCP](/mcp-setup) para conocer la configuración de cada editor (Cursor, Claude Code, Windsurf, Codex, VS Code).
 
 Con ambas cosas configuradas, el agente puede leer esquemas, ejecutar consultas y desplegar código desde tu editor.
@@ -27,9 +27,9 @@ En Cursor o tu asistente de IA, usa este prompt:
 ```
 Create a new Nuxt app with TypeScript.
 Add Tailwind CSS 3.4 for styling.
-Install the InsForge SDK and set up the client configuration.
+Install the Yarah SDK and set up the client configuration.
 
-In my InsForge database, create a sports table with id and name columns.
+In my Yarah database, create a sports table with id and name columns.
 Add sample data: basketball, soccer, and tennis. Make it publicly readable.
 
 Create a page that fetches and displays all sports from the database.
@@ -47,8 +47,8 @@ Tu asistente de IA creará automáticamente archivos como estos. No necesitas mo
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      insforgeBaseUrl: process.env.NUXT_PUBLIC_INSFORGE_BASE_URL,
-      insforgeAnonKey: process.env.NUXT_PUBLIC_INSFORGE_ANON_KEY
+      yarahBaseUrl: process.env.NUXT_PUBLIC_YARAH_BASE_URL,
+      yarahAnonKey: process.env.NUXT_PUBLIC_YARAH_ANON_KEY
     }
   }
 })
@@ -63,8 +63,8 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   const client = createClient({
-    baseUrl: config.public.insforgeBaseUrl,
-    anonKey: config.public.insforgeAnonKey
+    baseUrl: config.public.yarahBaseUrl,
+    anonKey: config.public.yarahAnonKey
   })
 
   const { data, error } = await client.database
@@ -160,11 +160,11 @@ Store favorites in a user_favorites table with user_id and sport_id.
 ```
 
 ```
-Add images to each sport using InsForge Storage.
+Add images to each sport using Yarah Storage.
 Allow users to upload sport images and display them in the grid.
 ```
 
 ```
 Add an AI chat feature that can answer questions about sports.
-Use InsForge AI with streaming responses.
+Use Yarah AI with streaming responses.
 ```

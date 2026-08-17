@@ -3,7 +3,7 @@ import { DatabaseManager } from '@/infra/database/database.manager.js';
 import logger from '@/utils/logger.js';
 import { AppError } from '@/utils/errors.js';
 import type { AuditLogEntry, AuditLogQuery } from '@/types/logs.js';
-import { ERROR_CODES, AuditLogSchema, GetAuditLogStatsResponse } from '@insforge/shared-schemas';
+import { ERROR_CODES, AuditLogSchema, GetAuditLogStatsResponse } from '@yarahdev/shared-schemas';
 
 export class AuditService {
   private static instance: AuditService;

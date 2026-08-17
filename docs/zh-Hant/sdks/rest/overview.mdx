@@ -1,14 +1,14 @@
 ---
-title: InsForge REST API 概覽
-description: "透過 HTTP 以任何語言直接呼叫 InsForge 身份驗證、資料庫、儲存與函式，使用 API 金鑰、JWT 與標準 REST 慣例。"
+title: Yarah REST API 概覽
+description: "透過 HTTP 以任何語言直接呼叫 Yarah 身份驗證、資料庫、儲存與函式，使用 API 金鑰、JWT 與標準 REST 慣例。"
 ---
 
-InsForge REST API 提供對所有 InsForge 服務的直接 HTTP 存取。當您需要與沒有官方 SDK 的語言或平台整合時，請使用這種方式。
+Yarah REST API 提供對所有 Yarah 服務的直接 HTTP 存取。當您需要與沒有官方 SDK 的語言或平台整合時，請使用這種方式。
 
 ## 基底 URL
 
 ```
-https://your-app.insforge.app
+https://your-app.apps.yarah.dev
 ```
 
 ## 驗證
@@ -25,17 +25,17 @@ Authorization: Bearer your-jwt-token-or-anon-key
 
 ```bash
 # Register a new user
-curl -X POST https://your-app.insforge.app/api/auth/users \
+curl -X POST https://your-app.apps.yarah.dev/api/auth/users \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "securepassword123"}'
 
 # Sign in and get token
-curl -X POST https://your-app.insforge.app/api/auth/sessions \
+curl -X POST https://your-app.apps.yarah.dev/api/auth/sessions \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "securepassword123"}'
 
 # Use the token for authenticated requests
-curl https://your-app.insforge.app/api/database/records/posts \
+curl https://your-app.apps.yarah.dev/api/database/records/posts \
   -H "Authorization: Bearer your-jwt-token"
 ```
 

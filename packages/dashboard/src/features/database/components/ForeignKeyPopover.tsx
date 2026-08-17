@@ -11,12 +11,12 @@ import {
   SelectItem,
   SelectTrigger,
   cn,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { Label } from '#components';
 import { useTables } from '#features/database/hooks/useTables';
 import { UseFormReturn } from 'react-hook-form';
 import { TableFormSchema, TableFormForeignKeySchema } from '#features/database/schema';
-import { ColumnSchema, OnDeleteActionSchema, OnUpdateActionSchema } from '@insforge/shared-schemas';
+import { ColumnSchema, OnDeleteActionSchema, OnUpdateActionSchema } from '@yarahdev/shared-schemas';
 import { AUTH_USERS_TABLE } from '#features/database/constants';
 import { parseDatabaseTableReference } from '#features/database/helpers';
 

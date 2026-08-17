@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import type { RazorpayEnvironment } from '@insforge/shared-schemas';
+import type { RazorpayEnvironment } from '@yarahdev/shared-schemas';
 import {
   razorpayService,
   type GetRazorpayConfigResponse,
   type UpsertRazorpayConfigRequest,
 } from '#features/payments/services/razorpay.service';
 import { razorpayQueryKeys } from '#features/payments/queryKeys';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 export function useRazorpayConfig() {
   const { t } = useTranslation('chrome');

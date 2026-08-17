@@ -1,10 +1,10 @@
 ---
 title: "Edge Functions"
 sidebarTitle: "Overview"
-description: "在 InsForge Edge Functions 上部署由 Deno 驱动的无服务器 TypeScript 函数，支持 HTTP 按需调用、cron 定时任务、数据库触发器链式调用、加密密钥与环境变量管理，以及流式响应、ESM 导入和本地开发与云端部署工作流。"
+description: "在 Yarah Edge Functions 上部署由 Deno 驱动的无服务器 TypeScript 函数，支持 HTTP 按需调用、cron 定时任务、数据库触发器链式调用、加密密钥与环境变量管理，以及流式响应、ESM 导入和本地开发与云端部署工作流。"
 ---
 
-使用 InsForge Edge Functions 在 [Deno](https://deno.com) 上运行 TypeScript，部署在接近您的用户的地方以实现低延迟。函数可以从任何客户端按需调用、从数据库触发器链接，或安排在 cron 表达式上运行。运行时开箱即用地提供标准 fetch、流式响应和 ESM 导入。
+使用 Yarah Edge Functions 在 [Deno](https://deno.com) 上运行 TypeScript，部署在接近您的用户的地方以实现低延迟。函数可以从任何客户端按需调用、从数据库触发器链接，或安排在 cron 表达式上运行。运行时开箱即用地提供标准 fetch、流式响应和 ESM 导入。
 
 <Note>
   **需要一个保持运行的流程？** 使用 [Compute](/core-concepts/compute/overview) 以获取队列工作者、AI 推理循环和任何有状态的东西。Edge Functions 用于请求/响应和短期作业。
@@ -16,7 +16,7 @@ graph TB
     Schedule[Cron Schedule] --> Fn
     Trigger[Database Trigger] --> Fn
 
-    Fn --> SDK[InsForge SDK]
+    Fn --> SDK[Yarah SDK]
     SDK --> DB[(Database)]
     SDK --> Storage[Storage]
     SDK --> Gateway[Model Gateway]
@@ -35,11 +35,11 @@ graph TB
 
 ### HTTP 触发器
 
-每个函数都可在 `https://<project>.insforge.dev/functions/<name>` 上访问。标准 fetch 输入，标准 `Response` 输出。流式处理、JSON、重定向和 websocket 都可以工作。
+每个函数都可在 `https://<project>.yarah.dev/functions/<name>` 上访问。标准 fetch 输入，标准 `Response` 输出。流式处理、JSON、重定向和 websocket 都可以工作。
 
 ### 时间表
 
-将 cron 表达式附加到函数，InsForge 会按时调用它，失败时重试。有关 cron 语法和执行模型，请查看 [Schedules](/core-concepts/functions/schedules)。
+将 cron 表达式附加到函数，Yarah 会按时调用它，失败时重试。有关 cron 语法和执行模型，请查看 [Schedules](/core-concepts/functions/schedules)。
 
 ### 数据库触发器
 
@@ -53,14 +53,14 @@ graph TB
 
 ```bash
 # 带过期时间的受保护秘密
-npx @insforge/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
+npx @yarah/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
 # 读回解密后的值
-npx @insforge/cli secrets get STRIPE_SECRET_KEY
+npx @yarah/cli secrets get STRIPE_SECRET_KEY
 ```
 
 ### 日志
 
-每次调用都会捕获结构化日志，可按状态、持续时间和函数名称查询。InsForge MCP `get-function-logs` 工具允许您的代理在不离开编辑器的情况下诊断失败。
+每次调用都会捕获结构化日志，可按状态、持续时间和函数名称查询。Yarah MCP `get-function-logs` 工具允许您的代理在不离开编辑器的情况下诊断失败。
 
 ### Deno 标准库
 

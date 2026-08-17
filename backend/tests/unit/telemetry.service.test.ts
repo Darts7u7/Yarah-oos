@@ -31,14 +31,14 @@ afterEach(() => {
 });
 
 function makeConfig(overrides: Partial<TelemetryConfig> = {}): TelemetryConfig {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'insforge-telemetry-'));
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'yarah-telemetry-'));
   tempRoots.push(tempRoot);
 
   return {
     disabled: false,
     endpoint: 'https://telemetry.test/v1/events',
     posthogApiKey: 'phc_test',
-    installationIdPath: path.join(tempRoot, '.insforge-installation-id'),
+    installationIdPath: path.join(tempRoot, '.yarah-installation-id'),
     heartbeatIntervalMs: 60_000,
     requestTimeoutMs: 500,
     ...overrides,
@@ -69,7 +69,7 @@ const deploymentEnvKeys = [
   'COOLIFY_RESOURCE_UUID',
   'COOLIFY_FQDN',
   'KUBERNETES_SERVICE_HOST',
-  'INSFORGE_DEPLOYMENT_METHOD',
+  'YARAH_DEPLOYMENT_METHOD',
 ];
 
 function clearDeploymentEnvironment(): void {
@@ -122,14 +122,17 @@ describe('TelemetryService', () => {
     );
   });
 
-  it('is disabled on cloud, so no collection or reporting happens there', () => {
-    delete process.env.INSFORGE_TELEMETRY_DISABLED;
-    expect(isTelemetryRuntimeDisabled()).toBe(false);
+  it('is disabled by default (no collector bundled) and on cloud', () => {
+    // Yarah ships no telemetry endpoint or key, so telemetry is off even
+    // without the opt-out env var. Explicit configs passed to the service
+    // (as other tests do) still exercise the full pipeline.
+    delete process.env.YARAH_TELEMETRY_DISABLED;
+    expect(isTelemetryRuntimeDisabled()).toBe(true);
 
     // Cloud is identified by the AWS instance profile. This gates both halves:
     // server.ts skips registering the usage middleware, and the service never
     // starts a heartbeat or writes an installation id.
-    process.env.AWS_INSTANCE_PROFILE_NAME = 'insforge-cloud-profile';
+    process.env.AWS_INSTANCE_PROFILE_NAME = 'yarah-cloud-profile';
     expect(isTelemetryRuntimeDisabled()).toBe(true);
   });
 
@@ -344,14 +347,14 @@ describe('TelemetryService', () => {
       name: 'platform-injected variables win over the artifact stamp',
       setup: () => {
         process.env.RAILWAY_ENVIRONMENT_ID = 'env-123';
-        process.env.INSFORGE_DEPLOYMENT_METHOD = 'docker';
+        process.env.YARAH_DEPLOYMENT_METHOD = 'docker';
       },
       expectedDeploymentMethod: 'railway',
     },
     {
       name: 'the artifact stamp is normalized',
       setup: () => {
-        process.env.INSFORGE_DEPLOYMENT_METHOD = ' Dokploy ';
+        process.env.YARAH_DEPLOYMENT_METHOD = ' Dokploy ';
       },
       expectedDeploymentMethod: 'dokploy',
     },
@@ -472,7 +475,7 @@ describe('TelemetryService', () => {
       properties: {
         $process_person_profile: false,
         installation_id: expect.any(String),
-        telemetry_source: 'insforge_oss',
+        telemetry_source: 'yarah_oss',
         telemetry_event_name: 'heartbeat',
         version: expect.any(String),
         hosting_mode: expect.stringMatching(/^(cloud|self-hosted)$/),
@@ -510,7 +513,7 @@ describe('TelemetryService', () => {
     );
 
     expect(warnSpy).toHaveBeenCalledWith(
-      'InsForge telemetry skipped',
+      'Yarah telemetry skipped',
       expect.objectContaining({ error: 'network down' })
     );
   });

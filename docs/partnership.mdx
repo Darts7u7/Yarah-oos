@@ -1,18 +1,18 @@
 ---
 title: Partner Integration
-description: Integrate InsForge as a co-branded or white-label partner platform with one-click connections, project lifecycle APIs, and dashboard embedding.
+description: Integrate Yarah as a co-branded or white-label partner platform with one-click connections, project lifecycle APIs, and dashboard embedding.
 ---
 
 ## Overview
 
-InsForge provides two partnership models that enable seamless integration of our Backend-as-a-Service platform into your applications. Whether you're looking for a co-branded solution or a fully white-labeled experience, we have the right partnership model for you.
+Yarah provides two partnership models that enable seamless integration of our Backend-as-a-Service platform into your applications. Whether you're looking for a co-branded solution or a fully white-labeled experience, we have the right partnership model for you.
 
 ## Partnership Models
 
 <CardGroup cols={2}>
   <Card title="Co-Branded Partnership" icon="handshake">
-    Perfect for platforms that want to offer InsForge alongside their services.
-    The integration process is remarkably simple - developers can connect to the InsForge platform with just one click, without complicated OAuth flows.
+    Perfect for platforms that want to offer Yarah alongside their services.
+    The integration process is remarkably simple - developers can connect to the Yarah platform with just one click, without complicated OAuth flows.
   </Card>
   <Card title="White-Label Partnership" icon="tag">
     Ideal for platforms seeking complete control over the user experience.
@@ -41,7 +41,7 @@ InsForge provides two partnership models that enable seamless integration of our
 
 <Steps>
   <Step title="Apply for Partnership">
-    Submit your partnership application through our [partner email](mailto:partnerships@insforge.dev).
+    Submit your partnership application through our [partner email](mailto:partnerships@yarah.dev).
     Specify whether you're interested in co-branded or white-label partnership.
   </Step>
 
@@ -56,7 +56,7 @@ InsForge provides two partnership models that enable seamless integration of our
     All API requests must include your secret key for authentication:
 
     ```bash
-    curl -X POST https://api.insforge.dev/partnership/v1/YOUR_PARTNER_ID/endpoint \
+    curl -X POST https://api.yarah.dev/partnership/v1/YOUR_PARTNER_ID/endpoint \
       -H "Content-Type: application/json" \
       -H "X-Partnership-Secret: YOUR_SECRET_KEY"
     ```
@@ -70,15 +70,15 @@ InsForge provides two partnership models that enable seamless integration of our
 ## Features by Partnership Type
 
 ### Co-Branded Features
-In co-branded mode, developers explicitly know they are InsForge platform users (linked through the same email address). After logging into the InsForge platform, developers have full management rights for projects created through partners and need to pay according to InsForge's billing plans.
+In co-branded mode, developers explicitly know they are Yarah platform users (linked through the same email address). After logging into the Yarah platform, developers have full management rights for projects created through partners and need to pay according to Yarah's billing plans.
 
 Partner platforms can:
-- Sync user accounts (name, email) with InsForge
-- Sync projects to InsForge
+- Sync user accounts (name, email) with Yarah
+- Sync projects to Yarah
 - Query project connection information to leverage the completed backend capabilities.
 
 ### White-Label Features
-In white-label mode, developers are not aware of InsForge's existence and cannot see partner-created projects on the InsForge platform.
+In white-label mode, developers are not aware of Yarah's existence and cannot see partner-created projects on the Yarah platform.
 
 Partner platforms can:
 - Create embedded projects
@@ -86,7 +86,7 @@ Partner platforms can:
 - Pause projects
 - Restore projects
 - Upgrade projects (change instance type / grow disk)
-- Restart projects (optionally upgrade the InsForge OSS version)
+- Restart projects (optionally upgrade the Yarah OSS version)
 - Delete projects
 - Get project's authorization token for access
 - Get project's usage
@@ -98,7 +98,7 @@ Partner platforms can:
   <Tab title="Co-Branded APIs">
 
     ### Connect User Account
-    Synchronize user account information with InsForge.
+    Synchronize user account information with Yarah.
 
     ```bash
     POST /partnership/v1/:partnerId/connect-user
@@ -143,7 +143,7 @@ Partner platforms can:
       "success": true,
       "project": {
         "id": "uuid-string",
-        "access_host": "https://project.us-east.insforge.app",
+        "access_host": "https://project.us-east.apps.yarah.dev",
         "api_key": "project-api-key",
         "status": "active"
       }
@@ -151,7 +151,7 @@ Partner platforms can:
     ```
 
     #### Handling Project Limits
-    Note: Due to project limits on the InsForge free plan, project synchronization from partner platforms may fail. In such cases, the response will be:
+    Note: Due to project limits on the Yarah free plan, project synchronization from partner platforms may fail. In such cases, the response will be:
 
     ```json
     {
@@ -160,7 +160,7 @@ Partner platforms can:
       "candidate_projects": [
         {
           "id": "uuid-string",
-          "access_host": "https://project2.us-east.insforge.app",
+          "access_host": "https://project2.us-east.apps.yarah.dev",
           "api_key": "project-api-key",
           "status": "active"
         }
@@ -182,7 +182,7 @@ Partner platforms can:
     {
       "project": {
         "id": "uuid-string",
-        "access_host": "https://project.us-east.insforge.app",
+        "access_host": "https://project.us-east.apps.yarah.dev",
         "api_key": "project-api-key",
         "status": "active"
       }
@@ -214,7 +214,7 @@ Partner platforms can:
       "success": true,
       "project": {
         "id": "uuid-string",
-        "access_host": "https://project.us-east.insforge.app",
+        "access_host": "https://project.us-east.apps.yarah.dev",
         "api_key": "project-api-key",
         "status": "active"
       }
@@ -233,7 +233,7 @@ Partner platforms can:
     {
       "project": {
         "id": "uuid-string",
-        "access_host": "https://project.us-east.insforge.app",
+        "access_host": "https://project.us-east.apps.yarah.dev",
         "api_key": "project-api-key",
         "region": "us-east",
         "instance_type": "nano",
@@ -319,7 +319,7 @@ Partner platforms can:
     ```
 
     ### Restart Project
-    Restart a project, optionally upgrading its InsForge OSS version. Omit `insforge_oss_version` to restart on the current version.
+    Restart a project, optionally upgrading its Yarah OSS version. Omit `yarah_oss_version` to restart on the current version.
 
     ```bash
     POST /partnership/v1/:partnerId/:projectId/restart
@@ -328,7 +328,7 @@ Partner platforms can:
     **Request Body:**
     ```json
     {
-      "insforge_oss_version": "v2.2.1",  // optional — omit to keep the current version
+      "yarah_oss_version": "v2.2.1",  // optional — omit to keep the current version
       "wait_for_completion": false        // optional
     }
     ```
@@ -337,7 +337,7 @@ Partner platforms can:
     ```json
     {
       "message": "Project restart initiated",
-      "insforgeOssVersion": "v2.2.1"
+      "yarahOssVersion": "v2.2.1"
     }
     ```
 
@@ -491,34 +491,34 @@ The following sequence diagram illustrates the integration flow for co-branded p
 sequenceDiagram
     participant User as End User
     participant Partner as Partner Platform
-    participant InsForge as InsForge API
-    participant Dashboard as InsForge Dashboard
+    participant Yarah as Yarah API
+    participant Dashboard as Yarah Dashboard
 
     User->>Partner: Sign up/Login
-    Partner->>InsForge: POST /connect-user<br/>(name, email)
-    InsForge-->>Partner: Return user account ID
+    Partner->>Yarah: POST /connect-user<br/>(name, email)
+    Yarah-->>Partner: Return user account ID
 
     User->>Partner: Create new project
-    Partner->>InsForge: POST /sync-project<br/>(userId, project_name)
+    Partner->>Yarah: POST /sync-project<br/>(userId, project_name)
 
     alt Success
-        InsForge-->>Partner: Return project details<br/>(id, access_host, api_key)
+        Yarah-->>Partner: Return project details<br/>(id, access_host, api_key)
         Partner->>Partner: Store project credentials
         Partner->>User: Show project ready
     else Project Limit Reached
-        InsForge-->>Partner: Return error + candidate projects
+        Yarah-->>Partner: Return error + candidate projects
         Partner->>User: Show existing projects to choose
         User->>Partner: Select existing project
-        Partner->>InsForge: GET /metadata<br/>(projectId)
-        InsForge-->>Partner: Return project details
+        Partner->>Yarah: GET /metadata<br/>(projectId)
+        Yarah-->>Partner: Return project details
     end
 
     User->>Partner: Use application features
-    Partner->>InsForge: API calls using project credentials
-    InsForge-->>Partner: Return data
+    Partner->>Yarah: API calls using project credentials
+    Yarah-->>Partner: Return data
     Partner-->>User: Display results
 
-    Note over User,Dashboard: User can also access InsForge Dashboard directly
+    Note over User,Dashboard: User can also access Yarah Dashboard directly
     User->>Dashboard: Login with same email
     Dashboard->>User: Full project management access
 ```
@@ -527,7 +527,7 @@ sequenceDiagram
 // 1. Connect user account
 const connectUser = async (name: string, email: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/connect-user`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/connect-user`,
     {
       method: 'POST',
       headers: {
@@ -545,7 +545,7 @@ const connectUser = async (name: string, email: string) => {
 // 2. Create project for user
 const createProject = async (userId: string, projectName: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/${userId}/sync-project`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/${userId}/sync-project`,
     {
       method: 'POST',
       headers: {
@@ -580,42 +580,42 @@ The following sequence diagram illustrates the integration flow for white-label 
 sequenceDiagram
     participant User as End User
     participant Partner as Partner Platform
-    participant InsForge as InsForge API
+    participant Yarah as Yarah API
 
-    Note over User,InsForge: User never interacts with InsForge directly
+    Note over User,Yarah: User never interacts with Yarah directly
 
     User->>Partner: Sign up/Login to partner platform
 
     User->>Partner: Create new project
-    Partner->>InsForge: POST /sync-embedded-project<br/>(project_name, region, instance_type)
-    InsForge-->>Partner: Return project details<br/>(id, access_host, api_key, status)
+    Partner->>Yarah: POST /sync-embedded-project<br/>(project_name, region, instance_type)
+    Yarah-->>Partner: Return project details<br/>(id, access_host, api_key, status)
     Partner->>Partner: Store project credentials
     Partner->>User: Show project ready
 
     User->>Partner: Use application features
-    Partner->>InsForge: API calls using project credentials
-    InsForge-->>Partner: Return data
+    Partner->>Yarah: API calls using project credentials
+    Yarah-->>Partner: Return data
     Partner-->>User: Display results
 
     User->>Partner: Request to pause project
-    Partner->>InsForge: POST /pause<br/>(projectId)
-    InsForge-->>Partner: Return status: paused
+    Partner->>Yarah: POST /pause<br/>(projectId)
+    Yarah-->>Partner: Return status: paused
     Partner->>User: Confirm project paused
 
     User->>Partner: Request to restore project
-    Partner->>InsForge: POST /restore<br/>(projectId)
-    InsForge-->>Partner: Return status: active
+    Partner->>Yarah: POST /restore<br/>(projectId)
+    Yarah-->>Partner: Return status: active
     Partner->>User: Confirm project active
 
-    Partner->>InsForge: GET /metadata<br/>(projectId)
-    InsForge-->>Partner: Return current project status
+    Partner->>Yarah: GET /metadata<br/>(projectId)
+    Yarah-->>Partner: Return current project status
 ```
 
 ```typescript
 // 1. Create embedded project
 const createEmbeddedProject = async (projectName: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/sync-embedded-project`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/sync-embedded-project`,
     {
       method: 'POST',
       headers: {
@@ -640,7 +640,7 @@ const createEmbeddedProject = async (projectName: string) => {
 // 2. Manage project lifecycle
 const pauseProject = async (projectId: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/${projectId}/pause`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/${projectId}/pause`,
     {
       method: 'POST',
       headers: {
@@ -659,7 +659,7 @@ const pauseProject = async (projectId: string) => {
 
 const restoreProject = async (projectId: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/${projectId}/restore`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/${projectId}/restore`,
     {
       method: 'POST',
       headers: {
@@ -679,7 +679,7 @@ const restoreProject = async (projectId: string) => {
 // 3. Delete project
 const deleteProject = async (projectId: string) => {
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/${projectId}`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/${projectId}`,
     {
       method: 'DELETE',
       headers: {
@@ -701,7 +701,7 @@ const deleteProject = async (projectId: string) => {
 const getPartnershipUsage = async (startDate: string, endDate: string) => {
   const params = new URLSearchParams({ start_date: startDate, end_date: endDate });
   const response = await fetch(
-    `https://api.insforge.dev/partnership/v1/${PARTNER_ID}/usage?${params}`,
+    `https://api.yarah.dev/partnership/v1/${PARTNER_ID}/usage?${params}`,
     {
       method: 'GET',
       headers: {
@@ -723,7 +723,7 @@ const getPartnershipUsage = async (startDate: string, endDate: string) => {
 ## Parameter and Response Reference
 
 ### Project Region Values
-InsForge provides global deployment capabilities. Each project can be deployed to different regions:
+Yarah provides global deployment capabilities. Each project can be deployed to different regions:
 - `us-east` - United States East Coast
 - `us-west` - United States West Coast
 - `ap-southeast` - Asia Pacific Southeast
@@ -732,7 +732,7 @@ InsForge provides global deployment capabilities. Each project can be deployed t
 Additional regions will be added based on demand.
 
 ### Project Instance Type Values
-Based on your project's business requirements, InsForge offers the following resource types:
+Based on your project's business requirements, Yarah offers the following resource types:
 - `nano` - Minimal resources for development
 - `micro` - Basic resources for testing and development
 - `small` - Light workloads
@@ -770,4 +770,4 @@ Common error scenarios:
 
 ## Next Steps
 
-- Schedule a [technical review](https://calendly.com/tony-chang-insforge/45min) with our team
+- Schedule a [technical review](https://calendly.com/tony-chang-yarah/45min) with our team

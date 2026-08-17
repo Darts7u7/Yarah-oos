@@ -10,7 +10,7 @@ import {
   createRazorpayPlanBodySchema,
   razorpayItemParamsSchema,
   updateRazorpayItemBodySchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const router = Router({ mergeParams: true });
 const catalogService = RazorpayCatalogService.getInstance();

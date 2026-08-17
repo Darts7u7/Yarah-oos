@@ -95,13 +95,13 @@ describe('config.app', () => {
 describe('config.telemetry', () => {
   it('enables anonymous telemetry by default', () => {
     unsetEnvKeys(
-      'INSFORGE_TELEMETRY_DISABLED',
-      'INSFORGE_TELEMETRY_DEBUG',
-      'INSFORGE_TELEMETRY_ENDPOINT',
-      'INSFORGE_TELEMETRY_POSTHOG_API_KEY',
-      'INSFORGE_TELEMETRY_INSTALLATION_ID_PATH',
-      'INSFORGE_TELEMETRY_HEARTBEAT_INTERVAL_MS',
-      'INSFORGE_TELEMETRY_REQUEST_TIMEOUT_MS',
+      'YARAH_TELEMETRY_DISABLED',
+      'YARAH_TELEMETRY_DEBUG',
+      'YARAH_TELEMETRY_ENDPOINT',
+      'YARAH_TELEMETRY_POSTHOG_API_KEY',
+      'YARAH_TELEMETRY_INSTALLATION_ID_PATH',
+      'YARAH_TELEMETRY_HEARTBEAT_INTERVAL_MS',
+      'YARAH_TELEMETRY_REQUEST_TIMEOUT_MS',
       'LOGS_DIR'
     );
     const c = loadConfig();
@@ -110,20 +110,20 @@ describe('config.telemetry', () => {
   });
 
   it('only exposes the telemetry disabled env var', () => {
-    process.env.INSFORGE_TELEMETRY_DISABLED = 'true';
-    process.env.INSFORGE_TELEMETRY_DEBUG = '1';
-    process.env.INSFORGE_TELEMETRY_ENDPOINT = 'https://events.example.com/v1';
-    process.env.INSFORGE_TELEMETRY_POSTHOG_API_KEY = 'phc_custom';
-    process.env.INSFORGE_TELEMETRY_INSTALLATION_ID_PATH = '/tmp/insforge-id';
-    process.env.INSFORGE_TELEMETRY_HEARTBEAT_INTERVAL_MS = '60000';
-    process.env.INSFORGE_TELEMETRY_REQUEST_TIMEOUT_MS = '500';
+    process.env.YARAH_TELEMETRY_DISABLED = 'true';
+    process.env.YARAH_TELEMETRY_DEBUG = '1';
+    process.env.YARAH_TELEMETRY_ENDPOINT = 'https://events.example.com/v1';
+    process.env.YARAH_TELEMETRY_POSTHOG_API_KEY = 'phc_custom';
+    process.env.YARAH_TELEMETRY_INSTALLATION_ID_PATH = '/tmp/yarah-id';
+    process.env.YARAH_TELEMETRY_HEARTBEAT_INTERVAL_MS = '60000';
+    process.env.YARAH_TELEMETRY_REQUEST_TIMEOUT_MS = '500';
     const c = loadConfig();
 
     expect(c.telemetry).toEqual({ disabled: true });
   });
 
   it('disables telemetry with the documented opt-out value', () => {
-    process.env.INSFORGE_TELEMETRY_DISABLED = '1';
+    process.env.YARAH_TELEMETRY_DISABLED = '1';
     const c = loadConfig();
 
     expect(c.telemetry).toEqual({ disabled: true });
@@ -148,7 +148,7 @@ describe('config.cloud', () => {
     );
     const c = loadConfig();
 
-    expect(c.cloud.apiHost).toBe('https://api.insforge.dev');
+    expect(c.cloud.apiHost).toBe('https://api.yarah.dev');
     expect(c.cloud.projectId).toBeUndefined();
     expect(c.cloud.cloudFrontUrl).toBeUndefined();
     expect(c.cloud.cloudFrontKeyPairId).toBeUndefined();
@@ -182,7 +182,7 @@ describe('config.denoSubhosting', () => {
 
     expect(c.denoSubhosting.token).toBe('');
     expect(c.denoSubhosting.organizationId).toBe('');
-    expect(c.denoSubhosting.domain).toBe('function2.insforge.app');
+    expect(c.denoSubhosting.domain).toBe('function2.apps.yarah.dev');
   });
 
   it('reads DENO_DEPLOY_TOKEN and DENO_DEPLOY_ORG_ID', () => {
@@ -196,7 +196,7 @@ describe('config.denoSubhosting', () => {
 
   it('domain defaults to the v2 proxy domain and is overridable via FUNCTIONS_DOMAIN', () => {
     unsetEnvKeys('FUNCTIONS_DOMAIN');
-    expect(loadConfig().denoSubhosting.domain).toBe('function2.insforge.app');
+    expect(loadConfig().denoSubhosting.domain).toBe('function2.apps.yarah.dev');
 
     process.env.FUNCTIONS_DOMAIN = 'custom.functions.example.com';
     expect(loadConfig().denoSubhosting.domain).toBe('custom.functions.example.com');
@@ -284,8 +284,8 @@ describe('config.server', () => {
   });
 
   it('reads LOGS_DIR when set', () => {
-    process.env.LOGS_DIR = '/var/log/insforge';
-    expect(loadConfig().server.logsDir).toBe('/var/log/insforge');
+    process.env.LOGS_DIR = '/var/log/yarah';
+    expect(loadConfig().server.logsDir).toBe('/var/log/yarah');
   });
 
   it('defaults trustProxy to 2 hops', () => {
@@ -360,7 +360,7 @@ describe('config.database', () => {
 
     expect(c.database.host).toBe('localhost');
     expect(c.database.port).toBe(5432);
-    expect(c.database.name).toBe('insforge');
+    expect(c.database.name).toBe('yarah');
     expect(c.database.user).toBe('postgres');
     expect(c.database.password).toBe('postgres');
     expect(c.database.postgrestBaseUrl).toBe('http://localhost:5430');
@@ -494,7 +494,7 @@ describe('config.storage', () => {
     expect(c.storage.awsAccessKeyId).toBeUndefined();
     expect(c.storage.awsSecretAccessKey).toBeUndefined();
     expect(c.storage.s3EndpointUrl).toBeUndefined();
-    expect(c.storage.awsConfigBucket).toBe('insforge-config');
+    expect(c.storage.awsConfigBucket).toBe('yarah-config');
     expect(c.storage.awsConfigRegion).toBe('us-east-2');
     expect(typeof c.storage.storageDir).toBe('string');
   });
@@ -592,8 +592,8 @@ describe('config.storage', () => {
   });
 
   it('reads STORAGE_DIR from env', () => {
-    process.env.STORAGE_DIR = '/data/insforge-storage';
-    expect(loadConfig().storage.storageDir).toBe('/data/insforge-storage');
+    process.env.STORAGE_DIR = '/data/yarah-storage';
+    expect(loadConfig().storage.storageDir).toBe('/data/yarah-storage');
   });
 
   it('reads config bucket overrides', () => {

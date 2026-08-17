@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Universal test runner for Insforge backend tests
+# Universal test runner for Yarah backend tests
 # This script runs all test files in the tests directory
 
 # Don't exit on error - we want to run all tests even if some fail
@@ -50,7 +50,7 @@ if [ -f "$PROJECT_ROOT/.env" ]; then
 fi
 
 echo "=========================================="
-echo "Running all Insforge backend tests"
+echo "Running all Yarah backend tests"
 echo "=========================================="
 echo ""
 

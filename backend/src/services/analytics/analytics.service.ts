@@ -3,7 +3,7 @@ import {
   type PosthogConfig,
   type PosthogDiscoveredProject,
   type PosthogRegion,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import { CloudAnalyticsProvider } from '@/providers/analytics/cloud.provider.js';
 import { LocalAnalyticsProvider } from '@/providers/analytics/local.provider.js';
 import type { AnalyticsProvider } from '@/providers/analytics/base.provider.js';

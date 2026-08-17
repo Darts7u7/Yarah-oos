@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useOutletContext } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Button, useToast } from '@insforge/ui';
+import { Button, useToast } from '@yarahdev/ui';
 import { ErrorState, LoadingState } from '#components';
 import { useDashboardHost, useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
 import { useProjectId } from '#lib/hooks/useMetadata';

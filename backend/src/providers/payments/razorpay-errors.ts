@@ -1,5 +1,5 @@
 import { AppError, UpstreamError, getUpstreamStatus } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { RazorpayKeyValidationError } from './razorpay.provider.js';
 
 interface RazorpayErrorLike {

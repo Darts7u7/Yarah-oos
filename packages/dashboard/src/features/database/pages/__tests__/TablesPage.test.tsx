@@ -139,7 +139,7 @@ vi.mock('#components', () => ({
   DeleteActionButton: () => null,
 }));
 
-vi.mock('@insforge/ui', () => ({
+vi.mock('@yarahdev/ui', () => ({
   Button: (props: React.ComponentProps<'button'> & { variant?: string; size?: string }) => (
     <button
       {...props}

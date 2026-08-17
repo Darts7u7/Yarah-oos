@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@insforge/ui';
+import { Button } from '@yarahdev/ui';
 import { DatabaseTemplate } from '#features/database/templates';
 import { TemplateCard } from './TemplateCard';
 

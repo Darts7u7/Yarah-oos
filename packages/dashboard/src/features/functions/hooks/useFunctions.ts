@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { functionService } from '#features/functions/services/function.service';
-import { FunctionSchema, type UpdateFunctionRequest } from '@insforge/shared-schemas';
-import { useToast } from '@insforge/ui';
+import { FunctionSchema, type UpdateFunctionRequest } from '@yarahdev/shared-schemas';
+import { useToast } from '@yarahdev/ui';
 
 function getDeploymentFailureMessage(t: TFunction<'chrome'>, buildLogs?: string[]): string {
   const logs = buildLogs?.map((log) => log.trim()).filter(Boolean) ?? [];

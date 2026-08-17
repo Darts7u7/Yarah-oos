@@ -40,7 +40,7 @@ vi.mock('bcryptjs', () => ({
 
 import { AuthOTPService, OTPPurpose, OTPType } from '../../src/services/auth/auth-otp.service.js';
 import { AppError } from '../../src/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 describe('AuthOTPService numeric attempt limits', () => {
   let service: AuthOTPService;

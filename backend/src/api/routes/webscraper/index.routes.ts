@@ -2,7 +2,7 @@ import { Router, Response, NextFunction } from 'express';
 import { verifyAdmin, AuthRequest } from '@/api/middlewares/auth.js';
 import { WebscraperService } from '@/services/webscraper/webscraper.service.js';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES, updateApifyConfigSchema } from '@insforge/shared-schemas';
+import { ERROR_CODES, updateApifyConfigSchema } from '@yarahdev/shared-schemas';
 import { isCloudEnvironment } from '@/utils/environment.js';
 
 export const webscraperRouter = Router();
@@ -146,7 +146,7 @@ webscraperRouter.get(
 function assertSelfHostedWebscraperConfig(): void {
   if (isCloudEnvironment()) {
     throw new AppError(
-      'The Apify connection is managed by InsForge Cloud.',
+      'The Apify connection is managed by Yarah Cloud.',
       400,
       ERROR_CODES.INVALID_INPUT
     );

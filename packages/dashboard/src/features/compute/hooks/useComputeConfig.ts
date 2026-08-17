@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '@insforge/ui';
-import type { ComputeConfig, UpdateComputeConfig } from '@insforge/shared-schemas';
+import { useToast } from '@yarahdev/ui';
+import type { ComputeConfig, UpdateComputeConfig } from '@yarahdev/shared-schemas';
 import { computeServicesApi } from '#features/compute/services/compute.service';
 
 export const COMPUTE_CONFIG_QUERY_KEY = ['compute', 'config'] as const;

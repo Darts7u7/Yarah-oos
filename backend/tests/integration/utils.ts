@@ -1,5 +1,5 @@
 import {
-  getConnections as getInsforgeConnections,
+  getConnections as getYarahConnections,
   seed,
   type GetConnectionResult,
 } from 'insforge-test';
@@ -18,13 +18,13 @@ const migrationFiles = fs
   .map((f) => path.join(MIGRATIONS, f));
 
 /**
- * Pre-configured getConnections() for InsForge integration tests.
+ * Pre-configured getConnections() for Yarah integration tests.
  *
- * Seeds the test database by running the full InsForge migration chain
+ * Seeds the test database by running the full Yarah migration chain
  * (db-init.sql + migrations 000–048) so the test schema matches production.
  *
  * pg_cron can only be installed in the database named by cron.database_name
- * (the Docker image hardcodes "insforge"), but pgsql-test creates isolated
+ * (the Docker image hardcodes "yarah"), but pgsql-test creates isolated
  * databases with random names. A stub cron schema provides the table and
  * function signatures that later migrations reference. The real pgcrypto
  * and http extensions are installed normally.
@@ -33,9 +33,9 @@ const migrationFiles = fs
  * extensions are handled in the pre-seed step above.
  */
 export const getConnections = (
-  opts: Parameters<typeof getInsforgeConnections>[0] = {}
+  opts: Parameters<typeof getYarahConnections>[0] = {}
 ): Promise<GetConnectionResult> =>
-  getInsforgeConnections(opts, [
+  getYarahConnections(opts, [
     // 1. Bootstrap roles and event triggers
     seed.sqlfile([path.join(ROOT, 'deploy/docker-init/db/db-init.sql')]),
     // 2. Install real extensions + stub pg_cron
@@ -44,7 +44,7 @@ export const getConnections = (
     //
     //    pg_cron cannot be installed here because CREATE EXTENSION pg_cron
     //    only works in the database named by cron.database_name (hardcoded
-    //    to "insforge" in postgresql.conf), and pgsql-test creates isolated
+    //    to "yarah" in postgresql.conf), and pgsql-test creates isolated
     //    databases with random names. We stub the cron schema because
     //    migrations 024 and 041 execute DO $$ blocks at migration time
     //    that SELECT FROM cron.job and PERFORM cron.schedule()/unschedule().

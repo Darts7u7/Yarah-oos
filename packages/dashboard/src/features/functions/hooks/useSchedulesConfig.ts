@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { SchedulesConfig } from '@insforge/shared-schemas';
+import type { SchedulesConfig } from '@yarahdev/shared-schemas';
 import { scheduleService } from '#features/functions/services/schedule.service';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 const SCHEDULES_CONFIG_QUERY_KEY = ['schedules', 'config'] as const;
 

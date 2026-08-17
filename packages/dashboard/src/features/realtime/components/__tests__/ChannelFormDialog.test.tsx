@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ChannelFormDialog } from '#features/realtime/components/ChannelFormDialog';
-import type { RealtimeChannel } from '@insforge/shared-schemas';
+import type { RealtimeChannel } from '@yarahdev/shared-schemas';
 
 describe('ChannelFormDialog', () => {
   it('creates a channel and filters empty webhook URLs', async () => {

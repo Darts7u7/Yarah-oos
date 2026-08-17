@@ -1,5 +1,5 @@
 import { useMetadata } from '#lib/hooks/useMetadata';
-import type { ComputeCapabilitiesSchema } from '@insforge/shared-schemas';
+import type { ComputeCapabilitiesSchema } from '@yarahdev/shared-schemas';
 
 /**
  * What a compute provider can actually do.

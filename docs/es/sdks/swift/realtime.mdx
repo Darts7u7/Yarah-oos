@@ -1,6 +1,6 @@
 ---
 title: Referencia del SDK de tiempo real de Swift
-description: Conecta vía Socket.IO, suscríbete a canales, publica eventos, rastrea presencia y maneja reconexiones con el cliente en tiempo real de Swift de InsForge.
+description: Conecta vía Socket.IO, suscríbete a canales, publica eventos, rastrea presencia y maneja reconexiones con el cliente en tiempo real de Swift de Yarah.
 ---
 
 import SwiftSdkInstallation from '/snippets/swift-sdk-installation.mdx';
@@ -11,16 +11,16 @@ import SwiftSdkInstallation from '/snippets/swift-sdk-installation.mdx';
 
 ## Modelo mental
 
-El SDK de Swift se conecta a InsForge Realtime a través de Socket.IO. Suscríbase a nombres de canal como `order:123` o `chat:room-1`, luego escuche nombres de eventos publicados en esos canales.
+El SDK de Swift se conecta a Yarah Realtime a través de Socket.IO. Suscríbase a nombres de canal como `order:123` o `chat:room-1`, luego escuche nombres de eventos publicados en esos canales.
 
 Los eventos se publican mediante disparadores de base de datos que llaman a `realtime.publish(...)` o mediante clientes que publican en un canal al que ya se han unido. Consulte [Descripción general de Realtime](/core-concepts/realtime/overview) para el modelo de canal y RLS.
 
 ## Inicio rápido
 
 ```swift
-try await insforge.realtime.connect()
+try await yarah.realtime.connect()
 
-await insforge.realtime.subscribe(to: "order:\\(orderId)") { message in
+await yarah.realtime.subscribe(to: "order:\\(orderId)") { message in
     if message.eventName == "status_changed" {
         print("Payload: \\(String(describing: message.payload))")
     }
@@ -33,7 +33,7 @@ Establece una conexión en tiempo real.
 
 ```swift
 do {
-    try await insforge.realtime.connect()
+    try await yarah.realtime.connect()
     print("Connected to realtime")
 } catch {
     print("Connection failed: \\(error)")
@@ -45,7 +45,7 @@ do {
 Suscríbase a un canal y reciba mensajes publicados en él.
 
 ```swift
-await insforge.realtime.subscribe(to: "chat:room-1") { message in
+await yarah.realtime.subscribe(to: "chat:room-1") { message in
     print("Event: \\(message.eventName ?? "")")
     print("Channel: \\(message.channelName ?? "")")
 
@@ -62,7 +62,7 @@ Si RLS está habilitado en `realtime.channels`, la suscripción se verifica con 
 Publique un evento en un canal.
 
 ```swift
-try await insforge.realtime.publish(
+try await yarah.realtime.publish(
     to: "chat:room-1",
     event: "new_message",
     payload: [
@@ -83,7 +83,7 @@ Si RLS está habilitado en `realtime.messages`, la publicación también se veri
 Abandone un canal.
 
 ```swift
-await insforge.realtime.unsubscribe(from: "chat:room-1")
+await yarah.realtime.unsubscribe(from: "chat:room-1")
 ```
 
 ## disconnect()
@@ -91,7 +91,7 @@ await insforge.realtime.unsubscribe(from: "chat:room-1")
 Cierre la conexión en tiempo real.
 
 ```swift
-await insforge.realtime.disconnect()
+await yarah.realtime.disconnect()
 ```
 
 ## API de canal
@@ -99,7 +99,7 @@ await insforge.realtime.disconnect()
 El API de canal agrupa operaciones para un nombre de canal.
 
 ```swift
-let channel = await insforge.realtime.channel("chat:room-1")
+let channel = await yarah.realtime.channel("chat:room-1")
 try await channel.subscribe()
 ```
 
@@ -108,7 +108,7 @@ try await channel.subscribe()
 Escucha un evento:
 
 ```swift
-let channel = await insforge.realtime.channel("chat:room-1")
+let channel = await yarah.realtime.channel("chat:room-1")
 try await channel.subscribe()
 
 for await message in await channel.broadcast(event: "new_message") {
@@ -133,7 +133,7 @@ try await channel.broadcast(
 Elimine un objeto de canal cuando ya no sea necesario:
 
 ```swift
-await insforge.realtime.removeChannel("chat:room-1")
+await yarah.realtime.removeChannel("chat:room-1")
 ```
 
 ## Presencia

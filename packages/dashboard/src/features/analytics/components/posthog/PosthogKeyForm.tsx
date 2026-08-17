@@ -8,8 +8,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@insforge/ui';
-import type { PosthogDiscoveredProject, PosthogRegion } from '@insforge/shared-schemas';
+} from '@yarahdev/ui';
+import type { PosthogDiscoveredProject, PosthogRegion } from '@yarahdev/shared-schemas';
 import {
   useListPosthogProjects,
   useUpdatePosthogConfig,

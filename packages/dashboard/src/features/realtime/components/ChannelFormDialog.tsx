@@ -16,9 +16,9 @@ import {
   DialogTitle,
   Input,
   Switch,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { Label, Textarea } from '#components';
-import { type CreateChannelRequest, type UpdateChannelRequest } from '@insforge/shared-schemas';
+import { type CreateChannelRequest, type UpdateChannelRequest } from '@yarahdev/shared-schemas';
 import type { RealtimeChannel } from '#features/realtime/services/realtime.service';
 
 // ── Shared form state ──────────────────────────────────────────────────────────

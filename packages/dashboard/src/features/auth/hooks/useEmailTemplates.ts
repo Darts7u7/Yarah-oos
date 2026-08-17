@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ListEmailTemplatesResponse, UpdateEmailTemplateRequest } from '@insforge/shared-schemas';
+import { ListEmailTemplatesResponse, UpdateEmailTemplateRequest } from '@yarahdev/shared-schemas';
 import { emailTemplateService } from '#features/auth/services/email-template.service';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 export function useEmailTemplates() {
   const { t } = useTranslation('chrome');

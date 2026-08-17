@@ -29,7 +29,7 @@ import {
   type RoleSchema,
   type VerifyRazorpaySubscriptionRequest,
   type VerifyRazorpaySubscriptionResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const RAZORPAY_SUBSCRIPTION_COLUMNS = `
   environment,

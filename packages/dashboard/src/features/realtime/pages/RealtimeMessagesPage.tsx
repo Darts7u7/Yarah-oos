@@ -10,7 +10,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { PaginationControls, TableHeader } from '#components';
 import { useRealtimeMessages } from '#features/realtime/hooks/useRealtimeMessages';
 import { MessageRow } from '#features/realtime/components/MessageRow';

@@ -10,7 +10,7 @@ import {
   type RealtimeMetadataSchema,
   type RlsPolicy,
   type RealtimePermissionsResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const SYSTEM_POLICIES = ['project_admin_policy'];
 

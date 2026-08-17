@@ -1,16 +1,16 @@
 ---
 title: "Stripe 付款"
 sidebarTitle: "Stripe"
-description: "将 Stripe Checkout、Billing Portal、目录同步与 Webhook 履约集成到 InsForge，配置订阅计划与事件，把支付状态同步到 Postgres。"
+description: "将 Stripe Checkout、Billing Portal、目录同步与 Webhook 履约集成到 Yarah，配置订阅计划与事件，把支付状态同步到 Postgres。"
 ---
 
 当您想要 Stripe 托管的 Checkout、Stripe Products 和 Prices、Stripe Subscriptions 和托管的 Billing Portal 时，使用 Stripe 集成。
 
-InsForge 在服务器端存储 Stripe 密钥，从您的应用创建 Checkout 和 Billing Portal 会话，当您的后端可访问时自动管理 Stripe webhook 端点，将 Stripe 状态镜像到 `payments` 架构，并记录已验证的 webhook 事件。
+Yarah 在服务器端存储 Stripe 密钥，从您的应用创建 Checkout 和 Billing Portal 会话，当您的后端可访问时自动管理 Stripe webhook 端点，将 Stripe 状态镜像到 `payments` 架构，并记录已验证的 webhook 事件。
 
 ## Stripe 模型
 
-| Stripe 概念 | InsForge 表或 API |
+| Stripe 概念 | Yarah 表或 API |
 |----------------|-----------------------|
 | Product | `payments.stripe_products` |
 | Price | `payments.stripe_prices` |
@@ -26,20 +26,20 @@ InsForge 在服务器端存储 Stripe 密钥，从您的应用创建 Checkout �
 在 Dashboard -> Payments -> Settings、CLI 或管理 API 中配置 `test` 和 `live` Stripe 密钥。
 
 ```bash
-npx @insforge/cli payments stripe status
-npx @insforge/cli payments stripe config set --environment test sk_test_xxx
-npx @insforge/cli payments stripe sync --environment test
-npx @insforge/cli payments stripe webhooks configure --environment test
+npx @yarah/cli payments stripe status
+npx @yarah/cli payments stripe config set --environment test sk_test_xxx
+npx @yarah/cli payments stripe sync --environment test
+npx @yarah/cli payments stripe webhooks configure --environment test
 ```
 
-连接密钥后，InsForge 验证账户、在秘密存储中存储密钥、尝试创建托管的 Stripe webhook 端点，并为 Products、Prices、Customers 和 Subscriptions 运行同步。
+连接密钥后，Yarah 验证账户、在秘密存储中存储密钥、尝试创建托管的 Stripe webhook 端点，并为 Products、Prices、Customers 和 Subscriptions 运行同步。
 
 ## Checkout
 
-从前端代码使用当前 InsForge 用户令牌创建 Checkout Sessions。
+从前端代码使用当前 Yarah 用户令牌创建 Checkout Sessions。
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'payment',
   lineItems: [{ priceId: 'price_123', quantity: 1 }],
   successUrl: `${window.location.origin}/checkout/success`,
@@ -58,7 +58,7 @@ if (data?.checkoutSession.url) {
 对于订阅 Checkout，传递计费主体。主体是您的应用拥有的计费所有者，如用户、团队、工作区、组织、租户或组。
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'subscription',
   subject: { type: 'team', id: teamId },
   lineItems: [{ priceId: 'price_monthly_123', quantity: 1 }],
@@ -74,14 +74,14 @@ if (data?.checkoutSession.url) {
 }
 ```
 
-Checkout 使用调用者的 InsForge 令牌在 `payments.stripe_checkout_sessions` 中插入一行。添加 RLS 策略，以便用户只能为他们被允许计费的主体创建会话。PostgreSQL 对 `INSERT ... RETURNING` 返回和幂等查找的行应用 `SELECT` 策略，因此重试也需要相同主体和幂等密钥的匹配 `SELECT` 策略。
+Checkout 使用调用者的 Yarah 令牌在 `payments.stripe_checkout_sessions` 中插入一行。添加 RLS 策略，以便用户只能为他们被允许计费的主体创建会话。PostgreSQL 对 `INSERT ... RETURNING` 返回和幂等查找的行应用 `SELECT` 策略，因此重试也需要相同主体和幂等密钥的匹配 `SELECT` 策略。
 
 ## Billing Portal
 
 对现有 Stripe 客户映射使用托管的 Billing Portal。
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCustomerPortalSession('test', {
+const { data, error } = await yarah.payments.stripe.createCustomerPortalSession('test', {
   subject: { type: 'team', id: teamId },
   returnUrl: `${window.location.origin}/billing`
 });
@@ -103,9 +103,9 @@ Portal 创建需要已验证的用户和主体的现有 `payments.customer_mappi
 
 ## Webhooks 和履行
 
-当后端具有公共 URL 时，Stripe webhook 会自动管理。InsForge 侦听保持 checkout 尝试、客户、订阅、退款和交易投影最新所需的事件。
+当后端具有公共 URL 时，Stripe webhook 会自动管理。Yarah 侦听保持 checkout 尝试、客户、订阅、退款和交易投影最新所需的事件。
 
-Stripe 还建议从 webhook 而不是成功 URL 履行 Checkout 订单。在 InsForge 中，将履行触发器附加到 `payments.webhook_events`。
+Stripe 还建议从 webhook 而不是成功 URL 履行 Checkout 订单。在 Yarah 中，将履行触发器附加到 `payments.webhook_events`。
 
 ```sql
 CREATE OR REPLACE FUNCTION public.fulfill_stripe_order()
@@ -134,9 +134,9 @@ CREATE TRIGGER fulfill_stripe_order_from_webhook
 
 ### 事件排序
 
-Webhook 事件独立验证和处理。InsForge 在将事件标记为 `processed` 之前提交派生自事件的每一行，但 Stripe 不保证事件间的排序：`invoice.paid` 可以在 `checkout.session.completed` 之前处理，所以另一个事件创建的行（如 `payments.customer_mappings`）在触发器触发时可能不存在。
+Webhook 事件独立验证和处理。Yarah 在将事件标记为 `processed` 之前提交派生自事件的每一行，但 Stripe 不保证事件间的排序：`invoice.paid` 可以在 `checkout.session.completed` 之前处理，所以另一个事件创建的行（如 `payments.customer_mappings`）在触发器触发时可能不存在。
 
-对于订阅事件，首先从事件有效负载解析计费主体 — InsForge 在 checkout 处将 `insforge_subject_type` 和 `insforge_subject_id` 戳入订阅元数据，Stripe 将其快照到订阅生成的发票上，作为 `parent.subscription_details.metadata`。接下来检查 `invoice.metadata`，然后回退到 `payments.customer_mappings`（InsForge 内部使用的相同顺序）：
+对于订阅事件，首先从事件有效负载解析计费主体 — Yarah 在 checkout 处将 `yarah_subject_type` 和 `yarah_subject_id` 戳入订阅元数据，Stripe 将其快照到订阅生成的发票上，作为 `parent.subscription_details.metadata`。接下来检查 `invoice.metadata`，然后回退到 `payments.customer_mappings`（Yarah 内部使用的相同顺序）：
 
 ```sql
 CREATE OR REPLACE FUNCTION public.grant_subscription_access()
@@ -150,13 +150,13 @@ BEGIN
      AND NEW.processing_status = 'processed' THEN
     v_subject_type := COALESCE(
       NEW.payload -> 'data' -> 'object' -> 'parent'
-        -> 'subscription_details' -> 'metadata' ->> 'insforge_subject_type',
-      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'insforge_subject_type'
+        -> 'subscription_details' -> 'metadata' ->> 'yarah_subject_type',
+      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'yarah_subject_type'
     );
     v_subject_id := COALESCE(
       NEW.payload -> 'data' -> 'object' -> 'parent'
-        -> 'subscription_details' -> 'metadata' ->> 'insforge_subject_id',
-      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'insforge_subject_id'
+        -> 'subscription_details' -> 'metadata' ->> 'yarah_subject_id',
+      NEW.payload -> 'data' -> 'object' -> 'metadata' ->> 'yarah_subject_id'
     );
 
     IF v_subject_id IS NULL THEN

@@ -9,7 +9,7 @@ import {
   ErrorState,
   TableHeader,
 } from '#components';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 import { useApifyActors } from '#features/webscraper/hooks/useWebscraper';
 import { useClientPagination } from '#features/webscraper/hooks/useClientPagination';
 import type { ApifyActor } from '#features/webscraper/services/webscraper.service';

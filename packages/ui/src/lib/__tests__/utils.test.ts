@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cn } from '@insforge/ui';
+import { cn } from '@yarahdev/ui';
 
 describe('cn', () => {
   it('merges conditional classes and resolves Tailwind conflicts', () => {

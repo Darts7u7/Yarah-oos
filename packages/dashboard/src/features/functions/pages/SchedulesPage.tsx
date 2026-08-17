@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, CirclePlus } from 'lucide-react';
 import { useSchedules } from '#features/functions/hooks/useSchedules';
-import type { ScheduleSchema } from '@insforge/shared-schemas';
+import type { ScheduleSchema } from '@yarahdev/shared-schemas';
 import {
   Button,
   ConfirmDialog,
@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
   Skeleton,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { TableHeader } from '#components';
 import { ScheduleFormDialog } from '#features/functions/components/ScheduleFormDialog';
 import type { ScheduleFormSchema } from '#features/functions/types';

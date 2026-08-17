@@ -1,6 +1,6 @@
 # Project Overview
 
-InsForge is an open-source Backend-as-a-Service (BaaS) platform designed specifically for AI agents. It provides a comprehensive solution for managing backend services including authentication, database operations, storage, and serverless functions, all accessible through REST APIs with PostgreSQL as the primary database.
+Yarah is an open-source Backend-as-a-Service (BaaS) platform designed specifically for AI agents. It provides a comprehensive solution for managing backend services including authentication, database operations, storage, and serverless functions, all accessible through REST APIs with PostgreSQL as the primary database.
 
 ## Architecture
 

@@ -1,14 +1,14 @@
 ---
-title: "Autoalojar InsForge en Azure Virtual Machines"
-description: "Autoaloja InsForge en una máquina virtual de Azure con Docker Compose, cubriendo acceso SSH, dominios personalizados, HTTPS y refuerzo para producción."
+title: "Autoalojar Yarah en Azure Virtual Machines"
+description: "Autoaloja Yarah en una máquina virtual de Azure con Docker Compose, cubriendo acceso SSH, dominios personalizados, HTTPS y refuerzo para producción."
 ---
 
-# 📖 Desplegar InsForge en Azure Virtual Machines (Guía extendida)
+# 📖 Desplegar Yarah en Azure Virtual Machines (Guía extendida)
 
-Esta guía proporciona instrucciones completas y paso a paso para desplegar, gestionar y proteger InsForge en una máquina virtual (VM) de Azure usando Docker Compose.
+Esta guía proporciona instrucciones completas y paso a paso para desplegar, gestionar y proteger Yarah en una máquina virtual (VM) de Azure usando Docker Compose.
 
 <Note>
-  Este recorrido en la nube es mantenido por la comunidad y puede quedar rezagado respecto a la última versión de InsForge. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de InsForge](https://github.com/InsForge/InsForge).
+  Este recorrido en la nube es mantenido por la comunidad y puede quedar rezagado respecto a la última versión de Yarah. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de Yarah](https://github.com/Yarah/Yarah).
 </Note>
 
 ## Requisitos previos
@@ -24,19 +24,19 @@ Esta guía proporciona instrucciones completas y paso a paso para desplegar, ges
 1.  **Inicie sesión en el [Portal de Azure](https://portal.azure.com/)** y navegue a **Máquinas virtuales**.
 2.  Haga clic en **+ Crear** > **Máquina virtual de Azure**.
 3.  **Pestaña Básicos:**
-    * **Grupo de recursos:** Cree uno nuevo (por ejemplo, `insforge-rg`).
-    * **Nombre de la máquina virtual:** `insforge-vm`.
+    * **Grupo de recursos:** Cree uno nuevo (por ejemplo, `yarah-rg`).
+    * **Nombre de la máquina virtual:** `yarah-vm`.
     * **Imagen:** **Ubuntu Server 22.04 LTS** o una versión más reciente.
     * **Tamaño:** `Standard_B2s` (2 vCPU, 4 GiB de memoria) es un buen punto de partida. Para producción, considere `Standard_B4ms` (4 vCPU, 16 GiB de memoria).
     * **Tipo de autenticación:** **Clave pública SSH**.
-    * **Origen de la clave pública SSH:** **Generar nuevo par de claves**. Llámelo `insforge-key`.
+    * **Origen de la clave pública SSH:** **Generar nuevo par de claves**. Llámelo `yarah-key`.
 4.  **Pestaña Redes:**
     * En la sección **Grupo de seguridad de red**, haga clic en **Crear nuevo**.
     * Agregue las siguientes **reglas de puertos de entrada** para permitir el tráfico:
         * `22` (SSH)
         * `80` (HTTP para Nginx)
         * `443` (HTTPS para Nginx/SSL)
-        * `7130` (API y panel de InsForge)
+        * `7130` (API y panel de Yarah)
 5.  **Revisar y crear:**
     * Haga clic en **Revisar y crear**, luego en **Crear**.
     * Cuando se le solicite, **descargue la clave privada y cree el recurso**. Guarde el archivo `.pem` de forma segura.
@@ -50,8 +50,8 @@ Esta guía proporciona instrucciones completas y paso a paso para desplegar, ges
     Abra su terminal, asigne los permisos correctos a su clave y conéctese a la VM.
 
     ```bash
-    chmod 400 /path/to/your/insforge-key.pem
-    ssh -i /path/to/your/insforge-key.pem azureuser@<your-vm-public-ip>
+    chmod 400 /path/to/your/yarah-key.pem
+    ssh -i /path/to/your/yarah-key.pem azureuser@<your-vm-public-ip>
     ```
 
 2.  **Actualizar los paquetes del sistema:**
@@ -88,18 +88,18 @@ Esta guía proporciona instrucciones completas y paso a paso para desplegar, ges
 
 ---
 
-## Paso 3: 🚀 Desplegar InsForge
+## Paso 3: 🚀 Desplegar Yarah
 
 1.  **Obtener el repositorio:**
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh | sh -s ~/insforge
+    curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
     ```
     Descarga los archivos que el stack lee y genera `JWT_SECRET`, `ENCRYPTION_KEY`, `ROOT_ADMIN_PASSWORD` y `POSTGRES_PASSWORD` en `.env`. No arranca nada.
 
 2.  **Crear la configuración del entorno:**
     Los secretos ya están generados: déjalos como están. Apunta las URL de la API a tu VM.
     ```bash
-    cd ~/insforge
+    cd ~/yarah
     nano .env
     ```
 
@@ -110,7 +110,7 @@ Esta guía proporciona instrucciones completas y paso a paso para desplegar, ges
     El resto de `.env.example` cubre funciones opcionales (OpenRouter, despliegues de Vercel, proveedores OAuth). Déjalas en blanco si no las necesitas.
     > Guarda una copia de `.env` en un lugar seguro. Sus secretos son lo que te permite migrar o restaurar esta instancia.
 
-3.  **Iniciar los servicios de InsForge:**
+3.  **Iniciar los servicios de Yarah:**
     Descargue las imágenes de Docker e inicie todos los servicios en segundo plano.
     ```bash
     docker compose up -d
@@ -121,11 +121,11 @@ Esta guía proporciona instrucciones completas y paso a paso para desplegar, ges
     ```bash
     docker compose ps
     ```
-    Debería ver los servicios `postgres`, `postgrest`, `insforge` y `deno` en ejecución.
+    Debería ver los servicios `postgres`, `postgrest`, `yarah` y `deno` en ejecución.
 
 ---
 
-## Paso 4: 🔑 Acceder a su instancia de InsForge
+## Paso 4: 🔑 Acceder a su instancia de Yarah
 
 1.  **Probar la API del backend:**
     Use `curl` para comprobar el endpoint de salud.
@@ -150,7 +150,7 @@ Esta guía proporciona instrucciones completas y paso a paso para desplegar, ges
 2.  **Instalar y configurar Nginx como proxy inverso:**
     ```bash
     sudo apt install nginx -y
-    sudo nano /etc/nginx/sites-available/insforge
+    sudo nano /etc/nginx/sites-available/yarah
     ```
     Pegue la siguiente configuración:
     ```nginx
@@ -181,7 +181,7 @@ Esta guía proporciona instrucciones completas y paso a paso para desplegar, ges
     ```
     Habilite la configuración y recargue Nginx:
     ```bash
-    sudo ln -s /etc/nginx/sites-available/insforge /etc/nginx/sites-enabled/
+    sudo ln -s /etc/nginx/sites-available/yarah /etc/nginx/sites-enabled/
     sudo nginx -t
     sudo systemctl reload nginx
     ```
@@ -198,7 +198,7 @@ Esta guía proporciona instrucciones completas y paso a paso para desplegar, ges
 4.  **Actualizar `.env` con URLs HTTPS:**
     Edite su archivo `.env` y actualice las URLs.
     ```bash
-    cd ~/insforge
+    cd ~/yarah
     nano .env
     ```
     Cambie las URLs a `https`:
@@ -215,19 +215,19 @@ Esta guía proporciona instrucciones completas y paso a paso para desplegar, ges
 
 ## 🔧 Gestión y mantenimiento
 
-* **Ver registros:** `docker compose logs -f` (todos los servicios) o `docker compose logs -f insforge` (servicio específico).
+* **Ver registros:** `docker compose logs -f` (todos los servicios) o `docker compose logs -f yarah` (servicio específico).
 * **Detener servicios:** `docker compose down`
 * **Reiniciar servicios:** `docker compose restart`
-* **Actualizar InsForge:** Ejecute esto desde `~/insforge`. Las imágenes están preconstruidas, así que descargue las últimas etiquetas en lugar de reconstruir.
+* **Actualizar Yarah:** Ejecute esto desde `~/yarah`. Las imágenes están preconstruidas, así que descargue las últimas etiquetas en lugar de reconstruir.
     ```bash
-    cd ~/insforge
-    git -C ~/insforge pull origin main
+    cd ~/yarah
+    git -C ~/yarah pull origin main
     sh deploy/setup.sh .
     docker compose pull && docker compose up -d
     ```
-* **Respaldar la base de datos:** Ejecute desde `~/insforge`.
+* **Respaldar la base de datos:** Ejecute desde `~/yarah`.
     ```bash
-    docker compose exec postgres pg_dump -U postgres insforge > backup_$(date +%Y%m%d_%H%M%S).sql
+    docker compose exec postgres pg_dump -U postgres yarah > backup_$(date +%Y%m%d_%H%M%S).sql
     ```
 
 ## 🐛 Solución de problemas
@@ -247,7 +247,7 @@ Esta guía proporciona instrucciones completas y paso a paso para desplegar, ges
 
 ### Configuración inicial (para desarrollo y proyectos pequeños)
 * **Costo:** **~$30 - $40/mes**
-* **Recursos:** Esta estimación corresponde a una VM `Standard_B2s` (2 vCPU, 4 GiB de RAM) que ejecuta todos los contenedores Docker de InsForge.
+* **Recursos:** Esta estimación corresponde a una VM `Standard_B2s` (2 vCPU, 4 GiB de RAM) que ejecuta todos los contenedores Docker de Yarah.
 * **Desglose:** El costo consiste principalmente en las horas de cómputo de la VM. También incluye el almacenamiento del disco del sistema operativo y una dirección IP pública estática. Esta única VM ejecuta su base de datos, backend, Deno y todos los demás servicios.
 
 ### Configuración de producción (para escalabilidad y confiabilidad)
@@ -262,7 +262,7 @@ Para producción, puede elegir entre una VM más grande todo en uno o una config
 * **Opción B: Servicios administrados (recomendado para producción)**
     * **Costo:** **~$120+/mes** (muy variable)
     * **Recursos:**
-        * **VM de aplicación:** Una VM `Standard_B2s` para los servicios de la aplicación (InsForge, PostgREST, Deno). `(~$30/mes)`
+        * **VM de aplicación:** Una VM `Standard_B2s` para los servicios de la aplicación (Yarah, PostgREST, Deno). `(~$30/mes)`
         * **Base de datos administrada:** Use **Azure Database for PostgreSQL** para confiabilidad, copias de seguridad automatizadas y escalabilidad. `(~$40+/mes para un nivel inicial)`
     * **Ventajas:** Altamente confiable y escalable. El rendimiento de la base de datos está aislado y garantizado. Copias de seguridad y seguridad administradas.
     * **Desventajas:** Configuración más compleja, los costos se distribuyen entre varios servicios.
@@ -271,5 +271,5 @@ Para producción, puede elegir entre una VM más grande todo en uno o una config
 
 * **Cambiar las contraseñas predeterminadas:** Actualice siempre las contraseñas de administrador y de la base de datos.
 * **Habilitar el firewall:** Use los **Grupos de seguridad de red (NSG)** de Azure para restringir el acceso a los puertos e direcciones IP necesarios.
-* **Actualizaciones regulares:** Ejecute periódicamente `sudo apt update && sudo apt upgrade -y` y actualice InsForge.
+* **Actualizaciones regulares:** Ejecute periódicamente `sudo apt update && sudo apt upgrade -y` y actualice Yarah.
 * **Respaldar regularmente:** Automatice las copias de seguridad de la base de datos y la configuración.

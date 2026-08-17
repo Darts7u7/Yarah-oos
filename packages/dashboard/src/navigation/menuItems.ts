@@ -160,7 +160,7 @@ export const dashboardWebscraperMenuItem: DashboardPrimaryMenuItem = {
   icon: Radar,
 };
 
-// d_test + cloud-hosting only: navigates to the Install InsForge route.
+// d_test + cloud-hosting only: navigates to the Install Yarah route.
 export const dashboardDTestInstallMenuItem: DashboardPrimaryMenuItem = {
   id: 'dtest-install',
   label: 'Install',
@@ -172,7 +172,7 @@ export const dashboardDTestInstallMenuItem: DashboardPrimaryMenuItem = {
 export const dashboardDTestDocMenuItem: DashboardPrimaryMenuItem = {
   id: 'dtest-doc',
   label: 'Doc',
-  href: 'https://docs.insforge.dev/introduction',
+  href: 'https://docs.yarah.dev/introduction',
   icon: BookOpen,
   external: true,
 };

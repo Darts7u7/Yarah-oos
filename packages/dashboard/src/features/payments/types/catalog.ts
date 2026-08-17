@@ -1,4 +1,4 @@
-import type { PaymentEnvironment, PaymentProvider } from '@insforge/shared-schemas';
+import type { PaymentEnvironment, PaymentProvider } from '@yarahdev/shared-schemas';
 
 export interface CatalogProduct {
   environment: PaymentEnvironment;

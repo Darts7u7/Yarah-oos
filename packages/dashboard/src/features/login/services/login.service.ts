@@ -3,7 +3,7 @@ import type {
   CreateAdminSessionResponse,
   GetCurrentAdminSessionResponse,
   AdminSchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 export class LoginService {
   async loginWithPassword(username: string, password: string): Promise<CreateAdminSessionResponse> {

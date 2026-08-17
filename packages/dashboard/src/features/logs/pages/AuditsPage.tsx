@@ -5,10 +5,10 @@ import { LogsDataGrid, type LogsColumnDef } from '#features/logs/components';
 import { formatTime } from '#lib/utils/utils';
 import { useConfirm } from '#lib/hooks/useConfirm';
 import { usePageSize } from '#lib/hooks/usePageSize';
-import { Button, ConfirmDialog, cn } from '@insforge/ui';
+import { Button, ConfirmDialog, cn } from '@yarahdev/ui';
 import { DataGridEmptyState, TableHeader } from '#components';
 import { useAuditLogs, useClearAuditLogs } from '#features/logs/hooks/useAuditLogs';
-import type { AuditLogSchema, GetAuditLogsRequest } from '@insforge/shared-schemas';
+import type { AuditLogSchema, GetAuditLogsRequest } from '@yarahdev/shared-schemas';
 
 function ModuleBadge({ module }: { module?: string | null }) {
   return (

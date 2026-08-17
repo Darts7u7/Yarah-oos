@@ -46,21 +46,21 @@ describe('FunctionService cloud secret behavior', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockListSecrets.mockResolvedValue([
-      { key: 'INSFORGE_INTERNAL_URL', isActive: true },
-      { key: 'INSFORGE_BASE_URL', isActive: true },
+      { key: 'YARAH_INTERNAL_URL', isActive: true },
+      { key: 'YARAH_BASE_URL', isActive: true },
     ]);
     mockGetSecretByKey.mockImplementation(async (key: string) => {
-      if (key === 'INSFORGE_INTERNAL_URL') {
-        return 'http://insforge:7130';
+      if (key === 'YARAH_INTERNAL_URL') {
+        return 'http://yarah:7130';
       }
-      if (key === 'INSFORGE_BASE_URL') {
+      if (key === 'YARAH_BASE_URL') {
         return 'https://api.example.com';
       }
       return null;
     });
   });
 
-  it('rewrites INSFORGE_INTERNAL_URL to INSFORGE_BASE_URL in cloud', async () => {
+  it('rewrites YARAH_INTERNAL_URL to YARAH_BASE_URL in cloud', async () => {
     mockIsCloudEnvironment.mockReturnValue(true);
 
     const { FunctionService } = await import('../../src/services/functions/function.service.js');
@@ -70,10 +70,10 @@ describe('FunctionService cloud secret behavior', () => {
 
     const secrets = await service.getFunctionSecrets();
 
-    expect(secrets.INSFORGE_INTERNAL_URL).toBe('https://api.example.com');
+    expect(secrets.YARAH_INTERNAL_URL).toBe('https://api.example.com');
   });
 
-  it('preserves INSFORGE_INTERNAL_URL in OSS', async () => {
+  it('preserves YARAH_INTERNAL_URL in OSS', async () => {
     mockIsCloudEnvironment.mockReturnValue(false);
 
     const { FunctionService } = await import('../../src/services/functions/function.service.js');
@@ -83,6 +83,6 @@ describe('FunctionService cloud secret behavior', () => {
 
     const secrets = await service.getFunctionSecrets();
 
-    expect(secrets.INSFORGE_INTERNAL_URL).toBe('http://insforge:7130');
+    expect(secrets.YARAH_INTERNAL_URL).toBe('http://yarah:7130');
   });
 });

@@ -30,7 +30,7 @@ interface PostHogTelemetryEvent {
   properties: {
     $process_person_profile: false;
     installation_id: string;
-    telemetry_source: 'insforge_oss';
+    telemetry_source: 'yarah_oss';
     telemetry_event_name: TelemetryEventName;
     version: string;
     hosting_mode: 'cloud' | 'self-hosted';
@@ -59,8 +59,10 @@ type FetchFunction = typeof fetch;
 type TimerHandle = ReturnType<typeof setInterval>;
 
 const CI_ENV_KEYS = ['CI', 'GITHUB_ACTIONS', 'GITLAB_CI', 'BUILDKITE', 'CIRCLECI', 'JENKINS_URL'];
-const DEFAULT_TELEMETRY_ENDPOINT = 'https://b.insforge.dev/capture/';
-const DEFAULT_POSTHOG_API_KEY = 'phc_ueV1ii62wdBTkH7E70ugyeqHIHu8dFDdjs0qq3TZhJz';
+// Telemetry ships disabled: no endpoint or key is bundled. To enable
+// first-party telemetry for Yarah, set both constants to your own collector.
+const DEFAULT_TELEMETRY_ENDPOINT = '';
+const DEFAULT_POSTHOG_API_KEY = '';
 const DEFAULT_HEARTBEAT_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_REQUEST_TIMEOUT_MS = 3000;
 
@@ -94,7 +96,12 @@ function detectRuntimeEnvironment(): TelemetryRuntimeEnvironment {
 }
 
 export function isTelemetryRuntimeDisabled(): boolean {
-  return appConfig.telemetry.disabled || isCloudEnvironment();
+  return (
+    appConfig.telemetry.disabled ||
+    isCloudEnvironment() ||
+    !DEFAULT_TELEMETRY_ENDPOINT ||
+    !DEFAULT_POSTHOG_API_KEY
+  );
 }
 
 function defaultTelemetryConfig(): TelemetryConfig {
@@ -102,7 +109,7 @@ function defaultTelemetryConfig(): TelemetryConfig {
     disabled: isTelemetryRuntimeDisabled(),
     endpoint: DEFAULT_TELEMETRY_ENDPOINT,
     posthogApiKey: DEFAULT_POSTHOG_API_KEY,
-    installationIdPath: path.join(appConfig.server.logsDir, '.insforge-installation-id'),
+    installationIdPath: path.join(appConfig.server.logsDir, '.yarah-installation-id'),
     heartbeatIntervalMs: DEFAULT_HEARTBEAT_INTERVAL_MS,
     requestTimeoutMs: DEFAULT_REQUEST_TIMEOUT_MS,
   };
@@ -179,7 +186,7 @@ export class TelemetryService {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
-            'user-agent': `insforge/${packageJson.version}`,
+            'user-agent': `yarah/${packageJson.version}`,
           },
           body: JSON.stringify(event),
           signal: controller.signal,
@@ -190,7 +197,7 @@ export class TelemetryService {
             this.featureUsage.commit(usage);
           }
         } else {
-          logger.warn('InsForge telemetry request failed', {
+          logger.warn('Yarah telemetry request failed', {
             status: response.status,
             statusText: response.statusText,
           });
@@ -199,7 +206,7 @@ export class TelemetryService {
         clearTimeout(timeout);
       }
     } catch (error) {
-      logger.warn('InsForge telemetry skipped', {
+      logger.warn('Yarah telemetry skipped', {
         error: error instanceof Error ? error.message : String(error),
       });
     }
@@ -215,7 +222,7 @@ export class TelemetryService {
     const installationIdDir = path.dirname(this.config.installationIdPath);
     const tempInstallationIdPath = path.join(
       installationIdDir,
-      `.insforge-installation-id.${process.pid}.${randomUUID()}.tmp`
+      `.yarah-installation-id.${process.pid}.${randomUUID()}.tmp`
     );
 
     fs.mkdirSync(installationIdDir, { recursive: true });
@@ -266,7 +273,7 @@ export class TelemetryService {
       properties: {
         $process_person_profile: false,
         installation_id: installationId,
-        telemetry_source: 'insforge_oss',
+        telemetry_source: 'yarah_oss',
         telemetry_event_name: eventName,
         version: packageJson.version,
         hosting_mode: isCloudEnvironment() ? 'cloud' : 'self-hosted',
@@ -359,7 +366,7 @@ function detectDeploymentMethod(): string {
   // Dockerfile, PaaS templates) declares its channel. Dokploy is identified
   // this way — it does not inject variables into containers. Length-capped
   // to keep property cardinality bounded when users edit the value.
-  const stamped = process.env.INSFORGE_DEPLOYMENT_METHOD?.trim().toLowerCase();
+  const stamped = process.env.YARAH_DEPLOYMENT_METHOD?.trim().toLowerCase();
   if (stamped) {
     return stamped.slice(0, 32);
   }

@@ -8,7 +8,7 @@ import { setDashboardBackendUrl } from '#lib/config/runtime';
 import type { DashboardMode, DashboardMetricsResponse } from '#types';
 import { ObservabilitySection } from '#features/dashboard/components/observability';
 
-const CLOUD_BACKEND = 'https://demo.us-east.insforge.app';
+const CLOUD_BACKEND = 'https://demo.us-east.apps.yarah.dev';
 
 function metricsResponse(memoryValues: number[]): DashboardMetricsResponse {
   return {
@@ -70,8 +70,8 @@ describe('ObservabilitySection memory advisory', () => {
     expect(advisoryText()).toBeNull();
   });
 
-  it('keeps the explanation but hides the CTA outside a cloud-hosting insforge.app project', async () => {
-    // cloud-hosting mode but a non-insforge.app backend: the Compute tab the
+  it('keeps the explanation but hides the CTA outside a cloud-hosting.apps.yarah.dev project', async () => {
+    // cloud-hosting mode but a non.apps.yarah.dev backend: the Compute tab the
     // CTA opens would fall back to Project Information, so no button.
     setDashboardBackendUrl('https://localhost:7130');
     renderSection('cloud-hosting', metricsResponse([70, 72, 84]));

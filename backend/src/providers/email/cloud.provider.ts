@@ -5,10 +5,10 @@ import { TokenManager } from '@/infra/security/token.manager.js';
 import { AppError } from '@/utils/errors.js';
 import { EMAIL_TEMPLATE_TYPES, EmailTemplate } from '@/types/email.js';
 import { EmailProvider } from './base.provider.js';
-import { ERROR_CODES, SendRawEmailRequest } from '@insforge/shared-schemas';
+import { ERROR_CODES, SendRawEmailRequest } from '@yarahdev/shared-schemas';
 
 /**
- * Cloud email provider for sending emails via Insforge cloud backend
+ * Cloud email provider for sending emails via Yarah cloud backend
  */
 export class CloudEmailProvider implements EmailProvider {
   /**

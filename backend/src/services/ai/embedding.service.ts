@@ -3,7 +3,7 @@ import {
   ERROR_CODES,
   type EmbeddingsRequest,
   type EmbeddingsResponse,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import logger from '@/utils/logger.js';
 import { AppError } from '@/utils/errors.js';
 

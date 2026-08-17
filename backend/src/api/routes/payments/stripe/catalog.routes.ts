@@ -14,7 +14,7 @@ import {
   stripeProductParamsSchema,
   updateStripePriceBodySchema,
   updateStripeProductBodySchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const router = Router({ mergeParams: true });
 const productService = StripeProductService.getInstance();

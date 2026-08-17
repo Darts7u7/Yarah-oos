@@ -8,7 +8,7 @@
 --
 -- This migration makes the exposed set dynamic with an OPT-OUT (deny-list)
 -- policy: every schema is exposed to the data API EXCEPT Postgres internals,
--- InsForge's own internal schemas, and extension-owned schemas. New schemas
+-- Yarah's own internal schemas, and extension-owned schemas. New schemas
 -- become reachable automatically via a DDL event trigger -- including those
 -- created through raw SQL or migrations, not just the table API.
 --
@@ -37,13 +37,13 @@
 -- UP migration
 
 -- Deny-list predicate: which schemas are exposed to the data API. Keeps
--- `public`, excludes Postgres internals, InsForge internal schemas, and any
+-- `public`, excludes Postgres internals, Yarah internal schemas, and any
 -- schema owned by an extension (e.g. pg_cron's `cron`, PostGIS's `tiger`).
 -- STABLE rather than IMMUTABLE because it reads catalogs and the
--- `insforge.internal_schemas` GUC.
+-- `yarah.internal_schemas` GUC.
 --
--- The InsForge-internal deny-list is sourced from the `insforge.internal_schemas`
--- setting (defined in postgresql.conf, alongside `insforge.policy_grant_tables`)
+-- The Yarah-internal deny-list is sourced from the `yarah.internal_schemas`
+-- setting (defined in postgresql.conf, alongside `yarah.policy_grant_tables`)
 -- so it has a single source of truth and can be updated without a migration.
 -- The literal below is only a fallback for deployments where the GUC is unset.
 CREATE OR REPLACE FUNCTION system.is_exposed_schema(p_schema text)
@@ -60,7 +60,7 @@ AS $fn$
       string_to_array(
         regexp_replace(
           coalesce(
-            nullif(current_setting('insforge.internal_schemas', true), ''),
+            nullif(current_setting('yarah.internal_schemas', true), ''),
             'ai,auth,compute,deployments,email,functions,memory,payments,realtime,schedules,storage,system'
           ),
           '\s', '', 'g'
@@ -134,8 +134,8 @@ BEGIN
   END IF;
 END $$;
 
-DROP EVENT TRIGGER IF EXISTS insforge_sync_postgrest_schemas;
-CREATE EVENT TRIGGER insforge_sync_postgrest_schemas
+DROP EVENT TRIGGER IF EXISTS yarah_sync_postgrest_schemas;
+CREATE EVENT TRIGGER yarah_sync_postgrest_schemas
   ON ddl_command_end
   WHEN TAG IN ('CREATE SCHEMA', 'ALTER SCHEMA', 'DROP SCHEMA')
   EXECUTE FUNCTION system.on_schema_ddl();
@@ -145,7 +145,7 @@ SELECT system.sync_postgrest_exposed_schemas();
 
 -- DOWN migration
 
-DROP EVENT TRIGGER IF EXISTS insforge_sync_postgrest_schemas;
+DROP EVENT TRIGGER IF EXISTS yarah_sync_postgrest_schemas;
 
 -- Reset the data API back to public-only before tearing down the helpers.
 DO $$

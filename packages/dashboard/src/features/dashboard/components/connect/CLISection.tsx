@@ -1,4 +1,4 @@
-import { CopyButton, cn } from '@insforge/ui';
+import { CopyButton, cn } from '@yarahdev/ui';
 import { useTranslation } from 'react-i18next';
 import { CLI_VERIFY_CONNECTION_PROMPT } from './constants';
 import { useProjectId } from '#lib/hooks/useMetadata';
@@ -10,7 +10,7 @@ interface CLISectionProps {
 export function CLISection({ className }: CLISectionProps) {
   const { t } = useTranslation('chrome');
   const { projectId } = useProjectId();
-  const cliLinkCommand = `npx @insforge/cli link --project-id ${projectId || '<project id>'}`;
+  const cliLinkCommand = `npx @yarah/cli link --project-id ${projectId || '<project id>'}`;
 
   return (
     <div className={cn('flex flex-col gap-6', className)}>

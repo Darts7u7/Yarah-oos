@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { withVercelRateLimitRetry } from '@/providers/deployments/vercel.provider.js';
 import { AppError } from '@/utils/errors.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 describe('withVercelRateLimitRetry', () => {
   it('retries on 429 honoring X-RateLimit-Reset (unix seconds)', async () => {

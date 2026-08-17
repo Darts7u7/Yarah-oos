@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { PosthogRegion, PosthogTimeframe } from '@insforge/shared-schemas';
+import type { PosthogRegion, PosthogTimeframe } from '@yarahdev/shared-schemas';
 import {
   analyticsService,
   type Breakdown,

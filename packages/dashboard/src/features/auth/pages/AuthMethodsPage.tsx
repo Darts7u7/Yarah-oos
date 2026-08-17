@@ -18,8 +18,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   ConfirmDialog,
-} from '@insforge/ui';
-import type { OAuthProvidersSchema, CustomOAuthConfigSchema } from '@insforge/shared-schemas';
+} from '@yarahdev/ui';
+import type { OAuthProvidersSchema, CustomOAuthConfigSchema } from '@yarahdev/shared-schemas';
 import { oauthProviders, type OAuthProviderInfo } from '#features/auth/helpers';
 
 export default function AuthMethodsPage() {

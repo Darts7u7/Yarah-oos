@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff } from 'lucide-react';
-import { Button, Input, cn } from '@insforge/ui';
+import { Button, Input, cn } from '@yarahdev/ui';
 
 interface SecretInputProps extends ComponentProps<typeof Input> {
   isVisible: boolean;

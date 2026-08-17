@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "Deploy Deno-powered serverless TypeScript edge functions with HTTP invocation, cron schedules, database triggers, secrets, and environment variables."
 ---
 
-Use InsForge edge functions to run TypeScript on [Deno](https://deno.com), deployed close to your users for low latency. Functions can be invoked on-demand from any client, chained from database triggers, or scheduled to run on a cron expression. The runtime ships standard fetch, streaming responses, and ESM imports out of the box.
+Use Yarah edge functions to run TypeScript on [Deno](https://deno.com), deployed close to your users for low latency. Functions can be invoked on-demand from any client, chained from database triggers, or scheduled to run on a cron expression. The runtime ships standard fetch, streaming responses, and ESM imports out of the box.
 
 <Note>
   **Need a process that stays up?** Use [Compute](/core-concepts/compute/overview) for queue workers, AI inference loops, and anything stateful. Edge Functions are for request/response and short-lived jobs.
@@ -16,7 +16,7 @@ graph TB
     Schedule[Cron Schedule] --> Fn
     Trigger[Database Trigger] --> Fn
 
-    Fn --> SDK[InsForge SDK]
+    Fn --> SDK[Yarah SDK]
     SDK --> DB[(Database)]
     SDK --> Storage[Storage]
     SDK --> Gateway[Model Gateway]
@@ -35,11 +35,11 @@ graph TB
 
 ### HTTP triggers
 
-Every function is reachable at `https://<project>.insforge.dev/functions/<name>`. Standard fetch in, standard `Response` out. Streaming, JSON, redirects, and websockets all work.
+Every function is reachable at `https://<project>.yarah.dev/functions/<name>`. Standard fetch in, standard `Response` out. Streaming, JSON, redirects, and websockets all work.
 
 ### Schedules
 
-Attach a cron expression to a function and InsForge invokes it on time, with retry on failure. See [Schedules](/core-concepts/functions/schedules) for the cron syntax and execution model.
+Attach a cron expression to a function and Yarah invokes it on time, with retry on failure. See [Schedules](/core-concepts/functions/schedules) for the cron syntax and execution model.
 
 ### Database triggers
 
@@ -53,14 +53,14 @@ The difference is how each value is stored and protected. **Secrets** are encryp
 
 ```bash
 # a protected secret with an expiry
-npx @insforge/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
+npx @yarah/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
 # read the decrypted value back
-npx @insforge/cli secrets get STRIPE_SECRET_KEY
+npx @yarah/cli secrets get STRIPE_SECRET_KEY
 ```
 
 ### Logs
 
-Structured logs are captured per invocation, queryable by status, duration, and function name. The InsForge MCP `get-function-logs` tool lets your agent diagnose failures without leaving the editor.
+Structured logs are captured per invocation, queryable by status, duration, and function name. The Yarah MCP `get-function-logs` tool lets your agent diagnose failures without leaving the editor.
 
 ### Deno standard library
 

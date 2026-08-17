@@ -1,6 +1,6 @@
 ---
 title: Referencia de SDK de Correo Electrónico
-description: Envía correos transaccionales personalizados con el SDK de InsForge en TypeScript, con plantillas, SMTP configurable y control del remitente por proyecto.
+description: Envía correos transaccionales personalizados con el SDK de Yarah en TypeScript, con plantillas, SMTP configurable y control del remitente por proyecto.
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
@@ -22,7 +22,7 @@ Envía correos electrónicos HTML personalizados a uno o más destinatarios.
 - `replyTo` (string, optional) - Dirección de correo electrónico de respuesta, debe ser una dirección de correo válida
 
 <Note>
-De forma predeterminada, los correos se envían desde `noreply@<tu-proyecto>.send.insforge.dev`, un subdominio por proyecto que InsForge Cloud aprovisiona y verifica por ti, por lo que no se requiere ninguna configuración de dominio. El campo `from` solo establece el nombre visible que aparece junto a esa dirección; con el proveedor predeterminado no puedes cambiar la dirección ni el dominio. Para enviar desde tu propio dominio, configura [SMTP Personalizado](/core-concepts/messaging/custom-smtp). Cuando SMTP Personalizado está habilitado, el campo `from` se ignora por completo y el nombre del remitente y el correo electrónico se toman de tu configuración SMTP para evitar spoofing a través de tu servidor.
+De forma predeterminada, los correos se envían desde `noreply@<tu-proyecto>.send.yarah.dev`, un subdominio por proyecto que Yarah Cloud aprovisiona y verifica por ti, por lo que no se requiere ninguna configuración de dominio. El campo `from` solo establece el nombre visible que aparece junto a esa dirección; con el proveedor predeterminado no puedes cambiar la dirección ni el dominio. Para enviar desde tu propio dominio, configura [SMTP Personalizado](/core-concepts/messaging/custom-smtp). Cuando SMTP Personalizado está habilitado, el campo `from` se ignora por completo y el nombre del remitente y el correo electrónico se toman de tu configuración SMTP para evitar spoofing a través de tu servidor.
 </Note>
 
 ### Devoluciones
@@ -37,7 +37,7 @@ De forma predeterminada, los correos se envían desde `noreply@<tu-proyecto>.sen
 ### Ejemplo
 
 ```javascript
-const { data, error } = await insforge.emails.send({
+const { data, error } = await yarah.emails.send({
   to: ['user1@example.com', 'user2@example.com'],
   cc: 'manager@example.com',
   from: 'Acme Support Team',

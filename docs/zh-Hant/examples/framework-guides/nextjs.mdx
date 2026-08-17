@@ -1,19 +1,19 @@
 ---
 title: Next.js
-description: "瞭解如何建立 InsForge 專案，並運用 AI 代理程式編碼快速建構 Next.js 全端應用程式，包含資料庫與身份驗證。"
+description: "瞭解如何建立 Yarah 專案，並運用 AI 代理程式編碼快速建構 Next.js 全端應用程式，包含資料庫與身份驗證。"
 ---
 
-瞭解如何建立 InsForge 專案並使用 AI 工具（如 Cursor）建構 Next.js 應用程式。
+瞭解如何建立 Yarah 專案並使用 AI 工具（如 Cursor）建構 Next.js 應用程式。
 
-## 1. 建立 InsForge 專案
+## 1. 建立 Yarah 專案
 
-在 [insforge.dev](https://insforge.dev) 建立新的 InsForge 專案。
+在 [yarah.dev](https://yarah.dev) 建立新的 Yarah 專案。
 
-## 2. 連接 InsForge
+## 2. 連接 Yarah
 
 兩個部分：
 
-- **CLI 連結** — 查看[快速開始](/quickstart)以執行 `npx @insforge/cli link --project-id <your-project-id>` 以便代理可以讀取您的專案 ID 和金鑰。
+- **CLI 連結** — 查看[快速開始](/quickstart)以執行 `npx @yarah/cli link --project-id <your-project-id>` 以便代理可以讀取您的專案 ID 和金鑰。
 - **MCP 設置** — 查看 [MCP 設置](/mcp-setup) 以瞭解每個編輯器的設定（Cursor、Claude Code、Windsurf、Codex、VS Code）。
 
 配置好兩者後，代理可以讀取綱要、執行查詢和從您的編輯器部署程式碼。
@@ -24,9 +24,9 @@ description: "瞭解如何建立 InsForge 專案，並運用 AI 代理程式編�
 
 ```
 Create a new Next.js app with TypeScript and Tailwind CSS 3.4.
-Install the InsForge SDK and set up the client configuration.
+Install the Yarah SDK and set up the client configuration.
 
-In my InsForge database, create a sports table with id and name columns.
+In my Yarah database, create a sports table with id and name columns.
 Add sample data: basketball, soccer, and tennis. Make it publicly readable.
 
 Create a page at /sports that fetches and displays all sports from the database.
@@ -38,13 +38,13 @@ Create a page at /sports that fetches and displays all sports from the database.
 
 您的 AI 助手將自動建立這樣的檔案。您無需手動觸摸它們。
 
-**InsForge 用戶端** 在 `lib/insforge.ts`:
+**Yarah 用戶端** 在 `lib/yarah.ts`:
 
-```typescript lib/insforge.ts
+```typescript lib/yarah.ts
 import { createClient } from '@insforge/sdk';
 
-export const insforge = createClient({
-  baseUrl: 'https://your-project.us-east.insforge.app',
+export const yarah = createClient({
+  baseUrl: 'https://your-project.us-east.apps.yarah.dev',
   anonKey: 'your-anon-key',
 });
 ```
@@ -52,10 +52,10 @@ export const insforge = createClient({
 **運動頁面** 在 `app/sports/page.tsx`:
 
 ```typescript app/sports/page.tsx
-import { insforge } from '@/lib/insforge';
+import { yarah } from '@/lib/yarah';
 
 export default async function SportsPage() {
-  const { data: sports, error } = await insforge.database
+  const { data: sports, error } = await yarah.database
     .from('sports')
     .select();
 
@@ -126,11 +126,11 @@ Store favorites in a user_favorites table with user_id and sport_id.
 ```
 
 ```
-Add images to each sport using InsForge Storage.
+Add images to each sport using Yarah Storage.
 Allow users to upload sport images and display them in the grid.
 ```
 
 ```
 Add an AI chat feature that can answer questions about sports.
-Use InsForge AI with streaming responses.
+Use Yarah AI with streaming responses.
 ```

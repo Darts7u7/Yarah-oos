@@ -26,7 +26,7 @@ import {
   resumeRazorpaySubscriptionBodySchema,
   verifyRazorpayOrderBodySchema,
   verifyRazorpaySubscriptionBodySchema,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 const router = Router();
 const environmentRouter = Router({ mergeParams: true });

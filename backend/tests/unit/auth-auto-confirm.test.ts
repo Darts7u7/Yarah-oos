@@ -145,7 +145,7 @@ vi.mock('../../src/infra/config/app.config', () => {
 
 import { AuthService } from '../../src/services/auth/auth.service';
 import { AppError } from '../../src/utils/errors';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 
 describe('AuthService.register – autoConfirm', () => {
   let authService: AuthService;

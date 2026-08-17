@@ -1,7 +1,7 @@
 import { Eye, EyeOff, Loader2, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button, CopyButton, cn } from '@insforge/ui';
-import { SecretSchema } from '@insforge/shared-schemas';
+import { Button, CopyButton, cn } from '@yarahdev/ui';
+import { SecretSchema } from '@yarahdev/shared-schemas';
 import { ListRow, ListRowCell } from '#components';
 import { formatDistance } from 'date-fns';
 import { useSecretValue } from '#features/functions/hooks/useSecrets';

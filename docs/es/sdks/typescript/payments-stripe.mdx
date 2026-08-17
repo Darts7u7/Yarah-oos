@@ -1,6 +1,6 @@
 ---
 title: SDK de Pagos de Stripe
-description: Crea sesiones de Stripe Checkout y Portal de Facturación con el SDK de TypeScript de InsForge para gestionar pagos, suscripciones y cumplimiento de webhooks.
+description: Crea sesiones de Stripe Checkout y Portal de Facturación con el SDK de TypeScript de Yarah para gestionar pagos, suscripciones y cumplimiento de webhooks.
 ---
 
 import Installation from '/snippets/sdk-installation.mdx';
@@ -11,25 +11,25 @@ import Installation from '/snippets/sdk-installation.mdx';
 
 El SDK de TypeScript expone asistentes de tiempo de ejecución de Stripe para frontends de aplicaciones generadas:
 
-- `insforge.payments.stripe.createCheckoutSession(...)`
-- `insforge.payments.stripe.createCustomerPortalSession(...)`
+- `yarah.payments.stripe.createCheckoutSession(...)`
+- `yarah.payments.stripe.createCustomerPortalSession(...)`
 
 Las claves secretas de Stripe, la gestión del catálogo, la configuración de webhooks y la supervisión de pagos son operaciones de administración. Configúralas desde el panel o la CLI antes de usar el SDK.
 
 ```bash
-npx @insforge/cli payments stripe status
-npx @insforge/cli payments stripe catalog --environment test
+npx @yarah/cli payments stripe status
+npx @yarah/cli payments stripe catalog --environment test
 ```
 
 <Note>
   Consulta [Pagos con Stripe](/core-concepts/payments/stripe) para la configuración, tablas de base de datos, proyecciones de webhook y patrones de cumplimiento.
 </Note>
 
-Los métodos del SDK requieren el token de usuario actual de InsForge. Los tokens anónimos de InsForge se pueden usar para el pago único de invitados, pero una clave de API de InsForge no es un sustituto porque el backend necesita el contexto del usuario para las filas de sesión locales.
+Los métodos del SDK requieren el token de usuario actual de Yarah. Los tokens anónimos de Yarah se pueden usar para el pago único de invitados, pero una clave de API de Yarah no es un sustituto porque el backend necesita el contexto del usuario para las filas de sesión locales.
 
 ## createCheckoutSession()
 
-Crea una sesión de Stripe Checkout a través del backend de InsForge.
+Crea una sesión de Stripe Checkout a través del backend de Yarah.
 
 ### Parámetros
 
@@ -46,7 +46,7 @@ Crea una sesión de Stripe Checkout a través del backend de InsForge.
 | `idempotencyKey` | `string` | No | Clave estable para la creación de Checkout segura ante reintentos |
 
 <Warning>
-  Las claves de metadatos que comienzan con `insforge_` están reservadas.
+  Las claves de metadatos que comienzan con `yarah_` están reservadas.
 </Warning>
 
 ### Devoluciones
@@ -80,7 +80,7 @@ Crea una sesión de Stripe Checkout a través del backend de InsForge.
 ### Pago único
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'payment',
   lineItems: [{ priceId: 'price_123', quantity: 1 }],
   successUrl: `${window.location.origin}/checkout/success`,
@@ -102,12 +102,12 @@ if (data?.checkoutSession.url) {
 
 Para compras únicas anónimas, omite `subject` y pasa `customerEmail` cuando esté disponible.
 
-Si un pago único incluye un `subject` y aún no existe un mapeo de cliente de Stripe, InsForge permite que Stripe cree el cliente durante el Checkout y rellena el mapeo del sujeto desde el webhook de finalización.
+Si un pago único incluye un `subject` y aún no existe un mapeo de cliente de Stripe, Yarah permite que Stripe cree el cliente durante el Checkout y rellena el mapeo del sujeto desde el webhook de finalización.
 
 ### Pago de suscripción
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCheckoutSession('test', {
+const { data, error } = await yarah.payments.stripe.createCheckoutSession('test', {
   mode: 'subscription',
   subject: { type: 'team', id: teamId },
   lineItems: [{ priceId: 'price_monthly_123', quantity: 1 }],
@@ -169,7 +169,7 @@ Crea una sesión del Portal de Facturación de Stripe para un sujeto de facturac
 ### Ejemplo
 
 ```typescript
-const { data, error } = await insforge.payments.stripe.createCustomerPortalSession('test', {
+const { data, error } = await yarah.payments.stripe.createCustomerPortalSession('test', {
   subject: { type: 'team', id: teamId },
   returnUrl: `${window.location.origin}/billing`
 });
@@ -191,7 +191,7 @@ Las sesiones del portal de clientes requieren un usuario autenticado y un mapeo 
 
 ## Autorización y RLS
 
-Los métodos del SDK llaman a las rutas de tiempo de ejecución usando el token actual de InsForge. El backend inserta filas de sesión locales usando el contexto del llamante:
+Los métodos del SDK llaman a las rutas de tiempo de ejecución usando el token actual de Yarah. El backend inserta filas de sesión locales usando el contexto del llamante:
 
 - `payments.stripe_checkout_sessions` para intentos de Checkout
 - `payments.stripe_customer_portal_sessions` para intentos del Portal de Facturación
@@ -222,5 +222,5 @@ Consulta [Pagos con Stripe](/core-concepts/payments/stripe) para ejemplos de cum
 Pasa `'test'` como el primer argumento del SDK durante el desarrollo. Solo cambia a `'live'` después de que el desarrollador apruebe explícitamente los cambios de producción de Stripe y estén configurados los precios en producción.
 
 <Warning>
-  Nunca pongas claves secretas de Stripe en el código del frontend ni en variables de entorno de despliegue público. Configura las claves de Stripe a través del panel de InsForge o la CLI.
+  Nunca pongas claves secretas de Stripe en el código del frontend ni en variables de entorno de despliegue público. Configura las claves de Stripe a través del panel de Yarah o la CLI.
 </Warning>

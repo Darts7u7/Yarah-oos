@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { RazorpaySubscription } from '@insforge/shared-schemas';
+import type { RazorpaySubscription } from '@yarahdev/shared-schemas';
 import { normalizeRazorpaySubscription } from '#features/payments/types/subscriptions';
 
 function makeRazorpaySubscription(

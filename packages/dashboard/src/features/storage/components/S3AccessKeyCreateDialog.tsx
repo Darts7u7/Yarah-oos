@@ -13,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
   Input,
-} from '@insforge/ui';
-import type { S3AccessKeyWithSecretSchema } from '@insforge/shared-schemas';
+} from '@yarahdev/ui';
+import type { S3AccessKeyWithSecretSchema } from '@yarahdev/shared-schemas';
 
 interface S3AccessKeyCreateDialogProps {
   open: boolean;

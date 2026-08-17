@@ -1,6 +1,6 @@
 ---
 title: 存储 SDK 参考
-description: 使用 InsForge Kotlin SDK 从 Android 与 Kotlin 多平台应用上传、下载、列出与删除文件，管理存储桶权限，生成签名 URL 用于安全共享资源。
+description: 使用 Yarah Kotlin SDK 从 Android 与 Kotlin 多平台应用上传、下载、列出与删除文件，管理存储桶权限，生成签名 URL 用于安全共享资源。
 ---
 
 import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
@@ -16,7 +16,7 @@ import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
 ### 示例
 
 ```kotlin
-val bucket = insforge.storage.from("images")
+val bucket = yarah.storage.from("images")
 ```
 
 ---
@@ -44,14 +44,14 @@ val bucket = insforge.storage.from("images")
 ```kotlin
 // Basic upload
 val imageData = bitmap.toByteArray()
-val result = insforge.storage
+val result = yarah.storage
     .from("images")
     .upload("posts/post-123/cover.jpg", imageData)
 
 Log.d("Storage", "Uploaded: ${result.url}")
 
 // Upload with options
-val result = insforge.storage
+val result = yarah.storage
     .from("images")
     .upload("posts/post-123/cover.jpg", imageData) {
         contentType = "image/jpeg"
@@ -60,7 +60,7 @@ val result = insforge.storage
     }
 
 // Using bracket syntax
-val result = insforge.storage["images"]
+val result = yarah.storage["images"]
     .upload("avatars/user-123.jpg", imageData) {
         contentType = "image/jpeg"
     }
@@ -106,7 +106,7 @@ suspend fun uploadFromUri(
 
 ```kotlin
 val imageData = bitmap.toByteArray()
-val result = insforge.storage
+val result = yarah.storage
     .from("uploads")
     .uploadWithAutoKey("photo.jpg", imageData) {
         contentType = "image/jpeg"
@@ -116,7 +116,7 @@ Log.d("Storage", "Auto-generated key: ${result.key}")
 Log.d("Storage", "URL: ${result.url}")
 
 // Save to database
-insforge.database
+yarah.database
     .from("posts")
     .insertTyped(listOf(
         Post(
@@ -139,7 +139,7 @@ insforge.database
 
 ```kotlin
 // Download file
-val data = insforge.storage
+val data = yarah.storage
     .from("images")
     .download(path = "posts/post-123/cover.jpg")
 
@@ -158,7 +158,7 @@ imageView.setImageBitmap(bitmap)
 
 ```kotlin
 // Get the file key from database
-val posts = insforge.database
+val posts = yarah.database
     .from("posts")
     .select("image_key")
     .eq("id", "post-123")
@@ -167,12 +167,12 @@ val posts = insforge.database
 val post = posts.firstOrNull() ?: return
 
 // Delete from storage
-insforge.storage
+yarah.storage
     .from("images")
     .delete(post.imageKey)
 
 // Clear database reference
-insforge.database
+yarah.database
     .from("posts")
     .update(buildJsonObject {
         put("image_url", JsonNull)
@@ -197,7 +197,7 @@ insforge.database
 
 ```kotlin
 // Create a signed URL (expires in 1 hour)
-val url = insforge.storage
+val url = yarah.storage
     .from("images")
     .createSignedUrl("posts/post-123/cover.jpg", expiresIn = 3600)
 
@@ -213,7 +213,7 @@ Log.d("Storage", "Signed URL: $url")
 ### 示例
 
 ```kotlin
-val strategy = insforge.storage
+val strategy = yarah.storage
     .from("images")
     .getDownloadUrl("posts/post-123/cover.jpg")
 
@@ -240,7 +240,7 @@ Log.d("Storage", "Download URL: ${strategy.url}")
 
 ```kotlin
 // List all files in bucket
-val files = insforge.storage
+val files = yarah.storage
     .from("images")
     .list()
 
@@ -249,7 +249,7 @@ files.forEach { file ->
 }
 
 // List with filters
-val files = insforge.storage
+val files = yarah.storage
     .from("images")
     .list {
         prefix = "posts/"
@@ -269,7 +269,7 @@ val files = insforge.storage
 列出所有存储桶。
 
 ```kotlin
-val buckets = insforge.storage.listBuckets()
+val buckets = yarah.storage.listBuckets()
 
 buckets.forEach { bucket ->
     Log.d("Storage", "Bucket: ${bucket.id}, Public: ${bucket.isPublic}")
@@ -281,7 +281,7 @@ buckets.forEach { bucket ->
 创建新存储桶。
 
 ```kotlin
-val bucket = insforge.storage.createBucket("my-bucket") {
+val bucket = yarah.storage.createBucket("my-bucket") {
     isPublic = true
 }
 
@@ -293,7 +293,7 @@ Log.d("Storage", "Created bucket: ${bucket.id}")
 更新桶设置。
 
 ```kotlin
-insforge.storage.updateBucket("my-bucket") {
+yarah.storage.updateBucket("my-bucket") {
     isPublic = false
 }
 ```
@@ -303,7 +303,7 @@ insforge.storage.updateBucket("my-bucket") {
 删除存储桶。
 
 ```kotlin
-insforge.storage.deleteBucket("my-bucket")
+yarah.storage.deleteBucket("my-bucket")
 ```
 
 ---
@@ -315,7 +315,7 @@ insforge.storage.deleteBucket("my-bucket")
 获取用于大文件或可恢复上传的上传策略。
 
 ```kotlin
-val strategy = insforge.storage
+val strategy = yarah.storage
     .from("videos")
     .getUploadStrategy("videos/large-file.mp4", fileSize = 100_000_000)
 
@@ -328,7 +328,7 @@ Log.d("Storage", "Upload URL: ${strategy.url}")
 确认已完成的上传。
 
 ```kotlin
-insforge.storage
+yarah.storage
     .from("videos")
     .confirmUpload("videos/large-file.mp4")
 ```

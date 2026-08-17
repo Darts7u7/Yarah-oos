@@ -3,7 +3,7 @@ import { EncryptionManager } from '@/infra/security/encryption.manager.js';
 import { AppError } from '@/utils/errors.js';
 import { NEXT_ACTIONS } from '@/utils/next-actions.js';
 import logger from '@/utils/logger.js';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { isCloudEnvironment } from '@/utils/environment.js';
 
 const EMAIL_PROVIDER_CONFIGURATION_LOCK_ID = 1869573991;

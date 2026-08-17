@@ -2,7 +2,7 @@ import { Router, type Request, type Response, type NextFunction } from 'express'
 import { parseZodSchema } from '@/utils/zod.js';
 import { AppError } from '@/utils/errors.js';
 import { RazorpayWebhookService } from '@/services/payments/razorpay/webhook.service.js';
-import { ERROR_CODES, razorpayWebhookParamsSchema } from '@insforge/shared-schemas';
+import { ERROR_CODES, razorpayWebhookParamsSchema } from '@yarahdev/shared-schemas';
 
 const router = Router();
 const webhookService = RazorpayWebhookService.getInstance();

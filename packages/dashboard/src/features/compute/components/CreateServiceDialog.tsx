@@ -15,14 +15,14 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@insforge/ui';
+} from '@yarahdev/ui';
 import { CPU_TIERS, MEMORY_OPTIONS, REGIONS, INGRESS_MODES } from '#features/compute/constants';
 import { useComputeCapabilities } from '#features/compute/hooks/useComputeCapabilities';
 import type {
   CreateServiceRequest,
   CreateServiceRequestInput,
   IngressMode,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 
 interface CreateServiceDialogProps {
   open: boolean;

@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { jwtVerify } from 'jose';
 import { AppError } from '../../src/utils/errors';
 import { appConfig } from '../../src/infra/config/app.config';
-import { ERROR_CODES } from '@insforge/shared-schemas';
+import { ERROR_CODES } from '@yarahdev/shared-schemas';
 import { describe, it, expect, beforeEach, afterEach, afterAll, vi } from 'vitest';
 
 // Mock jose.jwtVerify
@@ -222,7 +222,7 @@ describe('TokenManager.signCloudToken', () => {
     delete process.env.AWS_INSTANCE_PROFILE_NAME;
 
     expect(() => TokenManager.getInstance().signCloudToken('Cloud database access')).toThrow(
-      'Cloud database access is only available on InsForge Cloud projects.'
+      'Cloud database access is only available on Yarah Cloud projects.'
     );
   });
 

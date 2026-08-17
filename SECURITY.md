@@ -1,10 +1,10 @@
 # Security Policy
 
-Contact: https://github.com/InsForge/InsForge/security/advisories/new
-Contact: mailto:security@insforge.dev
+Contact: https://github.com/Yarah/Yarah/security/advisories/new
+Contact: mailto:security@yarah.dev
 
 
-At InsForge, we consider the security of our systems a top priority. But no matter how much effort we put into system security, there can still be vulnerabilities present.
+At Yarah, we consider the security of our systems a top priority. But no matter how much effort we put into system security, there can still be vulnerabilities present.
 
 If you discover a vulnerability, we would like to know about it so we can take steps to address it as quickly as possible. We ask you to help us better protect our users and our systems.
 
@@ -37,7 +37,7 @@ Here is a brief list of some common out-of-scope vulnerabilities:
 
 ## Testing guidelines
 
-- Do not run automated scanners against other customers' projects. Running automated scanners can run up costs for our users, may disrupt services, and our own security tooling cannot distinguish hostile reconnaissance from whitehat research. If you wish to run an automated scanner, notify us first at `security@insforge.dev` and only run it against your own InsForge project. Do NOT attack projects belonging to other customers.
+- Do not run automated scanners against other customers' projects. Running automated scanners can run up costs for our users, may disrupt services, and our own security tooling cannot distinguish hostile reconnaissance from whitehat research. If you wish to run an automated scanner, notify us first at `security@yarah.dev` and only run it against your own Yarah project. Do NOT attack projects belonging to other customers.
 - Do not take advantage of the vulnerability you discover, for example by downloading more data than necessary to demonstrate the issue, or by deleting or modifying other people's data.
 
 ## Reporting a vulnerability
@@ -45,24 +45,24 @@ Here is a brief list of some common out-of-scope vulnerabilities:
 **Please do not open a public GitHub issue for security vulnerabilities.**
 
 - File a private report through GitHub Security Advisories:
-  https://github.com/InsForge/InsForge/security/advisories/new
-- Or email `security@insforge.dev`. If you do not receive a reply within 5 business days, please follow up via GitHub Security Advisories so the report does not get lost.
+  https://github.com/Yarah/Yarah/security/advisories/new
+- Or email `security@yarah.dev`. If you do not receive a reply within 5 business days, please follow up via GitHub Security Advisories so the report does not get lost.
 
 Provide enough information to reproduce the problem so we can resolve it quickly. Helpful details include:
 
 - A description of the vulnerability and its impact.
 - Steps to reproduce, or a minimal proof-of-concept.
-- The affected version, commit, or deployment (self-hosted vs. `insforge.dev`).
+- The affected version, commit, or deployment (self-hosted vs. `yarah.dev`).
 - Any logs, screenshots, or scripts that help us reproduce the issue.
 - Your contact information so we can follow up.
 
 ## Disclosure guidelines
 
 - In order to protect our users, please do not reveal the problem to others until we have researched, addressed, and informed any affected customers.
-- If you want to publicly share your research about InsForge (at a conference, in a blog post, or any other public forum), please share a draft with us for review at least 30 days before publication. The following should not be included:
-  - Data regarding any InsForge customer projects.
-  - InsForge customers' data.
-  - Information about InsForge employees, contractors, or partners.
+- If you want to publicly share your research about Yarah (at a conference, in a blog post, or any other public forum), please share a draft with us for review at least 30 days before publication. The following should not be included:
+  - Data regarding any Yarah customer projects.
+  - Yarah customers' data.
+  - Information about Yarah employees, contractors, or partners.
 
 ## What we promise
 
@@ -86,4 +86,4 @@ If at any point you are unsure whether a particular action is allowed, please as
 
 ---
 
-*This policy is adapted from [Supabase's security policy](https://github.com/supabase/supabase/blob/master/SECURITY.md), with reporting channels and scope updated for InsForge.*
+*This policy is adapted from [Supabase's security policy](https://github.com/supabase/supabase/blob/master/SECURITY.md), with reporting channels and scope updated for Yarah.*

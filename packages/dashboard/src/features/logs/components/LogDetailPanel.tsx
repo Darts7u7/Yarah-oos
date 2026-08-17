@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { LogSchema } from '@insforge/shared-schemas';
+import type { LogSchema } from '@yarahdev/shared-schemas';
 
 interface LogDetailPanelProps {
   log: LogSchema | null;

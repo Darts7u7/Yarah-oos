@@ -2,7 +2,7 @@
 --
 -- Migration 046 transferred existing public objects to project_admin as a
 -- one-time sweep, but root execution paths that remained after it — the
--- unrestricted raw SQL endpoint (used by `insforge create` template init and
+-- unrestricted raw SQL endpoint (used by `yarah create` template init and
 -- `db query --unrestricted`) and superuser restores — keep creating public
 -- objects owned by the superuser. Custom migrations and restricted raw SQL
 -- run as project_admin, so any later ALTER on those objects fails with

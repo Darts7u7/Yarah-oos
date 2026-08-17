@@ -13,7 +13,7 @@ import {
 import { SQLModal, SQLCellButton } from '#features/database';
 import { useRealtimePermissions } from '#features/realtime/hooks/useRealtimePermissions';
 import type { RlsPolicy } from '#features/realtime/services/realtime.service';
-import { Tabs, Tab } from '@insforge/ui';
+import { Tabs, Tab } from '@yarahdev/ui';
 
 type TabType = 'subscribe' | 'publish';
 

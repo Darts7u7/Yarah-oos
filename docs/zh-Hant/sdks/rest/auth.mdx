@@ -1,6 +1,6 @@
 ---
 title: 驗證 API 參考
-description: InsForge 驗證 REST API 完整參考，涵蓋使用者註冊、密碼登入、電子郵件 OTP 無密碼登入、電子郵件驗證、忘記與重設密碼、OAuth 第三方登入整合、匿名工作階段、工作階段取得與撤銷、目前登入使用者資訊查詢以及管理員帳號管理等端點的請求參數、欄位說明、錯誤碼與回應範例。
+description: Yarah 驗證 REST API 完整參考，涵蓋使用者註冊、密碼登入、電子郵件 OTP 無密碼登入、電子郵件驗證、忘記與重設密碼、OAuth 第三方登入整合、匿名工作階段、工作階段取得與撤銷、目前登入使用者資訊查詢以及管理員帳號管理等端點的請求參數、欄位說明、錯誤碼與回應範例。
 ---
 
 ## 概覽
@@ -44,12 +44,12 @@ POST /api/auth/users
 | `email` | string | 是 | 使用者電子郵件地址 |
 | `password` | string | 是 | 密碼（必須符合設定的要求） |
 | `name` | string | 否 | 使用者顯示名稱 |
-| `redirectTo` | string | 否 | 用於基於連結的電子郵件驗證。電子郵件連結始終先開啟 InsForge 後端端點；令牌驗證後，InsForge 將瀏覽器重新導向到此 URL 並顯示驗證結果。當 `verifyEmailMethod` 為 `link` 時需要。此 URL 必須包含在 `allowedRedirectUrls` 中。建議：使用您的應用的登入頁面。 |
+| `redirectTo` | string | 否 | 用於基於連結的電子郵件驗證。電子郵件連結始終先開啟 Yarah 後端端點；令牌驗證後，Yarah 將瀏覽器重新導向到此 URL 並顯示驗證結果。當 `verifyEmailMethod` 為 `link` 時需要。此 URL 必須包含在 `allowedRedirectUrls` 中。建議：使用您的應用的登入頁面。 |
 
 ### 示例（Web 用戶端）
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/users" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/users" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -62,7 +62,7 @@ curl -X POST "https://your-app.insforge.app/api/auth/users" \
 ### 示例（非 Web 用戶端）
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/users?client_type=mobile" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/users?client_type=mobile" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -142,7 +142,7 @@ POST /api/auth/sessions
 ### 示例（Web 用戶端）
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/sessions" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/sessions" \
   -H "Content-Type: application/json" \
   -d '{
     "method": "password",
@@ -154,7 +154,7 @@ curl -X POST "https://your-app.insforge.app/api/auth/sessions" \
 ### 示例（非 Web 用戶端）
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/sessions?client_type=mobile" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/sessions?client_type=mobile" \
   -H "Content-Type: application/json" \
   -d '{
     "method": "password",
@@ -221,7 +221,7 @@ POST /api/auth/email/send-otp
 | `email` | string | 是 | 接收登入驗證碼的電子郵件地址 |
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/send-otp" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/send-otp" \
   -H "Content-Type: application/json" \
   -d '{ "email": "user@example.com" }'
 ```
@@ -250,7 +250,7 @@ POST /api/auth/sessions
 | `name` | string | 否 | 僅在驗證後建立新使用者時使用的個人資料名稱 |
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/sessions?client_type=server" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/sessions?client_type=server" \
   -H "Content-Type: application/json" \
   -d '{
     "method": "otp",
@@ -264,7 +264,7 @@ curl -X POST "https://your-app.insforge.app/api/auth/sessions?client_type=server
 
 <Note>
 - 驗證碼有效期為 5 分鐘，只能使用一次，並會在三次失敗嘗試後失效。
-- InsForge 不會在傳送驗證碼時建立使用者。如果電子郵件尚未註冊，只會在驗證成功後建立已驗證的免密碼使用者。
+- Yarah 不會在傳送驗證碼時建立使用者。如果電子郵件尚未註冊，只會在驗證成功後建立已驗證的免密碼使用者。
 - 為現有的未驗證帳戶驗證驗證碼會清除其已儲存的密碼，使該帳戶變為免密碼。
 - 如果已停用公開註冊，現有使用者仍可登入。未知電子郵件的有效驗證碼會被消耗，並傳回 HTTP 403。
 </Note>
@@ -300,7 +300,7 @@ POST /api/auth/refresh
 ### 示例（Web 用戶端）
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/refresh" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/refresh" \
   -H "X-CSRF-Token: abc123..." \
   --cookie "refresh_token=..."
 ```
@@ -308,7 +308,7 @@ curl -X POST "https://your-app.insforge.app/api/auth/refresh" \
 ### 示例（非 Web 用戶端）
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/refresh?client_type=mobile" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/refresh?client_type=mobile" \
   -H "Content-Type: application/json" \
   -d '{
     "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
@@ -368,7 +368,7 @@ POST /api/auth/logout
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/logout"
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/logout"
 ```
 
 ### 回應
@@ -399,7 +399,7 @@ GET /api/auth/sessions/current
 ### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/auth/sessions/current" \
+curl "https://your-app.apps.yarah.dev/api/auth/sessions/current" \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
@@ -434,7 +434,7 @@ PATCH /api/auth/profiles/current
 ### 示例
 
 ```bash
-curl -X PATCH "https://your-app.insforge.app/api/auth/profiles/current" \
+curl -X PATCH "https://your-app.apps.yarah.dev/api/auth/profiles/current" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -470,7 +470,7 @@ GET /api/auth/profiles/{userId}
 ### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/auth/profiles/123e4567-e89b-12d3-a456-426614174000"
+curl "https://your-app.apps.yarah.dev/api/auth/profiles/123e4567-e89b-12d3-a456-426614174000"
 ```
 
 ### 回應
@@ -500,12 +500,12 @@ POST /api/auth/email/send-verification
 | 欄位 | 類型 | 必需 | 描述 |
 |-------|------|----------|-------------|
 | `email` | string | 是 | 使用者電子郵件地址 |
-| `redirectTo` | string | 否 | 用於基於連結的電子郵件驗證。電子郵件連結始終先開啟 InsForge 後端端點；令牌驗證後，InsForge 將瀏覽器重新導向到此 URL 並顯示驗證結果。當 `verifyEmailMethod` 為 `link` 時需要。此 URL 必須包含在 `allowedRedirectUrls` 中。建議：使用您的應用的登入頁面。 |
+| `redirectTo` | string | 否 | 用於基於連結的電子郵件驗證。電子郵件連結始終先開啟 Yarah 後端端點；令牌驗證後，Yarah 將瀏覽器重新導向到此 URL 並顯示驗證結果。當 `verifyEmailMethod` 為 `link` 時需要。此 URL 必須包含在 `allowedRedirectUrls` 中。建議：使用您的應用的登入頁面。 |
 
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/send-verification" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/send-verification" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -551,18 +551,18 @@ GET /api/auth/email/verify-link?token=...
 
 像這樣處理瀏覽器重新導向：
 
-- 成功：`?insforge_status=success&insforge_type=verify_email`
-- 錯誤：`?insforge_status=error&insforge_type=verify_email&insforge_error=...`
-- `insforge_status`：瀏覽器連結流的結果。對於驗證，值為 `success` 或 `error`。
-- `insforge_type`：流識別符。對於驗證連結，這始終是 `verify_email`。
-- `insforge_error`：僅當 `insforge_status=error` 時出現。可顯示或記錄的人類可讀錯誤訊息。
-- 建議處理：使用您的登入頁面作為 `redirectTo`。當 `insforge_status=success` 時，顯示確認訊息並要求使用者使用其電子郵件和密碼登入。
-- 如果 `redirectTo` 未被允許列表，InsForge 會傳回 `400` 錯誤，其訊息包括被拒絕的 URL，`nextActions` 告訴您將其新增到 `allowedRedirectUrls`。
+- 成功：`?yarah_status=success&yarah_type=verify_email`
+- 錯誤：`?yarah_status=error&yarah_type=verify_email&yarah_error=...`
+- `yarah_status`：瀏覽器連結流的結果。對於驗證，值為 `success` 或 `error`。
+- `yarah_type`：流識別符。對於驗證連結，這始終是 `verify_email`。
+- `yarah_error`：僅當 `yarah_status=error` 時出現。可顯示或記錄的人類可讀錯誤訊息。
+- 建議處理：使用您的登入頁面作為 `redirectTo`。當 `yarah_status=success` 時，顯示確認訊息並要求使用者使用其電子郵件和密碼登入。
+- 如果 `redirectTo` 未被允許列表，Yarah 會傳回 `400` 錯誤，其訊息包括被拒絕的 URL，`nextActions` 告訴您將其新增到 `allowedRedirectUrls`。
 
 ### 示例（Web 用戶端）
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/verify" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/verify" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -573,7 +573,7 @@ curl -X POST "https://your-app.insforge.app/api/auth/email/verify" \
 ### 示例（非 Web 用戶端）
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/verify?client_type=mobile" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/verify?client_type=mobile" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -624,12 +624,12 @@ POST /api/auth/email/send-reset-password
 | 欄位 | 類型 | 必需 | 描述 |
 |-------|------|----------|-------------|
 | `email` | string | 是 | 使用者電子郵件地址 |
-| `redirectTo` | string | 否 | 用於基於連結的密碼重設。電子郵件連結始終先開啟 InsForge 後端端點；InsForge 然後將瀏覽器重新導向到此 URL，並在查詢字串中包含重設 `token`，以便您的應用可以呈現其自己的重設密碼頁面。當 `resetPasswordMethod` 為 `link` 時需要。此 URL 必須包含在 `allowedRedirectUrls` 中。建議：使用您的應用的專用重設密碼頁面。 |
+| `redirectTo` | string | 否 | 用於基於連結的密碼重設。電子郵件連結始終先開啟 Yarah 後端端點；Yarah 然後將瀏覽器重新導向到此 URL，並在查詢字串中包含重設 `token`，以便您的應用可以呈現其自己的重設密碼頁面。當 `resetPasswordMethod` 為 `link` 時需要。此 URL 必須包含在 `allowedRedirectUrls` 中。建議：使用您的應用的專用重設密碼頁面。 |
 
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/send-reset-password" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/send-reset-password" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -653,7 +653,7 @@ POST /api/auth/email/exchange-reset-password-token
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/exchange-reset-password-token" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/exchange-reset-password-token" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -686,13 +686,13 @@ GET /api/auth/email/reset-password-link?token=...
 
 像這樣處理瀏覽器重新導向：
 
-- 準備重設：`?token=...&insforge_status=ready&insforge_type=reset_password`
-- 錯誤：`?insforge_status=error&insforge_type=reset_password&insforge_error=...`
-- `token`：僅當 `insforge_status=ready` 時出現。將此值作為 `otp` 傳遞給 `POST /api/auth/email/reset-password`。
-- `insforge_status`：瀏覽器連結流的結果。對於重設連結，值為 `ready` 或 `error`。
-- `insforge_type`：流識別符。對於重設連結，這始終是 `reset_password`。
-- `insforge_error`：僅當 `insforge_status=error` 時出現。可顯示或記錄的人類可讀錯誤訊息。
-- 您的應用應僅在 `insforge_status=ready` 和 `token` 存在時呈現重設密碼表單。
+- 準備重設：`?token=...&yarah_status=ready&yarah_type=reset_password`
+- 錯誤：`?yarah_status=error&yarah_type=reset_password&yarah_error=...`
+- `token`：僅當 `yarah_status=ready` 時出現。將此值作為 `otp` 傳遞給 `POST /api/auth/email/reset-password`。
+- `yarah_status`：瀏覽器連結流的結果。對於重設連結，值為 `ready` 或 `error`。
+- `yarah_type`：流識別符。對於重設連結，這始終是 `reset_password`。
+- `yarah_error`：僅當 `yarah_status=error` 時出現。可顯示或記錄的人類可讀錯誤訊息。
+- 您的應用應僅在 `yarah_status=ready` 和 `token` 存在時呈現重設密碼表單。
 
 ### 請求體
 
@@ -704,7 +704,7 @@ GET /api/auth/email/reset-password-link?token=...
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/email/reset-password" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/email/reset-password" \
   -H "Content-Type: application/json" \
   -d '{
     "newPassword": "newSecurePassword123",
@@ -747,7 +747,7 @@ GET /api/auth/oauth/custom/{key}
 | 其他字串查詢參數 | string | 否 | 提供程式特定的 OAuth 提示，例如 Google 的 `prompt=select_account` |
 
 <Note>
-  僅當額外的查詢參數與伺服器擁有的 OAuth 欄位不衝突時，才會將其作為提供程式特定的提示轉送。不要傳遞 `client_id`、`redirect_uri`、`code_challenge`、`state`、`response_type` 或 `scope`；InsForge/提供程式產生的值獲勝，衝突的用戶端值被忽略。
+  僅當額外的查詢參數與伺服器擁有的 OAuth 欄位不衝突時，才會將其作為提供程式特定的提示轉送。不要傳遞 `client_id`、`redirect_uri`、`code_challenge`、`state`、`response_type` 或 `scope`；Yarah/提供程式產生的值獲勝，衝突的用戶端值被忽略。
 </Note>
 
 ### 支援的提供程式
@@ -772,12 +772,12 @@ CODE_VERIFIER=$(openssl rand -base64 32 | tr -d '=' | tr '/+' '_-')
 # Generate code_challenge (SHA256 hash of code_verifier, Base64 URL-encoded)
 CODE_CHALLENGE=$(echo -n $CODE_VERIFIER | openssl dgst -sha256 -binary | base64 | tr -d '=' | tr '/+' '_-')
 
-curl "https://your-app.insforge.app/api/auth/oauth/google?redirect_uri=https://myapp.com/callback&code_challenge=$CODE_CHALLENGE&prompt=select_account"
+curl "https://your-app.apps.yarah.dev/api/auth/oauth/google?redirect_uri=https://myapp.com/callback&code_challenge=$CODE_CHALLENGE&prompt=select_account"
 ```
 
 ```bash
 # Custom provider example
-curl "https://your-app.insforge.app/api/auth/oauth/custom/acme?redirect_uri=https://myapp.com/callback&code_challenge=$CODE_CHALLENGE"
+curl "https://your-app.apps.yarah.dev/api/auth/oauth/custom/acme?redirect_uri=https://myapp.com/callback&code_challenge=$CODE_CHALLENGE"
 ```
 
 ### 回應
@@ -793,11 +793,11 @@ curl "https://your-app.insforge.app/api/auth/oauth/custom/acme?redirect_uri=http
 使用者使用提供程式驗證後，他們將被重新導向到您的 `redirect_uri`，並帶上授權代碼：
 
 ```
-https://myapp.com/callback?insforge_code=abc123...
+https://myapp.com/callback?yarah_code=abc123...
 ```
 
 <Note>
-`insforge_code` 是一個臨時授權代碼，必須使用 `/api/auth/oauth/exchange` 端點交換為令牌。
+`yarah_code` 是一個臨時授權代碼，必須使用 `/api/auth/oauth/exchange` 端點交換為令牌。
 </Note>
 
 ---
@@ -820,13 +820,13 @@ POST /api/auth/oauth/exchange
 
 | 欄位 | 類型 | 必需 | 描述 |
 |-------|------|----------|-------------|
-| `code` | string | 是 | 回呼中接收的 `insforge_code` |
+| `code` | string | 是 | 回呼中接收的 `yarah_code` |
 | `code_verifier` | string | 是 | 用於生成 code_challenge 的原始 code_verifier |
 
 ### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/oauth/exchange?client_type=mobile" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/oauth/exchange?client_type=mobile" \
   -H "Content-Type: application/json" \
   -d '{
     "code": "abc123...",
@@ -866,19 +866,19 @@ let codeVerifier = generateRandomString(length: 43)
 let codeChallenge = sha256(codeVerifier).base64URLEncoded()
 
 // 2. Initiate OAuth flow
-let authURL = "https://your-app.insforge.app/api/auth/oauth/google" +
+let authURL = "https://your-app.apps.yarah.dev/api/auth/oauth/google" +
     "?redirect_uri=myapp://callback" +
     "&code_challenge=\(codeChallenge)"
 
 // 3. Open browser/WebView and wait for callback
 // User completes authentication...
 
-// 4. Handle callback with insforge_code
-// myapp://callback?insforge_code=abc123...
+// 4. Handle callback with yarah_code
+// myapp://callback?yarah_code=abc123...
 
 // 5. Exchange code for tokens
 let response = POST("/api/auth/oauth/exchange?client_type=mobile", body: {
-    "code": insforgeCode,
+    "code": yarahCode,
     "code_verifier": codeVerifier
 })
 
@@ -900,7 +900,7 @@ GET /api/auth/public-config
 ### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/auth/public-config"
+curl "https://your-app.apps.yarah.dev/api/auth/public-config"
 ```
 
 ### 回應
@@ -941,7 +941,7 @@ GET /api/auth/users/{userId}
 ### 刪除使用者
 
 ```bash
-curl -X DELETE "https://your-app.insforge.app/api/auth/users" \
+curl -X DELETE "https://your-app.apps.yarah.dev/api/auth/users" \
   -H "Authorization: Bearer admin-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{"userIds": ["user-id-1", "user-id-2"]}'
@@ -964,7 +964,7 @@ GET /api/auth/config
 #### 示例
 
 ```bash
-curl "https://your-app.insforge.app/api/auth/config" \
+curl "https://your-app.apps.yarah.dev/api/auth/config" \
   -H "Authorization: Bearer admin-jwt-token"
 ```
 
@@ -992,7 +992,7 @@ curl "https://your-app.insforge.app/api/auth/config" \
 - 精確項目必須完全相符，例如 `https://myapp.com/dashboard`。
 - 通配符僅在主機部分支援，例如 `https://*.myapp.com/callback`。
 - 深層連結在明確列出時允許，例如 `com.example.app:/oauth2redirect` 或 `myapp://auth/callback`。
-- 如果 `allowedRedirectUrls` 為空，InsForge 允許所有重新導向以方便開發人員。這對生產不安全，應在本機開發之外避免。
+- 如果 `allowedRedirectUrls` 為空，Yarah 允許所有重新導向以方便開發人員。這對生產不安全，應在本機開發之外避免。
 
 ### 更新驗證設定
 
@@ -1019,7 +1019,7 @@ PUT /api/auth/config
 #### 示例
 
 ```bash
-curl -X PUT "https://your-app.insforge.app/api/auth/config" \
+curl -X PUT "https://your-app.apps.yarah.dev/api/auth/config" \
   -H "Authorization: Bearer admin-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1041,12 +1041,12 @@ POST /api/auth/admin/sessions/exchange
 
 | 欄位 | 類型 | 必需 | 描述 |
 |-------|------|----------|-------------|
-| `code` | string | 是 | Insforge Cloud 的授權代碼或 JWT |
+| `code` | string | 是 | Yarah Cloud 的授權代碼或 JWT |
 
 #### 示例
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/admin/sessions/exchange" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/admin/sessions/exchange" \
   -H "Content-Type: application/json" \
   -d '{"code": "eyJhbGciOiJIUzI1NiIs..."}'
 ```
@@ -1083,16 +1083,16 @@ GET /api/auth/admin/sessions/current
 
 ### 重新整理管理員工作階段
 
-刷新儀表板管理員存取令牌。此端點使用僅限儀表板的 `insforge_admin_refresh_token` httpOnly Cookie，不共用應用/使用者刷新 Cookie。
+刷新儀表板管理員存取令牌。此端點使用僅限儀表板的 `yarah_admin_refresh_token` httpOnly Cookie，不共用應用/使用者刷新 Cookie。
 
 ```
 POST /api/auth/admin/refresh
 ```
 
 ```bash
-curl -X POST "https://your-app.insforge.app/api/auth/admin/refresh" \
+curl -X POST "https://your-app.apps.yarah.dev/api/auth/admin/refresh" \
   -H "X-CSRF-Token: abc123..." \
-  --cookie "insforge_admin_refresh_token=..."
+  --cookie "yarah_admin_refresh_token=..."
 ```
 
 ### 登出管理員工作階段

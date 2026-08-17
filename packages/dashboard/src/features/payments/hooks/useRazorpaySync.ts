@@ -4,14 +4,14 @@ import type { TFunction } from 'i18next';
 import type {
   RazorpayEnvironment,
   SyncRazorpayPaymentsEnvironmentResult,
-} from '@insforge/shared-schemas';
+} from '@yarahdev/shared-schemas';
 import {
   razorpayService,
   type SyncRazorpayPaymentsRequest,
   type SyncRazorpayPaymentsResponse,
 } from '#features/payments/services/razorpay.service';
 import { razorpayQueryKeys } from '#features/payments/queryKeys';
-import { useToast } from '@insforge/ui';
+import { useToast } from '@yarahdev/ui';
 
 function formatEnvironments(environments: RazorpayEnvironment[], t: TFunction<'chrome'>) {
   return environments

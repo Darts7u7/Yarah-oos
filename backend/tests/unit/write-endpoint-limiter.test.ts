@@ -110,8 +110,8 @@ describe('within a category the bucket is shared across routes', () => {
   });
 });
 
-describe('INSFORGE_DISABLE_WRITE_RATE_LIMIT bypass', () => {
-  const ORIGINAL = process.env.INSFORGE_DISABLE_WRITE_RATE_LIMIT;
+describe('YARAH_DISABLE_WRITE_RATE_LIMIT bypass', () => {
+  const ORIGINAL = process.env.YARAH_DISABLE_WRITE_RATE_LIMIT;
   const budget = DEFAULT_WRITE_ENDPOINT_LIMITS.functions;
 
   beforeEach(() => {
@@ -121,14 +121,14 @@ describe('INSFORGE_DISABLE_WRITE_RATE_LIMIT bypass', () => {
 
   afterEach(() => {
     if (ORIGINAL === undefined) {
-      delete process.env.INSFORGE_DISABLE_WRITE_RATE_LIMIT;
+      delete process.env.YARAH_DISABLE_WRITE_RATE_LIMIT;
     } else {
-      process.env.INSFORGE_DISABLE_WRITE_RATE_LIMIT = ORIGINAL;
+      process.env.YARAH_DISABLE_WRITE_RATE_LIMIT = ORIGINAL;
     }
   });
 
   it('lets unlimited POSTs through when set to "1"', async () => {
-    process.env.INSFORGE_DISABLE_WRITE_RATE_LIMIT = '1';
+    process.env.YARAH_DISABLE_WRITE_RATE_LIMIT = '1';
     const app = buildApp(functionsWriteLimiter);
     // Well past the per-category cap; would normally 429 long before this.
     for (let i = 0; i < budget * 3; i++) {
@@ -137,7 +137,7 @@ describe('INSFORGE_DISABLE_WRITE_RATE_LIMIT bypass', () => {
   });
 
   it('does not bypass for other truthy values like "true"', async () => {
-    process.env.INSFORGE_DISABLE_WRITE_RATE_LIMIT = 'true';
+    process.env.YARAH_DISABLE_WRITE_RATE_LIMIT = 'true';
     const app = buildApp(functionsWriteLimiter);
     for (let i = 0; i < budget; i++) {
       await request(app).post('/x').send({}).expect(200);

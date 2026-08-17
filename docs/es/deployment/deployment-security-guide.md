@@ -1,11 +1,11 @@
 ---
 title: "Guía de despliegue y seguridad en VPS"
-description: "Despliega InsForge en un VPS Linux genérico, protégelo con buenas prácticas de firewall, SSH y TLS, y mantenlo con actualizaciones y reversiones seguras."
+description: "Despliega Yarah en un VPS Linux genérico, protégelo con buenas prácticas de firewall, SSH y TLS, y mantenlo con actualizaciones y reversiones seguras."
 ---
 
 # Guía de despliegue y seguridad para instalación en VPS
 
-Esta guía completa cubre el despliegue de InsForge en un VPS (servidor privado virtual) genérico para producción, el endurecimiento de tu instancia con buenas prácticas de seguridad, y su mantenimiento a lo largo del tiempo con procedimientos seguros de actualización y reversión.
+Esta guía completa cubre el despliegue de Yarah en un VPS (servidor privado virtual) genérico para producción, el endurecimiento de tu instancia con buenas prácticas de seguridad, y su mantenimiento a lo largo del tiempo con procedimientos seguros de actualización y reversión.
 
 > **Alcance**: Esta guía es independiente del proveedor. Funciona en cualquier VPS con Linux —se recomienda Ubuntu/Debian— ya sea de proveedores como DigitalOcean, Hetzner, Linode, Vultr, OVH, o un servidor bare-metal. Para guías específicas de nube (AWS EC2, GCP, Azure, Render), consulta las demás guías de esta sección.
 
@@ -18,7 +18,7 @@ Esta guía completa cubre el despliegue de InsForge en un VPS (servidor privado 
   - [Requisitos del servidor](#1-server-requirements)
   - [Configuración inicial del servidor](#2-initial-server-setup)
   - [Instalar Docker y Docker Compose](#3-install-docker--docker-compose)
-  - [Desplegar InsForge con Docker Compose](#4-deploy-insforge-with-docker-compose)
+  - [Desplegar Yarah con Docker Compose](#4-deploy-yarah-with-docker-compose)
   - [Configuración de variables de entorno](#5-environment-variable-configuration)
   - [Configuración del proxy inverso](#6-reverse-proxy-setup)
   - [Configuración de HTTPS / TLS](#7-https--tls-setup)
@@ -31,7 +31,7 @@ Esta guía completa cubre el despliegue de InsForge en un VPS (servidor privado 
   - [Gestión de secretos](#13-secrets-management)
 - [Parte 3 — Actualización y mantenimiento](#part-3--updating--maintenance)
   - [Copia de seguridad previa a la actualización](#14-pre-update-backup)
-  - [Actualizar InsForge](#15-updating-insforge)
+  - [Actualizar Yarah](#15-updating-yarah)
   - [Procedimiento de reversión](#16-rollback-procedure)
   - [Copias de seguridad automatizadas](#17-automated-backups)
   - [Monitorización y comprobaciones de estado](#18-monitoring--health-checks)
@@ -65,13 +65,13 @@ Antes de empezar, asegúrate de tener:
 
 > 💡 **Consejo**: Para cargas de producción con múltiples usuarios, empieza con 4 GB de RAM. Monitoriza el uso con `docker stats` y escala verticalmente según sea necesario.
 
-InsForge consta de **4 servicios** que se ejecutan juntos:
+Yarah consta de **4 servicios** que se ejecutan juntos:
 
 | Service       | Description                        | Internal Port |
 |---------------|------------------------------------|---------------|
 | **PostgreSQL**| Primary database                   | 5432          |
 | **PostgREST** | Auto-generated REST API layer      | 3000 (mapped to 5430) |
-| **InsForge**  | Node.js backend + dashboard        | 7130          |
+| **Yarah**  | Node.js backend + dashboard        | 7130          |
 | **Deno**      | Serverless functions runtime       | 7133          |
 
 ---
@@ -159,12 +159,12 @@ docker run hello-world
 
 ---
 
-### 4. Desplegar InsForge con Docker Compose
+### 4. Desplegar Yarah con Docker Compose
 
 #### 4.1 Clona el repositorio
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh | sh -s ~/insforge
+curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 Descarga los archivos que el stack lee y genera `JWT_SECRET`, `ENCRYPTION_KEY`, `ROOT_ADMIN_PASSWORD` y `POSTGRES_PASSWORD` en `.env`. No arranca nada.
@@ -172,15 +172,15 @@ Descarga los archivos que el stack lee y genera `JWT_SECRET`, `ENCRYPTION_KEY`, 
 > ¿Prefieres no pasar un script a la shell? Léelo primero:
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/InsForge/InsForge/main/deploy/setup.sh -o setup.sh
+> curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh -o setup.sh
 > less setup.sh
-> sh setup.sh ~/insforge
+> sh setup.sh ~/yarah
 > ```
 
-#### 4.2 Inicia InsForge
+#### 4.2 Inicia Yarah
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 docker compose up -d
 ```
 
@@ -194,7 +194,7 @@ Deberías ver 4 contenedores en estado `running` o `healthy`:
 
 ```text
 NAME            SERVICE     STATUS
-insforge        insforge    running
+yarah        yarah    running
 postgres        postgres    healthy
 postgrest       postgrest   healthy
 deno            deno        running
@@ -212,7 +212,7 @@ Respuesta esperada:
 {
   "status": "ok",
   "version": "1.x.x",
-  "service": "Insforge OSS Backend",
+  "service": "Yarah OSS Backend",
   "timestamp": "2026-..."
 }
 ```
@@ -221,10 +221,10 @@ Respuesta esperada:
 
 ### 5. Configuración de variables de entorno
 
-Edita tu archivo `.env` para configurar InsForge para producción:
+Edita tu archivo `.env` para configurar Yarah para producción:
 
 ```bash
-nano ~/insforge/.env
+nano ~/yarah/.env
 ```
 
 #### 5.1 Variables obligatorias
@@ -239,8 +239,8 @@ ROOT_ADMIN_USERNAME=admin
 ROOT_ADMIN_PASSWORD=<strong-unique-password>
 
 # ── Public URL (must match your domain/IP) ────────────────────
-API_BASE_URL=https://insforge.yourdomain.com
-VITE_API_BASE_URL=https://insforge.yourdomain.com
+API_BASE_URL=https://yarah.yourdomain.com
+VITE_API_BASE_URL=https://yarah.yourdomain.com
 ```
 
 Genera secretos seguros directamente desde la terminal:
@@ -256,7 +256,7 @@ openssl rand -base64 24
 openssl rand -base64 18
 ```
 
-> ⚠️ **Importante**: `JWT_SECRET` y `ENCRYPTION_KEY` deben ser valores **diferentes**. Si `ENCRYPTION_KEY` no está definida, InsForge recurre a `JWT_SECRET` como respaldo — pero rotar `JWT_SECRET` más adelante corromperá de forma permanente todos los secretos almacenados (claves de API, tokens OAuth, etc.).
+> ⚠️ **Importante**: `JWT_SECRET` y `ENCRYPTION_KEY` deben ser valores **diferentes**. Si `ENCRYPTION_KEY` no está definida, Yarah recurre a `JWT_SECRET` como respaldo — pero rotar `JWT_SECRET` más adelante corromperá de forma permanente todos los secretos almacenados (claves de API, tokens OAuth, etc.).
 
 #### 5.2 Variables de base de datos
 
@@ -267,12 +267,12 @@ instalación nueva y no hayas arrancado nada todavía.
 
 ```env
 POSTGRES_USER=postgres
-POSTGRES_DB=insforge
+POSTGRES_DB=yarah
 ```
 
 #### 5.3 Variables de puertos
 
-Puertos predeterminados que usa InsForge:
+Puertos predeterminados que usa Yarah:
 
 ```env
 POSTGRES_PORT=5432
@@ -287,14 +287,14 @@ DENO_PORT=7133
 `COMPOSE_PROJECT_NAME` prefija cada contenedor, volumen y red:
 
 ```env
-COMPOSE_PROJECT_NAME=insforge
+COMPOSE_PROJECT_NAME=yarah
 ```
 
 > ⚠️ Una segunda instancia en el mismo host necesita su propio valor, además de sus propios puertos. Si dos archivos `.env` comparten este nombre, ejecutar `docker compose up` en uno de ellos adopta y recrea los contenedores del otro.
 
 #### 5.4 Requeridas para despliegues
 
-Estas variables solo son necesarias si planeas usar las **funciones de despliegue** de InsForge (desplegar proyectos a través del panel). Si no necesitas despliegues, omite esta sección.
+Estas variables solo son necesarias si planeas usar las **funciones de despliegue** de Yarah (desplegar proyectos a través del panel). Si no necesitas despliegues, omite esta sección.
 
 ```env
 # ── Deployments ──────────────────────────────────────────────
@@ -302,7 +302,7 @@ Estas variables solo son necesarias si planeas usar las **funciones de despliegu
 PROJECT_ID=your-project-id
 ```
 
-> ⚠️ `deploy/docker-compose/docker-compose.yml` no pasa `PROJECT_ID` al contenedor `insforge`. Añádela al bloque `environment` de ese servicio para usarla.
+> ⚠️ `deploy/docker-compose/docker-compose.yml` no pasa `PROJECT_ID` al contenedor `yarah`. Añádela al bloque `environment` de ese servicio para usarla.
 
 Las subidas zip heredadas a `POST /api/deployments` también necesitan un bucket S3: configúralo con las variables `S3_*` de 5.5.
 
@@ -352,7 +352,7 @@ WORKER_TIMEOUT_MS=60000
 Después de editar, reinicia los servicios para aplicar los cambios:
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 docker compose down
 docker compose up -d
 ```
@@ -361,7 +361,7 @@ docker compose up -d
 
 ### 6. Configuración del proxy inverso
 
-Un proxy inverso se sitúa delante de InsForge, encargándose de la terminación TLS, HTTP/2 y una URL limpia sin números de puerto.
+Un proxy inverso se sitúa delante de Yarah, encargándose de la terminación TLS, HTTP/2 y una URL limpia sin números de puerto.
 
 #### Opción A: Nginx (recomendado)
 
@@ -374,17 +374,17 @@ sudo apt install nginx -y
 ##### 6.2 Crea la configuración del sitio
 
 ```bash
-sudo nano /etc/nginx/sites-available/insforge
+sudo nano /etc/nginx/sites-available/yarah
 ```
 
-Pega la siguiente configuración — sustituye `insforge.yourdomain.com` por tu dominio real:
+Pega la siguiente configuración — sustituye `yarah.yourdomain.com` por tu dominio real:
 
 ```nginx
-# ── InsForge Backend + Dashboard ──────────────────────────────
+# ── Yarah Backend + Dashboard ──────────────────────────────
 server {
     listen 80;
     listen [::]:80;
-    server_name insforge.yourdomain.com;
+    server_name yarah.yourdomain.com;
 
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
@@ -419,7 +419,7 @@ server {
 ##### 6.3 Habilita el sitio
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/insforge /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/yarah /etc/nginx/sites-enabled/
 
 # Remove the default site (optional)
 sudo rm -f /etc/nginx/sites-enabled/default
@@ -450,7 +450,7 @@ sudo nano /etc/caddy/Caddyfile
 ```
 
 ```caddyfile
-insforge.yourdomain.com {
+yarah.yourdomain.com {
     reverse_proxy localhost:7130
 
     header {
@@ -487,7 +487,7 @@ sudo apt install certbot python3-certbot-nginx -y
 #### 7.2 Obtén certificados SSL
 
 ```bash
-sudo certbot --nginx -d insforge.yourdomain.com
+sudo certbot --nginx -d yarah.yourdomain.com
 ```
 
 Sigue las indicaciones interactivas. Certbot hará lo siguiente:
@@ -508,21 +508,21 @@ sudo certbot renew --dry-run
 sudo systemctl status certbot.timer
 ```
 
-#### 7.4 Actualiza el entorno de InsForge para HTTPS
+#### 7.4 Actualiza el entorno de Yarah para HTTPS
 
 Después de obtener tu certificado, actualiza tu `.env` para usar URLs HTTPS:
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 nano .env
 ```
 
 ```env
-API_BASE_URL=https://insforge.yourdomain.com
-VITE_API_BASE_URL=https://insforge.yourdomain.com
+API_BASE_URL=https://yarah.yourdomain.com
+VITE_API_BASE_URL=https://yarah.yourdomain.com
 ```
 
-Reinicia InsForge para aplicar los cambios:
+Reinicia Yarah para aplicar los cambios:
 
 ```bash
 docker compose down
@@ -550,8 +550,8 @@ Estos puertos se usan **únicamente** para la comunicación interna entre servic
 | Port  | Service     | Why Close It                                     |
 |-------|-------------|--------------------------------------------------|
 | 5432  | PostgreSQL  | Direct DB access — use `docker exec` instead     |
-| 5430  | PostgREST   | Internal REST layer — proxied through InsForge   |
-| 7130  | InsForge    | API + dashboard, accessed via reverse proxy on 443, not directly |
+| 5430  | PostgREST   | Internal REST layer — proxied through Yarah   |
+| 7130  | Yarah    | API + dashboard, accessed via reverse proxy on 443, not directly |
 | 7131  | (unused)    | Published by compose (`AUTH_PORT`), but no process listens on it |
 | 7133  | Deno        | Internal serverless runtime                      |
 
@@ -561,7 +561,7 @@ Estos puertos se usan **únicamente** para la comunicación interna entre servic
 > ports:
 >   - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"     # PostgreSQL
 >   - "127.0.0.1:${POSTGREST_PORT:-5430}:3000"     # PostgREST
->   - "127.0.0.1:${APP_PORT:-7130}:7130"            # InsForge (API + dashboard)
+>   - "127.0.0.1:${APP_PORT:-7130}:7130"            # Yarah (API + dashboard)
 >   - "127.0.0.1:${AUTH_PORT:-7131}:7131"           # AUTH_PORT (published by compose, unused)
 >   - "127.0.0.1:${DENO_PORT:-7133}:7133"           # Deno
 > ```
@@ -663,7 +663,7 @@ sudo ufw status
 
 ### 10. Ejecutar servicios como usuario no root
 
-La imagen Docker de InsForge ya sigue las buenas prácticas de no root:
+La imagen Docker de Yarah ya sigue las buenas prácticas de no root:
 
 - El Dockerfile de producción establece `USER node` (UID 1000), por lo que el proceso de la aplicación dentro del contenedor se ejecuta como un usuario no root.
 - Las operaciones de Docker a nivel de sistema están gestionadas por el usuario `deploy` (creado en el [Paso 2.3](#23-create-a-deploy-user-non-root)), que tiene acceso al socket de Docker a través del grupo `docker`.
@@ -671,7 +671,7 @@ La imagen Docker de InsForge ya sigue las buenas prácticas de no root:
 **Verifica el usuario del contenedor:**
 
 ```bash
-docker compose exec insforge whoami
+docker compose exec yarah whoami
 # Expected output: node
 ```
 
@@ -693,7 +693,7 @@ security_opt:
 
 ```bash
 # On your LOCAL machine — generate a key pair if you don't have one
-ssh-keygen -t ed25519 -C "deploy@insforge"
+ssh-keygen -t ed25519 -C "deploy@yarah"
 
 # Copy the public key to your server
 ssh-copy-id -i ~/.ssh/id_ed25519.pub deploy@your-server-ip
@@ -802,7 +802,7 @@ Por defecto, el backend permite todos los orígenes. Refleja el encabezado `Orig
 
 #### Sí ✅
 
-- Guarda los secretos en el archivo `.env` con `chmod 600 ~/insforge/.env`
+- Guarda los secretos en el archivo `.env` con `chmod 600 ~/yarah/.env`
 - Usa valores separados para `JWT_SECRET` y `ENCRYPTION_KEY`
 - Genera secretos con `openssl rand -base64 32`
 - Haz una copia de seguridad de tu archivo `.env` en una ubicación segura y sin conexión
@@ -825,12 +825,12 @@ Por defecto, el backend permite todos los orígenes. Refleja el encabezado `Orig
 #### 14.1 Haz una copia de seguridad de la base de datos
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 source .env
 
 # Create a timestamped database backup
 docker compose exec -T postgres pg_dump \
-  -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" \
+  -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-yarah}" \
   > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Verify size is reasonable
@@ -845,7 +845,7 @@ cp .env .env.backup_$(date +%Y%m%d)
 
 # Back up Docker volumes (optional but recommended)
 docker run --rm \
-  -v insforge_postgres-data:/data \
+  -v yarah_postgres-data:/data \
   -v $(pwd):/backup \
   alpine tar czf /backup/volumes_postgres_$(date +%Y%m%d_%H%M%S).tar.gz /data
 ```
@@ -859,14 +859,14 @@ docker compose images
 
 ---
 
-### 15. Actualizar InsForge
+### 15. Actualizar Yarah
 
 #### 15.1 Actualiza el repositorio
 
 Actualiza el checkout antes de descargar las imágenes: contiene el archivo de compose y la configuración de Postgres.
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 
 git fetch origin main
 git diff HEAD origin/main -- deploy functions .env.example
@@ -882,7 +882,7 @@ Revisa el diff antes de hacer merge. Las variables nuevas de `.env.example` debe
 #### 15.2 Descarga las imágenes más recientes
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 
 # Pull the latest versions
 docker compose pull
@@ -920,7 +920,7 @@ Si una actualización causa problemas, sigue estos pasos para revertirla:
 #### 16.1 Detén los servicios afectados
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 docker compose down
 ```
 
@@ -930,8 +930,8 @@ docker compose down
 
    ```yaml
    services:
-     insforge:
-       image: ghcr.io/insforge/insforge-oss:v2.2.9
+     yarah:
+       image: ghcr.io/yarah/yarah-oss:v2.2.9
    ```
 
 2. Añádelo a `COMPOSE_FILE` en `.env`, conservando las entradas que ya estén:
@@ -952,7 +952,7 @@ sigue ejecutando la fijada.
 Restaura la base de datos solo si la actualización incluyó una migración de base de datos que causó problemas:
 
 ```bash
-cd ~/insforge
+cd ~/yarah
 source .env
 
 # Start only PostgreSQL
@@ -964,7 +964,7 @@ docker compose exec postgres pg_isready -U "${POSTGRES_USER:-postgres}"
 # Restore from backup
 cat backup_YYYYMMDD_HHMMSS.sql | \
   docker compose exec -T postgres psql \
-  -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
+  -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-yarah}"
 
 # Start remaining services
 docker compose up -d
@@ -987,22 +987,22 @@ Configura una tarea cron para copias de seguridad automáticas diarias:
 #### 17.1 Crea un script de copia de seguridad
 
 ```bash
-nano ~/insforge/backup.sh
+nano ~/yarah/backup.sh
 ```
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-# InsForge Automated Backup Script
+# Yarah Automated Backup Script
 # Run from the checkout so docker compose reads COMPOSE_FILE and
 # COMPOSE_PROJECT_NAME from .env, which also carries POSTGRES_USER / POSTGRES_DB
-cd "$HOME/insforge"
+cd "$HOME/yarah"
 set -a
 source .env
 set +a
 
-BACKUP_DIR="$HOME/insforge/backups"
+BACKUP_DIR="$HOME/yarah/backups"
 RETENTION_DAYS=14
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
@@ -1012,11 +1012,11 @@ mkdir -p "$BACKUP_DIR"
 
 # Dump the database
 docker compose exec -T postgres \
-  pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" \
+  pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-yarah}" \
   > "$BACKUP_DIR/db_$TIMESTAMP.sql"
 
 # Copy the environment file
-cp "$HOME/insforge/.env" "$BACKUP_DIR/env_$TIMESTAMP.bak"
+cp "$HOME/yarah/.env" "$BACKUP_DIR/env_$TIMESTAMP.bak"
 
 # Remove backups older than retention period
 find "$BACKUP_DIR" -name "db_*.sql" -mtime +$RETENTION_DAYS -delete
@@ -1026,7 +1026,7 @@ echo "[$(date)] Backup completed successfully: db_$TIMESTAMP.sql"
 ```
 
 ```bash
-chmod +x ~/insforge/backup.sh
+chmod +x ~/yarah/backup.sh
 ```
 
 #### 17.2 Programa con Cron
@@ -1038,7 +1038,7 @@ crontab -e
 Añade esta línea para copias de seguridad diarias a las 3:00 a. m.:
 
 ```cron
-0 3 * * * /home/deploy/insforge/backup.sh >> /home/deploy/insforge/backups/cron.log 2>&1
+0 3 * * * /home/deploy/yarah/backup.sh >> /home/deploy/yarah/backups/cron.log 2>&1
 ```
 
 #### 17.3 Copias de seguridad fuera del sitio (recomendado)
@@ -1047,10 +1047,10 @@ Para la recuperación ante desastres, copia las copias de seguridad a una ubicac
 
 ```bash
 # Example: sync backups to S3-compatible storage
-aws s3 sync ~/insforge/backups s3://your-backup-bucket/insforge/
+aws s3 sync ~/yarah/backups s3://your-backup-bucket/yarah/
 
 # Example: sync to a remote server
-rsync -avz ~/insforge/backups/ user@backup-server:/backups/insforge/
+rsync -avz ~/yarah/backups/ user@backup-server:/backups/yarah/
 ```
 
 ---
@@ -1080,7 +1080,7 @@ free -h
 docker compose logs -f --tail=100
 
 # Specific service
-docker compose logs -f insforge
+docker compose logs -f yarah
 docker compose logs -f postgres
 docker compose logs -f deno
 ```
@@ -1091,10 +1091,10 @@ Monitoriza el endpoint de estado desde el exterior. Una comprobación sencilla b
 
 ```bash
 # Add to crontab for monitoring
-*/5 * * * * curl -sf https://insforge.yourdomain.com/api/health > /dev/null || echo "InsForge is DOWN" | mail -s "InsForge Alert" you@example.com
+*/5 * * * * curl -sf https://yarah.yourdomain.com/api/health > /dev/null || echo "Yarah is DOWN" | mail -s "Yarah Alert" you@example.com
 ```
 
-O usa un servicio gratuito de monitorización de disponibilidad como [UptimeRobot](https://uptimerobot.com) o [Betterstack](https://betterstack.com) para monitorizar `https://insforge.yourdomain.com/api/health`.
+O usa un servicio gratuito de monitorización de disponibilidad como [UptimeRobot](https://uptimerobot.com) o [Betterstack](https://betterstack.com) para monitorizar `https://yarah.yourdomain.com/api/health`.
 
 ---
 
@@ -1112,13 +1112,13 @@ docker compose pull               # Pull latest images
 # ── Diagnostics ───────────────────────────────
 docker compose ps                 # Service status
 docker compose logs -f            # Follow all logs
-docker compose logs -f insforge   # Follow specific service
+docker compose logs -f yarah   # Follow specific service
 docker stats --no-stream          # Resource usage
 
 # ── Database (source .env first for vars) ────
-source ~/insforge/.env
-docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" > backup.sql  # Backup
-cat backup.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"  # Restore
+source ~/yarah/.env
+docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-yarah}" > backup.sql  # Backup
+cat backup.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-yarah}"  # Restore
 
 # ── Updates ───────────────────────────────────
 docker compose pull               # Pull new images
@@ -1165,7 +1165,7 @@ Docker manipula iptables directamente. Vincula los puertos a `127.0.0.1` en `doc
 ```bash
 # Check logs for the failing service
 docker compose logs postgres
-docker compose logs insforge
+docker compose logs yarah
 
 # Verify disk space
 df -h
@@ -1211,13 +1211,13 @@ docker compose ps postgres
 docker compose logs postgres
 
 # Connect to the database directly
-docker compose exec postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
+docker compose exec postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-yarah}"
 ```
 
 ---
 
 ## 🆘 ¿Necesitas ayuda?
 
-- **Documentación**: [https://docs.insforge.dev](https://docs.insforge.dev)
-- **Comunidad de Discord**: [https://discord.com/invite/MPxwj5xVvW](https://discord.com/invite/MPxwj5xVvW)
-- **Issues de GitHub**: [https://github.com/insforge/insforge/issues](https://github.com/insforge/insforge/issues)
+- **Documentación**: [https://docs.yarah.dev](https://docs.yarah.dev)
+- **Comunidad de Discord**: [https://yarah.dev/community](https://yarah.dev/community)
+- **Issues de GitHub**: [https://github.com/yarah/yarah/issues](https://github.com/yarah/yarah/issues)
