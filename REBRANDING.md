@@ -216,6 +216,10 @@ Sistema vivo: **30/30 PASS**. Los otros 3 auditores hallaron lo que el grep no v
 
 ---
 
+## CIERRE (2026-08-16/17) — PASADA FINAL 100% EN VERDE
+Barrido 8 repos limpio · motor 6/6 suites PASS · e2e 12/13 (=base) · sdk 212 + mcp 318 + cli 781 PASS · sistema vivo OK · npm 5/5 · git 8/8 sync. **Repos PÚBLICOS** (decisión de Pierre; Actions gratis). Token npm con autocaducidad 7d (decisión de Pierre, no se borra a mano). Pendiente en vuelo: build multi-arch de `ghcr.io/darts7u7/postgres` en Actions → al terminar, hacer el package público en GitHub Packages.
+Trampa nueva aprendida (#10): **bind mounts de UN SOLO ARCHIVO en Docker quedan obsoletos cuando `sed -i` reemplaza el inode** — el contenedor ve el archivo viejo/trunco (así cayeron 5 suites de golpe con "Unterminated string in /app/package.json"); arreglo: `up -d --force-recreate`.
+
 ## 5. Riesgos conocidos y trampas (aprendidas del análisis)
 
 1. **`docker compose restart` NO relee el compose** → usar `up -d --force-recreate` (ya nos pasó).
