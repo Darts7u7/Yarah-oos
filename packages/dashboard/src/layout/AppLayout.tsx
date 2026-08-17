@@ -107,14 +107,16 @@ export default function AppLayout({ children }: LayoutProps) {
           <DTestConnectTip />
           <div
             className={cn(
-              'min-h-0 min-w-0 bg-semantic-0 flex flex-col',
+              'min-h-0 min-w-0 bg-semantic-2 flex flex-col',
               isContainedHostLayout ? 'h-full' : 'h-screen'
             )}
           >
             {showNavbar ? <AppHeader /> : null}
-            <div className="min-h-0 min-w-0 flex flex-1 overflow-hidden">
+            {/* Inset content area: the row paints the chrome tone so the gap
+                below/right of <main> reads as a floating panel, not a hole. */}
+            <div className="min-h-0 min-w-0 flex flex-1 overflow-hidden bg-semantic-2">
               <AppSidebar isCollapsed={isSidebarCollapsed} onToggleCollapse={toggleSidebar} />
-              <main className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
+              <main className="relative mb-2 mr-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto rounded-lg border border-[var(--alpha-8)] bg-semantic-0">
                 {children}
               </main>
             </div>

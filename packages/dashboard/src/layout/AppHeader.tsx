@@ -106,7 +106,9 @@ export default function AppHeader() {
 
   return (
     <>
-      <div className="h-12 w-full bg-semantic-2 border-b border-[var(--alpha-8)] z-50 flex items-center justify-between px-6">
+      {/* pl-2.5 (10px) centers the 28px logo on 24px — the same optical axis as
+          the sidebar icons: 8px (sidebar px-2) + 6px (item p-1.5) + 10px (half of h-5). */}
+      <div className="h-12 w-full bg-semantic-2 z-50 flex items-center justify-between pl-2.5 pr-6">
         {/* Logo */}
 
         <a href="https://yarah.dev" target="_blank" rel="noopener noreferrer">

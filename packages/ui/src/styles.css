@@ -55,7 +55,7 @@
   /* natural/semantic */
   --semantic-0: 255 255 255; /* #FFFFFF */
   --semantic-1: 247 247 247; /* #F7F7F7 */
-  --semantic-2: 240 240 240; /* #F0F0F0 */
+  --semantic-2: 247 247 247; /* #F7F7F7 — sidebar/header (día) */
   --semantic-3: 232 232 232; /* #E8E8E8 */
   --semantic-4: 224 224 224; /* #E0E0E0 */
   --semantic-5: 217 217 217; /* #D9D9D9 */
@@ -97,9 +97,9 @@
 
 .dark {
   /* natural/semantic */
-  --semantic-0: 22 22 22; /* #161616 */
+  --semantic-0: 23 23 23; /* #171717 — content page (noche) */
   --semantic-1: 27 27 27; /* #1B1B1B */
-  --semantic-2: 31 31 31; /* #1F1F1F */
+  --semantic-2: 30 30 30; /* #1E1E1E — sidebar/header (noche) */
   --semantic-3: 36 36 36; /* #242424 */
   --semantic-4: 41 41 41; /* #292929 */
   --semantic-5: 45 45 45; /* #2D2D2D */
