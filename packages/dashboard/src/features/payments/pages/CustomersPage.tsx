@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { SortColumn } from 'react-data-grid';
-import { AlertCircle, Mail } from 'lucide-react';
+import { AlertCircle, Mail } from '#components/icons';
 import { useOutletContext } from 'react-router-dom';
 import type { PaymentCustomerListItem } from '@yarahdev/shared-schemas';
 import MastercardLogo from '#assets/logos/mastercard.svg?react';

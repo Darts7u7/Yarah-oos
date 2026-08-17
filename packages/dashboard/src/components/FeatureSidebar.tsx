@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { Link, useMatch } from 'react-router-dom';
-import { LucideIcon, MoreVertical } from 'lucide-react';
+import { LucideIcon, MoreVertical } from '#components/icons';
 import { ScrollArea } from './radix/ScrollArea';
 import {
   Button,

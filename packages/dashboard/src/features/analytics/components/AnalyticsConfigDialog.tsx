@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Settings } from 'lucide-react';
+import { Eye, EyeOff, Settings } from '#components/icons';
 import TerminalIcon from '#assets/icons/terminal.svg?react';
 import {
   Button,

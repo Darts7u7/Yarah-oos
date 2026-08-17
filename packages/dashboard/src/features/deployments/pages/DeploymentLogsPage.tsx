@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RefreshCw, Search, MoreVertical, RefreshCcw, XCircle } from 'lucide-react';
+import { RefreshCw, Search, MoreVertical, RefreshCcw, XCircle } from '#components/icons';
 import {
   Button,
   DropdownMenu,

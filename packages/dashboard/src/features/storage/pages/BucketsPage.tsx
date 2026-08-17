@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { Upload } from 'lucide-react';
+import { Upload } from '#components/icons';
 import PencilIcon from '#assets/icons/pencil.svg?react';
 import RefreshIcon from '#assets/icons/refresh.svg?react';
 import { useBuckets } from '#features/storage/hooks/useBuckets';

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Cloud, ExternalLink, Settings } from 'lucide-react';
+import { Cloud, ExternalLink, Settings } from '#components/icons';
 import {
   Button,
   Input,

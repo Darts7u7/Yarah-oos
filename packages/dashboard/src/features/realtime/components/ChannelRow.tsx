@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '#lib/utils/utils';
-import { Trash2 } from 'lucide-react';
+import { Trash2 } from '#components/icons';
 import { Switch } from '@yarahdev/ui';
 import { ListRow, ListRowCell } from '#components';
 import type { RealtimeChannel } from '#features/realtime/services/realtime.service';

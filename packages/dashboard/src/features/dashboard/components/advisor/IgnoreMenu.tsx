@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { EllipsisVertical } from 'lucide-react';
+import { EllipsisVertical } from '#components/icons';
 import type {
   DashboardAdvisorIssue,
   DashboardAdvisorSuppressionReason,

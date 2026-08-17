@@ -1,11 +1,5 @@
 import * as React from 'react';
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  MoreHorizontal,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal } from './icons';
 import { cn } from '../lib';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select';
 

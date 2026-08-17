@@ -1,4 +1,4 @@
-import { Key } from 'lucide-react';
+import { Key } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 
 interface SecretEmptyStateProps {

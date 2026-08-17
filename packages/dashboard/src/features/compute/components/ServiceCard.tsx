@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, ExternalLink, MoreVertical, Play, Square, Trash2 } from 'lucide-react';
+import { AlertTriangle, ExternalLink, MoreVertical, Play, Square, Trash2 } from '#components/icons';
 import {
   DropdownMenu,
   DropdownMenuTrigger,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, ChevronDown, Plug } from 'lucide-react';
+import { LogOut, ChevronDown, Plug } from '#components/icons';
 import {
   Button,
   DropdownMenu,

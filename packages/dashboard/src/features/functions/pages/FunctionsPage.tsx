@@ -1,4 +1,4 @@
-import { ArrowLeft, Download, Edit3, Trash2, Upload } from 'lucide-react';
+import { ArrowLeft, Download, Edit3, Trash2, Upload } from '#components/icons';
 import { FunctionRow } from '#features/functions/components/FunctionRow';
 import FunctionEmptyState from '#features/functions/components/FunctionEmptyState';
 import { useFunctions } from '#features/functions/hooks/useFunctions';

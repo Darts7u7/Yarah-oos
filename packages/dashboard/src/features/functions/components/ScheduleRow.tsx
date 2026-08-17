@@ -1,7 +1,7 @@
 import type { ScheduleSchema } from '@yarahdev/shared-schemas';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2 } from '#components/icons';
 import {
   Button,
   CopyButton,

@@ -18,7 +18,7 @@ import {
   BookOpen,
   CreditCard,
   Megaphone,
-} from 'lucide-react';
+} from '#components/icons';
 
 export interface DashboardSecondaryMenuItem {
   id: string;

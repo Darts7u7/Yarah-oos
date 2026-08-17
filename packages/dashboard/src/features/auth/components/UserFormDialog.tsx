@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CircleAlert, Lock, Mail, User as UserIcon, X } from 'lucide-react';
+import { CircleAlert, Lock, Mail, User as UserIcon, X } from '#components/icons';
 import {
   Button,
   Dialog,

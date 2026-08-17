@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Plus, Play, Square, Trash2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Plus, Play, Square, Trash2, AlertTriangle } from '#components/icons';
 import { Button } from '@yarahdev/ui';
 import { ErrorState, LoadingState } from '#components';
 import { useComputeServices } from '#features/compute/hooks/useComputeServices';

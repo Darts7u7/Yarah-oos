@@ -1,6 +1,6 @@
 import { type MouseEventHandler, type ReactNode, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Info } from 'lucide-react';
+import { Info } from '#components/icons';
 import { Popover, PopoverContent, PopoverTrigger } from '#components';
 import type { DashboardMetricDataPoint } from '#types';
 import { aggregateMetricSeries } from '#features/dashboard/utils/aggregateMetricSeries';

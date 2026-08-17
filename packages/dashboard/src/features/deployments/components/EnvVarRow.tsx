@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, MoreVertical, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, MoreVertical, Pencil, Trash2, Loader2 } from '#components/icons';
 import {
   Button,
   DropdownMenu,

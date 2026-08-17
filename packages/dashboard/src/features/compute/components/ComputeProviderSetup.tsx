@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Settings } from 'lucide-react';
+import { Settings } from '#components/icons';
 import { Button, CopyButton } from '@yarahdev/ui';
 import { computeProviderLabel } from '#features/compute/constants';
 

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Copy, CheckCircle } from 'lucide-react';
+import { Copy, CheckCircle } from './icons';
 import { Button } from './Button';
 import { cn } from '../lib';
 

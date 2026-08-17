@@ -1,4 +1,4 @@
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import { Button, cn } from '@yarahdev/ui';
 import { Alert, AlertTitle, AlertDescription } from './';

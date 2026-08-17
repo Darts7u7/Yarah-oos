@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Container, Cloud, CheckCircle2 } from 'lucide-react';
+import { Container, Cloud, CheckCircle2 } from '#components/icons';
 import {
   MenuDialog,
   MenuDialogBody,

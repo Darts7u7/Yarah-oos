@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { Control, Controller, FieldError, UseFormReturn, UseFormSetValue } from 'react-hook-form';
-import { Calendar, Clock, Link2, X } from 'lucide-react';
+import { Calendar, Clock, Link2, X } from '#components/icons';
 import { Button, Input, cn } from '@yarahdev/ui';
 import {
   BooleanCellEditor,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CircleAlert } from 'lucide-react';
+import { CircleAlert } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import {
   Button,

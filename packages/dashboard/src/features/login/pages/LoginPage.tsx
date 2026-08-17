@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Lock, User } from 'lucide-react';
+import { Loader2, Lock, User } from '#components/icons';
 import {
   Alert,
   AlertDescription,

@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyRound, RefreshCw, Webhook } from 'lucide-react';
+import { KeyRound, RefreshCw, Webhook } from '#components/icons';
 import {
   MenuDialog,
   MenuDialogBody,

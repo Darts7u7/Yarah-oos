@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import { ClientTile } from './ClientTile';
 import { DTestInstallCliSection } from './DTestInstallCliSection';

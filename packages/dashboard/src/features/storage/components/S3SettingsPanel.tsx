@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { KeyRound, Trash2 } from 'lucide-react';
+import { KeyRound, Trash2 } from '#components/icons';
 import { Button, ConfirmDialog, CopyButton, Input } from '@yarahdev/ui';
 import type { S3AccessKeySchema } from '@yarahdev/shared-schemas';
 import { useS3AccessKeys, useS3GatewayConfig } from '#features/storage/hooks/useS3AccessKeys';

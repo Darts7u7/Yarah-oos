@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from '#components/icons';
 import { Button, Input } from '@yarahdev/ui';
 import type { ComputeCredentialStatus } from '@yarahdev/shared-schemas';
 import { useComputeConfig, useUpdateComputeConfig } from '#features/compute/hooks/useComputeConfig';

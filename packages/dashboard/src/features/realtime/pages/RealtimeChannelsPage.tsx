@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CirclePlus } from 'lucide-react';
+import { CirclePlus } from '#components/icons';
 import RefreshIcon from '#assets/icons/refresh.svg?react';
 import {
   Button,

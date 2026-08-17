@@ -14,7 +14,7 @@ import {
   Scan,
   User,
   Plug,
-} from 'lucide-react';
+} from '#components/icons';
 import {
   Edge,
   Handle,

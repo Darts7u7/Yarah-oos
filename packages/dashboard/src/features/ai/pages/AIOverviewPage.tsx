@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ArrowUpCircle, Loader2, RotateCcw, StopCircle } from 'lucide-react';
+import { ArrowUpCircle, Loader2, RotateCcw, StopCircle } from '#components/icons';
 import {
   Button,
   ConfirmDialog,

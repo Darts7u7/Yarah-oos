@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { Loader2, ChevronUp, ChevronDown, ChevronsUpDown } from '#components/icons';
 import { useAIModels } from '#features/ai/hooks/useAIModels';
 import {
   Tabs,

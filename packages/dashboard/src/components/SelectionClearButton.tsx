@@ -1,5 +1,5 @@
 import { Button } from '@yarahdev/ui';
-import { X } from 'lucide-react';
+import { X } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 
 interface SelectionClearButtonProps {

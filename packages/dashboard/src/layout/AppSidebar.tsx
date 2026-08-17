@@ -11,7 +11,7 @@ import {
   type DashboardPrimaryMenuItem,
 } from '#navigation/menuItems';
 import { Link, useLocation, matchPath } from 'react-router-dom';
-import { ExternalLink, PanelLeftOpen, PanelRightOpen } from 'lucide-react';
+import { ExternalLink, PanelLeftOpen, PanelRightOpen } from '#components/icons';
 import { isYarahCloudProject } from '#lib/utils/utils';
 import { useAiEntitlement } from '#lib/hooks/useAiEntitlement';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, cn } from '@yarahdev/ui';
@@ -132,6 +132,7 @@ export default function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebar
     isActive: boolean;
   }) => (
     <item.icon
+      weight={isActive ? 'Filled' : 'Outline'}
       className={cn(
         'h-5 w-5 shrink-0',
         isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'

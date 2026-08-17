@@ -1,4 +1,4 @@
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@yarahdev/ui';
 import type { PaymentProvider, RazorpayKeyConfig, StripeKeyConfig } from '@yarahdev/shared-schemas';

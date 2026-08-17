@@ -1,5 +1,5 @@
 import type { MouseEvent } from 'react';
-import { Database, Circle, Key, ExternalLink } from 'lucide-react';
+import { Database, Circle, Key, ExternalLink } from '#components/icons';
 import { Handle, Position } from '@xyflow/react';
 import { useNavigate } from 'react-router-dom';
 import { TableSchema } from '@yarahdev/shared-schemas';

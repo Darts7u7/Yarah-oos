@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, X } from 'lucide-react';
+import { AlertCircle, X } from '#components/icons';
 import {
   Button,
   Dialog,

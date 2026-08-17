@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button, CopyButton } from '@yarahdev/ui';
-import { Database, Globe } from 'lucide-react';
+import { Database, Globe } from '#components/icons';
 import StepUserIcon from '#assets/icons/step_user.svg?react';
 import StepUploadIcon from '#assets/icons/step_upload.svg?react';
 import stepBgDecoration from '#assets/images/step_bg_decoration.svg';

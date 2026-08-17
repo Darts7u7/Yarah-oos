@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RefreshCw, Trash2, ExternalLink } from 'lucide-react';
+import { RefreshCw, Trash2, ExternalLink } from '#components/icons';
 import { LogsDataGrid, type LogsColumnDef } from '#features/logs/components';
 import { formatTime } from '#lib/utils/utils';
 import { useConfirm } from '#lib/hooks/useConfirm';

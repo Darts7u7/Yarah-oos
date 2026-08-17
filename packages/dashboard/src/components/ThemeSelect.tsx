@@ -1,4 +1,4 @@
-import { Sun, Moon, Monitor } from 'lucide-react';
+import { Sun, Moon, Monitor } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '#lib/contexts/ThemeContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@yarahdev/ui';

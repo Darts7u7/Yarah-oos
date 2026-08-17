@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowDownToLine, ArrowUpFromLine, Cpu, HardDrive, MemoryStick } from 'lucide-react';
+import { ArrowDownToLine, ArrowUpFromLine, Cpu, HardDrive, MemoryStick } from '#components/icons';
 import { Button } from '@yarahdev/ui';
 import { useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
 import { isYarahCloudProject } from '#lib/utils/utils';

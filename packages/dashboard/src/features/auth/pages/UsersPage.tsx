@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CirclePlus, RefreshCw } from 'lucide-react';
+import { CirclePlus, RefreshCw } from '#components/icons';
 import {
   Button,
   ConfirmDialog,

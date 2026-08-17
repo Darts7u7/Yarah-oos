@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ExternalLink, Copy, Check, RefreshCw } from 'lucide-react';
+import { ExternalLink, Copy, Check, RefreshCw } from '#components/icons';
 import {
   Button,
   Skeleton,

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Radio, Plus } from 'lucide-react';
+import { Radio, Plus } from '#components/icons';
 import { Button } from '@yarahdev/ui';
 
 interface RealtimeEmptyStateProps {

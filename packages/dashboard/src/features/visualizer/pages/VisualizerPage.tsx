@@ -1,4 +1,4 @@
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw } from '#components/icons';
 import { useCallback } from 'react';
 import { useMetadata } from '#lib/hooks/useMetadata';
 import { useUsers } from '#features/auth/hooks/useUsers';

@@ -70,7 +70,6 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "i18next": "^26.3.6",
-    "lucide-react": "^0.536.0",
     "posthog-js": "^1.404.1",
     "react-data-grid": "7.0.0-beta.47",
     "react-hook-form": "^7.61.1",
@@ -79,7 +78,8 @@
     "recharts": "^3.8.1",
     "tailwind-merge": "^3.3.1",
     "uuid": "^14.0.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "reicon-react": "^1.2.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",

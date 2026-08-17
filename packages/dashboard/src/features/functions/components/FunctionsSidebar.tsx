@@ -1,4 +1,4 @@
-import { Settings } from 'lucide-react';
+import { Settings } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import { FeatureSidebar, type FeatureSidebarListItem } from '#components';
 

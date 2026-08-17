@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus } from 'lucide-react';
+import { Plus } from '#components/icons';
 import { Button, ConfirmDialog, Skeleton } from '@yarahdev/ui';
 import { EnvVarRow } from '#features/deployments/components/EnvVarRow';
 import { EnvVarDialog } from '#features/deployments/components/EnvVarDialog';

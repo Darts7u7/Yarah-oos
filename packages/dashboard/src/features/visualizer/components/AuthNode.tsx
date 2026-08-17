@@ -1,5 +1,5 @@
 import type { MouseEvent, ReactNode } from 'react';
-import { LockKeyhole, Mail, Users, Circle, ExternalLink, KeyRound } from 'lucide-react';
+import { LockKeyhole, Mail, Users, Circle, ExternalLink, KeyRound } from '#components/icons';
 import { Handle, Position } from '@xyflow/react';
 import { useNavigate } from 'react-router-dom';
 import { OAuthProvidersSchema } from '@yarahdev/shared-schemas';

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X } from './icons';
 import { Button } from './Button';
 import { Input } from './Input';
 import { cn } from '../lib';

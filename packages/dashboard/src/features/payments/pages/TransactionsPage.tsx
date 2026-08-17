@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle } from '#components/icons';
 import { useOutletContext } from 'react-router-dom';
 import type {
   PaymentTransaction,

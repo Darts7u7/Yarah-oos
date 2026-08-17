@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pencil, Plus, Settings, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Settings, Trash2 } from '#components/icons';
 import {
   EmptyStateIllustration,
   FeatureSidebar,

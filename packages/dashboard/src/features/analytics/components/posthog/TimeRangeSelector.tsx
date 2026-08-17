@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { PosthogTimeframe } from '@yarahdev/shared-schemas';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown } from '#components/icons';
 import {
   Button,
   DropdownMenu,

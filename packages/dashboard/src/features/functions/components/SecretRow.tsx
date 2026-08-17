@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Loader2, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Trash2 } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import { Button, CopyButton, cn } from '@yarahdev/ui';
 import { SecretSchema } from '@yarahdev/shared-schemas';

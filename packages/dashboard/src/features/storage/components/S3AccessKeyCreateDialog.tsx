@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import { AlertTriangle, Eye, EyeOff } from '#components/icons';
 import {
   Button,
   Checkbox,

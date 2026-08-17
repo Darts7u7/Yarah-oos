@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Trash2 } from 'lucide-react';
+import { ChevronRight, Trash2 } from '#components/icons';
 import RefreshIcon from '#assets/icons/refresh.svg?react';
 import {
   Button,

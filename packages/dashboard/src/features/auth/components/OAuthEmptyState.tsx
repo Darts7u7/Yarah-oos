@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Lock } from 'lucide-react';
+import { Lock } from '#components/icons';
 
 export function OAuthEmptyState() {
   const { t } = useTranslation('chrome');

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight } from '#components/icons';
 import { CodeBlock, cn } from '@yarahdev/ui';
 import { formatTime } from '#lib/utils/utils';
 import { ListRow, ListRowCell } from '#components';

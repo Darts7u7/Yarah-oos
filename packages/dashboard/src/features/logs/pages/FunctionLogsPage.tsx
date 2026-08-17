@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink } from '#components/icons';
 import { Tabs, Tab } from '@yarahdev/ui';
 import { useLogs } from '#features/logs/hooks/useLogs';
 import { EmptyState, TableHeader, DataGridEmptyState } from '#components';

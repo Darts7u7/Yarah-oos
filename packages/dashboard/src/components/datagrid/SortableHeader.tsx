@@ -1,6 +1,6 @@
 import type { DataGridColumn, DataGridRowType } from './datagridTypes';
 import { TypeBadge } from '#components/TypeBadge';
-import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronsUpDown } from '#components/icons';
 
 function SortableHeaderRenderer<TRow extends DataGridRowType>({
   column,

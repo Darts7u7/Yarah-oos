@@ -1,4 +1,4 @@
-import { Globe } from 'lucide-react';
+import { Globe } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 
 export default function DeploymentsEmptyState() {

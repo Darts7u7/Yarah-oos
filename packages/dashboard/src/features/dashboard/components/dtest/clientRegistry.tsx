@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Database } from 'lucide-react';
+import { Database } from '#components/icons';
 import KeyHorizontalIcon from '#assets/icons/key_horizontal.svg?react';
 import ClaudeLogo from '#assets/logos/claude_code.png';
 import CodexLogo from '#assets/logos/codex.svg?react';

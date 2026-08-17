@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DatabaseBackup } from 'lucide-react';
+import { DatabaseBackup } from '#components/icons';
 import type { UpdateDatabaseBackupConfig } from '@yarahdev/shared-schemas';
 import {
   Button,

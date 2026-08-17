@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CircleAlert, Info, Loader2, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { CircleAlert, Info, Loader2, MoreHorizontal, Pencil, Trash2 } from '#components/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Button,

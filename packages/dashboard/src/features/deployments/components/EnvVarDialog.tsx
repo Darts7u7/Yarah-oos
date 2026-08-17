@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ClipboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from '#components/icons';
 import {
   Button,
   Dialog,

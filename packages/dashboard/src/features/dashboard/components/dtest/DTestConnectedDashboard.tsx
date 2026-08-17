@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@yarahdev/ui';
-import { Braces, Database, Download, HardDrive, User } from 'lucide-react';
+import { Braces, Database, Download, HardDrive, User } from '#components/icons';
 import { MetricCard } from '#features/dashboard/components/MetricCard';
 import { useMetadata } from '#lib/hooks/useMetadata';
 import { useCloudProjectInfo } from '#lib/hooks/useCloudProjectInfo';

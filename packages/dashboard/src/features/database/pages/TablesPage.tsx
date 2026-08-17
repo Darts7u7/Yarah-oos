@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CirclePlus, FolderInput, FolderOutput } from 'lucide-react';
+import { CirclePlus, FolderInput, FolderOutput } from '#components/icons';
 import PencilIcon from '#assets/icons/pencil.svg?react';
 import RefreshIcon from '#assets/icons/refresh.svg?react';
 import { useDatabaseSchemas } from '#features/database/hooks/useDatabase';

@@ -1,4 +1,4 @@
-import { Clock } from 'lucide-react';
+import { Clock } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 
 export default function ScheduleEmptyState() {

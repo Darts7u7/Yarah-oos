@@ -1,4 +1,4 @@
-import { BellOff } from 'lucide-react';
+import { BellOff } from '#components/icons';
 import type {
   DashboardAdvisorCategory,
   DashboardAdvisorSeverity,

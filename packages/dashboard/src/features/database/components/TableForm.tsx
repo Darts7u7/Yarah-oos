@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { AlertCircle, Plus, X, Link, MoveRight } from 'lucide-react';
+import { AlertCircle, Plus, X, Link, MoveRight } from '#components/icons';
 import { Button, Input, useToast } from '@yarahdev/ui';
 import { Alert, AlertDescription } from '#components';
 import { tableService } from '#features/database/services/table.service';

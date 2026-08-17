@@ -1,5 +1,5 @@
 import type { MouseEvent } from 'react';
-import { HardDrive, ExternalLink } from 'lucide-react';
+import { HardDrive, ExternalLink } from '#components/icons';
 import { useNavigate } from 'react-router-dom';
 import { BucketMetadataSchema } from '@yarahdev/shared-schemas';
 

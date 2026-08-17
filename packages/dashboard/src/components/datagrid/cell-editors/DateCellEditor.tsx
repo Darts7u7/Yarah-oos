@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Clock } from '#components/icons';
 import { format, isValid, parse } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { Button, cn } from '@yarahdev/ui';

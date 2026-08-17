@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@yarahdev/ui';
 import type { DashboardAdvisorSeverity } from '#types';

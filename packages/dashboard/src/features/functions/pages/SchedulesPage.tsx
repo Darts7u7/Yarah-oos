@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, CirclePlus } from 'lucide-react';
+import { ArrowLeft, CirclePlus } from '#components/icons';
 import { useSchedules } from '#features/functions/hooks/useSchedules';
 import type { ScheduleSchema } from '@yarahdev/shared-schemas';
 import {

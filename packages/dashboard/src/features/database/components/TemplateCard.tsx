@@ -1,4 +1,4 @@
-import { Table2 } from 'lucide-react';
+import { Table2 } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import { DatabaseTemplate } from '#features/database/templates';
 

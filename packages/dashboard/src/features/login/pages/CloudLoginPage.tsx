@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { Lock } from 'lucide-react';
+import { Lock } from '#components/icons';
 import { Button } from '@yarahdev/ui';
 import { useDashboardHost, useDashboardProject } from '#lib/config/DashboardHostContext';
 import { useAuth } from '#lib/contexts/AuthContext';

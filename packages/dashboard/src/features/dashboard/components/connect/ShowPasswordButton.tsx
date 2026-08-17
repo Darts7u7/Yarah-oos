@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from '#components/icons';
 import { cn } from '@yarahdev/ui';
 import { useTranslation } from 'react-i18next';
 

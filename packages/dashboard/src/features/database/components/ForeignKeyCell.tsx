@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Link2, AlertCircle, X } from 'lucide-react';
+import { Link2, AlertCircle, X } from '#components/icons';
 import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@yarahdev/ui';
 import {
   TypeBadge,

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Lock, Mail, Settings, Plus, X } from 'lucide-react';
+import { Lock, Mail, Settings, Plus, X } from '#components/icons';
 import {
   Button,
   Checkbox,

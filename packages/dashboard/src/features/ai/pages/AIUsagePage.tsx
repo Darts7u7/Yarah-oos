@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from '#components/icons';
 import type { AIOverview } from '@yarahdev/shared-schemas';
 import { AIActivityChartCard } from '#features/ai/components/AIActivityChartCard';
 import { formatCompactNumber, formatUsd, sumMetricPoints } from '#features/ai/helpers';

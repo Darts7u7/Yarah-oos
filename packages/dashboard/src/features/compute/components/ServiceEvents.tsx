@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw } from '#components/icons';
 import { Button } from '@yarahdev/ui';
 import { useServiceEvents } from '#features/compute/hooks/useComputeServices';
 

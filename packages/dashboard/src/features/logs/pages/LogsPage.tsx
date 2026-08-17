@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink } from '#components/icons';
 import { useLogs } from '#features/logs/hooks/useLogs';
 import { DataGridEmptyState, EmptyState, TableHeader } from '#components';
 import {

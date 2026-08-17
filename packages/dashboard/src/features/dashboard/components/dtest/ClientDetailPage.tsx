@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from '#components/icons';
 import { Button, cn } from '@yarahdev/ui';
 import { ConnectionStringSectionV2 } from '#features/dashboard/components/connect/ConnectionStringSectionV2';
 import { APIKeysSectionV2 } from '#features/dashboard/components/connect/APIKeysSectionV2';

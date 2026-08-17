@@ -24,7 +24,7 @@ import {
   Archive,
   File,
   Folder,
-} from 'lucide-react';
+} from '#components/icons';
 import { StorageFileSchema } from '@yarahdev/shared-schemas';
 import { formatTime } from '#lib/utils/utils';
 import { useStorageObjects } from '#features/storage/hooks/useStorageObjects';

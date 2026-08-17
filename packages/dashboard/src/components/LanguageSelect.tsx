@@ -1,4 +1,4 @@
-import { Languages } from 'lucide-react';
+import { Languages } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import { useLocale, SUPPORTED_LOCALES, type Locale } from '#lib/contexts/LocaleContext';
 import {

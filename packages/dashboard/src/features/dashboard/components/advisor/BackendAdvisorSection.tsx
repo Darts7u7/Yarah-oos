@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { Check, Copy, Loader2, RotateCw } from 'lucide-react';
+import { Check, Copy, Loader2, RotateCw } from '#components/icons';
 import {
   useAdvisorCategoryCounts,
   useAdvisorIssues,

@@ -1,4 +1,4 @@
-import { Check, ChevronDown, ChevronUp, Copy } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Copy } from '#components/icons';
 import type { DashboardAdvisorIssue } from '#types';
 import { useToast } from '@yarahdev/ui';
 import { useCopyToClipboard } from '#lib/hooks/useCopyToClipboard';

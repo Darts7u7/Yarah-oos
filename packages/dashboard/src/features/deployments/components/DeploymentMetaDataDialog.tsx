@@ -1,4 +1,4 @@
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import { Button, Dialog, DialogContent, DialogDescription, DialogTitle } from '@yarahdev/ui';
 import { ScrollArea } from '#components';

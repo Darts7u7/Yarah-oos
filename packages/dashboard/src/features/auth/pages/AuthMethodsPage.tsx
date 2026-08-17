@@ -1,6 +1,14 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MoreHorizontal, Plus, Trash2, Pencil, Mail, ChevronDown, KeyRound } from 'lucide-react';
+import {
+  MoreHorizontal,
+  Plus,
+  Trash2,
+  Pencil,
+  Mail,
+  ChevronDown,
+  KeyRound,
+} from '#components/icons';
 import {
   OAuthConfigDialog,
   CustomOAuthConfigDialog,

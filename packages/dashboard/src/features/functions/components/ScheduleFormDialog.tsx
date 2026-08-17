@@ -22,7 +22,7 @@ import {
 import { JsonCellEditor } from '#components/datagrid/cell-editors/JsonCellEditor';
 import { Alert, AlertDescription } from '#components/radix/Alert';
 import { ScrollArea } from '#components/radix/ScrollArea';
-import { Pencil } from 'lucide-react';
+import { Pencil } from '#components/icons';
 
 interface ScheduleFormDialogProps {
   open: boolean;

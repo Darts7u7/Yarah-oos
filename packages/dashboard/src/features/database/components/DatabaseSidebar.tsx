@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Database, Pencil, Plus, Settings, Trash2 } from 'lucide-react';
+import { ArrowLeft, Database, Pencil, Plus, Settings, Trash2 } from '#components/icons';
 import { Link, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import {
   EmptyStateIllustration,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Settings } from 'lucide-react';
+import { Eye, EyeOff, Settings } from '#components/icons';
 import {
   Button,
   Input,

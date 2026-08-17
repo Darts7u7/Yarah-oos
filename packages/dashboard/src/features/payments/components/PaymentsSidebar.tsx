@@ -1,4 +1,4 @@
-import { Box, Rocket, Settings } from 'lucide-react';
+import { Box, Rocket, Settings } from '#components/icons';
 import { useTranslation } from 'react-i18next';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@yarahdev/ui';
 import type { PaymentEnvironment, PaymentProvider } from '@yarahdev/shared-schemas';

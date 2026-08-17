@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { Cpu, HardDrive, Plug, RefreshCw, Settings } from 'lucide-react';
+import { Cpu, HardDrive, Plug, RefreshCw, Settings } from '#components/icons';
 import {
   Button,
   Checkbox,

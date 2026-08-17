@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2, Eye, EyeOff, Loader2, Webhook } from 'lucide-react';
+import { CheckCircle2, Eye, EyeOff, Loader2, Webhook } from '#components/icons';
 import { Button } from '@yarahdev/ui';
 import type {
   PaymentEnvironment,

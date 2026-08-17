@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { AlertCircle, ChevronDown, ChevronRight } from 'lucide-react';
+import { AlertCircle, ChevronDown, ChevronRight } from '#components/icons';
 import { useOutletContext } from 'react-router-dom';
 import type { CatalogPrice, CatalogProduct } from '#features/payments/types/catalog';
 import {

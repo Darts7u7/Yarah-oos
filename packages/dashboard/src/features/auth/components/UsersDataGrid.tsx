@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyRound, Mail, User } from 'lucide-react';
+import { KeyRound, Mail, User } from '#components/icons';
 import {
   Avatar,
   AvatarFallback,

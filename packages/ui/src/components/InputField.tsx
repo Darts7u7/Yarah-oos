@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ChevronDown, CircleAlert, Info, Search } from 'lucide-react';
+import { ChevronDown, CircleAlert, Info, Search } from './icons';
 import { cn } from '../lib';
 
 interface InputFieldProps extends Omit<React.ComponentProps<'input'>, 'required'> {

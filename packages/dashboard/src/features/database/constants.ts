@@ -1,4 +1,13 @@
-import { Type, Clock, Calendar, Hash, Percent, ToggleLeft, Fingerprint, Code } from 'lucide-react';
+import {
+  Type,
+  Clock,
+  Calendar,
+  Hash,
+  Percent,
+  ToggleLeft,
+  Fingerprint,
+  Code,
+} from '#components/icons';
 import { ColumnType } from '@yarahdev/shared-schemas';
 
 // Special handling for auth.users foreign key references
