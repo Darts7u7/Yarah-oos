@@ -116,7 +116,7 @@ const STUDIO_MENU_TRANSITION_MS = 260;
 export function DatabaseStudioSidebarPanel({ onBack }: DatabaseStudioSidebarPanelProps) {
   const { t } = useTranslation('chrome');
   return (
-    <aside className="h-full w-60 flex flex-col border-r border-border bg-semantic-1 flex-shrink-0">
+    <aside className="h-full w-60 flex flex-col border-r border-border bg-semantic-0 flex-shrink-0">
       <div className="p-3">
         <Button
           variant="ghost"

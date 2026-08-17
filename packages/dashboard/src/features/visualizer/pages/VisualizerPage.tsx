@@ -34,7 +34,7 @@ const VisualizerPage = () => {
 
   if (!metadata || error) {
     return (
-      <div className="relative h-full bg-semantic-1 overflow-hidden">
+      <div className="relative h-full bg-semantic-0 overflow-hidden">
         {/* Dot Matrix Background - Light Mode */}
         <div
           className="absolute inset-0 opacity-50 dark:hidden"
@@ -69,7 +69,7 @@ const VisualizerPage = () => {
   }
 
   return (
-    <div className="relative h-full bg-semantic-1 overflow-hidden">
+    <div className="relative h-full bg-semantic-0 overflow-hidden">
       {/* Dot Matrix Background - Light Mode */}
       <div
         className="absolute inset-0 opacity-50 dark:hidden"

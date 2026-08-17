@@ -18,7 +18,7 @@ const PAGE_SIZE = 10;
 export function SessionReplayPage() {
   const { t } = useTranslation('chrome');
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-semantic-1">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-semantic-0">
       <TableHeader
         title={t('analytics.sidebar.sessionReplay', { defaultValue: 'Session Replay' })}
         showSearch={false}

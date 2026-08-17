@@ -457,7 +457,7 @@ export function TableForm({
   }
 
   return (
-    <div className="flex h-full flex-col bg-semantic-1 text-foreground">
+    <div className="flex h-full flex-col bg-semantic-0 text-foreground">
       <div className="px-4 pb-6 pt-10 sm:px-6 lg:px-10">
         <div className="mx-auto w-full max-w-[1024px]">
           <h1 className="text-2xl leading-8 font-medium">

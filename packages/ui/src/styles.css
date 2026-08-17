@@ -54,7 +54,7 @@
 :root {
   /* natural/semantic */
   --semantic-0: 255 255 255; /* #FFFFFF */
-  --semantic-1: 247 247 247; /* #F7F7F7 */
+  --semantic-1: 255 255 255; /* #FFFFFF — content page (día) */
   --semantic-2: 247 247 247; /* #F7F7F7 — sidebar/header (día) */
   --semantic-3: 232 232 232; /* #E8E8E8 */
   --semantic-4: 224 224 224; /* #E0E0E0 */
@@ -86,7 +86,7 @@
   --border: var(--alpha-8); /* general.border */
 
   /* special */
-  --card: var(--yarah-white); /* special.card */
+  --card: var(--semantic-2); /* #F7F7F7 — containers, conjuga con el sidebar */
   --toast: var(--yarah-white); /* special.toast */
   --page: var(--semantic-1); /* special.page */
 }

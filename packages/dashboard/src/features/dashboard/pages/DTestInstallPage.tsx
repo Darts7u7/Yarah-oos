@@ -8,7 +8,7 @@ import type { ClientId } from '#features/dashboard/components/dtest/clientRegist
 
 function DTestLoadingState() {
   return (
-    <main className="h-full min-h-0 min-w-0 overflow-y-auto bg-semantic-1">
+    <main className="h-full min-h-0 min-w-0 overflow-y-auto bg-semantic-0">
       <div className="mx-auto flex w-full max-w-[640px] flex-col gap-6 px-6 pt-16">
         <Skeleton className="h-10 w-48" />
         <Skeleton className="h-[140px] w-full rounded" />

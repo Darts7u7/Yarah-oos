@@ -106,7 +106,7 @@ export function RetentionCard({ enabled }: { enabled: boolean }) {
   //   with absolute fill bar of bg-emerald-700 sized to pct%, white centered text
   // - Empty cells (triangular gap): cell with no inner content
   return (
-    <div className="overflow-x-auto bg-semantic-1">
+    <div className="overflow-x-auto bg-semantic-0">
       {/* header row */}
       <div className="flex items-center border-b border-[var(--alpha-8)] pl-1.5">
         <div className="flex h-8 w-[202px] items-center p-1.5">

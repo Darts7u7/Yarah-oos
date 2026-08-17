@@ -35,7 +35,7 @@ export function InstallYarahPage({ onSelectClient, onDismiss }: InstallYarahPage
   const showCliPrompt = mcpVsCliVariant !== 'mcp';
 
   return (
-    <main className="h-full min-h-0 min-w-0 overflow-y-auto bg-semantic-1">
+    <main className="h-full min-h-0 min-w-0 overflow-y-auto bg-semantic-0">
       <div className="mx-auto flex w-full max-w-[640px] flex-col gap-6 px-6 pb-10 pt-16">
         {/* Title row */}
         <div className="flex items-center justify-between">

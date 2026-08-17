@@ -226,7 +226,7 @@ export function FeatureSidebar({
   return (
     <aside
       className={cn(
-        'w-60 h-full min-h-0 flex flex-col border-r border-[var(--alpha-8)] bg-semantic-1 flex-shrink-0',
+        'w-60 h-full min-h-0 flex flex-col border-r border-[var(--alpha-8)] bg-semantic-0 flex-shrink-0',
         'transition-all duration-300 ease-in-out'
       )}
     >
