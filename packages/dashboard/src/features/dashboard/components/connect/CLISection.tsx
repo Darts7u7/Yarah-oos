@@ -10,7 +10,7 @@ interface CLISectionProps {
 export function CLISection({ className }: CLISectionProps) {
   const { t } = useTranslation('chrome');
   const { projectId } = useProjectId();
-  const cliLinkCommand = `npx @yarah/cli link --project-id ${projectId || '<project id>'}`;
+  const cliLinkCommand = `npx @yarahdev/cli link --project-id ${projectId || '<project id>'}`;
 
   return (
     <div className={cn('flex flex-col gap-6', className)}>

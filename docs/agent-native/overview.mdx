@@ -31,16 +31,16 @@ Most backends assume a human in a dashboard. Yarah assumes a coding agent at a t
 
 A person and an agent want different things from a backend. A person wants a UI to click. An agent wants a stable text interface it can drive, read back, and reason about. That shows up everywhere in Yarah.
 
-Schema changes are [migrations](/core-concepts/database/migrations) in your repo, and project config is an [`yarah.toml`](/agent-native/config-as-code) file, so the agent edits text, commits it, and reviews it in a PR instead of clicking through forms. When it wants to try something risky, it spins up a [backend branch](/agent-native/branching), runs the change against a copy, and throws the branch away if it goes wrong. When something looks off, it fetches [diagnostics and advisor findings](/agent-native/diagnostics) directly with `npx @yarah/cli diagnose`, no dashboard in the loop, and applies the fix itself. That last part is also how the backend gets more secure: the agent reads a security finding like a permissive RLS policy and remediates it on its own, instead of waiting for a human to remember to check. And it reads current schemas, logs, and metadata straight from the backend with `npx @yarah/cli metadata`, so it works from real state rather than guessing.
+Schema changes are [migrations](/core-concepts/database/migrations) in your repo, and project config is an [`yarah.toml`](/agent-native/config-as-code) file, so the agent edits text, commits it, and reviews it in a PR instead of clicking through forms. When it wants to try something risky, it spins up a [backend branch](/agent-native/branching), runs the change against a copy, and throws the branch away if it goes wrong. When something looks off, it fetches [diagnostics and advisor findings](/agent-native/diagnostics) directly with `npx @yarahdev/cli diagnose`, no dashboard in the loop, and applies the fix itself. That last part is also how the backend gets more secure: the agent reads a security finding like a permissive RLS policy and remediates it on its own, instead of waiting for a human to remember to check. And it reads current schemas, logs, and metadata straight from the backend with `npx @yarahdev/cli metadata`, so it works from real state rather than guessing.
 
 ## The loop
 
 These chain together. A session usually goes:
 
-1. Read the current state with `npx @yarah/cli metadata`.
-2. Branch the backend, write a [migration](/core-concepts/database/migrations) and check what is pending with `npx @yarah/cli db migrations list`, or edit `yarah.toml` and preview the config diff with `npx @yarah/cli config plan`.
-3. Apply it with `npx @yarah/cli db migrations up --all` or `config apply`, against the branch first, then the parent.
-4. Run `npx @yarah/cli diagnose` to check advisor findings and error logs, and ask `diagnose --ai` to interpret them.
+1. Read the current state with `npx @yarahdev/cli metadata`.
+2. Branch the backend, write a [migration](/core-concepts/database/migrations) and check what is pending with `npx @yarahdev/cli db migrations list`, or edit `yarah.toml` and preview the config diff with `npx @yarahdev/cli config plan`.
+3. Apply it with `npx @yarahdev/cli db migrations up --all` or `config apply`, against the branch first, then the parent.
+4. Run `npx @yarahdev/cli diagnose` to check advisor findings and error logs, and ask `diagnose --ai` to interpret them.
 5. Apply the remediation, re-run diagnose, and merge the branch.
 
 ## Next steps

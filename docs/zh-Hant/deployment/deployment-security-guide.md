@@ -164,7 +164,7 @@ docker run hello-world
 #### 4.1 取得倉庫
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
+curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 checkout 這個 stack 會讀的檔案，並把 `JWT_SECRET`、`ENCRYPTION_KEY`、`ROOT_ADMIN_PASSWORD`、`POSTGRES_PASSWORD` 產生到 `.env`。不啟動任何東西。
@@ -172,7 +172,7 @@ checkout 這個 stack 會讀的檔案，並把 `JWT_SECRET`、`ENCRYPTION_KEY`�
 > 不想把腳本管線給 shell？先讀一遍再執行：
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh -o setup.sh
+> curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh -o setup.sh
 > less setup.sh
 > sh setup.sh ~/yarah
 > ```
@@ -930,7 +930,7 @@ docker compose down
    ```yaml
    services:
      yarah:
-       image: ghcr.io/yarah/yarah-oss:v2.2.9
+       image: ghcr.io/darts7u7/yarah-oss:latest
    ```
 
 2. 附加到 `.env` 中的 `COMPOSE_FILE`，保留既有項目：

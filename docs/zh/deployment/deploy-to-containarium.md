@@ -8,7 +8,7 @@ description: "在 Containarium LXC 主机上自托管 Yarah，利用按租户容
 本指南将逐步介绍如何在 [Containarium](https://github.com/footprintai/containarium) 主机上部署 Yarah。Containarium 是一个开源、可自托管的平台，为每个租户提供一个持久的 Linux 容器（LXC），具备一流的 SSH、MCP 和基于主机名的 TLS 原语——非常适合代理驱动的 Yarah 部署。
 
 <Note>
-  本指南由社区维护，可能落后于最新的 Yarah 版本。规范的、始终保持最新的配置位于 [Yarah 仓库](https://github.com/Yarah/Yarah)中的 `deploy/docker-compose/` 目录。
+  本指南由社区维护，可能落后于最新的 Yarah 版本。规范的、始终保持最新的配置位于 [Yarah 仓库](https://github.com/Darts7u7/Yarah-oos)中的 `deploy/docker-compose/` 目录。
 </Note>
 
 ## 何时选择 Containarium
@@ -53,7 +53,7 @@ ssh yarah
 ### 2. 在 box 内安装 Yarah
 
 ```bash
-ssh yarah 'curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah'
+ssh yarah 'curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah'
 ```
 
 会 checkout 这个栈要读的文件，并把密钥生成到 `~/yarah/.env`。不启动任何东西。
@@ -147,7 +147,7 @@ agent: create me a container called 'yarah'
 
 agent: set Yarah up, fill in .env
   → ssh yarah agent-box
-    → shell_exec("curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah")
+    → shell_exec("curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah")
     → edit ~/yarah/.env: API_BASE_URL, VITE_API_BASE_URL
       (setup.sh already generated the secrets — do not rewrite the file)
 

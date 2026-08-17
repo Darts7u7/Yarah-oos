@@ -26,10 +26,10 @@ Yarah 在伺服器端儲存 Stripe 密鑰、從您的應用建立 Checkout 和 B
 在 Dashboard -> Payments -> Settings、CLI 或管理 API 中配置 `test` 和 `live` Stripe 密鑰。
 
 ```bash
-npx @yarah/cli payments stripe status
-npx @yarah/cli payments stripe config set --environment test sk_test_xxx
-npx @yarah/cli payments stripe sync --environment test
-npx @yarah/cli payments stripe webhooks configure --environment test
+npx @yarahdev/cli payments stripe status
+npx @yarahdev/cli payments stripe config set --environment test sk_test_xxx
+npx @yarahdev/cli payments stripe sync --environment test
+npx @yarahdev/cli payments stripe webhooks configure --environment test
 ```
 
 連接密鑰後，Yarah 驗證帳戶、在祕密儲存中儲存密鑰、嘗試建立託管的 Stripe webhook 端點，並為 Products、Prices、Customers 和 Subscriptions 執行同步。

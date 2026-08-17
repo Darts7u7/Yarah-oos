@@ -16,7 +16,7 @@ You keep **one** `yarah.toml` in your repo. To apply it to a different environme
 This works the same way on Yarah Cloud projects and on self-hosted OSS deployments.
 
 <Note>
-  All examples use `npx @yarah/cli`. Do not install the CLI globally.
+  All examples use `npx @yarahdev/cli`. Do not install the CLI globally.
 </Note>
 
 ## Command summary
@@ -39,7 +39,7 @@ This works the same way on Yarah Cloud projects and on self-hosted OSS deploymen
     If you already configured the project through the dashboard, export it once to get a working file:
 
     ```bash
-    npx @yarah/cli config export
+    npx @yarahdev/cli config export
     ```
 
     This writes `yarah.toml` reflecting the current backend state.
@@ -53,13 +53,13 @@ This works the same way on Yarah Cloud projects and on self-hosted OSS deploymen
     Change the TOML, then preview the diff before applying:
 
     ```bash
-    npx @yarah/cli config plan
+    npx @yarahdev/cli config plan
     ```
   </Step>
 
   <Step title="Apply">
     ```bash
-    npx @yarah/cli config apply
+    npx @yarahdev/cli config apply
     ```
 
     Review the rendered plan and confirm. In CI, pass `--auto-approve` and `--json`.
@@ -69,7 +69,7 @@ This works the same way on Yarah Cloud projects and on self-hosted OSS deploymen
     To push the same config to staging or a self-hosted backend, point the CLI at the other project and re-run apply:
 
     ```bash
-    npx @yarah/cli --project-id <staging-project-id> config apply
+    npx @yarahdev/cli --project-id <staging-project-id> config apply
     ```
 
     Secrets that differ between environments (SMTP password, etc.) are resolved per-environment from the local shell, so the TOML doesn't need to change.
@@ -137,9 +137,9 @@ subdomain = "acme-prod"
 ## `config plan`
 
 ```bash
-npx @yarah/cli config plan
-npx @yarah/cli config plan --file ./config/yarah.toml
-npx @yarah/cli --json config plan
+npx @yarahdev/cli config plan
+npx @yarahdev/cli config plan --file ./config/yarah.toml
+npx @yarahdev/cli --json config plan
 ```
 
 `plan` reads `yarah.toml`, fetches live state via `/api/metadata` and the optional config endpoints for storage, realtime, and schedules, then prints a rendered diff. It also tags any section the live backend doesn't expose yet (older self-hosted versions, etc.). Apply will skip those instead of failing the whole run.
@@ -149,10 +149,10 @@ Use `plan` before every `apply` in interactive sessions, and as a CI gate to cat
 ## `config apply`
 
 ```bash
-npx @yarah/cli config apply
-npx @yarah/cli config apply --dry-run
-npx @yarah/cli config apply --auto-approve
-npx @yarah/cli --json config apply --auto-approve
+npx @yarahdev/cli config apply
+npx @yarahdev/cli config apply --dry-run
+npx @yarahdev/cli config apply --auto-approve
+npx @yarahdev/cli --json config apply --auto-approve
 ```
 
 `apply` runs the same diff as `plan`, then walks the change set:
@@ -170,9 +170,9 @@ Flags:
 ## `config export`
 
 ```bash
-npx @yarah/cli config export
-npx @yarah/cli config export --out ./config/yarah.toml
-npx @yarah/cli config export --force
+npx @yarahdev/cli config export
+npx @yarahdev/cli config export --out ./config/yarah.toml
+npx @yarahdev/cli config export --force
 ```
 
 `export` pulls the live project's configurable surface and writes it to a TOML file. Use it to:
@@ -206,7 +206,7 @@ This is what lets one `yarah.toml` apply cleanly to multiple environments: the d
 - **Multi-environment parity.** One TOML, applied to dev, staging, and prod, keeps the supported project settings aligned everywhere. Environment-specific values (subdomain, SMTP credentials) flow through `--project-id` overrides and `env(...)` refs.
 - **CI-driven config changes.** Run `config apply --auto-approve --json` from your deploy pipeline. Combine with `config plan` as a PR check so reviewers see what the merge will change in prod.
 - **Disaster recovery.** A committed `yarah.toml` is a known-good config snapshot. Re-apply it after restoring a project to bring auth, SMTP, storage, retention, and deployment settings back to the expected shape in seconds.
-- **Self-hosted and local OSS development.** Run `npx @yarah/cli link --api-base-url http://localhost:7130 --api-key <local-key>` against a docker-compose stack, then point the CLI's config commands at your local OSS instance the same way you'd point at cloud.
+- **Self-hosted and local OSS development.** Run `npx @yarahdev/cli link --api-base-url http://localhost:7130 --api-key <local-key>` against a docker-compose stack, then point the CLI's config commands at your local OSS instance the same way you'd point at cloud.
 
 ## Troubleshooting
 

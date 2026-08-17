@@ -8,7 +8,7 @@ description: "在 Azure 虛擬機器上使用 Docker Compose 部署 Yarah，涵�
 本指南提供了在 Azure 虛擬機器（VM）上使用 Docker Compose 部署、管理和保護 Yarah 的完整、逐步說明。
 
 <Note>
-  本雲端演練由社群維護，可能落後於最新的 Yarah 版本。標準的、始終保持最新的設定位於 [Yarah 儲存庫](https://github.com/Yarah/Yarah)中的 `deploy/docker-compose/` 目錄。
+  本雲端演練由社群維護，可能落後於最新的 Yarah 版本。標準的、始終保持最新的設定位於 [Yarah 儲存庫](https://github.com/Darts7u7/Yarah-oos)中的 `deploy/docker-compose/` 目錄。
 </Note>
 
 ## 先決條件
@@ -92,7 +92,7 @@ description: "在 Azure 虛擬機器上使用 Docker Compose 部署 Yarah，涵�
 
 1.  **取得儲存庫：**
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
+    curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
     ```
     會 checkout 這個 stack 要讀的檔案，並把 `JWT_SECRET`、`ENCRYPTION_KEY`、`ROOT_ADMIN_PASSWORD`、`POSTGRES_PASSWORD` 產生到 `.env`。不啟動任何東西。
 

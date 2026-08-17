@@ -8,7 +8,7 @@ description: "Ejecuta Yarah en un host Containarium LXC con contenedores por inq
 Esta guía explica paso a paso cómo desplegar Yarah en un host de [Containarium](https://github.com/footprintai/containarium). Containarium es una plataforma de código abierto y auto-alojable que ofrece a cada inquilino un contenedor Linux persistente (LXC) con primitivas de primera clase para SSH, MCP y TLS por nombre de host, un ajuste natural para despliegues de Yarah impulsados por agentes.
 
 <Note>
-  Esta guía es mantenida por la comunidad y puede quedar rezagada respecto a la última versión de Yarah. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de Yarah](https://github.com/Yarah/Yarah).
+  Esta guía es mantenida por la comunidad y puede quedar rezagada respecto a la última versión de Yarah. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de Yarah](https://github.com/Darts7u7/Yarah-oos).
 </Note>
 
 ## Cuándo elegir Containarium
@@ -53,7 +53,7 @@ ssh yarah
 ### 2. Instalar Yarah dentro de la caja
 
 ```bash
-ssh yarah 'curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah'
+ssh yarah 'curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah'
 ```
 
 Descarga los archivos que el stack lee y genera los secretos en `~/yarah/.env`. No arranca nada.
@@ -147,7 +147,7 @@ agent: create me a container called 'yarah'
 
 agent: set Yarah up, fill in .env
   → ssh yarah agent-box
-    → shell_exec("curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah")
+    → shell_exec("curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah")
     → edit ~/yarah/.env: API_BASE_URL, VITE_API_BASE_URL
       (setup.sh already generated the secrets — do not rewrite the file)
 

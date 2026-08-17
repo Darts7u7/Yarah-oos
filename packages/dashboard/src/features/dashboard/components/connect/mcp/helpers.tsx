@@ -28,7 +28,7 @@ import { getBackendUrl } from '#lib/utils/utils';
 export type PlatformType = 'macos-linux' | 'windows';
 
 export const GenerateInstallCommand = (agent: MCPAgent, apiKey: string) => {
-  return `npx @yarah/install --client ${agent.id} --env API_KEY=${apiKey} --env API_BASE_URL=${getBackendUrl()}`;
+  return `npx @yarahdev/install --client ${agent.id} --env API_KEY=${apiKey} --env API_BASE_URL=${getBackendUrl()}`;
 };
 
 export const MCP_AGENTS: MCPAgent[] = [
@@ -131,13 +131,13 @@ export const createMCPServerConfig = (
   if (platform === 'windows') {
     return {
       command: 'cmd',
-      args: ['/c', 'npx', '-y', '@yarah/mcp@latest'],
+      args: ['/c', 'npx', '-y', '@yarahdev/mcp@latest'],
       env,
     };
   } else {
     return {
       command: 'npx',
-      args: ['-y', '@yarah/mcp@latest'],
+      args: ['-y', '@yarahdev/mcp@latest'],
       env,
     };
   }

@@ -8,7 +8,7 @@ description: "逐步說明如何以 Docker Compose 將 Yarah 部署至 AWS EC2 �
 本指南將引導您使用 Docker Compose 在 AWS EC2 執行個體上部署 Yarah。
 
 <Note>
-  這份雲端部署教學由社群維護，可能會落後於最新的 Yarah 版本。標準且永遠最新的設定位於 [Yarah repo](https://github.com/Yarah/Yarah) 中的 `deploy/docker-compose/` 目錄。
+  這份雲端部署教學由社群維護，可能會落後於最新的 Yarah 版本。標準且永遠最新的設定位於 [Yarah repo](https://github.com/Darts7u7/Yarah-oos) 中的 `deploy/docker-compose/` 目錄。
 </Note>
 
 ## 📋 事前準備
@@ -115,7 +115,7 @@ sudo apt install git -y
 #### 4.1 取得儲存庫
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
+curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 會 checkout 這個 stack 要讀的檔案，並把 `JWT_SECRET`、`ENCRYPTION_KEY`、`ROOT_ADMIN_PASSWORD`、`POSTGRES_PASSWORD` 產生到 `.env`。不啟動任何東西。

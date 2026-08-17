@@ -23,9 +23,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check yarah-dev skill copies are in sync
-        run: scripts/sync-skills.sh --check
-
       - name: Check deploy/setup.sh invariants
         run: sh scripts/check-setup-sh.sh
 

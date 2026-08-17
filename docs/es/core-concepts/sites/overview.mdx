@@ -47,7 +47,7 @@ flowchart TB
 Implementa desde el directorio fuente de tu aplicación. El CLI sube el árbol de archivos fuente, omite los archivos exclusivamente locales como `node_modules`, `.git`, la salida de compilación y los archivos `.env`, y luego inicia la compilación en Vercel a través de Yarah.
 
 ```bash
-npx @yarah/cli deployments deploy ./frontend
+npx @yarahdev/cli deployments deploy ./frontend
 ```
 
 ### Compilaciones de frameworks
@@ -59,9 +59,9 @@ Implementa proyectos en React, Vue, Svelte, Next.js, sitios estáticos y otros p
 Gestiona las variables de entorno del proveedor desde el panel. Usa prefijos públicos como `VITE_` o `NEXT_PUBLIC_` solo para valores que sean seguros de exponer en el código del navegador.
 
 ```bash
-npx @yarah/cli deployments env list
-npx @yarah/cli deployments env set VITE_YARAH_URL https://your-project.region.apps.yarah.dev
-npx @yarah/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
+npx @yarahdev/cli deployments env list
+npx @yarahdev/cli deployments env set VITE_YARAH_URL https://your-project.region.apps.yarah.dev
+npx @yarahdev/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
 ```
 
 ### Historial de implementaciones
@@ -69,9 +69,9 @@ npx @yarah/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
 Revisa las ejecuciones anteriores, sincroniza el estado de Vercel, inspecciona los metadatos y cancela implementaciones en curso desde la página de registros de implementación.
 
 ```bash
-npx @yarah/cli deployments list
-npx @yarah/cli deployments status deployment_123 --sync
-npx @yarah/cli deployments cancel deployment_123
+npx @yarahdev/cli deployments list
+npx @yarahdev/cli deployments status deployment_123 --sync
+npx @yarahdev/cli deployments cancel deployment_123
 ```
 
 ### Dominios
@@ -89,5 +89,5 @@ Cada implementación lista obtiene una URL predeterminada en `https://<appkey>.y
 ## Próximos pasos
 
 - Configura el [CLI](/quickstart) y conecta tu proyecto.
-- Agrega variables de entorno seguras para el navegador desde el panel o con `npx @yarah/cli deployments env set`.
-- Ejecuta `npx @yarah/cli deployments deploy ./frontend`.
+- Agrega variables de entorno seguras para el navegador desde el panel o con `npx @yarahdev/cli deployments env set`.
+- Ejecuta `npx @yarahdev/cli deployments deploy ./frontend`.

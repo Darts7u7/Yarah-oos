@@ -16,7 +16,7 @@ description: 通过 yarah.toml 声明文件与 CLI 的 plan、apply、export 工
 这在 Yarah Cloud 项目和自托管 OSS 部署上的工作方式相同。
 
 <Note>
-  所有示例使用 `npx @yarah/cli`。不要全局安装 CLI。
+  所有示例使用 `npx @yarahdev/cli`。不要全局安装 CLI。
 </Note>
 
 ## 命令摘要
@@ -39,7 +39,7 @@ description: 通过 yarah.toml 声明文件与 CLI 的 plan、apply、export 工
     如果您已通过仪表板配置项目，导出一次以获得工作文件：
 
     ```bash
-    npx @yarah/cli config export
+    npx @yarahdev/cli config export
     ```
 
     这写 `yarah.toml` 反映当前后端状态。
@@ -53,13 +53,13 @@ description: 通过 yarah.toml 声明文件与 CLI 的 plan、apply、export 工
     更改 TOML，然后在应用前预览差异：
 
     ```bash
-    npx @yarah/cli config plan
+    npx @yarahdev/cli config plan
     ```
   </Step>
 
   <Step title="应用">
     ```bash
-    npx @yarah/cli config apply
+    npx @yarahdev/cli config apply
     ```
 
     审查呈现的计划并确认。在 CI 中，通过 `--auto-approve` 和 `--json`。
@@ -69,7 +69,7 @@ description: 通过 yarah.toml 声明文件与 CLI 的 plan、apply、export 工
     要将相同的配置推送到暂存或自托管后端，请将 CLI 指向其他项目并重新运行应用：
 
     ```bash
-    npx @yarah/cli --project-id <staging-project-id> config apply
+    npx @yarahdev/cli --project-id <staging-project-id> config apply
     ```
 
     在本地 shell 中因环境解析的不同秘密（SMTP 密码等），所以 TOML 不需要更改。
@@ -137,9 +137,9 @@ subdomain = "acme-prod"
 ## `config plan`
 
 ```bash
-npx @yarah/cli config plan
-npx @yarah/cli config plan --file ./config/yarah.toml
-npx @yarah/cli --json config plan
+npx @yarahdev/cli config plan
+npx @yarahdev/cli config plan --file ./config/yarah.toml
+npx @yarahdev/cli --json config plan
 ```
 
 `plan` 读取 `yarah.toml`，通过 `/api/metadata` 和存储、实时和计划的可选配置端点获取实时状态，然后打印呈现的差异。它也标记任何部分实时后端尚未公开（较旧的自托管版本等）。应用将跳过而不是失败整个运行。
@@ -149,10 +149,10 @@ npx @yarah/cli --json config plan
 ## `config apply`
 
 ```bash
-npx @yarah/cli config apply
-npx @yarah/cli config apply --dry-run
-npx @yarah/cli config apply --auto-approve
-npx @yarah/cli --json config apply --auto-approve
+npx @yarahdev/cli config apply
+npx @yarahdev/cli config apply --dry-run
+npx @yarahdev/cli config apply --auto-approve
+npx @yarahdev/cli --json config apply --auto-approve
 ```
 
 `apply` 运行与 `plan` 相同的差异，然后遍历更改集：
@@ -170,9 +170,9 @@ npx @yarah/cli --json config apply --auto-approve
 ## `config export`
 
 ```bash
-npx @yarah/cli config export
-npx @yarah/cli config export --out ./config/yarah.toml
-npx @yarah/cli config export --force
+npx @yarahdev/cli config export
+npx @yarahdev/cli config export --out ./config/yarah.toml
+npx @yarahdev/cli config export --force
 ```
 
 `export` 拉取实时项目的可配置表面并将其写入 TOML 文件。使用它来：
@@ -206,7 +206,7 @@ password = "env(SENDGRID_API_KEY)"
 - **多环境奇偶校验。** 一个 TOML，应用于开发、暂存和生产，保持支持的项目设置在各处对齐。环境特定值（子域、SMTP 凭证）通过 `--project-id` 覆盖和 `env(...)` refs 流。
 - **CI 驱动的配置更改。** 从您的部署管道运行 `config apply --auto-approve --json`。与 `config plan` 结合作为 PR 检查，以便审查者看到合并在产品中会改变什么。
 - **灾难恢复。** 提交的 `yarah.toml` 是已知好的配置快照。在恢复项目后重新应用它以在几秒钟内使身份验证、SMTP、存储、保留和部署设置回到预期形状。
-- **自托管和本地 OSS 开发。** 运行 `npx @yarah/cli link --api-base-url http://localhost:7130 --api-key <local-key>` 针对 docker-compose 堆栈，然后将 CLI 的配置命令指向您的本地 OSS 实例，方式与您指向云的方式相同。
+- **自托管和本地 OSS 开发。** 运行 `npx @yarahdev/cli link --api-base-url http://localhost:7130 --api-key <local-key>` 针对 docker-compose 堆栈，然后将 CLI 的配置命令指向您的本地 OSS 实例，方式与您指向云的方式相同。
 
 ## 故障排除
 

@@ -97,7 +97,7 @@ Por bloques, con puerta de verificación tras cada uno:
 - [x] Nombres de paquete raíz/backend/frontend → `yarah`, `yarah-backend`, `yarah-shell` + `turbo.json` corregido (incluida la deriva de nombres de fábrica)
 - [x] `COMPOSE_PROJECT_NAME=yarah`, servicio `insforge`→`yarah` (contenedores `yarah-*`), `POSTGRES_DB=yarah`, `cron.database_name='yarah'`, host interno `yarah:7130` — con `down -v` + stack fresco verificado (health, BD, login 200)
 - [x] `deploy/`: setup.sh default → `Darts7u7/Yarah-oos`, compose de deploy renombrado
-- [ ] `postgresql.conf`: GUCs `insforge.*`→`yarah.*` y `insforge_pg_utils`→`yarah_pg_utils` ⚠️ SOLO junto con Fase 4 (lockstep con la imagen de BD; imagen `ghcr.io/insforge/postgres` preservada a propósito hasta entonces)
+- [x] `postgresql.conf`: GUCs `yarah.*` y `yarah_pg_utils` — ejecutado en lockstep con la Fase 4 (checkbox actualizado tras auditoría)
 - [x] `Dockerfile`: ENV y rutas `/yarah-storage`, `/yarah-logs`, entrypoint `yarah-entrypoint`
 - [x] Workflows `.github/`: renombrados a marca yarah (imagen `yarah-oss`); ⚠️ pendiente Fase 4/7: podar pushes a DockerHub/ECR de InsForge y probar el build
 
@@ -177,6 +177,23 @@ Por bloques, con puerta de verificación tras cada uno:
 - [ ] Nombres de paquete `insforge-*` → `yarah-*`; corregir los `testnextjs`
 - [ ] READMEs, botones de deploy, badges
 - [ ] Verificar: crear app desde plantilla contra el motor local y que funcione login+datos
+
+### AUDITORÍA FINAL 100% (2026-08-16, 4 agentes) — hallazgos y correcciones
+Sistema vivo: **30/30 PASS**. Los otros 3 auditores hallaron lo que el grep no ve; TODO corregido:
+- [x] Clave PostHog de InsForge viva en `docs/docs.json` → eliminada (analytics de docs OFF)
+- [x] Discord de InsForge en dashboard+docs (14×) → `yarah.dev/community`
+- [x] `github.com/Yarah/Yarah` (repo inexistente, 51 archivos + llamada runtime en `github.service.ts`) → `Darts7u7/Yarah-oos`
+- [x] Scope mal derivado `@yarah/*` (111 archivos) → `@yarahdev/*`
+- [x] `ghcr.io/yarah/yarah-oss` (namespace ajeno, 8 archivos deploy/docs) → `ghcr.io/darts7u7/yarah-oss`
+- [x] CI: `build-image.yml` → `GITHUB_TOKEN`, jobs ECR/DockerHub de InsForge eliminados, arg PostHog muerto fuera; paso `sync-skills` roto eliminado de `lint-and-format.yml`; `integration-tests` pg → v15.13.4
+- [x] **Imagen de BD publicándose**: LICENSE+NOTICE añadidos a Yarah-oos-db, tag `v15.13.4` pusheado → Actions construye `ghcr.io/darts7u7/postgres:v15.13.4` (⚠️ al terminar, hacer el package PÚBLICO en GitHub Packages)
+- [x] **ASCII art de la CLI decía INSFORGE** → redibujado YARAH; `create.apps.yarah.dev` (comando roto) → `create-yarah-app`; package.json de cli/install con `repository`
+- [x] Lockfiles: 3 satélites con `file:/private/tmp` + 12 de plantillas con `@insforge/sdk` → todos regenerados limpios
+- [x] Assets binarios de InsForge: banner del MCP eliminado, favicon del plugin skills → globo Yarah, capturas `signin/connect.png` del motor eliminadas, logo+favicon del sitio docs → globo
+- [x] skills: descripción corrupta del routing arreglada; versiones de plugin alineadas 1.3.0; mantenedores `Darts7u7`
+- [x] Plantillas: `testreact`→`yarah-react-starter`, env unificado `*_YARAH_URL`, docs SDK dominio `functions.yarah.dev`
+- [x] Republicación: sdk 1.5.3, mcp 1.2.13, cli 0.2.8 (arte YARAH), install 0.0.54
+- [ ] PENDIENTES CONOCIDOS (no bloqueantes, decisión de producto): mascota "Forger" de la CLI (animación sin texto), dep `mixpanel` inerte en mcp, `clf_` client-id muerto del cloud viejo, paquete `create-yarah-app` por crear, ~38 capturas de docs con UI de InsForge (regenerar desde el dashboard Yarah), publicar `@yarahdev/test` propio (hoy devDep `insforge-test`), hacer público el package GHCR de postgres al terminar Actions
 
 ### FASE 7 — Barrido final y cierre — EN CURSO (2026-08-16)
 - [x] Meta-dirs internos de InsForge eliminados del motor (`.claude`, `.codex`, `.agents/skills`, `.internal`, `.archive`, `.gstack`, logs) — `.agents/docs` conservado (servido por `/api/docs`)

@@ -53,9 +53,9 @@ graph TB
 
 ```bash
 # 带过期时间的受保护秘密
-npx @yarah/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
+npx @yarahdev/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
 # 读回解密后的值
-npx @yarah/cli secrets get STRIPE_SECRET_KEY
+npx @yarahdev/cli secrets get STRIPE_SECRET_KEY
 ```
 
 ### 日志

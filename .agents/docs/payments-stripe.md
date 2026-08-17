@@ -21,10 +21,10 @@ Do not build raw card collection UI. Do not use Razorpay concepts such as Orders
 Project admins configure Stripe in Dashboard -> Payments -> Settings or with the CLI:
 
 ```bash
-npx @yarah/cli payments stripe status
-npx @yarah/cli payments stripe config set --environment test sk_test_xxx
-npx @yarah/cli payments stripe sync --environment test
-npx @yarah/cli payments stripe webhooks configure --environment test
+npx @yarahdev/cli payments stripe status
+npx @yarahdev/cli payments stripe config set --environment test sk_test_xxx
+npx @yarahdev/cli payments stripe sync --environment test
+npx @yarahdev/cli payments stripe webhooks configure --environment test
 ```
 
 ## Runtime Setup

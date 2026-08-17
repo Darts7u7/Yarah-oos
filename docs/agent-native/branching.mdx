@@ -15,22 +15,22 @@ Each branch runs on its own EC2 instance, restored from the parent at create tim
 Create a branch with `full` (schema + data) or `schema-only` (faster, empty user tables).
 
 ```bash
-npx @yarah/cli branch create feat-billing --mode full
-npx @yarah/cli branch list
+npx @yarahdev/cli branch create feat-billing --mode full
+npx @yarahdev/cli branch list
 ```
 
 Preview the merge SQL before applying.
 
 ```bash
-npx @yarah/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
-npx @yarah/cli branch merge feat-billing
+npx @yarahdev/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
+npx @yarahdev/cli branch merge feat-billing
 ```
 
 Roll back to the create-time snapshot, or delete the branch.
 
 ```bash
-npx @yarah/cli branch reset feat-billing
-npx @yarah/cli branch delete feat-billing
+npx @yarahdev/cli branch reset feat-billing
+npx @yarahdev/cli branch delete feat-billing
 ```
 
 ## Specific usage cases
@@ -43,4 +43,4 @@ Merges block on conflicts. Resolve on the branch or reset and retry. Quotas: 3 p
 
 - [Database migrations](/core-concepts/database/migrations) for forward-only SQL files.
 - [Database overview](/core-concepts/database/overview) for what runs under each branch.
-- [CLI reference](https://github.com/Yarah/Yarah) for the full `branch` flag set.
+- [CLI reference](https://github.com/Darts7u7/Yarah-oos) for the full `branch` flag set.

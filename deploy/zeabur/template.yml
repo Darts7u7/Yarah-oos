@@ -870,7 +870,7 @@ spec:
           template: PREBUILT_V2
           spec:
             source:
-                image: ghcr.io/yarah/yarah-oss:latest
+                image: ghcr.io/darts7u7/yarah-oss:latest
             ports:
                 - id: web
                   port: 7130

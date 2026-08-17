@@ -4,15 +4,15 @@ sidebarTitle: "CLI harness"
 description: "La CLI de Yarah es las manos del agente: una interfaz de terminal para esquema, configuración, implementaciones y diagnósticos."
 ---
 
-`@yarah/cli` es la interfaz que un agente de codificación utiliza para operar su backend. Donde un humano se dirige al panel, el agente se dirige a la terminal: ejecuta un comando, lee el resultado y decide qué hacer a continuación. Cada comando habla `--json`, por lo que el agente funciona con datos estructurados en lugar de raspar una pantalla.
+`@yarahdev/cli` es la interfaz que un agente de codificación utiliza para operar su backend. Donde un humano se dirige al panel, el agente se dirige a la terminal: ejecuta un comando, lee el resultado y decide qué hacer a continuación. Cada comando habla `--json`, por lo que el agente funciona con datos estructurados en lugar de raspar una pantalla.
 
 <Note>
-  Ejecute la CLI con `npx @yarah/cli`. No lo instale globalmente, para que el agente siempre use la versión fijada al proyecto.
+  Ejecute la CLI con `npx @yarahdev/cli`. No lo instale globalmente, para que el agente siempre use la versión fijada al proyecto.
 </Note>
 
 ## Por qué una CLI para agentes
 
-Un panel se construye para un puntero humano; una CLI se construye para cualquier cosa que pueda escribir texto. Pase `--json` a cualquier comando y el agente obtiene un resultado estructurado que puede analizar; pase `--yes` y se ejecuta sin detenerse en un indicador de confirmación. El esquema, la configuración de autenticación, el almacenamiento, las funciones, las implementaciones, las ramas y los diagnósticos son todos subcomandos de la misma herramienta, por lo que hay una superficie para aprender en lugar de un panel para navegar. Se ejecuta en cualquier terminal, cualquier editor o CI, sin necesidad de configurar una integración. Y después de un cambio, el agente puede ejecutar [`npx @yarah/cli diagnose`](/agent-native/diagnostics) y leer exactamente qué se rompió.
+Un panel se construye para un puntero humano; una CLI se construye para cualquier cosa que pueda escribir texto. Pase `--json` a cualquier comando y el agente obtiene un resultado estructurado que puede analizar; pase `--yes` y se ejecuta sin detenerse en un indicador de confirmación. El esquema, la configuración de autenticación, el almacenamiento, las funciones, las implementaciones, las ramas y los diagnósticos son todos subcomandos de la misma herramienta, por lo que hay una superficie para aprender en lugar de un panel para navegar. Se ejecuta en cualquier terminal, cualquier editor o CI, sin necesidad de configurar una integración. Y después de un cambio, el agente puede ejecutar [`npx @yarahdev/cli diagnose`](/agent-native/diagnostics) y leer exactamente qué se rompió.
 
 ## Superficie de comando
 
@@ -26,13 +26,13 @@ Un panel se construye para un puntero humano; una CLI se construye para cualquie
 | Construir | `functions`, `storage`, `deployments`, `secrets`, `schedules`, `ai` |
 | Diagnosticar | `diagnose`, `diagnose advisor`, `diagnose db`, `diagnose logs`, `metadata` |
 
-Ejecute `npx @yarah/cli help <command>` para las banderas en cualquiera de estos.
+Ejecute `npx @yarahdev/cli help <command>` para las banderas en cualquiera de estos.
 
 ## Actualizar y eliminar un proyecto
 
 ```bash
-npx @yarah/cli projects update-version
-npx @yarah/cli projects delete --project <id>
+npx @yarahdev/cli projects update-version
+npx @yarahdev/cli projects delete --project <id>
 ```
 
 `projects update-version` mueve el proyecto a la última versión del backend de Yarah. Apunta al proyecto vinculado de forma predeterminada; pase `--project <id>` para elegir otro. El comando reinicia la instancia, así que espere una breve interrupción. Añada `--wait` para bloquear hasta que la actualización termine.
@@ -45,18 +45,18 @@ Para hacer cualquiera de las dos desde el panel en su lugar, ambas se encuentran
 
 ```bash
 # connect
-npx @yarah/cli login
-npx @yarah/cli link
+npx @yarahdev/cli login
+npx @yarahdev/cli link
 
 # read current state
-npx @yarah/cli --json metadata
+npx @yarahdev/cli --json metadata
 
 # change schema, safely
-npx @yarah/cli db migrations new add-orders-table
-npx @yarah/cli db migrations up --all
+npx @yarahdev/cli db migrations new add-orders-table
+npx @yarahdev/cli db migrations up --all
 
 # check the result
-npx @yarah/cli diagnose --json
+npx @yarahdev/cli diagnose --json
 ```
 
 ## Deje que el agente interprete la salida
@@ -64,7 +64,7 @@ npx @yarah/cli diagnose --json
 Los diagnósticos incluyen una bandera de IA para que el agente pueda entregar sus propios datos de backend a un modelo y obtener una explicación:
 
 ```bash
-npx @yarah/cli diagnose --ai "why are auth requests failing after the last migration?"
+npx @yarahdev/cli diagnose --ai "why are auth requests failing after the last migration?"
 ```
 
 Esto empareja las señales sin procesar (hallazgos del asesor, salud de DB, registros de errores) con una lectura en lenguaje natural, que es lo que convierte "aquí hay un seguimiento de pila" en "aquí está la solución". Ver [Diagnósticos y asesor](/agent-native/diagnostics).

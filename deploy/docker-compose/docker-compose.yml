@@ -59,7 +59,7 @@ services:
       - yarah-network
 
   yarah:
-    image: ghcr.io/yarah/yarah-oss:latest
+    image: ghcr.io/darts7u7/yarah-oss:latest
 
     working_dir: /app
     depends_on:

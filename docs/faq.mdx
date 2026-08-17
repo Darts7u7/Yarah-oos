@@ -102,9 +102,9 @@ description: "Answers to common Yarah questions on database calls, edge function
     yarah db query "ALTER TABLE public.mytable DISABLE ROW LEVEL SECURITY"
 
     # or track it as a migration
-    npx @yarah/cli db migrations new disable-rls-on-mytable
+    npx @yarahdev/cli db migrations new disable-rls-on-mytable
     # put the ALTER TABLE statement in the generated .sql file, then:
-    npx @yarah/cli db migrations up --all
+    npx @yarahdev/cli db migrations up --all
     ```
 
     You can also run it from the dashboard SQL editor, the MCP `run-raw-sql` tool, or the raw SQL REST endpoint (`POST /api/database/advance/rawsql/unrestricted`).
@@ -122,7 +122,7 @@ description: "Answers to common Yarah questions on database calls, edge function
     - **Anon Key**: public, for the browser. Requests run as the `anon` role, gated by RLS. This is the one that hits `permission denied for schema storage`.
     - **API Key**: full-access admin key, server-only. Bypasses RLS.
 
-    Find the API Key in the dashboard under **Project Settings → General** (the **API Key** row, marked "full access control... do not expose in your frontend"), or run `npx @yarah/cli secrets get API_KEY`.
+    Find the API Key in the dashboard under **Project Settings → General** (the **API Key** row, marked "full access control... do not expose in your frontend"), or run `npx @yarahdev/cli secrets get API_KEY`.
 
     Use it from trusted server code through `createAdminClient`, never the browser:
 
@@ -174,11 +174,11 @@ description: "Answers to common Yarah questions on database calls, edge function
     - You can restore a free project from the dashboard for up to **30 days** after it pauses. After that it's archived and you can only download the database backup and storage files (still no data loss).
     - If it was paused because the organization hit its usage limit, **Upgrade to Pro** to restore it.
 
-    Still stuck? Ask in our [Discord](https://discord.com/invite/DvBtaEc9Jz) for the fastest response.
+    Still stuck? Ask in our [Discord](https://yarah.dev/community) for the fastest response.
   </Accordion>
 
   <Accordion title="How do I authenticate the CLI without a browser?">
-    `npx @yarah/cli login` opens a browser to sign in. On a headless machine, a remote server, or CI, use a user API key instead. No browser needed.
+    `npx @yarahdev/cli login` opens a browser to sign in. On a headless machine, a remote server, or CI, use a user API key instead. No browser needed.
 
     The quickest way is the setup prompt from the dashboard, which signs in and links the project for you:
 
@@ -197,8 +197,8 @@ description: "Answers to common Yarah questions on database calls, edge function
     The prompt fills in a login command scoped to your account, followed by the link command:
 
     ```bash
-    npx @yarah/cli login --user-api-key <your-user-api-key>
-    npx @yarah/cli link --project-id <your-project-id>
+    npx @yarahdev/cli login --user-api-key <your-user-api-key>
+    npx @yarahdev/cli link --project-id <your-project-id>
     ```
 
     If you only need the key, for example to run the CLI in CI, open your account menu and go to **Profile → API Keys**, then create a key (set an expiry, or **Never**). Store it as a CI secret and run `login --user-api-key` with it. Add `--json` for machine-readable output.
@@ -213,14 +213,14 @@ description: "Answers to common Yarah questions on database calls, edge function
   </Accordion>
 
   <Accordion title="Can this assistant help with something specific to my own project?">
-    Not really. This assistant answers from Yarah's public docs, so it can't see your project: it can't debug an error, read your data, or check your configuration. Take anything specific to your own project to your coding agent instead. Connected to Yarah through the CLI or MCP, your agent can read your live backend, schema, data, and logs and debug the problem directly. Just describe it in plain words. For a backend health and error report you can run yourself, use `npx @yarah/cli diagnose`. See [Diagnostics & advisor](/agent-native/diagnostics).
+    Not really. This assistant answers from Yarah's public docs, so it can't see your project: it can't debug an error, read your data, or check your configuration. Take anything specific to your own project to your coding agent instead. Connected to Yarah through the CLI or MCP, your agent can read your live backend, schema, data, and logs and debug the problem directly. Just describe it in plain words. For a backend health and error report you can run yourself, use `npx @yarahdev/cli diagnose`. See [Diagnostics & advisor](/agent-native/diagnostics).
   </Accordion>
 
   <Accordion title="How do I get my database's Postgres connection string?">
     Every cloud project has a direct Postgres connection string, handy for `psql`, a database GUI, an ORM (Prisma, Drizzle), or an external service like [Better Auth](/integrations/better-auth) that needs its own Postgres. Print it with the CLI:
 
     ```bash
-    npx @yarah/cli db connection-string
+    npx @yarahdev/cli db connection-string
     ```
 
     You can also grab it from the dashboard under **Project Settings → Connect → Connection String** (cloud projects only).
@@ -252,7 +252,7 @@ description: "Answers to common Yarah questions on database calls, edge function
     2. Get your Yarah connection string (cloud projects only):
 
     ```bash
-    npx @yarah/cli db connection-string
+    npx @yarahdev/cli db connection-string
     ```
 
     3. Restore into Yarah:
@@ -276,13 +276,13 @@ description: "Answers to common Yarah questions on database calls, edge function
   </Accordion>
 
   <Accordion title="How do I take down or remove a deployed site?">
-    There's currently no self-serve way to take down a deployed [Site](/core-concepts/sites/overview) — there's no `deployments delete` command and no dashboard action for it. Deployed sites are hosted externally, so even deleting your project (`npx @yarah/cli projects delete --project <id>`) tears down your backend resources — database, storage, and backend branches — but does *not* remove the hosted site.
+    There's currently no self-serve way to take down a deployed [Site](/core-concepts/sites/overview) — there's no `deployments delete` command and no dashboard action for it. Deployed sites are hosted externally, so even deleting your project (`npx @yarahdev/cli projects delete --project <id>`) tears down your backend resources — database, storage, and backend branches — but does *not* remove the hosted site.
 
-    In practice this rarely matters. If you do need a deployed site taken down, ask the Yarah team in [Discord](https://discord.com/invite/DvBtaEc9Jz).
+    In practice this rarely matters. If you do need a deployed site taken down, ask the Yarah team in [Discord](https://yarah.dev/community).
 
     Two related actions that are *not* the same as removing a live site:
 
-    - **Cancel a build that's still running:** `npx @yarah/cli deployments cancel <id>` stops an in-progress deployment; it does not take down a site that is already live.
-    - **Replace what's live:** redeploy over the same site with `npx @yarah/cli deployments deploy ./frontend` — the newest ready deployment serves the URL.
+    - **Cancel a build that's still running:** `npx @yarahdev/cli deployments cancel <id>` stops an in-progress deployment; it does not take down a site that is already live.
+    - **Replace what's live:** redeploy over the same site with `npx @yarahdev/cli deployments deploy ./frontend` — the newest ready deployment serves the URL.
   </Accordion>
 </AccordionGroup>

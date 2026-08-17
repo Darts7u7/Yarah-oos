@@ -12,7 +12,7 @@ export function DTestInstallCliSection({ className }: DTestInstallCliSectionProp
   const { projectId } = useProjectId();
 
   const command = useMemo(
-    () => `npx @yarah/cli link --project-id ${projectId ?? '<project-id>'}`,
+    () => `npx @yarahdev/cli link --project-id ${projectId ?? '<project-id>'}`,
     [projectId]
   );
   const canCopy = Boolean(projectId);

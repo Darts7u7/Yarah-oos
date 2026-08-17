@@ -31,16 +31,16 @@ description: "Yarah 代理原生倡議提供讓編碼代理可直接操作後端
 
 人和代理想要來自後端的不同東西。一個人想要一個 UI 按一下。一個代理想要一個穩定的文字介面，可以驅動、讀取和推理。這在 Yarah 各處顯示。
 
-結構描述變更是您的存放庫中的[移轉](/core-concepts/database/migrations)，專案設定是一個 [`yarah.toml`](/agent-native/config-as-code) 檔案，所以代理編輯文字、提交它並在 PR 中評論它，而不是按一下表單。當它想嘗試危險的事情時，它轉動一個[後端分支](/agent-native/branching)、執行對複本的變更並在出錯時扔掉分支。當某些事情看起來不對時，它直接用 `npx @yarah/cli diagnose` 取得[診斷和顧問發現](/agent-native/diagnostics)，沒有儀表板在迴圈中，這就是讓它關閉像許可 RLS 原則這樣的安全漏洞本身而不是等待人類記得檢查。它還用 `npx @yarah/cli metadata` 直接從後端讀取目前結構描述、日誌和中繼資料，所以它從真實狀態工作，而不是猜測。
+結構描述變更是您的存放庫中的[移轉](/core-concepts/database/migrations)，專案設定是一個 [`yarah.toml`](/agent-native/config-as-code) 檔案，所以代理編輯文字、提交它並在 PR 中評論它，而不是按一下表單。當它想嘗試危險的事情時，它轉動一個[後端分支](/agent-native/branching)、執行對複本的變更並在出錯時扔掉分支。當某些事情看起來不對時，它直接用 `npx @yarahdev/cli diagnose` 取得[診斷和顧問發現](/agent-native/diagnostics)，沒有儀表板在迴圈中，這就是讓它關閉像許可 RLS 原則這樣的安全漏洞本身而不是等待人類記得檢查。它還用 `npx @yarahdev/cli metadata` 直接從後端讀取目前結構描述、日誌和中繼資料，所以它從真實狀態工作，而不是猜測。
 
 ## 迴圈
 
 這些串聯在一起。工作階段通常是這樣的：
 
-1. 用 `npx @yarah/cli metadata` 讀取目前狀態。
-2. 分支後端、寫一個[移轉](/core-concepts/database/migrations)並檢查什麼是待處理的 `npx @yarah/cli db migrations list`，或編輯 `yarah.toml` 並用 `npx @yarah/cli config plan` 預覽設定差異。
-3. 用 `npx @yarah/cli db migrations up --all` 或 `config apply` 套用它，針對分支先，然後父項。
-4. 執行 `npx @yarah/cli diagnose` 以檢查顧問發現和錯誤日誌，並問 `diagnose --ai` 以解釋它們。
+1. 用 `npx @yarahdev/cli metadata` 讀取目前狀態。
+2. 分支後端、寫一個[移轉](/core-concepts/database/migrations)並檢查什麼是待處理的 `npx @yarahdev/cli db migrations list`，或編輯 `yarah.toml` 並用 `npx @yarahdev/cli config plan` 預覽設定差異。
+3. 用 `npx @yarahdev/cli db migrations up --all` 或 `config apply` 套用它，針對分支先，然後父項。
+4. 執行 `npx @yarahdev/cli diagnose` 以檢查顧問發現和錯誤日誌，並問 `diagnose --ai` 以解釋它們。
 5. 套用補救、重新執行診斷並合併分支。
 
 ## 後續步驟

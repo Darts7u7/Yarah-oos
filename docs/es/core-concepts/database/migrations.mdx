@@ -3,7 +3,7 @@ title: "Migraciones de base de datos"
 description: "Rastrea cambios de esquema de Postgres en git y aplícalos con la CLI de Yarah para mantener tu base de datos versionada y reproducible por entornos."
 ---
 
-Las migraciones son archivos SQL versionados en `migrations/` aplicados con `@yarah/cli`. Cada ejecución exitosa se registra en `system.custom_migrations`. El flujo de trabajo es de solo avance.
+Las migraciones son archivos SQL versionados en `migrations/` aplicados con `@yarahdev/cli`. Cada ejecución exitosa se registra en `system.custom_migrations`. El flujo de trabajo es de solo avance.
 
 ## Conceptos
 
@@ -14,9 +14,9 @@ Una migración es un archivo SQL prefijado con una marca de tiempo UTC de 14 dí
 Vincule el backend y luego cree un archivo.
 
 ```bash
-npx @yarah/cli login
-npx @yarah/cli link
-npx @yarah/cli db migrations new create-employees-table
+npx @yarahdev/cli login
+npx @yarahdev/cli link
+npx @yarahdev/cli db migrations new create-employees-table
 ```
 
 Escriba el SQL.
@@ -33,8 +33,8 @@ create table if not exists public.employees (
 Aplique migraciones pendientes y verifique el historial.
 
 ```bash
-npx @yarah/cli db migrations up --all
-npx @yarah/cli db migrations list
+npx @yarahdev/cli db migrations up --all
+npx @yarahdev/cli db migrations list
 ```
 
 Apunte a un archivo único con `up <version>`, o aplique todo pendiente hasta e incluyendo un destino con `up --to <version>`.

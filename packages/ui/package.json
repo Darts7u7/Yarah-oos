@@ -4,13 +4,13 @@
   "author": "Yarah",
   "description": "React UI component library, design tokens, and Tailwind preset for Yarah apps",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/Yarah/Yarah/tree/main/packages/ui",
+  "homepage": "https://github.com/Darts7u7/Yarah-oos/tree/main/packages/ui",
   "bugs": {
-    "url": "https://github.com/Yarah/Yarah/issues"
+    "url": "https://github.com/Darts7u7/Yarah-oos/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Yarah/Yarah.git",
+    "url": "https://github.com/Darts7u7/Yarah-oos.git",
     "directory": "packages/ui"
   },
   "keywords": [

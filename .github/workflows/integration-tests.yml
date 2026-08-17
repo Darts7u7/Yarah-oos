@@ -15,7 +15,7 @@ jobs:
 
     services:
       postgres:
-        image: ghcr.io/darts7u7/postgres:v15.13.2
+        image: ghcr.io/darts7u7/postgres:v15.13.4
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres

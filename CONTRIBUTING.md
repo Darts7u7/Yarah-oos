@@ -39,7 +39,7 @@ Before you start development, ensure you have the following:
 1. Fork the repository to your GitHub account
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/Yarah/Yarah.git
+   git clone https://github.com/Darts7u7/Yarah-oos.git
    cd yarah
    ```
 3. Install Docker

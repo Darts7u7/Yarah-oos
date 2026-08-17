@@ -47,7 +47,7 @@ flowchart TB
 從您應用程式的原始碼目錄進行部署。CLI 會上傳原始碼樹，略過僅限本機使用的檔案，例如 `node_modules`、`.git`、建置輸出與 `.env` 檔案，接著透過 Yarah 啟動 Vercel 建置。
 
 ```bash
-npx @yarah/cli deployments deploy ./frontend
+npx @yarahdev/cli deployments deploy ./frontend
 ```
 
 ### 框架建置
@@ -59,9 +59,9 @@ npx @yarah/cli deployments deploy ./frontend
 從儀表板管理提供者環境變數。僅針對可安全公開於瀏覽器程式碼中的值，使用如 `VITE_` 或 `NEXT_PUBLIC_` 的公開前綴。
 
 ```bash
-npx @yarah/cli deployments env list
-npx @yarah/cli deployments env set VITE_YARAH_URL https://your-project.region.apps.yarah.dev
-npx @yarah/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
+npx @yarahdev/cli deployments env list
+npx @yarahdev/cli deployments env set VITE_YARAH_URL https://your-project.region.apps.yarah.dev
+npx @yarahdev/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
 ```
 
 ### 部署歷史
@@ -69,9 +69,9 @@ npx @yarah/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
 在部署紀錄頁面檢視先前的執行紀錄、同步 Vercel 狀態、檢查中繼資料，並取消進行中的部署。
 
 ```bash
-npx @yarah/cli deployments list
-npx @yarah/cli deployments status deployment_123 --sync
-npx @yarah/cli deployments cancel deployment_123
+npx @yarahdev/cli deployments list
+npx @yarahdev/cli deployments status deployment_123 --sync
+npx @yarahdev/cli deployments cancel deployment_123
 ```
 
 ### 網域
@@ -89,5 +89,5 @@ npx @yarah/cli deployments cancel deployment_123
 ## 後續步驟
 
 - 設定 [CLI](/quickstart) 並連接您的專案。
-- 從儀表板或使用 `npx @yarah/cli deployments env set` 新增瀏覽器安全的環境變數。
-- 執行 `npx @yarah/cli deployments deploy ./frontend`。
+- 從儀表板或使用 `npx @yarahdev/cli deployments env set` 新增瀏覽器安全的環境變數。
+- 執行 `npx @yarahdev/cli deployments deploy ./frontend`。

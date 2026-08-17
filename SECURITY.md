@@ -1,6 +1,6 @@
 # Security Policy
 
-Contact: https://github.com/Yarah/Yarah/security/advisories/new
+Contact: https://github.com/Darts7u7/Yarah-oos/security/advisories/new
 Contact: mailto:security@yarah.dev
 
 
@@ -45,7 +45,7 @@ Here is a brief list of some common out-of-scope vulnerabilities:
 **Please do not open a public GitHub issue for security vulnerabilities.**
 
 - File a private report through GitHub Security Advisories:
-  https://github.com/Yarah/Yarah/security/advisories/new
+  https://github.com/Darts7u7/Yarah-oos/security/advisories/new
 - Or email `security@yarah.dev`. If you do not receive a reply within 5 business days, please follow up via GitHub Security Advisories so the report does not get lost.
 
 Provide enough information to reproduce the problem so we can resolve it quickly. Helpful details include:

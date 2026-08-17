@@ -52,7 +52,7 @@ export class GitHubService {
 
   private async fetchAndCache(): Promise<GitHubRepositoryMetadata> {
     try {
-      const response = await axios.get('https://api.github.com/repos/Yarah/Yarah', {
+      const response = await axios.get('https://api.github.com/repos/Darts7u7/Yarah-oos', {
         timeout: 5000,
         headers: {
           Accept: 'application/vnd.github+json',

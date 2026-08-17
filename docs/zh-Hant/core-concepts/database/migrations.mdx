@@ -3,7 +3,7 @@ title: "資料庫遷移"
 description: "使用 Yarah CLI 建立、追蹤與套用資料庫遷移，將 Postgres 結構描述變更納入 git 版控並安全部署至生產。"
 ---
 
-遷移是 `migrations/` 中應用於 `@yarah/cli` 的版本化 SQL 檔案。每次成功執行都記錄在 `system.custom_migrations` 中。工作流程是僅向前的。
+遷移是 `migrations/` 中應用於 `@yarahdev/cli` 的版本化 SQL 檔案。每次成功執行都記錄在 `system.custom_migrations` 中。工作流程是僅向前的。
 
 ## 概念
 
@@ -14,9 +14,9 @@ description: "使用 Yarah CLI 建立、追蹤與套用資料庫遷移，將 Pos
 連結後端，然後建立檔案。
 
 ```bash
-npx @yarah/cli login
-npx @yarah/cli link
-npx @yarah/cli db migrations new create-employees-table
+npx @yarahdev/cli login
+npx @yarahdev/cli link
+npx @yarahdev/cli db migrations new create-employees-table
 ```
 
 編寫 SQL。
@@ -33,8 +33,8 @@ create table if not exists public.employees (
 應用待處理的遷移並檢查歷史。
 
 ```bash
-npx @yarah/cli db migrations up --all
-npx @yarah/cli db migrations list
+npx @yarahdev/cli db migrations up --all
+npx @yarahdev/cli db migrations list
 ```
 
 使用 `up <version>` 針對單個檔案，或使用 `up --to <version>` 應用到目標為止的所有待處理項。

@@ -102,9 +102,9 @@ description: "Yarah 常见问题：数据库调用、Edge Function 与 Custom Co
     yarah db query "ALTER TABLE public.mytable DISABLE ROW LEVEL SECURITY"
 
     # 或者作为 migration 跟踪
-    npx @yarah/cli db migrations new disable-rls-on-mytable
+    npx @yarahdev/cli db migrations new disable-rls-on-mytable
     # 把 ALTER TABLE 语句写进生成的 .sql 文件里，然后：
-    npx @yarah/cli db migrations up --all
+    npx @yarahdev/cli db migrations up --all
     ```
 
     也可以在 dashboard 的 SQL 编辑器、MCP 的 `run-raw-sql` 工具，或原始 SQL 的 REST 端点（`POST /api/database/advance/rawsql/unrestricted`）里执行。
@@ -122,7 +122,7 @@ description: "Yarah 常见问题：数据库调用、Edge Function 与 Custom Co
     - **Anon Key**：公开的，给浏览器用。请求以 `anon` 角色运行，受 RLS 管，`permission denied for schema storage` 就是它撞出来的。
     - **API Key**：全权限管理员 key，只在服务端用，绕过 RLS。
 
-    在 dashboard 的 **Project Settings → General** 里找 API Key（标着 **API Key** 的那一行，写明「对项目有完全控制权限，不要暴露在前端」），或者运行 `npx @yarah/cli secrets get API_KEY`。
+    在 dashboard 的 **Project Settings → General** 里找 API Key（标着 **API Key** 的那一行，写明「对项目有完全控制权限，不要暴露在前端」），或者运行 `npx @yarahdev/cli secrets get API_KEY`。
 
     在可信的服务端代码里通过 `createAdminClient` 使用，绝不要放到浏览器：
 
@@ -174,11 +174,11 @@ description: "Yarah 常见问题：数据库调用、Edge Function 与 Custom Co
     - free 项目在暂停后的 **30 天内**都可以在 dashboard 直接恢复。超过之后项目会被归档，你只能下载数据库备份和 Storage 文件（数据仍然不会丢失）。
     - 如果是因为 organization 超出用量而暂停，需要 **Upgrade to Pro** 才能恢复。
 
-    还是卡住？到我们的 [Discord](https://discord.com/invite/DvBtaEc9Jz) 提问，响应最快。
+    还是卡住？到我们的 [Discord](https://yarah.dev/community) 提问，响应最快。
   </Accordion>
 
   <Accordion title="不打开浏览器，怎么给 CLI 登录鉴权？">
-    `npx @yarah/cli login` 会打开浏览器登录。在无界面机器、远程服务器或 CI 上，改用 user API key，不需要浏览器。
+    `npx @yarahdev/cli login` 会打开浏览器登录。在无界面机器、远程服务器或 CI 上，改用 user API key，不需要浏览器。
 
     最快的方式是用 dashboard 里的 setup prompt，它会帮你登录并关联好项目：
 
@@ -197,8 +197,8 @@ description: "Yarah 常见问题：数据库调用、Edge Function 与 Custom Co
     这个 prompt 会填好一条限定到你账号的登录命令，后面跟着关联命令：
 
     ```bash
-    npx @yarah/cli login --user-api-key <your-user-api-key>
-    npx @yarah/cli link --project-id <your-project-id>
+    npx @yarahdev/cli login --user-api-key <your-user-api-key>
+    npx @yarahdev/cli link --project-id <your-project-id>
     ```
 
     如果你只需要那把 key（比如在 CI 里跑 CLI），打开账号菜单，进入 **Profile → API Keys**，创建一把 key（设个有效期，或选 **Never**）。把它存成 CI secret，再用它跑 `login --user-api-key`。加上 `--json` 可以得到机器可读的输出。
@@ -213,14 +213,14 @@ description: "Yarah 常见问题：数据库调用、Edge Function 与 Custom Co
   </Accordion>
 
   <Accordion title="这个助手能帮我解决我自己项目里的具体问题吗？">
-    基本不行。这个助手是基于 Yarah 的公开文档来回答的，看不到你的项目：既没法调试报错，也读不到你的数据，更查不了你的配置。凡是跟你自己项目相关的，交给你的编码 agent 来处理。你的 agent 通过 CLI 或 MCP 连着 Yarah，能读到你的实时后端、结构、数据和日志，直接帮你调试，用大白话描述问题就行。想自己拿一份后端健康和报错报告，跑 `npx @yarah/cli diagnose`。参见 [Diagnostics & advisor](/agent-native/diagnostics)。
+    基本不行。这个助手是基于 Yarah 的公开文档来回答的，看不到你的项目：既没法调试报错，也读不到你的数据，更查不了你的配置。凡是跟你自己项目相关的，交给你的编码 agent 来处理。你的 agent 通过 CLI 或 MCP 连着 Yarah，能读到你的实时后端、结构、数据和日志，直接帮你调试，用大白话描述问题就行。想自己拿一份后端健康和报错报告，跑 `npx @yarahdev/cli diagnose`。参见 [Diagnostics & advisor](/agent-native/diagnostics)。
   </Accordion>
 
   <Accordion title="怎么拿到数据库的 Postgres 连接串（connection string）？">
     每个 cloud 项目都有一个直连的 Postgres connection string，方便用 `psql`、数据库 GUI、ORM（Prisma、Drizzle），或者像 [Better Auth](/integrations/better-auth) 这类需要自带 Postgres 的外部服务。用 CLI 打印出来：
 
     ```bash
-    npx @yarah/cli db connection-string
+    npx @yarahdev/cli db connection-string
     ```
 
     你也可以在 dashboard 里拿到：进入 **Project Settings → Connect → Connection String**（仅限 cloud 项目）。
@@ -252,7 +252,7 @@ description: "Yarah 常见问题：数据库调用、Edge Function 与 Custom Co
     2. 拿到 Yarah 的 connection string（仅限 cloud 项目）：
 
     ```bash
-    npx @yarah/cli db connection-string
+    npx @yarahdev/cli db connection-string
     ```
 
     3. restore 到 Yarah：
@@ -276,13 +276,13 @@ description: "Yarah 常见问题：数据库调用、Edge Function 与 Custom Co
   </Accordion>
 
   <Accordion title="怎么下线或删除已部署的站点（site）？">
-    目前没有自助下线已部署 [Site](/core-concepts/sites/overview) 的方式——既没有 `deployments delete` 命令，dashboard 里也没有对应操作。已部署的站点托管在外部，所以即使删除项目（`npx @yarah/cli projects delete --project <id>`）也只会清掉后端资源——数据库、Storage 和后端分支——而*不会*移除已托管的站点。
+    目前没有自助下线已部署 [Site](/core-concepts/sites/overview) 的方式——既没有 `deployments delete` 命令，dashboard 里也没有对应操作。已部署的站点托管在外部，所以即使删除项目（`npx @yarahdev/cli projects delete --project <id>`）也只会清掉后端资源——数据库、Storage 和后端分支——而*不会*移除已托管的站点。
 
-    实际上这基本不影响使用。如果你确实需要下线某个已部署的站点，请到 [Discord](https://discord.com/invite/DvBtaEc9Jz) 联系 Yarah 团队。
+    实际上这基本不影响使用。如果你确实需要下线某个已部署的站点，请到 [Discord](https://yarah.dev/community) 联系 Yarah 团队。
 
     有两个相关操作，和「下线一个已上线站点」并不是一回事：
 
-    - **取消还在跑的构建：** `npx @yarah/cli deployments cancel <id>` 会终止一个进行中的部署；它不会下线一个已经上线的站点。
-    - **替换当前上线的内容：** 用 `npx @yarah/cli deployments deploy ./frontend` 在同一个站点上重新部署——最新一次 ready 的部署会接管这个 URL。
+    - **取消还在跑的构建：** `npx @yarahdev/cli deployments cancel <id>` 会终止一个进行中的部署；它不会下线一个已经上线的站点。
+    - **替换当前上线的内容：** 用 `npx @yarahdev/cli deployments deploy ./frontend` 在同一个站点上重新部署——最新一次 ready 的部署会接管这个 URL。
   </Accordion>
 </AccordionGroup>

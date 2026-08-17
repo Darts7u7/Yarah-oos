@@ -12,7 +12,7 @@ This guide walks through self-hosting the Yarah platform on a [Containarium](htt
 </Note>
 
 <Note>
-  This guide is community-maintained and can lag the latest Yarah release. The canonical, always-current setup is the `deploy/docker-compose/` directory in the [Yarah repo](https://github.com/Yarah/Yarah).
+  This guide is community-maintained and can lag the latest Yarah release. The canonical, always-current setup is the `deploy/docker-compose/` directory in the [Yarah repo](https://github.com/Darts7u7/Yarah-oos).
 </Note>
 
 ## When to choose Containarium
@@ -57,7 +57,7 @@ ssh yarah
 ### 2. Set Yarah up inside the box
 
 ```bash
-ssh yarah 'curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah'
+ssh yarah 'curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah'
 ```
 
 Checks out the files the stack reads and generates the secrets into `~/yarah/.env`. Nothing is started.
@@ -151,7 +151,7 @@ agent: create me a container called 'yarah'
 
 agent: set Yarah up, fill in .env
   → ssh yarah agent-box
-    → shell_exec("curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah")
+    → shell_exec("curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah")
     → edit ~/yarah/.env: API_BASE_URL, VITE_API_BASE_URL
       (setup.sh already generated the secrets — do not rewrite the file)
 

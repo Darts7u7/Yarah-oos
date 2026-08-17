@@ -12,7 +12,7 @@ from the Yarah marketplace.
 In Claude Code, run:
 
 ```
-/plugin marketplace add Yarah/Yarah
+/plugin marketplace add Darts7u7/Yarah-oos
 ```
 
 Then install the plugin:
@@ -33,7 +33,7 @@ realtime, email, Stripe flows, and S3-compatible storage integrations.
 
 ### `yarah-cli`
 
-Command-line project management with `@yarah/cli`, including project
+Command-line project management with `@yarahdev/cli`, including project
 creation, linking, SQL, migrations, RLS policies, functions, storage,
 deployments, compute services, secrets, AI setup, payments, schedules, logs,
 imports, exports, and backend branches.
@@ -81,7 +81,7 @@ The skills in that repository are Markdown files with YAML frontmatter. See its
 
 ## Feedback
 
-Found an issue or have a suggestion? [Open an issue](https://github.com/Yarah/Yarah/issues)
+Found an issue or have a suggestion? [Open an issue](https://github.com/Darts7u7/Yarah-oos/issues)
 or join our [Discord](https://yarah.dev/community).
 
 ## License

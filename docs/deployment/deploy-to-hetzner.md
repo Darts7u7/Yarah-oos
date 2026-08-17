@@ -12,7 +12,7 @@ This guide walks through self-hosting the Yarah platform on a [Hetzner Cloud](ht
 </Note>
 
 <Note>
-  This cloud walkthrough is community-maintained and can lag the latest Yarah release. The canonical, always-current setup is the `deploy/docker-compose/` directory in the [Yarah repo](https://github.com/Yarah/Yarah).
+  This cloud walkthrough is community-maintained and can lag the latest Yarah release. The canonical, always-current setup is the `deploy/docker-compose/` directory in the [Yarah repo](https://github.com/Darts7u7/Yarah-oos).
 </Note>
 
 ## 📋 Prerequisites
@@ -117,7 +117,7 @@ apt install git -y
 #### 5.1 Fetch the Self-Host Files
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
+curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 This sparse-checkouts the files the stack reads and writes `JWT_SECRET`, `ENCRYPTION_KEY`, `ROOT_ADMIN_PASSWORD`, `POSTGRES_PASSWORD`, and the API keys into `~/yarah/.env` (mode `600`). Nothing is started yet.
@@ -125,7 +125,7 @@ This sparse-checkouts the files the stack reads and writes `JWT_SECRET`, `ENCRYP
 > Rather not pipe a script into a shell? Read it first:
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh -o setup.sh
+> curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh -o setup.sh
 > less setup.sh
 > sh setup.sh ~/yarah
 > ```
@@ -359,7 +359,7 @@ Resize to a larger plan in the Hetzner Console (**Rescale**), for example from *
 
 - **Yarah docs**: [https://docs.yarah.dev](https://docs.yarah.dev)
 - **Hetzner docs**: [https://docs.hetzner.com/cloud/](https://docs.hetzner.com/cloud/)
-- **GitHub Issues**: [https://github.com/Yarah/Yarah/issues](https://github.com/Yarah/Yarah/issues)
+- **GitHub Issues**: [https://github.com/Darts7u7/Yarah-oos/issues](https://github.com/Darts7u7/Yarah-oos/issues)
 - **Discord**: [https://yarah.dev/community](https://yarah.dev/community)
 
 ## 📝 Cost Notes

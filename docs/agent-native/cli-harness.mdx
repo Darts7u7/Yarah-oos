@@ -1,18 +1,18 @@
 ---
 title: "CLI harness"
 sidebarTitle: "CLI harness"
-description: "The @yarah/cli is the agent's hands: one terminal interface with JSON output for schema, config, deploys, and diagnostics across your Yarah project."
+description: "The @yarahdev/cli is the agent's hands: one terminal interface with JSON output for schema, config, deploys, and diagnostics across your Yarah project."
 ---
 
-The `@yarah/cli` is the interface a coding agent uses to operate your backend. Where a human reaches for the dashboard, the agent reaches for the terminal: it runs a command, reads the output, and decides what to do next. Every command speaks `--json`, so the agent works from structured data instead of scraping a screen.
+The `@yarahdev/cli` is the interface a coding agent uses to operate your backend. Where a human reaches for the dashboard, the agent reaches for the terminal: it runs a command, reads the output, and decides what to do next. Every command speaks `--json`, so the agent works from structured data instead of scraping a screen.
 
 <Note>
-  Run the CLI with `npx @yarah/cli`. Do not install it globally, so the agent always uses the version pinned to the project.
+  Run the CLI with `npx @yarahdev/cli`. Do not install it globally, so the agent always uses the version pinned to the project.
 </Note>
 
 ## Why a CLI for agents
 
-A dashboard is built for a human pointer; a CLI is built for anything that can write text. Pass `--json` to any command and the agent gets a structured result it can parse; pass `--yes` and it runs without stopping for a confirmation prompt. Schema, auth config, storage, functions, deploys, branches, and diagnostics are all subcommands of the same tool, so there is one surface to learn instead of a dashboard to navigate. It runs in any terminal, any editor, or CI, with no integration to set up. And after a change, the agent can run [`npx @yarah/cli diagnose`](/agent-native/diagnostics) and read back exactly what broke.
+A dashboard is built for a human pointer; a CLI is built for anything that can write text. Pass `--json` to any command and the agent gets a structured result it can parse; pass `--yes` and it runs without stopping for a confirmation prompt. Schema, auth config, storage, functions, deploys, branches, and diagnostics are all subcommands of the same tool, so there is one surface to learn instead of a dashboard to navigate. It runs in any terminal, any editor, or CI, with no integration to set up. And after a change, the agent can run [`npx @yarahdev/cli diagnose`](/agent-native/diagnostics) and read back exactly what broke.
 
 ## Command surface
 
@@ -26,7 +26,7 @@ A dashboard is built for a human pointer; a CLI is built for anything that can w
 | Build | `functions`, `storage`, `deployments`, `secrets`, `schedules`, `ai` |
 | Diagnose | `diagnose`, `diagnose advisor`, `diagnose db`, `diagnose logs`, `metadata` |
 
-Run `npx @yarah/cli help <command>` for the flags on any of these.
+Run `npx @yarahdev/cli help <command>` for the flags on any of these.
 
 ## Built-in secrets
 
@@ -40,8 +40,8 @@ The `secrets` commands manage the same store your edge functions read from. Ever
 | `YARAH_BASE_URL` | The project's API base URL |
 
 ```bash
-npx @yarah/cli secrets list          # every key, values hidden
-npx @yarah/cli secrets get ANON_KEY  # decrypted value of one key
+npx @yarahdev/cli secrets list          # every key, values hidden
+npx @yarahdev/cli secrets get ANON_KEY  # decrypted value of one key
 ```
 
 Use `secrets add`, `secrets update`, and `secrets delete` for your own keys, and `secrets rotate api-key` or `secrets rotate anon-key` to reissue a project key with an optional grace period. The API key and anon key are also in the dashboard: click **Install** and open **API Keys**.
@@ -49,8 +49,8 @@ Use `secrets add`, `secrets update`, and `secrets delete` for your own keys, and
 ## Upgrading and deleting a project
 
 ```bash
-npx @yarah/cli projects update-version
-npx @yarah/cli projects delete --project <id>
+npx @yarahdev/cli projects update-version
+npx @yarahdev/cli projects delete --project <id>
 ```
 
 `projects update-version` moves the project to the latest Yarah backend version. It targets the linked project by default; pass `--project <id>` to pick another. The command restarts the instance, so expect a brief downtime. Add `--wait` to block until the update finishes.
@@ -63,18 +63,18 @@ To do either from the dashboard instead, both live under **Settings → General*
 
 ```bash
 # connect
-npx @yarah/cli login
-npx @yarah/cli link
+npx @yarahdev/cli login
+npx @yarahdev/cli link
 
 # read current state
-npx @yarah/cli --json metadata
+npx @yarahdev/cli --json metadata
 
 # change schema, safely
-npx @yarah/cli db migrations new add-orders-table
-npx @yarah/cli db migrations up --all
+npx @yarahdev/cli db migrations new add-orders-table
+npx @yarahdev/cli db migrations up --all
 
 # check the result
-npx @yarah/cli diagnose --json
+npx @yarahdev/cli diagnose --json
 ```
 
 ## Let the agent interpret the output
@@ -82,7 +82,7 @@ npx @yarah/cli diagnose --json
 Diagnostics ships an AI flag so the agent can hand its own backend data to a model and get back an explanation:
 
 ```bash
-npx @yarah/cli diagnose --ai "why are auth requests failing after the last migration?"
+npx @yarahdev/cli diagnose --ai "why are auth requests failing after the last migration?"
 ```
 
 This pairs the raw signals (advisor findings, DB health, error logs) with a plain-language read, which is what turns "here is a stack trace" into "here is the fix." See [Diagnostics & advisor](/agent-native/diagnostics).

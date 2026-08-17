@@ -16,7 +16,7 @@ Usted mantiene **un** `yarah.toml` en su repositorio. Para aplicarlo a un entorn
 Esto funciona de la misma manera en los proyectos de Yarah Cloud y en implementaciones OSS autohospedadas.
 
 <Note>
-  Todos los ejemplos usan `npx @yarah/cli`. No instale la CLI globalmente.
+  Todos los ejemplos usan `npx @yarahdev/cli`. No instale la CLI globalmente.
 </Note>
 
 ## Resumen de comandos
@@ -39,7 +39,7 @@ Esto funciona de la misma manera en los proyectos de Yarah Cloud y en implementa
     Si ya ha configurado el proyecto a través del panel, exporte una vez para obtener un archivo de trabajo:
 
     ```bash
-    npx @yarah/cli config export
+    npx @yarahdev/cli config export
     ```
 
     Esto escribe `yarah.toml` reflejando el estado del backend actual.
@@ -53,13 +53,13 @@ Esto funciona de la misma manera en los proyectos de Yarah Cloud y en implementa
     Cambie el TOML, luego obtenga una vista previa de la diferencia antes de aplicar:
 
     ```bash
-    npx @yarah/cli config plan
+    npx @yarahdev/cli config plan
     ```
   </Step>
 
   <Step title="Aplicar">
     ```bash
-    npx @yarah/cli config apply
+    npx @yarahdev/cli config apply
     ```
 
     Revise el plan renderizado y confirme. En CI, pase `--auto-approve` y `--json`.
@@ -69,7 +69,7 @@ Esto funciona de la misma manera en los proyectos de Yarah Cloud y en implementa
     Para insertar la misma configuración en almacenamiento provisional o un backend autohospedado, apunte la CLI al otro proyecto y vuelva a ejecutar aplicar:
 
     ```bash
-    npx @yarah/cli --project-id <staging-project-id> config apply
+    npx @yarahdev/cli --project-id <staging-project-id> config apply
     ```
 
     Los secretos que difieren entre entornos (contraseña SMTP, etc.) se resuelven por entorno desde el shell local, por lo que el TOML no necesita cambiar.
@@ -137,9 +137,9 @@ subdomain = "acme-prod"
 ## `config plan`
 
 ```bash
-npx @yarah/cli config plan
-npx @yarah/cli config plan --file ./config/yarah.toml
-npx @yarah/cli --json config plan
+npx @yarahdev/cli config plan
+npx @yarahdev/cli config plan --file ./config/yarah.toml
+npx @yarahdev/cli --json config plan
 ```
 
 `plan` lee `yarah.toml`, obtiene el estado activo a través de `/api/metadata` y los puntos finales de configuración opcionales para almacenamiento, tiempo real y programaciones, luego imprime una diferencia renderizada. También etiqueta cualquier sección que el backend activo aún no expose (versiones autohospedadas más antiguas, etc.). Aplicar omitirá esos en lugar de fallar la ejecución completa.
@@ -149,10 +149,10 @@ Use `plan` antes de cada `apply` en sesiones interactivas y como puerta de CI pa
 ## `config apply`
 
 ```bash
-npx @yarah/cli config apply
-npx @yarah/cli config apply --dry-run
-npx @yarah/cli config apply --auto-approve
-npx @yarah/cli --json config apply --auto-approve
+npx @yarahdev/cli config apply
+npx @yarahdev/cli config apply --dry-run
+npx @yarahdev/cli config apply --auto-approve
+npx @yarahdev/cli --json config apply --auto-approve
 ```
 
 `apply` ejecuta la misma diferencia que `plan`, luego recorre el conjunto de cambios:
@@ -170,9 +170,9 @@ Banderas:
 ## `config export`
 
 ```bash
-npx @yarah/cli config export
-npx @yarah/cli config export --out ./config/yarah.toml
-npx @yarah/cli config export --force
+npx @yarahdev/cli config export
+npx @yarahdev/cli config export --out ./config/yarah.toml
+npx @yarahdev/cli config export --force
 ```
 
 `export` extrae la superficie configurable del proyecto activo y la escribe en un archivo TOML. Úsalo para:
@@ -206,7 +206,7 @@ Los refs `env(...)` en un TOML que es el destino de `apply` reenvían la contras
 - **Paridad multiambiental.** Un TOML, aplicado a desarrollo, almacenamiento provisional y producción, mantiene los ajustes de proyecto compatibles alineados en todas partes. Los valores específicos del entorno (subdominio, credenciales SMTP) fluyen a través de anulaciones `--project-id` y refs `env(...)`.
 - **Cambios de configuración impulsados por CI.** Ejecute `config apply --auto-approve --json` desde su canalización de implementación. Combine con `config plan` como puerta de PR para que los revisores vean qué cambiará la fusión en producción.
 - **Recuperación ante desastres.** Un `yarah.toml` confirmado es una instantánea de configuración conocida. Vuelva a aplicarlo después de restaurar un proyecto para que los ajustes de autenticación, SMTP, almacenamiento, retención e implementación vuelvan a la forma esperada en segundos.
-- **Desarrollo OSS autohospedado y local.** Ejecute `npx @yarah/cli link --api-base-url http://localhost:7130 --api-key <local-key>` contra una pila docker-compose, luego apunte los comandos de configuración de la CLI a su instancia OSS local de la misma manera que apuntaría a cloud.
+- **Desarrollo OSS autohospedado y local.** Ejecute `npx @yarahdev/cli link --api-base-url http://localhost:7130 --api-key <local-key>` contra una pila docker-compose, luego apunte los comandos de configuración de la CLI a su instancia OSS local de la misma manera que apuntaría a cloud.
 
 ## Solución de problemas
 

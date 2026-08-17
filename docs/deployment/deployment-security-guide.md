@@ -168,7 +168,7 @@ docker run hello-world
 #### 4.1 Get the Repository
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
+curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 Checks out the files the stack reads and generates `JWT_SECRET`, `ENCRYPTION_KEY`, `ROOT_ADMIN_PASSWORD` and `POSTGRES_PASSWORD` into `.env`. Nothing is started.
@@ -176,7 +176,7 @@ Checks out the files the stack reads and generates `JWT_SECRET`, `ENCRYPTION_KEY
 > Rather not pipe a script into a shell? Read it first:
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh -o setup.sh
+> curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh -o setup.sh
 > less setup.sh
 > sh setup.sh ~/yarah
 > ```
@@ -949,7 +949,7 @@ docker compose down
    ```yaml
    services:
      yarah:
-       image: ghcr.io/yarah/yarah-oss:v2.2.9
+       image: ghcr.io/darts7u7/yarah-oss:latest
    ```
 
 2. Append it to `COMPOSE_FILE` in `.env`, keeping the entries already there:

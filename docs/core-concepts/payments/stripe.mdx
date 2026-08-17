@@ -26,10 +26,10 @@ Yarah stores Stripe secret keys server-side, creates Checkout and Billing Portal
 Configure `test` and `live` Stripe secret keys in Dashboard -> Payments -> Settings, the CLI, or the admin API.
 
 ```bash
-npx @yarah/cli payments stripe status
-npx @yarah/cli payments stripe config set --environment test sk_test_xxx
-npx @yarah/cli payments stripe sync --environment test
-npx @yarah/cli payments stripe webhooks configure --environment test
+npx @yarahdev/cli payments stripe status
+npx @yarahdev/cli payments stripe config set --environment test sk_test_xxx
+npx @yarahdev/cli payments stripe sync --environment test
+npx @yarahdev/cli payments stripe webhooks configure --environment test
 ```
 
 After a key is connected, Yarah validates the account, stores the key in the secret store, tries to create the managed Stripe webhook endpoint, and runs sync for Products, Prices, Customers, and Subscriptions.

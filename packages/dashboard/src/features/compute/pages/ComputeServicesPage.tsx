@@ -378,7 +378,7 @@ export default function ComputeServicesPage() {
                       })}
                     </p>
                     <code className="block px-3 py-2 bg-muted text-foreground rounded text-xs font-mono break-all">
-                      npx @yarah/cli compute deploy --name my-api --image nginx:alpine --port 80
+                      npx @yarahdev/cli compute deploy --name my-api --image nginx:alpine --port 80
                     </code>
                   </div>
                   <div>

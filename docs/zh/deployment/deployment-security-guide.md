@@ -164,7 +164,7 @@ docker run hello-world
 #### 4.1 获取仓库
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
+curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 checkout 这个栈会读的文件，并把 `JWT_SECRET`、`ENCRYPTION_KEY`、`ROOT_ADMIN_PASSWORD`、`POSTGRES_PASSWORD` 生成到 `.env`。不启动任何东西。
@@ -172,7 +172,7 @@ checkout 这个栈会读的文件，并把 `JWT_SECRET`、`ENCRYPTION_KEY`、`RO
 > 不想把脚本管道给 shell？先读一遍再跑：
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh -o setup.sh
+> curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh -o setup.sh
 > less setup.sh
 > sh setup.sh ~/yarah
 > ```
@@ -929,7 +929,7 @@ docker compose down
    ```yaml
    services:
      yarah:
-       image: ghcr.io/yarah/yarah-oss:v2.2.9
+       image: ghcr.io/darts7u7/yarah-oss:latest
    ```
 
 2. 追加到 `.env` 里的 `COMPOSE_FILE`，保留已有条目：

@@ -4,7 +4,7 @@ sidebarTitle: "Diagnostics & advisor"
 description: "编码代理通过 Yarah 诊断工具读取后端健康状况、顾问建议与错误日志，自动定位数据库、身份验证与存储问题，并应用建议的修复方案。"
 ---
 
-当出现问题时，代理不应该猜测。`npx @yarah/cli diagnose` 将后端自身的信号转变为代理可以直接获取和处理的东西：顾问发现有补救方案、数据库健康检查、实例指标和聚合错误日志。每个发现都带有修复，所以"什么是错"和"做什么"一起到达。代理自己拉取所有这个，没有仪表板在循环中，这就是让它关闭安全漏洞的原因，比如一个宽松的 RLS 策略，然后他们泄露数据。
+当出现问题时，代理不应该猜测。`npx @yarahdev/cli diagnose` 将后端自身的信号转变为代理可以直接获取和处理的东西：顾问发现有补救方案、数据库健康检查、实例指标和聚合错误日志。每个发现都带有修复，所以"什么是错"和"做什么"一起到达。代理自己拉取所有这个，没有仪表板在循环中，这就是让它关闭安全漏洞的原因，比如一个宽松的 RLS 策略，然后他们泄露数据。
 
 <Frame caption="一个后端顾问发现：问题、受影响的表和代理可以复制和应用的补救。">
   <img src="/images/backend-advisor.png" alt="Backend Advisor finding: a permissive RLS policy on public.messages with a Copy Remediation button" />
@@ -15,8 +15,8 @@ description: "编码代理通过 Yarah 诊断工具读取后端健康状况、�
 不带子命令运行 `diagnose` 以获得一切：
 
 ```bash
-npx @yarah/cli diagnose
-npx @yarah/cli diagnose --json
+npx @yarahdev/cli diagnose
+npx @yarahdev/cli diagnose --json
 ```
 
 报告将顾问扫描、数据库健康、实例指标和最近的错误日志捆绑到一个输出中。在 `--json` 模式下，代理将其全部作为结构化数据获取。
@@ -26,8 +26,8 @@ npx @yarah/cli diagnose --json
 顾问扫描安全、性能和健康问题，并为每个问题写补救。仪表板用"复制补救"按钮显示发现，但代理不需要仪表板：它用 `--json` 直接获取相同的扫描，自己应用修复，所以安全问题被关闭，无需等待人类注意到它。
 
 ```bash
-npx @yarah/cli diagnose advisor
-npx @yarah/cli diagnose advisor --json
+npx @yarahdev/cli diagnose advisor
+npx @yarahdev/cli diagnose advisor --json
 ```
 
 典型发现是一个宽松的 RLS 策略，向匿名用户公开表。顾问命名表、严重性和 SQL 以修复它。代理读取发现、应用补救为[迁移](/core-concepts/database/migrations)并重新扫描以确认它清除。
@@ -46,8 +46,8 @@ npx @yarah/cli diagnose advisor --json
 对于来自单一源的原始日志，使用顶级命令：
 
 ```bash
-npx @yarah/cli logs function.logs
-npx @yarah/cli logs postgres.logs
+npx @yarahdev/cli logs function.logs
+npx @yarahdev/cli logs postgres.logs
 ```
 
 源包括 `yarah.logs`, `postgREST.logs`, `postgres.logs`, `function.logs` 和 `function-deploy.logs`。
@@ -57,7 +57,7 @@ npx @yarah/cli logs postgres.logs
 `diagnose --ai` 将收集的诊断数据递交给模型并返回纯文本分析：
 
 ```bash
-npx @yarah/cli diagnose --ai "why did write latency spike after the last deploy?"
+npx @yarahdev/cli diagnose --ai "why did write latency spike after the last deploy?"
 ```
 
 这就是转储堆栈跟踪和解释修复的区别。代理就实时后端提出问题并得到根据实际信号的答案。

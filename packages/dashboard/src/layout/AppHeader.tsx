@@ -121,7 +121,7 @@ export default function AppHeader() {
         <div className="flex items-center gap-1">
           {/* Social Links - Small Icon Buttons */}
           <a
-            href="https://discord.gg/DvBtaEc9Jz"
+            href="https://yarah.dev/community"
             target="_blank"
             rel="noopener noreferrer"
             className="p-2 text-gray-600 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white transition-colors duration-200"
@@ -130,7 +130,7 @@ export default function AppHeader() {
             <DiscordIcon className="h-5 w-5" />
           </a>
           <a
-            href="https://github.com/Yarah/Yarah"
+            href="https://github.com/Darts7u7/Yarah-oos"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 p-2 text-gray-600 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white transition-colors duration-200"

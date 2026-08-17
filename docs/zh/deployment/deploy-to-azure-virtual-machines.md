@@ -8,7 +8,7 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 Yarah，涵�
 本指南提供了在 Azure 虚拟机（VM）上使用 Docker Compose 部署、管理和保护 Yarah 的全面、逐步说明。
 
 <Note>
-  本云端演练由社区维护，可能落后于最新的 Yarah 版本。规范的、始终保持最新的配置位于 [Yarah 仓库](https://github.com/Yarah/Yarah)中的 `deploy/docker-compose/` 目录。
+  本云端演练由社区维护，可能落后于最新的 Yarah 版本。规范的、始终保持最新的配置位于 [Yarah 仓库](https://github.com/Darts7u7/Yarah-oos)中的 `deploy/docker-compose/` 目录。
 </Note>
 
 ## 前提条件
@@ -92,7 +92,7 @@ description: "在 Azure 虚拟机上使用 Docker Compose 自托管 Yarah，涵�
 
 1.  **获取仓库：**
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
+    curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
     ```
     会 checkout 这个栈要读的文件，并把 `JWT_SECRET`、`ENCRYPTION_KEY`、`ROOT_ADMIN_PASSWORD`、`POSTGRES_PASSWORD` 生成到 `.env`。不启动任何东西。
 

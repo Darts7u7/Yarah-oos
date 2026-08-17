@@ -8,7 +8,7 @@ description: "Despliega Yarah en una VM de Google Cloud Compute Engine con Docke
 Esta guía te llevará paso a paso por la implementación de Yarah en Google Cloud Compute Engine usando Docker Compose.
 
 <Note>
-  Esta guía de nube la mantiene la comunidad y puede quedar por detrás de la última versión de Yarah. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de Yarah](https://github.com/Yarah/Yarah).
+  Esta guía de nube la mantiene la comunidad y puede quedar por detrás de la última versión de Yarah. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de Yarah](https://github.com/Darts7u7/Yarah-oos).
 </Note>
 
 ## 📋 Requisitos previos
@@ -149,7 +149,7 @@ sudo apt install git -y
 #### 4.1 Obtener el repositorio
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
+curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 Descarga los archivos que el stack lee y genera `JWT_SECRET`, `ENCRYPTION_KEY`, `ROOT_ADMIN_PASSWORD` y `POSTGRES_PASSWORD` en `.env`. No arranca nada.

@@ -15,7 +15,7 @@ export function JoinDiscordCta({ className }: JoinDiscordCtaProps) {
     >
       <span>Need help? Join our</span>
       <a
-        href="https://discord.gg/DvBtaEc9Jz"
+        href="https://yarah.dev/community"
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center gap-1 text-[#818cf8] transition-colors hover:text-[#99a3ff]"

@@ -8,7 +8,7 @@ description: "Autoaloja Yarah en una máquina virtual de Azure con Docker Compos
 Esta guía proporciona instrucciones completas y paso a paso para desplegar, gestionar y proteger Yarah en una máquina virtual (VM) de Azure usando Docker Compose.
 
 <Note>
-  Este recorrido en la nube es mantenido por la comunidad y puede quedar rezagado respecto a la última versión de Yarah. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de Yarah](https://github.com/Yarah/Yarah).
+  Este recorrido en la nube es mantenido por la comunidad y puede quedar rezagado respecto a la última versión de Yarah. La configuración canónica y siempre actualizada es el directorio `deploy/docker-compose/` en el [repositorio de Yarah](https://github.com/Darts7u7/Yarah-oos).
 </Note>
 
 ## Requisitos previos
@@ -92,7 +92,7 @@ Esta guía proporciona instrucciones completas y paso a paso para desplegar, ges
 
 1.  **Obtener el repositorio:**
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
+    curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
     ```
     Descarga los archivos que el stack lee y genera `JWT_SECRET`, `ENCRYPTION_KEY`, `ROOT_ADMIN_PASSWORD` y `POSTGRES_PASSWORD` en `.env`. No arranca nada.
 

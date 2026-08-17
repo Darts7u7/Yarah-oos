@@ -26,10 +26,10 @@ Yarah almacena claves secretas de Stripe en el lado del servidor, crea sesiones 
 Configure las claves secretas de Stripe `test` y `live` en Dashboard -> Payments -> Settings, CLI o API de administrador.
 
 ```bash
-npx @yarah/cli payments stripe status
-npx @yarah/cli payments stripe config set --environment test sk_test_xxx
-npx @yarah/cli payments stripe sync --environment test
-npx @yarah/cli payments stripe webhooks configure --environment test
+npx @yarahdev/cli payments stripe status
+npx @yarahdev/cli payments stripe config set --environment test sk_test_xxx
+npx @yarahdev/cli payments stripe sync --environment test
+npx @yarahdev/cli payments stripe webhooks configure --environment test
 ```
 
 Después de conectar una clave, Yarah valida la cuenta, almacena la clave en el almacén de secretos, intenta crear el punto final del webhook de Stripe administrado y ejecuta la sincronización para Productos, Precios, Clientes y Suscripciones.

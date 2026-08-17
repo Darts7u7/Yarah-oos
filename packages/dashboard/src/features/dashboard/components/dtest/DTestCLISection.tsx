@@ -11,7 +11,7 @@ interface DTestCLISectionProps {
 
 function buildCliPrompt(projectId: string | null | undefined, apiKey: string | null) {
   const id = projectId || '<project id>';
-  const loginLine = apiKey ? `npx @yarah/cli login --user-api-key ${apiKey}` : '<placeholder>';
+  const loginLine = apiKey ? `npx @yarahdev/cli login --user-api-key ${apiKey}` : '<placeholder>';
   return [
     "I'm using Yarah as my backend. Login through:",
     '',
@@ -19,7 +19,7 @@ function buildCliPrompt(projectId: string | null | undefined, apiKey: string | n
     '',
     'Then install the Yarah CLI and skills for this project, and link it with:',
     '',
-    `npx @yarah/cli link --project-id ${id}`,
+    `npx @yarahdev/cli link --project-id ${id}`,
     '',
     'Use the Yarah CLI and skills for backend tasks.',
   ].join('\n');

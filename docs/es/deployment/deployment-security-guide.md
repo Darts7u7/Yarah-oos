@@ -164,7 +164,7 @@ docker run hello-world
 #### 4.1 Clona el repositorio
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
+curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 Descarga los archivos que el stack lee y genera `JWT_SECRET`, `ENCRYPTION_KEY`, `ROOT_ADMIN_PASSWORD` y `POSTGRES_PASSWORD` en `.env`. No arranca nada.
@@ -172,7 +172,7 @@ Descarga los archivos que el stack lee y genera `JWT_SECRET`, `ENCRYPTION_KEY`, 
 > ¿Prefieres no pasar un script a la shell? Léelo primero:
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh -o setup.sh
+> curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh -o setup.sh
 > less setup.sh
 > sh setup.sh ~/yarah
 > ```
@@ -931,7 +931,7 @@ docker compose down
    ```yaml
    services:
      yarah:
-       image: ghcr.io/yarah/yarah-oss:v2.2.9
+       image: ghcr.io/darts7u7/yarah-oss:latest
    ```
 
 2. Añádelo a `COMPOSE_FILE` en `.env`, conservando las entradas que ya estén:

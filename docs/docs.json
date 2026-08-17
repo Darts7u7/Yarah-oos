@@ -286,71 +286,71 @@
             "groups": [
               {
                 "group": "Tables",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/tables.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/tables.yaml"
               },
               {
                 "group": "Schedules",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/schedules.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/schedules.yaml"
               },
               {
                 "group": "Authentication",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/auth.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/auth.yaml"
               },
               {
                 "group": "Records",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/records.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/records.yaml"
               },
               {
                 "group": "Storage",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/storage.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/storage.yaml"
               },
               {
                 "group": "Model Gateway",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/ai.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/ai.yaml"
               },
               {
                 "group": "Functions",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/functions.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/functions.yaml"
               },
               {
                 "group": "Realtime",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/realtime.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/realtime.yaml"
               },
               {
                 "group": "Messaging",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/email.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/email.yaml"
               },
               {
                 "group": "Payments",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/payments.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/payments.yaml"
               },
               {
                 "group": "Secrets",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/secrets.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/secrets.yaml"
               },
               {
                 "group": "Logs",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/logs.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/logs.yaml"
               },
               {
                 "group": "Usage",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/usage.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/usage.yaml"
               },
               {
                 "group": "Metadata",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/metadata.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/metadata.yaml"
               },
               {
                 "group": "Health",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/health.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/health.yaml"
               },
               {
                 "group": "Deployments",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/deployments.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/deployments.yaml"
               },
               {
                 "group": "Dashboard",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/dashboard.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/dashboard.yaml"
               }
             ]
           }
@@ -614,71 +614,71 @@
             "groups": [
               {
                 "group": "Tables",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/tables.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/tables.yaml"
               },
               {
                 "group": "Schedules",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/schedules.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/schedules.yaml"
               },
               {
                 "group": "身份认证",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/auth.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/auth.yaml"
               },
               {
                 "group": "Records",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/records.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/records.yaml"
               },
               {
                 "group": "存储",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/storage.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/storage.yaml"
               },
               {
                 "group": "模型网关",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/ai.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/ai.yaml"
               },
               {
                 "group": "Functions",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/functions.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/functions.yaml"
               },
               {
                 "group": "实时",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/realtime.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/realtime.yaml"
               },
               {
                 "group": "消息",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/email.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/email.yaml"
               },
               {
                 "group": "支付",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/payments.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/payments.yaml"
               },
               {
                 "group": "Secrets",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/secrets.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/secrets.yaml"
               },
               {
                 "group": "Logs",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/logs.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/logs.yaml"
               },
               {
                 "group": "Usage",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/usage.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/usage.yaml"
               },
               {
                 "group": "Metadata",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/metadata.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/metadata.yaml"
               },
               {
                 "group": "Health",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/health.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/health.yaml"
               },
               {
                 "group": "Deployments",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/deployments.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/deployments.yaml"
               },
               {
                 "group": "Dashboard",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/dashboard.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/dashboard.yaml"
               }
             ]
           }
@@ -942,71 +942,71 @@
             "groups": [
               {
                 "group": "Tables",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/tables.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/tables.yaml"
               },
               {
                 "group": "Schedules",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/schedules.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/schedules.yaml"
               },
               {
                 "group": "身分驗證",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/auth.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/auth.yaml"
               },
               {
                 "group": "Records",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/records.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/records.yaml"
               },
               {
                 "group": "儲存",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/storage.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/storage.yaml"
               },
               {
                 "group": "模型閘道",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/ai.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/ai.yaml"
               },
               {
                 "group": "Functions",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/functions.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/functions.yaml"
               },
               {
                 "group": "即時",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/realtime.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/realtime.yaml"
               },
               {
                 "group": "訊息",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/email.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/email.yaml"
               },
               {
                 "group": "金流",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/payments.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/payments.yaml"
               },
               {
                 "group": "Secrets",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/secrets.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/secrets.yaml"
               },
               {
                 "group": "Logs",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/logs.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/logs.yaml"
               },
               {
                 "group": "Usage",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/usage.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/usage.yaml"
               },
               {
                 "group": "Metadata",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/metadata.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/metadata.yaml"
               },
               {
                 "group": "Health",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/health.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/health.yaml"
               },
               {
                 "group": "Deployments",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/deployments.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/deployments.yaml"
               },
               {
                 "group": "Dashboard",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/dashboard.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/dashboard.yaml"
               }
             ]
           }
@@ -1270,71 +1270,71 @@
             "groups": [
               {
                 "group": "Tables",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/tables.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/tables.yaml"
               },
               {
                 "group": "Schedules",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/schedules.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/schedules.yaml"
               },
               {
                 "group": "Autenticación",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/auth.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/auth.yaml"
               },
               {
                 "group": "Records",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/records.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/records.yaml"
               },
               {
                 "group": "Almacenamiento",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/storage.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/storage.yaml"
               },
               {
                 "group": "Model Gateway",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/ai.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/ai.yaml"
               },
               {
                 "group": "Functions",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/functions.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/functions.yaml"
               },
               {
                 "group": "Tiempo real",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/realtime.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/realtime.yaml"
               },
               {
                 "group": "Mensajería",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/email.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/email.yaml"
               },
               {
                 "group": "Pagos",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/payments.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/payments.yaml"
               },
               {
                 "group": "Secrets",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/secrets.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/secrets.yaml"
               },
               {
                 "group": "Logs",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/logs.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/logs.yaml"
               },
               {
                 "group": "Usage",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/usage.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/usage.yaml"
               },
               {
                 "group": "Metadata",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/metadata.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/metadata.yaml"
               },
               {
                 "group": "Health",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/health.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/health.yaml"
               },
               {
                 "group": "Deployments",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/deployments.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/deployments.yaml"
               },
               {
                 "group": "Dashboard",
-                "openapi": "https://raw.githubusercontent.com/Yarah/Yarah/main/openapi/dashboard.yaml"
+                "openapi": "https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/openapi/dashboard.yaml"
               }
             ]
           }
@@ -1360,7 +1360,7 @@
         },
         {
           "anchor": "GitHub",
-          "href": "https://github.com/Yarah/Yarah",
+          "href": "https://github.com/Darts7u7/Yarah-oos",
           "icon": "github"
         }
       ]
@@ -1411,13 +1411,13 @@
   "footer": {
     "socials": {
       "x": "https://x.com/Yarah_dev",
-      "github": "https://github.com/Yarah/Yarah",
+      "github": "https://github.com/Darts7u7/Yarah-oos",
       "linkedin": "https://linkedin.com/company/yarah"
     }
   },
   "integrations": {
     "posthog": {
-      "apiKey": "phc_ueV1ii62wdBTkH7E70ugyeqHIHu8dFDdjs0qq3TZhJz",
+      "apiKey": "",
       "sessionRecording": false
     }
   }

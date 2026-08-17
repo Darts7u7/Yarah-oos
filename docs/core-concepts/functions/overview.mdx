@@ -53,9 +53,9 @@ The difference is how each value is stored and protected. **Secrets** are encryp
 
 ```bash
 # a protected secret with an expiry
-npx @yarah/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
+npx @yarahdev/cli secrets add STRIPE_SECRET_KEY sk_live_xxx --reserved --expires 2027-01-01T00:00:00Z
 # read the decrypted value back
-npx @yarah/cli secrets get STRIPE_SECRET_KEY
+npx @yarahdev/cli secrets get STRIPE_SECRET_KEY
 ```
 
 ### Logs

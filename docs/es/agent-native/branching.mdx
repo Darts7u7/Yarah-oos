@@ -15,22 +15,22 @@ Cada rama se ejecuta en su propia instancia EC2, restaurada desde el padre en el
 Cree una rama con `full` (esquema + datos) o `schema-only` (más rápido, tablas de usuario vacías).
 
 ```bash
-npx @yarah/cli branch create feat-billing --mode full
-npx @yarah/cli branch list
+npx @yarahdev/cli branch create feat-billing --mode full
+npx @yarahdev/cli branch list
 ```
 
 Obtenga una vista previa del SQL de fusión antes de aplicar.
 
 ```bash
-npx @yarah/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
-npx @yarah/cli branch merge feat-billing
+npx @yarahdev/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
+npx @yarahdev/cli branch merge feat-billing
 ```
 
 Revierta a la instantánea de creación o elimine la rama.
 
 ```bash
-npx @yarah/cli branch reset feat-billing
-npx @yarah/cli branch delete feat-billing
+npx @yarahdev/cli branch reset feat-billing
+npx @yarahdev/cli branch delete feat-billing
 ```
 
 ## Casos de uso específicos
@@ -43,4 +43,4 @@ Las fusiones se bloquean en conflictos. Resuelva en la rama o restablezca e inte
 
 - [Migraciones de base de datos](/core-concepts/database/migrations) para archivos SQL de solo avance.
 - [Descripción general de la base de datos](/core-concepts/database/overview) para lo que se ejecuta bajo cada rama.
-- [Referencia de CLI](https://github.com/Yarah/Yarah) para el conjunto completo de banderas `branch`.
+- [Referencia de CLI](https://github.com/Darts7u7/Yarah-oos) para el conjunto completo de banderas `branch`.

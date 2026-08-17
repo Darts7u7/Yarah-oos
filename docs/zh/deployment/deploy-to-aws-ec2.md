@@ -8,7 +8,7 @@ description: "在 AWS EC2 实例上使用 Docker Compose 自托管 Yarah 的分�
 本指南将带你使用 Docker Compose 在 AWS EC2 实例上部署 Yarah。
 
 <Note>
-  本云端部署指南由社区维护，可能滞后于最新的 Yarah 版本。最权威、始终保持最新的配置位于 [Yarah 仓库](https://github.com/Yarah/Yarah) 中的 `deploy/docker-compose/` 目录。
+  本云端部署指南由社区维护，可能滞后于最新的 Yarah 版本。最权威、始终保持最新的配置位于 [Yarah 仓库](https://github.com/Darts7u7/Yarah-oos) 中的 `deploy/docker-compose/` 目录。
 </Note>
 
 ## 📋 前置条件
@@ -115,7 +115,7 @@ sudo apt install git -y
 #### 4.1 获取仓库
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yarah/Yarah/main/deploy/setup.sh | sh -s ~/yarah
+curl -fsSL https://raw.githubusercontent.com/Darts7u7/Yarah-oos/main/deploy/setup.sh | sh -s ~/yarah
 ```
 
 会 checkout 这个栈要读的文件，并把 `JWT_SECRET`、`ENCRYPTION_KEY`、`ROOT_ADMIN_PASSWORD`、`POSTGRES_PASSWORD` 生成到 `.env`。不启动任何东西。

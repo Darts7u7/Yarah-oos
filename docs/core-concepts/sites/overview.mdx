@@ -51,7 +51,7 @@ flowchart TB
 Deploy from your app's source directory. The CLI uploads the source tree, skips local-only files such as `node_modules`, `.git`, build output, and `.env` files, then starts the Vercel build through Yarah.
 
 ```bash
-npx @yarah/cli deployments deploy ./frontend
+npx @yarahdev/cli deployments deploy ./frontend
 ```
 
 ### Framework builds
@@ -63,9 +63,9 @@ Deploy React, Vue, Svelte, Next.js, static sites, and other frontend projects. Y
 Manage provider environment variables from the dashboard. Use public prefixes such as `VITE_` or `NEXT_PUBLIC_` only for values that are safe to expose in browser code.
 
 ```bash
-npx @yarah/cli deployments env list
-npx @yarah/cli deployments env set VITE_YARAH_URL https://your-project.region.apps.yarah.dev
-npx @yarah/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
+npx @yarahdev/cli deployments env list
+npx @yarahdev/cli deployments env set VITE_YARAH_URL https://your-project.region.apps.yarah.dev
+npx @yarahdev/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
 ```
 
 ### Deployment history
@@ -73,9 +73,9 @@ npx @yarah/cli deployments env set VITE_YARAH_ANON_KEY ik_xxx
 Review previous runs, sync Vercel status, inspect metadata, and cancel in-progress deployments from the Deployment Logs page.
 
 ```bash
-npx @yarah/cli deployments list
-npx @yarah/cli deployments status deployment_123 --sync
-npx @yarah/cli deployments cancel deployment_123
+npx @yarahdev/cli deployments list
+npx @yarahdev/cli deployments status deployment_123 --sync
+npx @yarahdev/cli deployments cancel deployment_123
 ```
 
 ### Domains
@@ -93,5 +93,5 @@ Every ready deployment gets a default URL at `https://<appkey>.yarah.site`. You 
 ## Next steps
 
 - Set up the [CLI](/quickstart) and connect your project.
-- Add browser-safe environment variables from the dashboard or with `npx @yarah/cli deployments env set`.
-- Run `npx @yarah/cli deployments deploy ./frontend`.
+- Add browser-safe environment variables from the dashboard or with `npx @yarahdev/cli deployments env set`.
+- Run `npx @yarahdev/cli deployments deploy ./frontend`.

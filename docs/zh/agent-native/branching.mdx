@@ -15,22 +15,22 @@ description: "为 Yarah 项目创建隔离的后端分支副本，安全测试�
 使用 `full`（架构 + 数据）或 `schema-only`（更快，用户表为空）创建分支。
 
 ```bash
-npx @yarah/cli branch create feat-billing --mode full
-npx @yarah/cli branch list
+npx @yarahdev/cli branch create feat-billing --mode full
+npx @yarahdev/cli branch list
 ```
 
 在应用前预览合并 SQL。
 
 ```bash
-npx @yarah/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
-npx @yarah/cli branch merge feat-billing
+npx @yarahdev/cli branch merge feat-billing --dry-run --save-sql ./preview.sql
+npx @yarahdev/cli branch merge feat-billing
 ```
 
 回滚到创建时快照或删除分支。
 
 ```bash
-npx @yarah/cli branch reset feat-billing
-npx @yarah/cli branch delete feat-billing
+npx @yarahdev/cli branch reset feat-billing
+npx @yarahdev/cli branch delete feat-billing
 ```
 
 ## 特定用途案例
@@ -43,4 +43,4 @@ npx @yarah/cli branch delete feat-billing
 
 - [数据库迁移](/core-concepts/database/migrations)用于仅前向 SQL 文件。
 - [数据库概览](/core-concepts/database/overview)了解每个分支下运行什么。
-- [CLI 参考](https://github.com/Yarah/Yarah)用于完整的 `branch` 标志集。
+- [CLI 参考](https://github.com/Darts7u7/Yarah-oos)用于完整的 `branch` 标志集。

@@ -39,7 +39,6 @@ docker compose up -d
 Open your browser and navigate to `http://localhost:7130`, you can see the Yarah dashboard as below:
 
 <div align="center">
-  <img src="../assets/signin.png" alt="Yarah Dashboard" width="600">
 </div>
 
 ## Running Multiple Instances
@@ -119,7 +118,6 @@ Each project has its own database, storage, and configuration. They are complete
 Open [Yarah Dashboard](http://localhost:7130), Follow the steps to connect Yarah MCP Server:
 
 <div align="center">
-  <img src="../assets/connect.png" alt="Connect Yarah MCP" width="600">
 </div>
 
 ### 2. Verify installation
