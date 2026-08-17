@@ -21,7 +21,6 @@ import { CLISection } from './CLISection';
 import { useApiKey, useAnonKey } from '#lib/hooks/useMetadata';
 import { useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
 import { getBackendUrl, isYarahCloudProject } from '#lib/utils/utils';
-import { JoinDiscordCta } from '#features/dashboard/components/JoinDiscordCta';
 
 type ConnectTabId = 'cli' | 'mcp' | 'connection-string' | 'api-keys';
 
@@ -168,8 +167,7 @@ export function ConnectDialog({ open, onOpenChange }: ConnectDialogProps) {
             )}
           </DialogBody>
 
-          <DialogFooter className="justify-between">
-            <JoinDiscordCta />
+          <DialogFooter className="justify-end">
             <Button
               type="button"
               variant="secondary"

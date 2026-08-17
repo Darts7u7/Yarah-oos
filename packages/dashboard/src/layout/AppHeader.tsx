@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, ChevronDown, Plug } from '#components/icons';
+import { LogOut, Plug } from '#components/icons';
 import {
   Button,
   DropdownMenu,
@@ -19,7 +19,6 @@ import { FEATURE_FLAGS, FEATURE_FLAG_VARIANTS } from '#lib/analytics/constants';
 import { githubService } from '#features/dashboard/services/github.service';
 
 // Import SVG icons
-import DiscordIcon from '#assets/logos/discord.svg?react';
 import GitHubIcon from '#assets/logos/github.svg?react';
 import YarahLogoLight from '#assets/logos/yarah_light.svg';
 import YarahLogoDark from '#assets/logos/yarah_dark.svg';
@@ -123,15 +122,6 @@ export default function AppHeader() {
         <div className="flex items-center gap-1">
           {/* Social Links - Small Icon Buttons */}
           <a
-            href="https://yarah.dev/community"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-2 text-gray-600 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white transition-colors duration-200"
-            aria-label="Discord"
-          >
-            <DiscordIcon className="h-5 w-5" />
-          </a>
-          <a
             href="https://github.com/Darts7u7/Yarah-oos"
             target="_blank"
             rel="noopener noreferrer"
@@ -164,24 +154,37 @@ export default function AppHeader() {
           <Separator className="h-5 mx-2" orientation="vertical" />
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <button className="w-50 flex items-center gap-3 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-[8px] pr-3 transition-all duration-200 group">
-                <Avatar className="h-8 w-8 ring-2 ring-white dark:ring-gray-700 shadow-sm">
+              <button
+                className="flex items-center rounded-full transition-opacity duration-200 hover:opacity-80"
+                aria-label={t('header.admin')}
+              >
+                <Avatar className="h-8 w-8">
                   <AvatarFallback
                     className={cn('text-white font-medium text-sm', getAvatarColor(adminLabel))}
                   >
                     {getUserInitials(adminLabel)}
                   </AvatarFallback>
                 </Avatar>
-                <div className="text-left hidden md:block">
-                  <p className="text-sm font-medium text-zinc-950 dark:text-zinc-100 leading-tight">
-                    {t('header.admin')}
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">{adminLabel}</p>
-                </div>
-                <ChevronDown className="h-5 w-5 text-black dark:text-white hidden md:block ml-auto" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48" sideOffset={8} collisionPadding={16}>
+            <DropdownMenuContent align="end" className="w-56" sideOffset={8} collisionPadding={16}>
+              {/* Identity moved out of the header bar and into the menu. */}
+              <div className="flex items-center gap-3 px-2 py-2">
+                <Avatar className="h-9 w-9 shrink-0">
+                  <AvatarFallback
+                    className={cn('text-white font-medium text-sm', getAvatarColor(adminLabel))}
+                  >
+                    {getUserInitials(adminLabel)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 text-left">
+                  <p className="truncate text-sm font-medium leading-tight text-foreground">
+                    {t('header.admin')}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">{adminLabel}</p>
+                </div>
+              </div>
+              <div className="my-1 h-px bg-[var(--alpha-8)]" />
               <DropdownMenuItem
                 onClick={() => void logout()}
                 className="cursor-pointer text-red-600 dark:text-red-400"
