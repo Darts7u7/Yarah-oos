@@ -35,8 +35,8 @@
   --yarah-black: 0 0 0;
   --yarah-neutral-400: 163 163 163;
   --yarah-neutral-600: 82 82 82;
-  --yarah-emerald-300: 110 231 183;
-  --yarah-emerald-600: 5 150 105;
+  --yarah-blue-300: 95 198 255; /* derivado claro de #0FA8FF para tema oscuro */
+  --yarah-blue-600: 15 168 255; /* #0FA8FF — primario de marca */
   --yarah-red-500: 239 68 68;
   --yarah-red-600: 220 38 38;
   --yarah-green-500: 34 197 94;
@@ -78,7 +78,7 @@
   --muted-foreground: var(--yarah-neutral-600); /* general.weak */
   --disabled: var(--yarah-neutral-400); /* general.disabled */
   --inverse: var(--yarah-white); /* general.inverse */
-  --primary: var(--yarah-emerald-600); /* general.primary */
+  --primary: var(--yarah-blue-600); /* general.primary */
   --success: var(--yarah-green-600); /* general.success */
   --destructive: var(--yarah-red-600); /* general.alert */
   --warning: var(--yarah-amber-600); /* general.warning */
@@ -122,7 +122,7 @@
   --muted-foreground: var(--yarah-neutral-400); /* general.weak */
   --disabled: var(--yarah-neutral-600); /* general.disabled */
   --inverse: var(--yarah-black); /* general.inverse */
-  --primary: var(--yarah-emerald-300); /* general.primary */
+  --primary: var(--yarah-blue-300); /* general.primary */
   --success: var(--yarah-green-500); /* general.success */
   --destructive: var(--yarah-red-500); /* general.alert */
   --warning: var(--yarah-amber-500); /* general.warning */
@@ -184,4 +184,11 @@
   to {
     transform: scaleX(1);
   }
+}
+
+/* Reicon: reducción óptica global — los glifos llenan su caja más que lucide.
+   Ajustar el factor aquí cambia TODOS los iconos a la vez. */
+svg[data-reicon] {
+  transform: scale(0.85);
+  transform-origin: center;
 }

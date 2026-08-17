@@ -5,7 +5,6 @@ import {
   AlertCircle as R_AlertCircle,
   AlertTriangle as R_AlertTriangle,
   Archive as R_Archive,
-  ArrowDottedRotateAnticlockwise as R_ArrowDottedRotateAnticlockwise,
   ArrowLeft as R_ArrowLeft,
   ArrowRight as R_ArrowRight,
   ArrowRotate as R_ArrowRotate,
@@ -16,7 +15,6 @@ import {
   Box as R_Box,
   Box2 as R_Box2,
   Calendar as R_Calendar,
-  Chart2 as R_Chart2,
   ChartLine as R_ChartLine,
   Check as R_Check,
   CheckCircle as R_CheckCircle,
@@ -31,6 +29,12 @@ import {
   CodeFile as R_CodeFile,
   Copy as R_Copy,
   Cpu as R_Cpu,
+  Ram as R_Ram,
+  Loader as R_Loader,
+  ChartBar as R_ChartBar,
+  Bullhorn as R_Bullhorn,
+  Undo as R_Undo,
+  CodeSquare as R_CodeSquare,
   CreditCard as R_CreditCard,
   Database as R_Database,
   Download as R_Download,
@@ -88,7 +92,6 @@ import {
   SidebarRight as R_SidebarRight,
   Sort as R_Sort,
   Sparkles as R_Sparkles,
-  Speaker2 as R_Speaker2,
   Stop as R_Stop,
   StopCircle as R_StopCircle,
   Sun as R_Sun,
@@ -115,7 +118,7 @@ export type LucideIcon = ComponentType<IconProps>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const wrap = (Ic: any): LucideIcon => {
   const C = ({ strokeWidth: _sw, absoluteStrokeWidth: _asw, ...rest }: IconProps) => (
-    <Ic {...rest} />
+    <Ic data-reicon="" {...rest} />
   );
   return C;
 };
@@ -127,11 +130,11 @@ export const ArrowDownToLine = wrap(R_Import);
 export const ArrowLeft = wrap(R_ArrowLeft);
 export const ArrowUpCircle = wrap(R_ArrowUpCircle);
 export const ArrowUpFromLine = wrap(R_Export);
-export const BarChart3 = wrap(R_Chart2);
+export const BarChart3 = wrap(R_ChartBar);
 export const BellOff = wrap(R_BellOff);
 export const BookOpen = wrap(R_BookOpen);
 export const Box = wrap(R_Box);
-export const Braces = wrap(R_CodeFile);
+export const Braces = wrap(R_CodeSquare);
 export const Calendar = wrap(R_Calendar);
 export const ChartLine = wrap(R_ChartLine);
 export const Check = wrap(R_Check);
@@ -182,13 +185,13 @@ export const KeyRound = wrap(R_Key2);
 export const Languages = wrap(R_Language);
 export const Link = wrap(R_Link);
 export const Link2 = wrap(R_Link2);
-export const Loader2 = wrap(R_Refresh);
+export const Loader2 = wrap(R_Loader);
 export const Lock = wrap(R_Lock);
 export const LockKeyhole = wrap(R_LockKeyhole);
 export const LogOut = wrap(R_Logout);
 export const Mail = wrap(R_Envelope);
-export const Megaphone = wrap(R_Speaker2);
-export const MemoryStick = wrap(R_Cpu);
+export const Megaphone = wrap(R_Bullhorn);
+export const MemoryStick = wrap(R_Ram);
 export const Minus = wrap(R_Minus);
 export const Monitor = wrap(R_Monitor);
 export const Moon = wrap(R_Moon);
@@ -210,7 +213,7 @@ export const Radio = wrap(R_Radio);
 export const RefreshCcw = wrap(R_Refresh2);
 export const RefreshCw = wrap(R_Refresh);
 export const Rocket = wrap(R_Rocket);
-export const RotateCcw = wrap(R_ArrowDottedRotateAnticlockwise);
+export const RotateCcw = wrap(R_Undo);
 export const RotateCw = wrap(R_ArrowRotate);
 export const Scan = wrap(R_Scan);
 export const Search = wrap(R_Search);
