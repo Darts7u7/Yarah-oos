@@ -34,6 +34,12 @@
   --yarah-white: 255 255 255;
   --yarah-black: 0 0 0;
   --yarah-neutral-400: 163 163 163;
+  --yarah-text-strong: 41 41 41;   /* #292929 */
+  --yarah-text-body: 93 93 93;     /* #5D5D5D */
+  --yarah-text-muted: 127 127 127; /* #7F7F7F */
+  --yarah-text-strong-dark: 237 237 237; /* #EDEDED */
+  --yarah-text-body-dark: 166 166 166;   /* #A6A6A6 */
+  --yarah-text-muted-dark: 133 133 133;  /* #858585 */
   --yarah-neutral-600: 82 82 82;
   --yarah-blue-300: 95 198 255; /* derivado claro de #0FA8FF para tema oscuro */
   --yarah-blue-600: 15 168 255; /* #0FA8FF — primario de marca */
@@ -74,8 +80,9 @@
   --alpha-inverse-16: rgba(255, 255, 255, 0.16);
 
   /* general */
-  --foreground: var(--yarah-black); /* general.default */
-  --muted-foreground: var(--yarah-neutral-600); /* general.weak */
+  --foreground: var(--yarah-text-strong); /* #292929 — títulos */
+  --muted-foreground: var(--yarah-text-body); /* #5D5D5D — cuerpo */
+  --text-muted: var(--yarah-text-muted); /* #7F7F7F — secundario */
   --disabled: var(--yarah-neutral-400); /* general.disabled */
   --inverse: var(--yarah-white); /* general.inverse */
   --primary: var(--yarah-blue-600); /* general.primary */
@@ -118,8 +125,9 @@
   --alpha-inverse-16: rgba(0, 0, 0, 0.16);
 
   /* general */
-  --foreground: var(--yarah-white); /* general.default */
-  --muted-foreground: var(--yarah-neutral-400); /* general.weak */
+  --foreground: var(--yarah-text-strong-dark); /* #EDEDED — títulos */
+  --muted-foreground: var(--yarah-text-body-dark); /* #A6A6A6 — cuerpo */
+  --text-muted: var(--yarah-text-muted-dark); /* #858585 — secundario */
   --disabled: var(--yarah-neutral-600); /* general.disabled */
   --inverse: var(--yarah-black); /* general.inverse */
   --primary: var(--yarah-blue-300); /* general.primary */
@@ -191,4 +199,9 @@
 svg[data-reicon] {
   transform: scale(0.85);
   transform-origin: center;
+}
+
+/* Design spec: slightly tightened tracking across the product. */
+body {
+  letter-spacing: -0.15px;
 }

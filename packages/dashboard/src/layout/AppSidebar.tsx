@@ -106,8 +106,9 @@ export default function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebar
 
   const menuItemBaseClasses = (isActive: boolean) =>
     cn(
-      'group flex items-center rounded transition-colors',
-      isCollapsed ? 'h-8 w-full justify-start p-1.5' : 'h-8 w-full gap-1 p-1.5',
+      // Design spec: 28px rows, 9px radius.
+      'group flex items-center rounded-[9px] transition-colors',
+      isCollapsed ? 'h-7 w-full justify-start p-1.5' : 'h-7 w-full gap-1 p-1.5',
       isActive
         ? 'bg-toast text-foreground'
         : 'text-muted-foreground hover:bg-alpha-4 hover:text-foreground'
@@ -116,7 +117,8 @@ export default function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebar
   const MenuItemLabel = ({ label, isActive }: { label: string; isActive: boolean }) => (
     <span
       className={cn(
-        'min-w-0 truncate px-2 text-sm font-normal leading-5',
+        // Design spec: 13px labels.
+        'min-w-0 truncate px-2 text-[13px] font-normal leading-5',
         isActive ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'
       )}
     >

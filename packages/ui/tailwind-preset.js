@@ -10,6 +10,7 @@ const tailwindPreset = {
         'alpha-16': 'var(--alpha-16)',
         foreground: 'rgb(var(--foreground))',
         'muted-foreground': 'rgb(var(--muted-foreground))',
+        'text-muted': 'rgb(var(--text-muted))',
         primary: 'rgb(var(--primary))',
         destructive: 'rgb(var(--destructive))',
         'semantic-0': 'rgb(var(--semantic-0))',
