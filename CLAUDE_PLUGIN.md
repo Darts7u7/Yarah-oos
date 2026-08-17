@@ -27,7 +27,7 @@ The public plugin currently includes four skills.
 
 ### `yarah`
 
-Guidance for building application code with Yarah and `@insforge/sdk`,
+Guidance for building application code with Yarah and `@yarahdev/sdk`,
 including database CRUD, auth, storage uploads, functions, OpenRouter AI,
 realtime, email, Stripe flows, and S3-compatible storage integrations.
 
@@ -56,7 +56,7 @@ Once installed, Claude Code can load Yarah-specific guidance when you are:
 
 - setting up backend infrastructure such as tables, buckets, functions, auth,
   AI, payments, or deployments
-- integrating `@insforge/sdk` into frontend or server applications
+- integrating `@yarahdev/sdk` into frontend or server applications
 - implementing database access with RLS-aware patterns
 - debugging Yarah project errors and deployment issues
 - connecting external auth providers to Yarah

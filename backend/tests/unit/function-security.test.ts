@@ -159,7 +159,7 @@ describe('FunctionService Code Validation (Public API)', () => {
     it('should not reject dynamic imports or CommonJS-shaped code at the API layer', async () => {
       const code = `
         export default async function(req: Request) {
-          const dependency = await import('npm:@insforge/sdk');
+          const dependency = await import('npm:@yarahdev/sdk');
           const maybeRequire = 'require("fs") appears only as text here';
           return new Response(JSON.stringify({ dependency: !!dependency, maybeRequire }));
         }
@@ -171,7 +171,7 @@ describe('FunctionService Code Validation (Public API)', () => {
 
     it('should allow semicolon-free static import statements', async () => {
       const code = `
-        import { createClient } from 'npm:@insforge/sdk'
+        import { createClient } from 'npm:@yarahdev/sdk'
         export default async function(req: Request) {
           return new Response(String(Boolean(createClient)))
         }

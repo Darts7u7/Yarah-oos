@@ -23,7 +23,7 @@ For the backend channel and RLS model, see [Realtime overview](/core-concepts/re
 ## Quick start
 
 ```typescript
-import { createClient } from '@insforge/sdk';
+import { createClient } from '@yarahdev/sdk';
 
 const yarah = createClient({
   baseUrl: 'https://your-app.apps.yarah.dev',
@@ -216,7 +216,7 @@ yarah.realtime.disconnect();
 Delivered messages include your payload fields plus server metadata.
 
 ```typescript
-import type { SocketMessage } from '@insforge/sdk';
+import type { SocketMessage } from '@yarahdev/sdk';
 
 interface OrderStatusMessage extends SocketMessage {
   id: string;
@@ -304,7 +304,7 @@ Returns an empty array for channels you are not subscribed to. While the socket 
 When the connection drops, the SDK automatically resubscribes to every channel on reconnect and emits `presence:sync` with the fresh presence snapshot for each. Members who joined or left while you were disconnected produce no individual `presence:join`/`presence:leave` deltas, so replace — don't merge — any state you keep outside the SDK:
 
 ```typescript
-import type { PresenceSyncEvent } from '@insforge/sdk';
+import type { PresenceSyncEvent } from '@yarahdev/sdk';
 
 yarah.realtime.on<PresenceSyncEvent>('presence:sync', ({ channel, presence }) => {
   replaceMembers(channel, presence.members);

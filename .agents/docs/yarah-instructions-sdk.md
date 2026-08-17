@@ -27,7 +27,7 @@ Use the `download-template` MCP tool to create a new project with your backend U
 ### Step 2: Install SDK
 
 ```bash
-npm install @insforge/sdk@latest
+npm install @yarahdev/sdk@latest
 ```
 
 ### Step 3: Create SDK Client
@@ -35,7 +35,7 @@ npm install @insforge/sdk@latest
 You must create a client instance using `createClient()` with your base URL and anon key:
 
 ```javascript
-import { createClient } from '@insforge/sdk';
+import { createClient } from '@yarahdev/sdk';
 
 const client = createClient({
   baseUrl: 'https://your-app.apps.yarah.dev',  // Your Yarah backend URL

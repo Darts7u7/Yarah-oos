@@ -53,7 +53,7 @@ description: "Yarah 常見問題：解說資料庫呼叫、Edge Function 與 Cus
     yarah db query "SELECT * FROM my_schema.mytable"
     ```
 
-    **SDK。** 在查詢建構器前鏈式呼叫 `.schema()`（`@insforge/sdk` 支援）。它底層對應到同樣的 `Accept-Profile` / `Content-Profile` header，讀、寫、RPC 都會路由到你指定的 schema：
+    **SDK。** 在查詢建構器前鏈式呼叫 `.schema()`（`@yarahdev/sdk` 支援）。它底層對應到同樣的 `Accept-Profile` / `Content-Profile` header，讀、寫、RPC 都會路由到你指定的 schema：
 
     ```javascript
     // 讀
@@ -127,7 +127,7 @@ description: "Yarah 常見問題：解說資料庫呼叫、Edge Function 與 Cus
     在可信的伺服器端程式碼裡透過 `createAdminClient` 使用，絕不要放到瀏覽器：
 
     ```javascript
-    import { createAdminClient } from '@insforge/sdk'
+    import { createAdminClient } from '@yarahdev/sdk'
 
     const admin = createAdminClient({
       baseUrl: process.env.YARAH_URL,

@@ -53,7 +53,7 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     yarah db query "SELECT * FROM my_schema.mytable"
     ```
 
-    **SDK.** Encadena `.schema()` antes del constructor de consultas (compatible con `@insforge/sdk`). Se traduce a la misma cabecera `Accept-Profile` / `Content-Profile`, así que lecturas, escrituras y RPC se enrutan al schema que indiques:
+    **SDK.** Encadena `.schema()` antes del constructor de consultas (compatible con `@yarahdev/sdk`). Se traduce a la misma cabecera `Accept-Profile` / `Content-Profile`, así que lecturas, escrituras y RPC se enrutan al schema que indiques:
 
     ```javascript
     // lectura
@@ -127,7 +127,7 @@ description: "Respuestas sobre llamadas a la base de datos, edge functions, cust
     Úsala desde código de servidor de confianza a través de `createAdminClient`, nunca desde el navegador:
 
     ```javascript
-    import { createAdminClient } from '@insforge/sdk'
+    import { createAdminClient } from '@yarahdev/sdk'
 
     const admin = createAdminClient({
       baseUrl: process.env.YARAH_URL,

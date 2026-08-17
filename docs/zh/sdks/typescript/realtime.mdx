@@ -23,7 +23,7 @@ TypeScript SDK 向您的 Yarah 后端打开一个 Socket.IO 连接。您订阅�
 ## 快速开始
 
 ```typescript
-import { createClient } from '@insforge/sdk';
+import { createClient } from '@yarahdev/sdk';
 
 const yarah = createClient({
   baseUrl: 'https://your-app.apps.yarah.dev',
@@ -216,7 +216,7 @@ yarah.realtime.disconnect();
 传递的消息包括您的载荷字段加上服务器元数据。
 
 ```typescript
-import type { SocketMessage } from '@insforge/sdk';
+import type { SocketMessage } from '@yarahdev/sdk';
 
 interface OrderStatusMessage extends SocketMessage {
   id: string;
@@ -304,7 +304,7 @@ const members = yarah.realtime.getPresenceState('chat:room-1');
 当连接断开时，SDK 会在重新连接时自动重新订阅每个频道，并为每个频道发出带有新在线状态快照的 `presence:sync`。在您断开连接期间加入或离开的成员不会产生单独的 `presence:join`/`presence:leave` 增量，因此请替换（而非合并）您在 SDK 之外保留的任何状态：
 
 ```typescript
-import type { PresenceSyncEvent } from '@insforge/sdk';
+import type { PresenceSyncEvent } from '@yarahdev/sdk';
 
 yarah.realtime.on<PresenceSyncEvent>('presence:sync', ({ channel, presence }) => {
   replaceMembers(channel, presence.members);

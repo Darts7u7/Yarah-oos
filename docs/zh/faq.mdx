@@ -53,7 +53,7 @@ description: "Yarah 常见问题：数据库调用、Edge Function 与 Custom Co
     yarah db query "SELECT * FROM my_schema.mytable"
     ```
 
-    **SDK。** 在查询构造器前链式调用 `.schema()`（`@insforge/sdk` 支持）。它底层映射到同样的 `Accept-Profile` / `Content-Profile` header，读、写、RPC 都会路由到你指定的 schema：
+    **SDK。** 在查询构造器前链式调用 `.schema()`（`@yarahdev/sdk` 支持）。它底层映射到同样的 `Accept-Profile` / `Content-Profile` header，读、写、RPC 都会路由到你指定的 schema：
 
     ```javascript
     // 读
@@ -127,7 +127,7 @@ description: "Yarah 常见问题：数据库调用、Edge Function 与 Custom Co
     在可信的服务端代码里通过 `createAdminClient` 使用，绝不要放到浏览器：
 
     ```javascript
-    import { createAdminClient } from '@insforge/sdk'
+    import { createAdminClient } from '@yarahdev/sdk'
 
     const admin = createAdminClient({
       baseUrl: process.env.YARAH_URL,

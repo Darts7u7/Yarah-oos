@@ -53,7 +53,7 @@ description: "Answers to common Yarah questions on database calls, edge function
     yarah db query "SELECT * FROM my_schema.mytable"
     ```
 
-    **SDK.** Chain `.schema()` before the query builder (supported by `@insforge/sdk`). It maps to the same `Accept-Profile` / `Content-Profile` header, so reads, writes, and RPC all route to the schema you name:
+    **SDK.** Chain `.schema()` before the query builder (supported by `@yarahdev/sdk`). It maps to the same `Accept-Profile` / `Content-Profile` header, so reads, writes, and RPC all route to the schema you name:
 
     ```javascript
     // read
@@ -127,7 +127,7 @@ description: "Answers to common Yarah questions on database calls, edge function
     Use it from trusted server code through `createAdminClient`, never the browser:
 
     ```javascript
-    import { createAdminClient } from '@insforge/sdk'
+    import { createAdminClient } from '@yarahdev/sdk'
 
     const admin = createAdminClient({
       baseUrl: process.env.YARAH_URL,

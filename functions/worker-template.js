@@ -88,7 +88,7 @@ self.onmessage = (e) => {
 let createClient, encodeBase64, decodeBase64;
 let __importFailed = false;
 try {
-  ({ createClient } = await import('npm:@insforge/sdk'));
+  ({ createClient } = await import('npm:@yarahdev/sdk'));
   ({ encodeBase64, decodeBase64 } =
     await import('https://deno.land/std@0.224.0/encoding/base64.ts'));
 } catch (importError) {

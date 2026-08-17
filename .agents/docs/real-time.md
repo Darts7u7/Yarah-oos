@@ -115,7 +115,7 @@ Use `realtime.channel_name()` in subscribe policies because `realtime.channels` 
 ## Frontend SDK Pattern
 
 ```typescript
-import { createClient } from '@insforge/sdk';
+import { createClient } from '@yarahdev/sdk';
 
 const yarah = createClient({
   baseUrl: 'https://your-project.apps.yarah.dev',

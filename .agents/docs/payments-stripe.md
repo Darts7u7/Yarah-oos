@@ -32,7 +32,7 @@ npx @yarah/cli payments stripe webhooks configure --environment test
 Use the TypeScript SDK from application code:
 
 ```typescript
-import { createClient } from '@insforge/sdk';
+import { createClient } from '@yarahdev/sdk';
 
 const yarah = createClient({
   baseUrl: 'https://your-project.apps.yarah.dev',

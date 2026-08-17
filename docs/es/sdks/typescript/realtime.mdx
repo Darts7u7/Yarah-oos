@@ -23,7 +23,7 @@ Para el modelo de canal de backend y RLS, consulta [Descripción general de tiem
 ## Inicio rápido
 
 ```typescript
-import { createClient } from '@insforge/sdk';
+import { createClient } from '@yarahdev/sdk';
 
 const yarah = createClient({
   baseUrl: 'https://your-app.apps.yarah.dev',
@@ -216,7 +216,7 @@ yarah.realtime.disconnect();
 Los mensajes entregados incluyen los campos de tu carga útil más los metadatos del servidor.
 
 ```typescript
-import type { SocketMessage } from '@insforge/sdk';
+import type { SocketMessage } from '@yarahdev/sdk';
 
 interface OrderStatusMessage extends SocketMessage {
   id: string;
@@ -304,7 +304,7 @@ Devuelve una matriz vacía para canales a los que no estás suscrito. Mientras e
 Cuando la conexión se cae, el SDK vuelve a suscribirse automáticamente a cada canal en la reconexión y emite `presence:sync` con la instantánea de presencia nueva para cada uno. Los miembros que se unieron o abandonaron mientras estabas desconectado no producen deltas individuales `presence:join`/`presence:leave`, por lo que reemplaza — no fusiones — cualquier estado que mantengas fuera del SDK:
 
 ```typescript
-import type { PresenceSyncEvent } from '@insforge/sdk';
+import type { PresenceSyncEvent } from '@yarahdev/sdk';
 
 yarah.realtime.on<PresenceSyncEvent>('presence:sync', ({ channel, presence }) => {
   replaceMembers(channel, presence.members);

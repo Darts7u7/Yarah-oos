@@ -953,7 +953,7 @@ export class DenoSubhostingProvider {
    *    module.exports = async function(req) { return new Response("Hello"); }
    *
    * 2. Deno-native (export default) - used as-is, user imports directly:
-   *    import { createClient } from 'npm:@insforge/sdk';
+   *    import { createClient } from 'npm:@yarahdev/sdk';
    *    export default async function(req: Request) { return new Response("Hello"); }
    */
   private transformUserCode(userCode: string, slug: string): string {
@@ -976,7 +976,7 @@ export class DenoSubhostingProvider {
   private convertLegacyFormat(userCode: string, slug: string): string {
     return `// Function: ${slug} (legacy format)
 // createClient is injected and available in scope
-import { createClient } from 'npm:@insforge/sdk';
+import { createClient } from 'npm:@yarahdev/sdk';
 
 declare global {
   var __yarah_dispatch__: (req: Request) => Promise<Response>;

@@ -178,7 +178,19 @@ Por bloques, con puerta de verificación tras cada uno:
 - [ ] READMEs, botones de deploy, badges
 - [ ] Verificar: crear app desde plantilla contra el motor local y que funcione login+datos
 
-### FASE 7 — Barrido final y cierre
+### FASE 7 — Barrido final y cierre — EN CURSO (2026-08-16)
+- [x] Meta-dirs internos de InsForge eliminados del motor (`.claude`, `.codex`, `.agents/skills`, `.internal`, `.archive`, `.gstack`, logs) — `.agents/docs` conservado (servido por `/api/docs`)
+- [x] **Commit + push de los 8 repos a github.com/Darts7u7** (1.750 archivos) — todo el rebranding a salvo
+- [x] Publicación npm ejecutada: los 5 `@yarahdev/*` ACEPTADOS por el servidor pero **en cuarentena anti-spam** (falso positivo por cuenta+org nueva+ráfaga+token bypass). Prueba: republicar da "cannot publish over the previously published versions". → Pierre abre ticket en npmjs.com/support (texto redactado en el chat) y revisa su email
+- [x] **Los 5 paquetes npm VIVOS en el registro** (la "cuarentena" era propagación de scope nuevo ~15 min; emails "Successfully published" ×5, sin flags) — sin ticket necesario
+- [x] Motor conectado a `npm:@yarahdev/sdk` (todos los `@insforge/*` liberados; 0 restos no-esperados)
+- [x] Incidente final resuelto: `functions/deno.lock` congelaba nombres del barrido intermedio → borrado y regenerado (lección: lockfiles se regeneran tras renombrados, no se barren)
+- [x] **E2E FUNCIÓN: PASS** — `POST /functions/yarah-e2e` → `{"ok":true,"brand":"Yarah","runtime":"deno"}` con `@yarahdev/sdk` descargado del npm público. **REBRANDING FUNCIONALMENTE COMPLETO.**
+- [ ] Pierre: borrar el token `yarah-publish` de npm (quedó pegado en el chat; expira solo el 23-ago)
+- [ ] Opcionales de lanzamiento: publicar imagen `ghcr.io/darts7u7/postgres` a GHCR; visibilidad pública de repos; cambiar `ROOT_ADMIN_PASSWORD` antes de exponer nada
+- [ ] Tokens restantes POR DISEÑO: devDep `insforge-test` (opcional publicar uno propio), atribución en LICENSE/NOTICE/CHANGELOG (permanente)
+
+### FASE 7-bis (original) — Barrido final y cierre
 - [ ] `grep -ri insforge` en los 8 repos = 0 (excepto LICENSE/NOTICE documentados)
 - [ ] Despliegue limpio de punta a punta en carpeta virgen (simulando usuario nuevo): setup → up → conectar MCP → crear app
 - [ ] Suites completas en verde vs línea base
