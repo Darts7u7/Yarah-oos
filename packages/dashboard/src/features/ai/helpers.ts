@@ -1,0 +1,258 @@
+import {
+  ModalitySchema,
+  AIModelSchema,
+  type AIOverviewMetricPoint,
+} from '@insforge/shared-schemas';
+export interface ModelOption {
+  id: string;
+  created?: number;
+  modelId: string;
+  modelName: string;
+  providerName: string;
+  logo: React.ComponentType<React.SVGProps<SVGSVGElement>> | undefined;
+  inputModality: ModalitySchema[];
+  outputModality: ModalitySchema[];
+  inputPrice?: number; // Price per million tokens in USD
+  outputPrice?: number; // Price per million tokens in USD
+  inputPriceLabel?: string;
+  outputPriceLabel?: string;
+}
+
+import GrokIcon from '#assets/logos/grok.svg?react';
+import GeminiIcon from '#assets/logos/gemini.svg?react';
+import ClaudeIcon from '#assets/logos/claude_code.svg?react';
+import OpenAIIcon from '#assets/logos/openai.svg?react';
+import AmazonIcon from '#assets/logos/amazon.svg?react';
+import DeepseekIcon from '#assets/logos/deepseek.svg?react';
+import QwenIcon from '#assets/logos/qwen.svg?react';
+
+const PROVIDER_DISPLAY_ORDER: Record<string, number> = {
+  openai: 1,
+  anthropic: 2,
+  google: 3,
+  'x-ai': 4,
+  amazon: 5,
+  deepseek: 6,
+  qwen: 7,
+  other: 999,
+};
+
+// Provider tab configuration
+export interface ProviderTab {
+  id: string;
+  displayName: string;
+  logo: React.FunctionComponent<React.SVGProps<SVGSVGElement>> | undefined;
+}
+
+// Extract provider ID from modelId (e.g., "openai/gpt-4o" -> "openai")
+export const getProviderIdFromModelId = (modelId: string): string => {
+  return modelId.split('/')[0] || '';
+};
+
+export const getProviderDisplayName = (providerId: string): string => {
+  const providerMap: Record<string, string> = {
+    openai: 'OpenAI',
+    anthropic: 'Anthropic',
+    google: 'Google',
+    openrouter: 'OpenRouter',
+    azure: 'Azure',
+    amazon: 'Amazon',
+    'x-ai': 'xAI',
+    huggingface: 'HuggingFace',
+    deepseek: 'DeepSeek',
+    qwen: 'Qwen',
+  };
+
+  return (
+    providerMap[providerId.toLowerCase()] ||
+    providerId.charAt(0).toUpperCase() + providerId.slice(1)
+  );
+};
+
+export const getProviderLogo = (
+  providerId: string
+): React.FunctionComponent<React.SVGProps<SVGSVGElement>> | undefined => {
+  const logoMap: Record<string, React.FunctionComponent<React.SVGProps<SVGSVGElement>>> = {
+    anthropic: ClaudeIcon,
+    openai: OpenAIIcon,
+    google: GeminiIcon,
+    'x-ai': GrokIcon,
+    amazon: AmazonIcon,
+    deepseek: DeepseekIcon,
+    qwen: QwenIcon,
+  };
+  return logoMap[providerId];
+};
+
+export const getProviderDisplayOrder = (providerId: string): number =>
+  PROVIDER_DISPLAY_ORDER[providerId.toLowerCase()] ?? 500;
+
+// Filter models by provider ID
+export const filterModelsByProvider = (
+  models: AIModelSchema[],
+  providerId: string
+): AIModelSchema[] => {
+  if (providerId === 'other') {
+    // "other" tab contains models whose provider has no logo
+    return models.filter((model) => {
+      const modelProviderId = getProviderIdFromModelId(model.modelId);
+      return !getProviderLogo(modelProviderId);
+    });
+  }
+  return models.filter((model) => getProviderIdFromModelId(model.modelId) === providerId);
+};
+
+// Dynamically generate provider tabs
+// Providers with logos get their own tab, others go to "Other"
+export const generateProviderTabs = (models: AIModelSchema[]): ProviderTab[] => {
+  // Extract unique provider IDs from models
+  const providerIds = new Set<string>();
+  models.forEach((model) => {
+    const providerId = getProviderIdFromModelId(model.modelId);
+    if (providerId) {
+      providerIds.add(providerId);
+    }
+  });
+
+  const mainProviders: ProviderTab[] = [];
+  let hasOtherProviders = false;
+
+  providerIds.forEach((providerId) => {
+    const logo = getProviderLogo(providerId);
+    if (logo) {
+      mainProviders.push({
+        id: providerId,
+        displayName: getProviderDisplayName(providerId),
+        logo,
+      });
+    } else {
+      hasOtherProviders = true;
+    }
+  });
+
+  // Add "Other" tab at the end if there are providers without logos
+  if (hasOtherProviders) {
+    mainProviders.push({
+      id: 'other',
+      displayName: 'Other',
+      logo: undefined,
+    });
+  }
+
+  return mainProviders.sort((a, b) => {
+    const orderDiff = getProviderDisplayOrder(a.id) - getProviderDisplayOrder(b.id);
+    return orderDiff !== 0 ? orderDiff : a.displayName.localeCompare(b.displayName);
+  });
+};
+
+// Helper function to filter AI models based on selected modalities
+export const filterModelsByModalities = (
+  models: AIModelSchema[],
+  selectedInputModalities: ModalitySchema[],
+  selectedOutputModalities: ModalitySchema[]
+): AIModelSchema[] => {
+  if (!models?.length) {
+    return [];
+  }
+
+  return models.filter((model) => {
+    const inputModalities = new Set(model.inputModality);
+    const outputModalities = new Set(model.outputModality);
+    return (
+      selectedInputModalities.every((m) => inputModalities.has(m)) &&
+      selectedOutputModalities.every((m) => outputModalities.has(m))
+    );
+  });
+};
+
+// Helper function to get friendly model name from model ID
+export const getFriendlyModelName = (rawModelName: string): string => {
+  // Convert kebab-case to Title Case
+  return rawModelName
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+export function toModelOption(model: AIModelSchema): ModelOption {
+  const [rawProviderId, rawModelName] = model.modelId.split('/');
+
+  return {
+    ...model,
+    modelName: getFriendlyModelName(rawModelName),
+    providerName: getProviderDisplayName(rawProviderId),
+    logo: getProviderLogo(rawProviderId),
+  };
+}
+
+// Sorting types
+export type SortField = 'inputPrice' | 'outputPrice' | 'released';
+export type SortDirection = 'asc' | 'desc';
+
+// Format credits display
+export const formatCredits = (remaining: number): string => {
+  if (remaining >= 1000) {
+    return `${(remaining / 1000).toFixed(1)}K`;
+  }
+  return remaining.toFixed(2);
+};
+
+// Format price per million tokens
+export const formatPrice = (price?: number): string => {
+  if (price === undefined) {
+    return '-';
+  }
+  if (price === 0) {
+    return 'Free';
+  }
+  if (price < 0.01) {
+    return `$${price.toFixed(4)}`;
+  }
+  if (price < 1) {
+    return `$${price.toFixed(2)}`;
+  }
+  return `$${price.toFixed(1)}`;
+};
+
+export const formatInputPrice = (model: Pick<ModelOption, 'inputPrice' | 'inputPriceLabel'>) =>
+  model.inputPriceLabel ?? formatPrice(model.inputPrice);
+
+export const formatOutputPrice = (model: Pick<ModelOption, 'outputPrice' | 'outputPriceLabel'>) =>
+  model.outputPriceLabel ?? formatPrice(model.outputPrice);
+
+// Format modality for display
+export const formatModality = (modality: string): string => {
+  return modality.charAt(0).toUpperCase() + modality.slice(1);
+};
+
+export const formatReleasedDate = (created?: number): string => {
+  if (created === undefined || created === null) {
+    return '-';
+  }
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
+  }).format(new Date(created * 1000));
+};
+
+export function formatCompactNumber(value: number): string {
+  return new Intl.NumberFormat('en', {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
+export function formatUsd(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: value > 0 && value < 0.01 ? 4 : 2,
+  }).format(value);
+}
+
+export function sumMetricPoints(points: AIOverviewMetricPoint[]): number {
+  return points.reduce((sum, point) => sum + point.value, 0);
+}

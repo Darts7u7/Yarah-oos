@@ -1,0 +1,247 @@
+import axios from 'axios';
+import logger from '@/utils/logger.js';
+import { getApiBaseUrl } from '@/utils/environment.js';
+import { OAuthConfigService } from '@/services/auth/oauth-config.service.js';
+import { OAuthProvider } from './base.provider.js';
+import type { MicrosoftUserInfo, OAuthUserData } from '@/types/auth.js';
+
+/**
+ * Microsoft OAuth Service
+ * Handles all Microsoft OAuth operations including URL generation, token exchange, and user info retrieval
+ */
+export class MicrosoftOAuthProvider implements OAuthProvider {
+  private static instance: MicrosoftOAuthProvider;
+
+  private constructor() {
+    // Initialize OAuth helpers if needed
+  }
+
+  public static getInstance(): MicrosoftOAuthProvider {
+    if (!MicrosoftOAuthProvider.instance) {
+      MicrosoftOAuthProvider.instance = new MicrosoftOAuthProvider();
+    }
+    return MicrosoftOAuthProvider.instance;
+  }
+
+  /**
+   * Generate Microsoft OAuth authorization URL
+   */
+  async generateOAuthUrl(
+    state?: string,
+    additionalParams?: Record<string, string>
+  ): Promise<string> {
+    const oAuthConfigService = OAuthConfigService.getInstance();
+    const config = await oAuthConfigService.getConfigByProvider('microsoft');
+    if (!config) {
+      throw new Error('Microsoft OAuth not configured');
+    }
+
+    const selfBaseUrl = getApiBaseUrl();
+
+    if (config?.useSharedKey) {
+      if (!state) {
+        logger.warn('Shared Microsoft OAuth called without state parameter');
+        throw new Error('State parameter is required for shared Microsoft OAuth');
+      }
+      // Use shared keys if configured
+      const cloudBaseUrl = process.env.CLOUD_API_HOST || 'https://api.insforge.dev';
+      const redirectUri = `${selfBaseUrl}/api/auth/oauth/shared/callback/${encodeURIComponent(state)}`;
+
+      let sharedAuthUrl: string;
+      try {
+        const response = await axios.get(
+          `${cloudBaseUrl}/auth/v1/shared/microsoft?redirect_uri=${encodeURIComponent(redirectUri)}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            timeout: 5000,
+          }
+        );
+        sharedAuthUrl = response.data.auth_url || response.data.url;
+      } catch (error) {
+        logger.error('Failed to get shared Microsoft OAuth URL:', error);
+        throw new Error(
+          `Failed to initialize shared Microsoft OAuth: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+      }
+
+      if (!sharedAuthUrl) {
+        throw new Error('Shared Microsoft OAuth did not return an authorization URL');
+      }
+      let authUrl: URL;
+      try {
+        authUrl = new URL(sharedAuthUrl);
+      } catch {
+        throw new Error(`Shared Microsoft OAuth returned an invalid URL: ${sharedAuthUrl}`);
+      }
+      Object.entries(additionalParams ?? {}).forEach(([key, value]) => {
+        if (!authUrl.searchParams.has(key)) {
+          authUrl.searchParams.set(key, value);
+        }
+      });
+      return authUrl.toString();
+    }
+
+    logger.debug('Microsoft OAuth Config (fresh from DB):', {
+      clientId: config.clientId ? 'SET' : 'NOT SET',
+    });
+
+    const authUrl = new URL('https://login.microsoftonline.com/common/oauth2/v2.0/authorize');
+    authUrl.searchParams.set('client_id', config.clientId ?? '');
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('redirect_uri', `${selfBaseUrl}/api/auth/oauth/microsoft/callback`);
+    authUrl.searchParams.set(
+      'scope',
+      config.scopes && config.scopes.length > 0
+        ? config.scopes.join(' ')
+        : 'openid email profile offline_access User.Read'
+    );
+    if (state) {
+      authUrl.searchParams.set('state', state);
+    }
+    Object.entries(additionalParams ?? {}).forEach(([key, value]) => {
+      if (!authUrl.searchParams.has(key)) {
+        authUrl.searchParams.set(key, value);
+      }
+    });
+    return authUrl.toString();
+  }
+
+  /**
+   * Exchange Microsoft code for tokens
+   */
+  async exchangeCodeToToken(code: string): Promise<{ access_token: string; id_token?: string }> {
+    const oAuthConfigService = OAuthConfigService.getInstance();
+    const config = await oAuthConfigService.getConfigByProvider('microsoft');
+    if (!config) {
+      throw new Error('Microsoft OAuth not configured');
+    }
+
+    try {
+      logger.info('Exchanging Microsoft code for tokens', {
+        hasCode: !!code,
+        clientId: config.clientId?.substring(0, 10) + '...',
+      });
+
+      const clientSecret = await oAuthConfigService.getClientSecretByProvider('microsoft');
+      const selfBaseUrl = getApiBaseUrl();
+
+      const body = new URLSearchParams({
+        client_id: config.clientId ?? '',
+        client_secret: clientSecret ?? '',
+        code,
+        redirect_uri: `${selfBaseUrl}/api/auth/oauth/microsoft/callback`,
+        grant_type: 'authorization_code',
+        scope:
+          config.scopes && config.scopes.length > 0
+            ? config.scopes.join(' ')
+            : 'openid email profile offline_access User.Read',
+      });
+
+      const response = await axios.post(
+        'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+        body.toString(),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
+
+      if (!response.data.access_token) {
+        throw new Error('Failed to get access token from Microsoft');
+      }
+      return {
+        access_token: response.data.access_token,
+        id_token: response.data.id_token, // optional
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        logger.error('Microsoft token exchange failed', {
+          status: error.response.status,
+          error: error.response.data,
+        });
+        throw new Error(`Microsoft OAuth error: ${JSON.stringify(error.response.data)}`);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Get Microsoft user info via Graph API
+   */
+  async getUserInfo(accessToken: string): Promise<MicrosoftUserInfo> {
+    try {
+      const userResp = await axios.get('https://graph.microsoft.com/v1.0/me', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const data = userResp.data as {
+        id: string;
+        displayName?: string;
+        userPrincipalName?: string;
+        mail?: string | null;
+      };
+
+      const email = data.mail || data.userPrincipalName || `${data.id}@users.noreply.microsoft.com`;
+      const name = data.displayName || data.userPrincipalName || email;
+
+      return {
+        id: data.id,
+        email,
+        name,
+      };
+    } catch (error) {
+      logger.error('Microsoft user info retrieval failed:', error);
+      throw new Error(`Failed to get Microsoft user info: ${error}`);
+    }
+  }
+
+  /**
+   * Handle Microsoft OAuth callback
+   */
+  async handleCallback(payload: { code?: string; token?: string }): Promise<OAuthUserData> {
+    if (!payload.code) {
+      throw new Error('No authorization code provided');
+    }
+
+    const tokens = await this.exchangeCodeToToken(payload.code);
+    const microsoftUserInfo = await this.getUserInfo(tokens.access_token);
+
+    // Transform Microsoft user info to generic format
+    const userName = microsoftUserInfo.name || microsoftUserInfo.email.split('@')[0] || 'user';
+    return {
+      provider: 'microsoft',
+      providerId: microsoftUserInfo.id,
+      email: microsoftUserInfo.email,
+      userName,
+      avatarUrl: '', // Microsoft doesn't provide avatar in basic profile
+      identityData: microsoftUserInfo,
+    };
+  }
+
+  /**
+   * Handle shared callback payload transformation
+   */
+  handleSharedCallback(payloadData: Record<string, unknown>): OAuthUserData {
+    const providerId = typeof payloadData.providerId === 'string' ? payloadData.providerId : '';
+    if (!providerId) {
+      throw new Error('Missing providerId from Microsoft shared callback payload');
+    }
+
+    const email = typeof payloadData.email === 'string' ? payloadData.email : '';
+    if (!email) {
+      throw new Error('Shared Microsoft callback missing required email');
+    }
+    const name = typeof payloadData.name === 'string' ? payloadData.name : '';
+    const avatar = typeof payloadData.avatar === 'string' ? payloadData.avatar : '';
+
+    return {
+      provider: 'microsoft',
+      providerId,
+      email,
+      userName: name || email.split('@')[0] || 'user',
+      avatarUrl: avatar,
+      identityData: payloadData,
+    };
+  }
+}

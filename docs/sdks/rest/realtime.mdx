@@ -1,0 +1,390 @@
+---
+title: Realtime API Reference
+description: Manage InsForge realtime channels, inspect message history, tune retention, and publish or subscribe with the raw Socket.IO surface over the REST API.
+---
+
+## Overview
+
+Realtime has two surfaces:
+
+- **REST API** for channel management, message history, delivery stats, permissions, and retention settings.
+- **Socket.IO** for live subscribe, publish, presence, and delivered events.
+
+<Note>
+  The REST API does not stream messages. Use the Socket.IO connection, or the [TypeScript SDK](/sdks/typescript/realtime), for live events.
+</Note>
+
+## Authentication
+
+Admin REST endpoints require a project-admin token or API key.
+
+```bash
+Authorization: Bearer <project-admin-jwt-or-ik_api_key>
+Content-Type: application/json
+```
+
+You can also pass API keys with:
+
+```bash
+X-API-Key: <ik_api_key>
+```
+
+Socket.IO connections authenticate through the Socket.IO `auth` object:
+
+```javascript
+const socket = io('https://your-app.insforge.app', {
+  auth: {
+    token: '<user-jwt-or-anon-token>'
+  }
+});
+```
+
+Server/admin clients may pass an API key:
+
+```javascript
+const socket = io('https://your-app.insforge.app', {
+  auth: {
+    apiKey: '<ik_api_key>'
+  }
+});
+```
+
+## Socket.IO Pub/Sub
+
+Install the Socket.IO client when you are not using the InsForge SDK:
+
+```bash
+npm install socket.io-client
+```
+
+### Connect And Subscribe
+
+```javascript
+import { io } from 'socket.io-client';
+
+const socket = io('https://your-app.insforge.app', {
+  auth: {
+    token: '<user-jwt-or-anon-token>'
+  }
+});
+
+socket.emit('realtime:subscribe', { channel: 'order:123' }, (response) => {
+  if (response.ok) {
+    console.log('Subscribed:', response.channel);
+    console.log('Presence:', response.presence.members);
+  } else {
+    console.error(response.error.code, response.error.message);
+  }
+});
+```
+
+### Listen For Events
+
+```javascript
+socket.on('status_changed', (message) => {
+  console.log(message.status);
+  console.log(message.meta.messageId);
+  console.log(message.meta.senderType);
+});
+
+socket.on('presence:join', (message) => {
+  console.log('Joined:', message.member);
+});
+
+socket.on('presence:leave', (message) => {
+  console.log('Left:', message.member);
+});
+
+socket.on('realtime:error', (error) => {
+  console.error(error.channel, error.code, error.message);
+});
+```
+
+### Publish
+
+```javascript
+socket.emit('realtime:publish', {
+  channel: 'order:123',
+  event: 'customer_viewed',
+  payload: {
+    viewedAt: new Date().toISOString()
+  }
+});
+```
+
+<Warning>
+  The socket must successfully subscribe to a channel before it can publish to that channel.
+</Warning>
+
+### Unsubscribe
+
+```javascript
+socket.emit('realtime:unsubscribe', { channel: 'order:123' });
+socket.disconnect();
+```
+
+### Socket Events
+
+| Event | Direction | Description |
+|-------|-----------|-------------|
+| `realtime:subscribe` | Client to server | Subscribe to a channel. The acknowledgement returns success/error and a presence snapshot. |
+| `realtime:unsubscribe` | Client to server | Leave a channel. |
+| `realtime:publish` | Client to server | Insert a user message into the realtime pipeline. |
+| Custom event name | Server to client | Delivered message, emitted under the message `eventName`. |
+| `presence:join` | Server to client | A logical member became present in the channel. |
+| `presence:leave` | Server to client | A logical member is no longer present in the channel. |
+| `realtime:error` | Server to client | Subscribe or publish failed. |
+
+## Channel Patterns
+
+Create channel definitions before clients subscribe.
+
+| Pattern | Matches |
+|---------|---------|
+| `orders` | `orders` |
+| `order:%` | `order:123`, `order:456` |
+| `chat:%:messages` | `chat:room-1:messages` |
+
+Pattern matching uses SQL `LIKE`, so `%` is the wildcard. `_` is not accepted in channel patterns because it is also a SQL wildcard.
+
+## Channels
+
+### List Channels
+
+```http
+GET /api/realtime/channels
+```
+
+```bash
+curl "https://your-app.insforge.app/api/realtime/channels" \
+  -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>"
+```
+
+Response:
+
+```json
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "pattern": "order:%",
+    "description": "Order updates",
+    "webhookUrls": ["https://example.com/webhook"],
+    "enabled": true,
+    "createdAt": "2026-04-25T17:00:00.000Z",
+    "updatedAt": "2026-04-25T17:00:00.000Z"
+  }
+]
+```
+
+### Create Channel
+
+```http
+POST /api/realtime/channels
+```
+
+Request body:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `pattern` | `string` | Yes | Channel pattern. |
+| `description` | `string` | No | Human-readable description. |
+| `webhookUrls` | `string[]` | No | Webhook URLs for every delivered message. |
+| `enabled` | `boolean` | No | Defaults to `true`. Disabled channels cannot be joined or delivered to. |
+
+```bash
+curl -X POST "https://your-app.insforge.app/api/realtime/channels" \
+  -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pattern": "chat:%",
+    "description": "Chat rooms",
+    "webhookUrls": ["https://example.com/realtime-webhook"],
+    "enabled": true
+  }'
+```
+
+### Get Channel
+
+```http
+GET /api/realtime/channels/{id}
+```
+
+### Update Channel
+
+```http
+PUT /api/realtime/channels/{id}
+```
+
+```bash
+curl -X PUT "https://your-app.insforge.app/api/realtime/channels/550e8400-e29b-41d4-a716-446655440000" \
+  -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "description": "Active order updates",
+    "enabled": true
+  }'
+```
+
+### Delete Channel
+
+```http
+DELETE /api/realtime/channels/{id}
+```
+
+```json
+{
+  "message": "Channel deleted"
+}
+```
+
+Message history is preserved. Deleted channels set existing message `channelId` values to `null`.
+
+## Messages
+
+### List Messages
+
+```http
+GET /api/realtime/messages
+```
+
+Query parameters:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `channelId` | `uuid` | Filter by channel ID. |
+| `eventName` | `string` | Filter by event name. |
+| `limit` | `integer` | 1 to 1000. Defaults to 100. |
+| `offset` | `integer` | Defaults to 0. |
+
+```bash
+curl "https://your-app.insforge.app/api/realtime/messages?eventName=status_changed&limit=50" \
+  -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>"
+```
+
+Response:
+
+```json
+[
+  {
+    "id": "660e8400-e29b-41d4-a716-446655440000",
+    "eventName": "status_changed",
+    "channelId": "550e8400-e29b-41d4-a716-446655440000",
+    "channelName": "order:123",
+    "payload": {
+      "id": "123",
+      "status": "shipped"
+    },
+    "senderType": "system",
+    "senderId": null,
+    "wsAudienceCount": 5,
+    "whAudienceCount": 1,
+    "whDeliveredCount": 1,
+    "createdAt": "2026-04-25T17:00:00.000Z"
+  }
+]
+```
+
+### Message Stats
+
+```http
+GET /api/realtime/messages/stats
+```
+
+Query parameters:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `channelId` | `uuid` | Filter stats by channel ID. |
+| `since` | `date-time` | Include only messages created after this timestamp. |
+
+```json
+{
+  "totalMessages": 1250,
+  "whDeliveryRate": 0.98,
+  "topEvents": [
+    {
+      "eventName": "status_changed",
+      "count": 450
+    }
+  ],
+  "retentionDays": null
+}
+```
+
+`retentionDays: null` means messages are retained indefinitely.
+
+## Permissions
+
+```http
+GET /api/realtime/permissions
+```
+
+Returns user-defined RLS policies for:
+
+- Subscribe checks on `realtime.channels`.
+- Publish checks on `realtime.messages`.
+
+```json
+{
+  "subscribe": {
+    "policies": [
+      {
+        "policyName": "users_subscribe_own_orders",
+        "tableName": "channels",
+        "command": "SELECT",
+        "roles": ["authenticated"],
+        "using": "pattern = 'order:%'",
+        "withCheck": null
+      }
+    ]
+  },
+  "publish": {
+    "policies": []
+  }
+}
+```
+
+## Configuration
+
+### Get Realtime Config
+
+```http
+GET /api/realtime/config
+```
+
+```json
+{
+  "retentionDays": null
+}
+```
+
+### Update Realtime Config
+
+```http
+PATCH /api/realtime/config
+```
+
+```bash
+curl -X PATCH "https://your-app.insforge.app/api/realtime/config" \
+  -H "Authorization: Bearer <project-admin-jwt-or-ik_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "retentionDays": 90
+  }'
+```
+
+Use `null` to keep messages indefinitely. Positive integers retain messages for that many days.
+
+## Webhooks
+
+When a channel has `webhookUrls`, each message delivered through that channel is posted to each URL.
+
+The request body is the original message payload. Headers identify the delivery:
+
+| Header | Value |
+|--------|-------|
+| `X-InsForge-Event` | Event name |
+| `X-InsForge-Channel` | Resolved channel name |
+| `X-InsForge-Message-Id` | Message UUID |
+
+Delivery attempts are reflected in `whAudienceCount` and `whDeliveredCount` on message history.

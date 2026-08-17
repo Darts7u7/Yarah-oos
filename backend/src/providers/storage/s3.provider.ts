@@ -1,0 +1,891 @@
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+  ListObjectsV2Command,
+  DeleteObjectsCommand,
+  HeadObjectCommand,
+  CopyObjectCommand,
+  CreateMultipartUploadCommand,
+  UploadPartCommand,
+  CompleteMultipartUploadCommand,
+  AbortMultipartUploadCommand,
+  ListPartsCommand,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
+import { getSignedUrl as getCloudFrontSignedUrl } from '@aws-sdk/cloudfront-signer';
+import { Readable } from 'stream';
+import { UploadStrategyResponse, DownloadStrategyResponse } from '@insforge/shared-schemas';
+import {
+  StorageProvider,
+  ObjectMetadata,
+  GetObjectResult,
+  DeleteObjectsResult,
+  ObjectNotFoundError,
+} from './base.provider.js';
+import logger from '@/utils/logger.js';
+import { appConfig } from '@/infra/config/app.config.js';
+import { getApiBaseUrl } from '@/utils/environment.js';
+
+function stripEtagQuotes(etag: string | undefined): string {
+  return (etag ?? '').replace(/^"(.*)"$/, '$1');
+}
+
+// S3-compatible backends surface "object doesn't exist" in various shapes:
+// native AWS S3 throws `NotFound`, MinIO and some proxies throw `NoSuchKey`,
+// and a few older SDKs only set `$metadata.httpStatusCode`. Treat all three
+// as a miss so headObject() can honour its Promise<... | null> contract
+// without leaking a thrown error to callers.
+function isS3NotFound(err: unknown): boolean {
+  const e = err as { name?: string; Code?: string; $metadata?: { httpStatusCode?: number } };
+  return (
+    e?.name === 'NotFound' ||
+    e?.name === 'NoSuchKey' ||
+    e?.Code === 'NoSuchKey' ||
+    e?.$metadata?.httpStatusCode === 404
+  );
+}
+
+const ONE_HOUR_IN_SECONDS = 3600;
+const SEVEN_DAYS_IN_SECONDS = 604800;
+const MAX_DELETE_OBJECTS_PER_REQUEST = 1000;
+
+/**
+ * S3 storage implementation
+ */
+export class S3StorageProvider implements StorageProvider {
+  private s3Client: S3Client | null = null;
+
+  constructor(
+    private s3Bucket: string,
+    private appKey: string,
+    private region: string = 'us-east-2',
+    /**
+     * When set, this provider runs in branch mode: read methods try the
+     * branch's S3 path first, then fall back to the parent's path on 404.
+     * Writes (put/delete/copy/multipart) are NEVER directed to the parent
+     * path. Injected by StorageService from the PARENT_APP_KEY env var
+     * that cloud-backend sets at branch EC2 startup.
+     */
+    private parentAppKey?: string
+  ) {}
+
+  initialize(): void {
+    // Use explicit AWS credentials if provided (local dev or self hosting)
+    // Otherwise, use IAM role credentials (EC2 production)
+    const s3Config: {
+      region: string;
+      credentials?: { accessKeyId: string; secretAccessKey: string };
+      endpoint?: string;
+      forcePathStyle?: boolean;
+    } = {
+      region: this.region,
+    };
+
+    // Use S3-specific credentials as a pair, otherwise fall back to AWS credentials as a pair
+    const useS3Creds = appConfig.storage.s3AccessKeyId && appConfig.storage.s3SecretAccessKey;
+    const accessKeyId = useS3Creds
+      ? appConfig.storage.s3AccessKeyId
+      : appConfig.storage.awsAccessKeyId;
+    const secretAccessKey = useS3Creds
+      ? appConfig.storage.s3SecretAccessKey
+      : appConfig.storage.awsSecretAccessKey;
+
+    if (accessKeyId && secretAccessKey) {
+      s3Config.credentials = { accessKeyId, secretAccessKey };
+    }
+
+    // Support MinIO or other S3-compatible endpoints
+    if (appConfig.storage.s3EndpointUrl) {
+      s3Config.endpoint = appConfig.storage.s3EndpointUrl;
+      // MinIO needs path-style; Tencent COS / Aliyun OSS need virtual-hosted-style.
+      // Configurable via S3_FORCE_PATH_STYLE (default true, backward-compatible).
+      s3Config.forcePathStyle = appConfig.storage.s3ForcePathStyle;
+    }
+
+    this.s3Client = new S3Client(s3Config);
+
+    if (!appConfig.storage.s3UsePresignedUrls && appConfig.cloud.cloudFrontUrl) {
+      logger.warn(
+        'S3_USE_PRESIGNED_URLS=false: CloudFront settings are ignored in proxy mode; all object bytes are served through the backend'
+      );
+    }
+  }
+
+  private getS3Key(bucket: string, key: string): string {
+    return `${this.appKey}/${bucket}/${key}`;
+  }
+
+  /**
+   * Parent's S3 key path for the same bucket+key, when this provider is in
+   * branch mode. Returns null when no parent is configured (regular project).
+   */
+  private getParentS3Key(bucket: string, key: string): string | null {
+    return this.parentAppKey ? `${this.parentAppKey}/${bucket}/${key}` : null;
+  }
+
+  /**
+   * Branch fallback wrapper for read paths: try the branch's S3 key first;
+   * on a "not found" miss (provider returned null), retry with the parent's
+   * S3 key when one is configured. Errors other than NotFound propagate.
+   */
+  private async withFallback<T>(
+    branchPath: string,
+    parentPath: string | null,
+    op: (s3Key: string) => Promise<T | null>
+  ): Promise<T | null> {
+    const primary = await op(branchPath);
+    if (primary !== null) {
+      return primary;
+    }
+    if (!parentPath) {
+      return null;
+    }
+    return op(parentPath);
+  }
+
+  async putObject(
+    bucket: string,
+    key: string,
+    file: Express.Multer.File
+  ): Promise<{ etag: string }> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    const s3Key = this.getS3Key(bucket, key);
+
+    const command = new PutObjectCommand({
+      Bucket: this.s3Bucket,
+      Key: s3Key,
+      Body: file.buffer,
+      ContentType: file.mimetype || 'application/octet-stream',
+    });
+
+    try {
+      const resp = await this.s3Client.send(command);
+      return { etag: stripEtagQuotes(resp.ETag) };
+    } catch (error) {
+      logger.error('S3 Upload error', {
+        error: error instanceof Error ? error.message : String(error),
+        bucket,
+        key: s3Key,
+      });
+      throw error;
+    }
+  }
+
+  async getObject(bucket: string, key: string): Promise<Buffer | null> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    try {
+      return await this.withFallback(
+        this.getS3Key(bucket, key),
+        this.getParentS3Key(bucket, key),
+        async (s3Key) => this.tryGetObject(s3Key)
+      );
+    } catch (err) {
+      // Preserve prior service-layer behaviour: any error reading the object
+      // surfaces as null to callers. Parent fallback is only triggered on
+      // true 404s (tryGetObject rethrows non-404 errors), so transient
+      // failures on the branch path no longer silently read from the parent.
+      logger.warn('S3 getObject failed', {
+        bucket,
+        key,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      return null;
+    }
+  }
+
+  private async tryGetObject(s3Key: string): Promise<Buffer | null> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    try {
+      const command = new GetObjectCommand({
+        Bucket: this.s3Bucket,
+        Key: s3Key,
+      });
+      const response = await this.s3Client.send(command);
+      const chunks: Uint8Array[] = [];
+      const body = response.Body as AsyncIterable<Uint8Array>;
+      for await (const chunk of body) {
+        chunks.push(chunk);
+      }
+      return Buffer.concat(chunks);
+    } catch (err) {
+      if (isS3NotFound(err)) {
+        return null;
+      }
+      throw err;
+    }
+  }
+
+  async deleteObject(bucket: string, key: string): Promise<void> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    const command = new DeleteObjectCommand({
+      Bucket: this.s3Bucket,
+      Key: this.getS3Key(bucket, key),
+    });
+    await this.s3Client.send(command);
+  }
+
+  async deleteObjects(bucket: string, keys: string[]): Promise<DeleteObjectsResult> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    if (keys.length === 0) {
+      return { deleted: [], failed: [] };
+    }
+
+    const deleted: string[] = [];
+    const failed: Array<{ key: string; message: string }> = [];
+
+    for (let index = 0; index < keys.length; index += MAX_DELETE_OBJECTS_PER_REQUEST) {
+      const batchKeys = keys.slice(index, index + MAX_DELETE_OBJECTS_PER_REQUEST);
+      const s3KeyToOriginalKey = new Map(batchKeys.map((key) => [this.getS3Key(bucket, key), key]));
+      const command = new DeleteObjectsCommand({
+        Bucket: this.s3Bucket,
+        Delete: {
+          Objects: batchKeys.map((key) => ({ Key: this.getS3Key(bucket, key) })),
+          Quiet: true,
+        },
+      });
+      const response = await this.s3Client.send(command);
+      const responseErrors = response.Errors ?? [];
+      const errorsWithKeys = responseErrors.filter(
+        (error): error is (typeof responseErrors)[number] & { Key: string } =>
+          typeof error.Key === 'string' && error.Key.length > 0
+      );
+
+      if (responseErrors.length > 0) {
+        logger.warn('S3 batch object delete returned errors', {
+          bucket,
+          errors: responseErrors.map((error) => ({
+            key: error.Key,
+            code: error.Code,
+            message: error.Message,
+          })),
+        });
+      }
+
+      const hasUnkeyedErrors = errorsWithKeys.length !== responseErrors.length;
+      if (hasUnkeyedErrors) {
+        logger.warn('S3 batch object delete returned an error without a key', {
+          bucket,
+          batchSize: batchKeys.length,
+        });
+      }
+
+      const batchFailed = errorsWithKeys.map((error) => {
+        const originalKey = s3KeyToOriginalKey.get(error.Key) ?? error.Key;
+        return {
+          key: originalKey,
+          message: 'Failed to delete object',
+        };
+      });
+
+      const failedKeys = new Set(batchFailed.map((error) => error.key));
+      deleted.push(...batchKeys.filter((key) => !failedKeys.has(key)));
+      failed.push(...batchFailed);
+    }
+
+    return { deleted, failed };
+  }
+
+  async createBucket(_bucket: string): Promise<void> {
+    // In S3 with multi-tenant, we don't create actual buckets
+    // We just use folders under the app key
+  }
+
+  async deleteBucket(bucket: string): Promise<void> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    // List and delete all objects in the "bucket" (folder)
+    const prefix = `${this.appKey}/${bucket}/`;
+
+    let continuationToken: string | undefined;
+    do {
+      const listCommand = new ListObjectsV2Command({
+        Bucket: this.s3Bucket,
+        Prefix: prefix,
+        ContinuationToken: continuationToken,
+      });
+      const listResponse = await this.s3Client.send(listCommand);
+
+      if (listResponse.Contents && listResponse.Contents.length) {
+        const deleteCommand = new DeleteObjectsCommand({
+          Bucket: this.s3Bucket,
+          Delete: {
+            Objects: listResponse.Contents.filter((obj) => obj.Key !== undefined).map((obj) => ({
+              Key: obj.Key as string,
+            })),
+            Quiet: true,
+          },
+        });
+        await this.s3Client.send(deleteCommand);
+      }
+
+      continuationToken = listResponse.NextContinuationToken;
+    } while (continuationToken);
+  }
+
+  // Presigned URLs are handed to clients only when the endpoint is reachable
+  // by them. S3_USE_PRESIGNED_URLS=false switches to proxy mode: strategies point
+  // at the backend routes instead, mirroring LocalStorageProvider.
+  supportsPresignedUrls(): boolean {
+    return appConfig.storage.s3UsePresignedUrls;
+  }
+
+  async getUploadStrategy(
+    bucket: string,
+    key: string,
+    metadata: { contentType?: string; size?: number },
+    maxFileSizeBytes: number,
+    contentType: string = 'application/octet-stream'
+  ): Promise<UploadStrategyResponse> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+
+    // Proxy mode: the endpoint is not client-reachable (or lacks POST-policy
+    // support), so hand back the backend PUT route — same contract as
+    // LocalStorageProvider. The route writes through provider.putObject.
+    if (!appConfig.storage.s3UsePresignedUrls) {
+      const baseUrl = getApiBaseUrl();
+      return {
+        method: 'direct',
+        uploadUrl: `${baseUrl}/api/storage/buckets/${bucket}/objects/${encodeURIComponent(key)}`,
+        key,
+        confirmRequired: false,
+      };
+    }
+
+    const s3Key = this.getS3Key(bucket, key);
+    const expiresIn = ONE_HOUR_IN_SECONDS; // 1 hour
+
+    try {
+      // Generate presigned POST URL for multipart form upload
+      const { url, fields } = await createPresignedPost(this.s3Client, {
+        Bucket: this.s3Bucket,
+        Key: s3Key,
+        Fields: {
+          'Content-Type': contentType,
+        },
+        Conditions: [
+          [
+            'content-length-range',
+            0,
+            Math.min(metadata.size || maxFileSizeBytes, maxFileSizeBytes),
+          ],
+          ['eq', '$Content-Type', contentType],
+        ],
+        Expires: expiresIn,
+      });
+
+      return {
+        method: 'presigned',
+        uploadUrl: url,
+        fields,
+        key,
+        confirmRequired: true,
+        confirmUrl: `/api/storage/buckets/${bucket}/objects/${encodeURIComponent(key)}/confirm-upload`,
+        expiresAt: new Date(Date.now() + expiresIn * 1000),
+      };
+    } catch (error) {
+      logger.error('Failed to generate presigned upload URL', {
+        error: error instanceof Error ? error.message : String(error),
+        bucket,
+        key,
+      });
+      throw error;
+    }
+  }
+
+  async getDownloadStrategy(
+    bucket: string,
+    key: string,
+    expiresIn: number = ONE_HOUR_IN_SECONDS,
+    isPublic: boolean = false,
+    version?: string | null,
+    options?: { asAttachment?: boolean }
+  ): Promise<DownloadStrategyResponse> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+
+    // Proxy mode: direct URL onto the backend GET route, mirroring
+    // LocalStorageProvider. Safe to append the `?v=` cache stamp (no
+    // signature covers the query string). The branch-mode HEAD probe is
+    // deliberately skipped — the GET route resolves parent fallback itself
+    // via getObjectStream. asAttachment is ignored for the same reason the
+    // local provider ignores it: the route re-derives Content-Disposition
+    // from the stored MIME type.
+    if (!appConfig.storage.s3UsePresignedUrls) {
+      const baseUrl = getApiBaseUrl();
+      const base = `${baseUrl}/api/storage/buckets/${bucket}/objects/${encodeURIComponent(key)}`;
+      return {
+        method: 'direct',
+        url: version ? `${base}?v=${encodeURIComponent(version)}` : base,
+      };
+    }
+
+    // In branch mode, HEAD the branch path first; if missing and a parent
+    // is configured, sign the parent's S3 path instead. The HEAD adds one
+    // round-trip but is required: we can't tell from key alone whether the
+    // object lives on the branch or fell through to parent.
+    const branchKey = this.getS3Key(bucket, key);
+    const parentKey = this.getParentS3Key(bucket, key);
+    let s3Key = branchKey;
+    if (parentKey) {
+      try {
+        const branchExists = await this.tryHeadObject(branchKey);
+        if (!branchExists) {
+          s3Key = parentKey;
+        }
+      } catch (headErr) {
+        // HEAD failures (network, IAM, throttling) shouldn't break URL
+        // generation. Default to the branch key; if the object truly only
+        // lives on the parent path, the signed URL will 404 at download
+        // time — degraded but recoverable, vs. failing the whole call.
+        logger.warn('Branch HEAD check failed in getDownloadStrategy; signing branch key', {
+          bucket,
+          key,
+          error: headErr instanceof Error ? headErr.message : String(headErr),
+        });
+      }
+    }
+    // Public files get longer expiration (7 days), private files get shorter (1 hour default)
+    const actualExpiresIn = isPublic ? SEVEN_DAYS_IN_SECONDS : expiresIn; // 604800 = 7 days
+    const cloudFrontUrl = appConfig.cloud.cloudFrontUrl;
+
+    try {
+      // If CloudFront URL is configured and not using a custom S3 endpoint, use CloudFront for downloads
+      // CloudFront only works with AWS S3, not with S3-compatible providers like Wasabi/MinIO
+      if (cloudFrontUrl && !appConfig.storage.s3EndpointUrl) {
+        const cloudFrontKeyPairId = appConfig.cloud.cloudFrontKeyPairId;
+        const cloudFrontPrivateKey = appConfig.cloud.cloudFrontPrivateKey;
+
+        if (!cloudFrontKeyPairId || !cloudFrontPrivateKey) {
+          logger.warn(
+            'CloudFront URL configured but missing key pair ID or private key, falling back to S3'
+          );
+        } else {
+          try {
+            // Generate CloudFront signed URL
+            // IMPORTANT: URL-encode the S3 key to match what CloudFront receives
+            // This ensures the signature matches for files with spaces, parentheses, etc.
+            const encodedS3Key = s3Key
+              .split('/')
+              .map((segment) => encodeURIComponent(segment))
+              .join('/');
+            const baseUrl = `${cloudFrontUrl.replace(/\/$/, '')}/${encodedS3Key}`;
+            // Canned-policy signatures cover the full Resource URL minus the
+            // three CF params (Expires / Signature / Key-Pair-Id). CloudFront
+            // reconstructs Resource by stripping those three from the request
+            // URL, so any *other* query — including our `?v=<version>` cache
+            // stamp — must be in the URL *before* signing or verification
+            // fails with 403. Append v first, then sign.
+            let urlToSign = version ? `${baseUrl}?v=${encodeURIComponent(version)}` : baseUrl;
+            if (options?.asAttachment) {
+              const attachParam = 'response-content-disposition=attachment';
+              urlToSign = urlToSign.includes('?')
+                ? `${urlToSign}&${attachParam}`
+                : `${urlToSign}?${attachParam}`;
+            }
+
+            // Convert escaped newlines to actual newlines in the private key
+            const formattedPrivateKey = cloudFrontPrivateKey.replace(/\\n/g, '\n');
+
+            // dateLessThan can be string | number | Date - using Date object directly
+            const dateLessThan = new Date(Date.now() + actualExpiresIn * 1000);
+
+            const signedUrl = getCloudFrontSignedUrl({
+              url: urlToSign,
+              keyPairId: cloudFrontKeyPairId,
+              privateKey: formattedPrivateKey,
+              dateLessThan,
+            });
+
+            logger.info('CloudFront signed URL generated successfully.');
+
+            return {
+              method: 'presigned',
+              url: signedUrl,
+              expiresAt: dateLessThan,
+            };
+          } catch (cfError) {
+            logger.error('Failed to generate CloudFront signed URL, falling back to S3', {
+              error: cfError instanceof Error ? cfError.message : String(cfError),
+              bucket,
+              key,
+            });
+            // Fall through to S3 signed URL generation
+          }
+        }
+      }
+
+      // Note: isPublic here refers to the application-level setting,
+      // not the actual S3 bucket policy. In a multi-tenant setup,
+      // we're using a single S3 bucket with folder-based isolation,
+      // so we always use presigned URLs for security.
+      // The "public" setting only affects the URL expiration time.
+
+      // Always generate presigned URL for security in multi-tenant environment.
+      // SigV4's canonical query string covers every parameter in the URL, so
+      // we intentionally do NOT append `?v=<version>` here — doing so after
+      // signing would yield SignatureDoesNotMatch. When no CloudFront is
+      // configured there is no CDN in front of S3 anyway; the per-request
+      // signature (X-Amz-Signature, X-Amz-Date) already makes the URL unique.
+      const command = new GetObjectCommand({
+        Bucket: this.s3Bucket,
+        Key: s3Key,
+        ...(options?.asAttachment ? { ResponseContentDisposition: 'attachment' } : {}),
+      });
+
+      const url = await getSignedUrl(this.s3Client, command, { expiresIn: actualExpiresIn });
+
+      return {
+        method: 'presigned',
+        url,
+        expiresAt: new Date(Date.now() + actualExpiresIn * 1000),
+      };
+    } catch (error) {
+      logger.error('Failed to generate download URL', {
+        error: error instanceof Error ? error.message : String(error),
+        bucket,
+        key,
+      });
+      throw error;
+    }
+  }
+
+  async verifyObjectExists(
+    bucket: string,
+    key: string
+  ): Promise<{ exists: boolean; size?: number; etag?: string }> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+
+    const s3Key = this.getS3Key(bucket, key);
+
+    try {
+      const command = new HeadObjectCommand({
+        Bucket: this.s3Bucket,
+        Key: s3Key,
+      });
+      const response = await this.s3Client.send(command);
+      return {
+        exists: true,
+        size: response.ContentLength,
+        etag: stripEtagQuotes(response.ETag) || undefined,
+      };
+    } catch {
+      return { exists: false };
+    }
+  }
+
+  // ==========================================================================
+  // S3 Protocol extensions
+  // ==========================================================================
+
+  async putObjectStream(
+    bucket: string,
+    key: string,
+    body: Readable,
+    opts: { contentType?: string; contentLength?: number }
+  ): Promise<{ etag: string; size: number }> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    const s3Key = this.getS3Key(bucket, key);
+    const resp = await this.s3Client.send(
+      new PutObjectCommand({
+        Bucket: this.s3Bucket,
+        Key: s3Key,
+        Body: body,
+        ContentType: opts.contentType,
+        ContentLength: opts.contentLength,
+      })
+    );
+    return { etag: stripEtagQuotes(resp.ETag), size: opts.contentLength ?? 0 };
+  }
+
+  async getObjectStream(
+    bucket: string,
+    key: string,
+    opts?: { range?: string }
+  ): Promise<GetObjectResult> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    const branchKey = this.getS3Key(bucket, key);
+    const parentKey = this.getParentS3Key(bucket, key);
+    const range = opts?.range;
+    const result = await this.withFallback(branchKey, parentKey, async (s3Key) =>
+      this.tryGetObjectStream(s3Key, range)
+    );
+    if (!result) {
+      // Missing object surfaces as a typed error (callers expect a stream,
+      // not null) so routes can map it to a 404/NoSuchKey by instanceof.
+      throw new ObjectNotFoundError();
+    }
+    return result;
+  }
+
+  private async tryGetObjectStream(
+    s3Key: string,
+    range: string | undefined
+  ): Promise<GetObjectResult | null> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    try {
+      const resp = await this.s3Client.send(
+        new GetObjectCommand({ Bucket: this.s3Bucket, Key: s3Key, Range: range })
+      );
+      if (!resp.Body) {
+        return null;
+      }
+      return {
+        body: resp.Body as Readable,
+        size: Number(resp.ContentLength ?? 0),
+        etag: stripEtagQuotes(resp.ETag),
+        contentType: resp.ContentType,
+        lastModified: resp.LastModified ?? new Date(),
+        contentRange: resp.ContentRange,
+      };
+    } catch (err) {
+      if (isS3NotFound(err)) {
+        return null;
+      }
+      throw err;
+    }
+  }
+
+  async headObject(bucket: string, key: string): Promise<ObjectMetadata | null> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    return this.withFallback(
+      this.getS3Key(bucket, key),
+      this.getParentS3Key(bucket, key),
+      async (s3Key) => this.tryHeadObject(s3Key)
+    );
+  }
+
+  private async tryHeadObject(s3Key: string): Promise<ObjectMetadata | null> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    try {
+      const resp = await this.s3Client.send(
+        new HeadObjectCommand({ Bucket: this.s3Bucket, Key: s3Key })
+      );
+      return {
+        size: Number(resp.ContentLength ?? 0),
+        etag: stripEtagQuotes(resp.ETag),
+        contentType: resp.ContentType,
+        lastModified: resp.LastModified ?? new Date(),
+      };
+    } catch (err: unknown) {
+      if (isS3NotFound(err)) {
+        return null;
+      }
+      throw err;
+    }
+  }
+
+  async copyObject(
+    srcBucket: string,
+    srcKey: string,
+    dstBucket: string,
+    dstKey: string
+  ): Promise<{ etag: string; lastModified: Date }> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    // Destination always writes to the branch path; source falls back to the
+    // parent path on 404 so inherited (not-yet-overwritten) files can be
+    // copied. S3 CopyObject is atomic — a NoSuchKey on source leaves no
+    // partial destination, so retrying is safe.
+    const dstS3Key = this.getS3Key(dstBucket, dstKey);
+    const branchSrcKey = this.getS3Key(srcBucket, srcKey);
+    try {
+      return await this.tryCopyObject(branchSrcKey, dstS3Key);
+    } catch (err) {
+      if (!isS3NotFound(err)) {
+        throw err;
+      }
+      const parentSrcKey = this.getParentS3Key(srcBucket, srcKey);
+      if (!parentSrcKey) {
+        throw err;
+      }
+      return this.tryCopyObject(parentSrcKey, dstS3Key);
+    }
+  }
+
+  private async tryCopyObject(
+    srcS3Key: string,
+    dstS3Key: string
+  ): Promise<{ etag: string; lastModified: Date }> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    // CopySource must be `<bucket>/<key>` with forward slashes preserved.
+    // Encoding the whole key with encodeURIComponent turns '/' into '%2F' and
+    // S3 then fails to resolve the source. Encode each segment individually.
+    const encodedKey = srcS3Key
+      .split('/')
+      .map((seg) => encodeURIComponent(seg))
+      .join('/');
+    const source = `${this.s3Bucket}/${encodedKey}`;
+    const resp = await this.s3Client.send(
+      new CopyObjectCommand({
+        Bucket: this.s3Bucket,
+        Key: dstS3Key,
+        CopySource: source,
+      })
+    );
+    return {
+      etag: stripEtagQuotes(resp.CopyObjectResult?.ETag),
+      lastModified: resp.CopyObjectResult?.LastModified ?? new Date(),
+    };
+  }
+
+  async createMultipartUpload(
+    bucket: string,
+    key: string,
+    opts: { contentType?: string }
+  ): Promise<{ uploadId: string }> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    const resp = await this.s3Client.send(
+      new CreateMultipartUploadCommand({
+        Bucket: this.s3Bucket,
+        Key: this.getS3Key(bucket, key),
+        ContentType: opts.contentType,
+      })
+    );
+    if (!resp.UploadId) {
+      throw new Error('CreateMultipartUpload returned no UploadId');
+    }
+    return { uploadId: resp.UploadId };
+  }
+
+  async uploadPart(
+    bucket: string,
+    key: string,
+    uploadId: string,
+    partNumber: number,
+    body: Readable,
+    contentLength: number
+  ): Promise<{ etag: string }> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    const resp = await this.s3Client.send(
+      new UploadPartCommand({
+        Bucket: this.s3Bucket,
+        Key: this.getS3Key(bucket, key),
+        UploadId: uploadId,
+        PartNumber: partNumber,
+        Body: body,
+        ContentLength: contentLength,
+      })
+    );
+    return { etag: stripEtagQuotes(resp.ETag) };
+  }
+
+  async completeMultipartUpload(
+    bucket: string,
+    key: string,
+    uploadId: string,
+    parts: Array<{ partNumber: number; etag: string }>
+  ): Promise<{ etag: string; size: number }> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    const resp = await this.s3Client.send(
+      new CompleteMultipartUploadCommand({
+        Bucket: this.s3Bucket,
+        Key: this.getS3Key(bucket, key),
+        UploadId: uploadId,
+        MultipartUpload: {
+          Parts: parts.map((p) => ({ ETag: `"${p.etag}"`, PartNumber: p.partNumber })),
+        },
+      })
+    );
+    // After S3 successfully completes the multipart upload, the object must
+    // be head-able. If it isn't, something is wrong with the backend or we're
+    // looking at consistency lag — either way, returning size:0 would corrupt
+    // storage.objects metadata. Fail fast instead.
+    const head = await this.headObject(bucket, key);
+    if (!head) {
+      throw new Error(
+        `CompleteMultipartUpload succeeded but HEAD returned null for ${bucket}/${key}`
+      );
+    }
+    return { etag: stripEtagQuotes(resp.ETag), size: head.size };
+  }
+
+  async abortMultipartUpload(bucket: string, key: string, uploadId: string): Promise<void> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    await this.s3Client.send(
+      new AbortMultipartUploadCommand({
+        Bucket: this.s3Bucket,
+        Key: this.getS3Key(bucket, key),
+        UploadId: uploadId,
+      })
+    );
+  }
+
+  async listParts(
+    bucket: string,
+    key: string,
+    uploadId: string,
+    opts: { maxParts?: number; partNumberMarker?: number }
+  ): Promise<{
+    parts: Array<{ partNumber: number; etag: string; size: number; lastModified: Date }>;
+    isTruncated: boolean;
+    nextPartNumberMarker?: number;
+  }> {
+    if (!this.s3Client) {
+      throw new Error('S3 client not initialized');
+    }
+    const resp = await this.s3Client.send(
+      new ListPartsCommand({
+        Bucket: this.s3Bucket,
+        Key: this.getS3Key(bucket, key),
+        UploadId: uploadId,
+        MaxParts: opts.maxParts,
+        PartNumberMarker:
+          opts.partNumberMarker !== undefined && opts.partNumberMarker !== null
+            ? String(opts.partNumberMarker)
+            : undefined,
+      })
+    );
+    return {
+      parts: (resp.Parts ?? []).map((p) => ({
+        partNumber: p.PartNumber ?? 0,
+        etag: stripEtagQuotes(p.ETag),
+        size: Number(p.Size ?? 0),
+        lastModified: p.LastModified ?? new Date(),
+      })),
+      isTruncated: !!resp.IsTruncated,
+      nextPartNumberMarker: resp.NextPartNumberMarker
+        ? Number(resp.NextPartNumberMarker)
+        : undefined,
+    };
+  }
+}

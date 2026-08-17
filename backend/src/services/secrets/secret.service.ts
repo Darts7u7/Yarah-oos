@@ -1,0 +1,950 @@
+import { Pool, PoolClient } from 'pg';
+import crypto from 'crypto';
+import { DatabaseManager } from '@/infra/database/database.manager.js';
+import { AppError } from '@/utils/errors.js';
+import logger from '@/utils/logger.js';
+import { EncryptionManager } from '@/infra/security/encryption.manager.js';
+import { SecretSchema, CreateSecretRequest, ERROR_CODES } from '@insforge/shared-schemas';
+import { appConfig } from '@/infra/config/app.config.js';
+
+export interface CreateSecretInput extends CreateSecretRequest {
+  isReserved?: boolean;
+  expiresAt?: Date;
+}
+
+export interface UpdateSecretInput {
+  value?: string;
+  isActive?: boolean;
+  isReserved?: boolean;
+  expiresAt?: Date | null;
+}
+
+interface AnonKeyCache {
+  /** Active anon key plus any grace-period keys still valid at load time */
+  keys: { value: string; expiresAt: Date | null }[];
+  loadedAt: number;
+}
+
+// Anon key verification runs on every anonymous request (the hottest public
+// path), so verified keys are cached in memory briefly instead of hitting the
+// database per request. Single-instance server, so no cross-instance
+// invalidation is needed; rotation invalidates the cache directly.
+const ANON_KEY_CACHE_TTL_MS = 60 * 1000;
+
+// Old anon keys are embedded in deployed frontends and mobile binaries that
+// may sit in app-store review, so the default grace period is much longer
+// than the admin API key's 24 hours.
+const ANON_KEY_DEFAULT_GRACE_HOURS = 168;
+
+export class SecretService {
+  private static instance: SecretService;
+  private pool: Pool | null = null;
+  private anonKeyCache: AnonKeyCache | null = null;
+  private anonKeyLoadPromise: Promise<AnonKeyCache> | null = null;
+
+  private constructor() {
+    // Encryption is now handled by the shared EncryptionManager
+  }
+
+  public static getInstance(): SecretService {
+    if (!SecretService.instance) {
+      SecretService.instance = new SecretService();
+    }
+    return SecretService.instance;
+  }
+
+  private getPool(): Pool {
+    if (!this.pool) {
+      this.pool = DatabaseManager.getInstance().getPool();
+    }
+    return this.pool;
+  }
+
+  /**
+   * Create a new secret
+   */
+  async createSecret(input: CreateSecretInput, client?: PoolClient): Promise<{ id: string }> {
+    try {
+      const encryptedValue = EncryptionManager.encrypt(input.value);
+      const executor = client ?? this.getPool();
+
+      // The dashboard's DELETE endpoint deactivates rows instead of removing
+      // them, but UNIQUE(key) counts inactive rows too — so a soft-deleted
+      // row would block every future INSERT of the same key (23505) with no
+      // way to recover from the dashboard. Revive such a row instead.
+      const revived = await executor.query(
+        `UPDATE system.secrets
+         SET value_ciphertext = $2,
+             is_reserved = $3,
+             expires_at = $4,
+             is_active = true,
+             last_used_at = NULL
+         WHERE key = $1 AND is_active = false AND is_reserved = false
+         RETURNING id`,
+        [input.key, encryptedValue, input.isReserved || false, input.expiresAt || null]
+      );
+
+      if (revived.rows.length) {
+        logger.info('Secret revived', { id: revived.rows[0].id, key: input.key });
+        return { id: revived.rows[0].id };
+      }
+
+      const result = await executor.query(
+        `INSERT INTO system.secrets (key, value_ciphertext, is_reserved, expires_at)
+         VALUES ($1, $2, $3, $4)
+         RETURNING id`,
+        [input.key, encryptedValue, input.isReserved || false, input.expiresAt || null]
+      );
+
+      logger.info('Secret created', { id: result.rows[0].id, key: input.key });
+      return { id: result.rows[0].id };
+    } catch (error) {
+      logger.error('Failed to create secret', { error, key: input.key });
+      if ((error as { code?: string }).code === '23505') {
+        throw new AppError(
+          `Secret already exists: ${input.key}`,
+          409,
+          ERROR_CODES.SECRET_ALREADY_EXISTS,
+          `A secret named ${input.key} already exists in this project. Update or delete it in the Secrets tab, or use a different name.`
+        );
+      }
+      throw new Error('Failed to create secret');
+    }
+  }
+
+  /**
+   * Get a decrypted secret by ID
+   */
+  async getSecretById(id: string): Promise<string | null> {
+    try {
+      const result = await this.getPool().query(
+        `UPDATE system.secrets
+         SET last_used_at = NOW()
+         WHERE id = $1 AND is_active = true
+         AND (expires_at IS NULL OR expires_at > NOW())
+         RETURNING value_ciphertext`,
+        [id]
+      );
+
+      if (!result.rows.length) {
+        return null;
+      }
+
+      const decryptedValue = EncryptionManager.decrypt(result.rows[0].value_ciphertext);
+      logger.info('Secret retrieved', { id });
+      return decryptedValue;
+    } catch (error) {
+      logger.error('Failed to get secret', { error, id });
+      throw new Error('Failed to get secret');
+    }
+  }
+
+  /**
+   * Get a decrypted secret by key
+   */
+  async getSecretByKey(key: string): Promise<string | null> {
+    try {
+      const result = await this.getPool().query(
+        `UPDATE system.secrets
+         SET last_used_at = NOW()
+         WHERE key = $1 AND is_active = true
+         AND (expires_at IS NULL OR expires_at > NOW())
+         RETURNING value_ciphertext`,
+        [key]
+      );
+
+      if (!result.rows.length) {
+        return null;
+      }
+
+      const decryptedValue = EncryptionManager.decrypt(result.rows[0].value_ciphertext);
+      logger.info('Secret retrieved by key', { key });
+      return decryptedValue;
+    } catch (error) {
+      logger.error('Failed to get secret by key', { error, key });
+      throw new Error('Failed to get secret');
+    }
+  }
+
+  /**
+   * List all secrets (without decrypting values)
+   */
+  async listSecrets(): Promise<SecretSchema[]> {
+    try {
+      const result = await this.getPool().query(
+        `SELECT
+          id,
+          key,
+          is_active as "isActive",
+          is_reserved as "isReserved",
+          last_used_at as "lastUsedAt",
+          expires_at as "expiresAt",
+          created_at as "createdAt",
+          updated_at as "updatedAt"
+         FROM system.secrets
+         ORDER BY created_at DESC`
+      );
+
+      return result.rows;
+    } catch (error) {
+      logger.error('Failed to list secrets', { error });
+      throw new Error('Failed to list secrets');
+    }
+  }
+
+  /**
+   * Update a secret
+   */
+  async updateSecret(id: string, input: UpdateSecretInput, client?: PoolClient): Promise<boolean> {
+    try {
+      const updates: string[] = [];
+      const values: (string | boolean | Date | null)[] = [];
+      let paramCount = 1;
+      const executor = client ?? this.getPool();
+
+      if (input.value !== undefined) {
+        const encryptedValue = EncryptionManager.encrypt(input.value);
+        updates.push(`value_ciphertext = $${paramCount++}`);
+        values.push(encryptedValue);
+      }
+
+      if (input.isActive !== undefined) {
+        updates.push(`is_active = $${paramCount++}`);
+        values.push(input.isActive);
+      }
+
+      if (input.isReserved !== undefined) {
+        updates.push(`is_reserved = $${paramCount++}`);
+        values.push(input.isReserved);
+      }
+
+      if (input.expiresAt !== undefined) {
+        updates.push(`expires_at = $${paramCount++}`);
+        values.push(input.expiresAt);
+      }
+
+      if (updates.length === 0) {
+        return false;
+      }
+
+      values.push(id);
+
+      const result = await executor.query(
+        `UPDATE system.secrets
+         SET ${updates.join(', ')}
+         WHERE id = $${paramCount}`,
+        values
+      );
+
+      const success = (result.rowCount ?? 0) > 0;
+      if (success) {
+        logger.info('Secret updated', { id });
+      }
+      return success;
+    } catch (error) {
+      logger.error('Failed to update secret', { error, id });
+      throw new Error('Failed to update secret');
+    }
+  }
+
+  /**
+   * Update a secret by key
+   */
+  async updateSecretByKey(
+    key: string,
+    input: UpdateSecretInput,
+    client?: PoolClient
+  ): Promise<boolean> {
+    try {
+      const updates: string[] = [];
+      const values: (string | boolean | Date | null)[] = [];
+      let paramCount = 1;
+      const executor = client ?? this.getPool();
+
+      if (input.value !== undefined) {
+        const encryptedValue = EncryptionManager.encrypt(input.value);
+        updates.push(`value_ciphertext = $${paramCount++}`);
+        values.push(encryptedValue);
+      }
+
+      if (input.isActive !== undefined) {
+        updates.push(`is_active = $${paramCount++}`);
+        values.push(input.isActive);
+      }
+
+      if (input.isReserved !== undefined) {
+        updates.push(`is_reserved = $${paramCount++}`);
+        values.push(input.isReserved);
+      }
+
+      if (input.expiresAt !== undefined) {
+        updates.push(`expires_at = $${paramCount++}`);
+        values.push(input.expiresAt);
+      }
+
+      if (updates.length === 0) {
+        return false;
+      }
+
+      values.push(key);
+
+      const result = await executor.query(
+        `UPDATE system.secrets
+         SET ${updates.join(', ')}
+         WHERE key = $${paramCount}`,
+        values
+      );
+
+      const success = (result.rowCount ?? 0) > 0;
+      if (success) {
+        logger.info('Secret updated by key', { key });
+      }
+      return success;
+    } catch (error) {
+      logger.error('Failed to update secret by key', { error, key });
+      throw new Error('Failed to update secret');
+    }
+  }
+
+  /**
+   * Delete a secret by key.
+   *
+   * Reserved secrets are skipped: the statement matches zero rows and this
+   * returns false. That is the guard behind the Secrets UI, so it stays the
+   * default. A feature that owns a reserved secret and needs to remove it must
+   * say so explicitly via deleteReservedSecretByKey().
+   */
+  async deleteSecretByKey(key: string, client?: PoolClient): Promise<boolean> {
+    return this.runDeleteByKey(key, false, client);
+  }
+
+  /**
+   * Delete a secret by key, reserved or not.
+   *
+   * Only for a service removing a reserved secret it created itself — e.g.
+   * ApifyConfigService dropping APIFY_API_TOKEN when the admin disconnects
+   * Apify. Without this the disconnect would report success while leaving the
+   * credential in the store. Never wire this to a generic, user-facing secrets
+   * route: reserved secrets still show up in the Secrets list — `isReserved`
+   * does not hide them — but they are deliberately not editable or deletable
+   * there, so the owning service is the only thing allowed to remove one.
+   */
+  async deleteReservedSecretByKey(key: string, client?: PoolClient): Promise<boolean> {
+    return this.runDeleteByKey(key, true, client);
+  }
+
+  private async runDeleteByKey(
+    key: string,
+    allowReserved: boolean,
+    client?: PoolClient
+  ): Promise<boolean> {
+    try {
+      const executor = client ?? this.getPool();
+      const result = await executor.query(
+        allowReserved
+          ? 'DELETE FROM system.secrets WHERE key = $1'
+          : 'DELETE FROM system.secrets WHERE key = $1 AND is_reserved = false',
+        [key]
+      );
+
+      const success = (result.rowCount ?? 0) > 0;
+      if (success) {
+        logger.info('Secret deleted by key', { key, allowReserved });
+      }
+      return success;
+    } catch (error) {
+      logger.error('Failed to delete secret by key', { error, key, allowReserved });
+      throw new Error('Failed to delete secret');
+    }
+  }
+
+  /**
+   * Check if a secret value matches the stored value
+   */
+  async checkSecretByKey(key: string, value: string): Promise<boolean> {
+    try {
+      // Optimized: Single query that retrieves and updates in one operation
+      const result = await this.getPool().query(
+        `UPDATE system.secrets
+         SET last_used_at = NOW()
+         WHERE key = $1
+         AND is_active = true
+         AND (expires_at IS NULL OR expires_at > NOW())
+         RETURNING value_ciphertext`,
+        [key]
+      );
+
+      if (!result.rows.length) {
+        logger.warn('Secret not found for verification', { key });
+        return false;
+      }
+
+      const decryptedValue = EncryptionManager.decrypt(result.rows[0].value_ciphertext);
+      // Use constant-time comparison to prevent timing attacks
+      const decryptedBuffer = Buffer.from(decryptedValue);
+      const valueBuffer = Buffer.from(value);
+      const matches =
+        decryptedBuffer.length === valueBuffer.length &&
+        crypto.timingSafeEqual(decryptedBuffer, valueBuffer);
+
+      if (matches) {
+        logger.info('Secret check successful', { key });
+      } else {
+        logger.warn('Secret check failed - value mismatch', { key });
+      }
+
+      return matches;
+    } catch (error) {
+      logger.error('Failed to check secret', { error, key });
+      return false;
+    }
+  }
+
+  /**
+   * Delete a secret
+   */
+  async deleteSecret(id: string, client?: PoolClient): Promise<boolean> {
+    try {
+      // Optimized: Single query with WHERE clause to prevent deleting reserved secrets
+      const executor = client ?? this.getPool();
+      const result = await executor.query(
+        'DELETE FROM system.secrets WHERE id = $1 AND is_reserved = false',
+        [id]
+      );
+
+      const success = (result.rowCount ?? 0) > 0;
+      if (success) {
+        logger.info('Secret deleted', { id });
+      } else {
+        // Check if it exists but is reserved
+        const checkResult = await executor.query(
+          'SELECT is_reserved FROM system.secrets WHERE id = $1',
+          [id]
+        );
+        if (checkResult.rows.length && checkResult.rows[0].is_reserved) {
+          throw new Error('Cannot delete reserved secret');
+        }
+      }
+      return success;
+    } catch (error) {
+      logger.error('Failed to delete secret', { error, id });
+      throw new Error('Failed to delete secret');
+    }
+  }
+
+  /**
+   * Rotate a secret (create new value, keep old for grace period)
+   */
+  async rotateSecret(id: string, newValue: string): Promise<{ newId: string }> {
+    const client = await this.getPool().connect();
+    try {
+      await client.query('BEGIN');
+
+      const oldSecretResult = await client.query(`SELECT key FROM system.secrets WHERE id = $1`, [
+        id,
+      ]);
+
+      if (!oldSecretResult.rows.length) {
+        throw new Error('Secret not found');
+      }
+
+      const secretKey = oldSecretResult.rows[0].key;
+
+      await client.query(
+        `UPDATE system.secrets
+         SET is_active = false,
+             expires_at = NOW() + INTERVAL '24 hours'
+         WHERE id = $1`,
+        [id]
+      );
+
+      const encryptedValue = EncryptionManager.encrypt(newValue);
+      const newSecretResult = await client.query(
+        `INSERT INTO system.secrets (key, value_ciphertext)
+         VALUES ($1, $2)
+         RETURNING id`,
+        [secretKey, encryptedValue]
+      );
+
+      await client.query('COMMIT');
+
+      logger.info('Secret rotated', {
+        oldId: id,
+        newId: newSecretResult.rows[0].id,
+        key: secretKey,
+      });
+
+      return { newId: newSecretResult.rows[0].id };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      logger.error('Failed to rotate secret', { error, id });
+      throw new Error('Failed to rotate secret');
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Clean up expired secrets
+   */
+  async cleanupExpiredSecrets(): Promise<number> {
+    try {
+      const result = await this.getPool().query(
+        `DELETE FROM system.secrets
+         WHERE expires_at IS NOT NULL
+         AND expires_at < NOW()`
+      );
+
+      const deletedCount = result.rowCount ?? 0;
+      if (deletedCount > 0) {
+        logger.info('Expired secrets cleaned up', { count: deletedCount });
+      }
+      return deletedCount;
+    } catch (error) {
+      logger.error('Failed to cleanup expired secrets', { error });
+      throw new Error('Failed to cleanup expired secrets');
+    }
+  }
+
+  /**
+   * Generate a new API key with 'ik_' prefix (Insforge Key)
+   */
+  generateApiKey(): string {
+    return 'ik_' + crypto.randomBytes(32).toString('hex');
+  }
+
+  /**
+   * Verify API key against database
+   * Checks both active key and rotated keys in grace period
+   */
+  async verifyApiKey(apiKey: string): Promise<boolean> {
+    if (!apiKey) {
+      return false;
+    }
+
+    // Check active API_KEY first
+    const activeMatch = await this.checkSecretByKey('API_KEY', apiKey);
+    if (activeMatch) {
+      return true;
+    }
+
+    // Check rotated API keys in grace period (API_KEY_OLD_* with expires_at > NOW)
+    let rows: { value_ciphertext: string }[] = [];
+    try {
+      const result = await this.getPool().query(
+        `SELECT value_ciphertext FROM system.secrets
+         WHERE key LIKE 'API_KEY_OLD_%'
+         AND is_active = true
+         AND expires_at IS NOT NULL
+         AND expires_at > NOW()`,
+        []
+      );
+      rows = result.rows;
+    } catch (error) {
+      logger.error('Failed to query grace-period API keys', { error });
+      return false;
+    }
+
+    const valueBuffer = Buffer.from(apiKey);
+    for (const row of rows) {
+      try {
+        const decryptedValue = EncryptionManager.decrypt(row.value_ciphertext);
+        const decryptedBuffer = Buffer.from(decryptedValue);
+        if (
+          decryptedBuffer.length === valueBuffer.length &&
+          crypto.timingSafeEqual(decryptedBuffer, valueBuffer)
+        ) {
+          return true;
+        }
+      } catch (error) {
+        logger.error('Failed to decrypt grace-period API key', { error });
+        continue;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Rotate API key with grace period for old key
+   * Old key remains valid for specified grace period (default 24 hours)
+   */
+  async rotateApiKey(
+    gracePeriodHours: number = 24
+  ): Promise<{ newApiKey: string; oldKeyExpiresAt: Date }> {
+    // Validate gracePeriodHours
+    const isValidHours =
+      typeof gracePeriodHours === 'number' &&
+      Number.isFinite(gracePeriodHours) &&
+      gracePeriodHours >= 0;
+    const validatedHours = isValidHours ? gracePeriodHours : 24;
+
+    const oldKeyExpiresAt = new Date(Date.now() + validatedHours * 60 * 60 * 1000);
+
+    const client = await this.getPool().connect();
+    try {
+      await client.query('BEGIN');
+
+      // Get current API key
+      const currentResult = await client.query(
+        `SELECT id, value_ciphertext FROM system.secrets
+         WHERE key = 'API_KEY' AND is_active = true`,
+        []
+      );
+
+      if (!currentResult.rows.length) {
+        throw new Error('No active API key found');
+      }
+
+      const oldKeyId = currentResult.rows[0].id;
+
+      // Rename old key to API_KEY_OLD_<timestamp> for grace period
+      const gracePeriodKey = `API_KEY_OLD_${Date.now()}`;
+      await client.query(
+        `UPDATE system.secrets
+         SET key = $1, expires_at = $2
+         WHERE id = $3`,
+        [gracePeriodKey, oldKeyExpiresAt, oldKeyId]
+      );
+
+      // Generate and insert new API key
+      const newApiKey = this.generateApiKey();
+      const newKeyEncrypted = EncryptionManager.encrypt(newApiKey);
+      await client.query(
+        `INSERT INTO system.secrets (key, value_ciphertext, is_active, is_reserved)
+         VALUES ('API_KEY', $1, true, true)`,
+        [newKeyEncrypted]
+      );
+
+      await client.query('COMMIT');
+
+      logger.info('API key rotated successfully', {
+        gracePeriodKey,
+        oldKeyExpiresAt: oldKeyExpiresAt.toISOString(),
+      });
+
+      return { newApiKey, oldKeyExpiresAt };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      logger.error('Failed to rotate API key', { error });
+      throw new Error('Failed to rotate API key');
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Generate a new anon key with 'anon_' prefix
+   * Opaque, non-secret client identifier that maps requests to the `anon`
+   * Postgres role at the gateway. Possessing it grants nothing beyond what
+   * RLS policies allow the `anon` role.
+   */
+  generateAnonKey(): string {
+    return 'anon_' + crypto.randomBytes(32).toString('hex');
+  }
+
+  /**
+   * Load the active anon key and grace-period keys into the in-memory cache.
+   * Concurrent callers share one in-flight load so a TTL expiry under
+   * traffic produces a single database query instead of a stampede.
+   */
+  private loadAnonKeys(): Promise<AnonKeyCache> {
+    if (this.anonKeyLoadPromise) {
+      return this.anonKeyLoadPromise;
+    }
+
+    this.anonKeyLoadPromise = (async () => {
+      const result = await this.getPool().query(
+        `SELECT value_ciphertext, expires_at FROM system.secrets
+         WHERE (key = 'ANON_KEY' OR key LIKE 'ANON_KEY_OLD_%')
+         AND is_active = true
+         AND (expires_at IS NULL OR expires_at > NOW())`,
+        []
+      );
+
+      const keys: AnonKeyCache['keys'] = [];
+      for (const row of result.rows) {
+        try {
+          keys.push({
+            value: EncryptionManager.decrypt(row.value_ciphertext),
+            expiresAt: row.expires_at,
+          });
+        } catch (error) {
+          logger.error('Failed to decrypt anon key', { error });
+        }
+      }
+
+      this.anonKeyCache = { keys, loadedAt: Date.now() };
+      return this.anonKeyCache;
+    })().finally(() => {
+      this.anonKeyLoadPromise = null;
+    });
+
+    return this.anonKeyLoadPromise;
+  }
+
+  /**
+   * Invalidate the in-memory anon key cache (called on rotation)
+   */
+  invalidateAnonKeyCache(): void {
+    this.anonKeyCache = null;
+  }
+
+  /**
+   * Verify an opaque anon key against the active key and any rotated keys
+   * still inside their grace period. Cache-backed: this runs on every
+   * anonymous request. Plain comparison is fine here — the anon key is a
+   * public identifier, not a secret, so timing leaks reveal nothing.
+   */
+  async verifyAnonKey(anonKey: string): Promise<boolean> {
+    if (!anonKey || !anonKey.startsWith('anon_')) {
+      return false;
+    }
+
+    let cache = this.anonKeyCache;
+    if (!cache || Date.now() - cache.loadedAt > ANON_KEY_CACHE_TTL_MS) {
+      try {
+        cache = await this.loadAnonKeys();
+      } catch (error) {
+        logger.error('Failed to load anon keys for verification', { error });
+        return false;
+      }
+    }
+
+    const now = Date.now();
+    return cache.keys.some(
+      // Grace-period expiry can lapse while the cache entry is still warm
+      (key) => key.value === anonKey && (!key.expiresAt || key.expiresAt.getTime() > now)
+    );
+  }
+
+  /**
+   * Rotate anon key with grace period for the old key.
+   * The old key stays valid for the grace period (default 7 days) so already
+   * deployed clients keep working while the new key ships.
+   */
+  async rotateAnonKey(
+    gracePeriodHours: number = ANON_KEY_DEFAULT_GRACE_HOURS
+  ): Promise<{ newAnonKey: string; oldKeyExpiresAt: Date }> {
+    const isValidHours =
+      typeof gracePeriodHours === 'number' &&
+      Number.isFinite(gracePeriodHours) &&
+      gracePeriodHours >= 0;
+    const validatedHours = isValidHours ? gracePeriodHours : ANON_KEY_DEFAULT_GRACE_HOURS;
+
+    const oldKeyExpiresAt = new Date(Date.now() + validatedHours * 60 * 60 * 1000);
+
+    const client = await this.getPool().connect();
+    try {
+      await client.query('BEGIN');
+
+      const currentResult = await client.query(
+        `SELECT id FROM system.secrets
+         WHERE key = 'ANON_KEY' AND is_active = true`,
+        []
+      );
+
+      if (!currentResult.rows.length) {
+        throw new Error('No active anon key found');
+      }
+
+      const oldKeyId = currentResult.rows[0].id;
+
+      // Rename old key to ANON_KEY_OLD_<timestamp> for grace period
+      const gracePeriodKey = `ANON_KEY_OLD_${Date.now()}`;
+      await client.query(
+        `UPDATE system.secrets
+         SET key = $1, expires_at = $2
+         WHERE id = $3`,
+        [gracePeriodKey, oldKeyExpiresAt, oldKeyId]
+      );
+
+      const newAnonKey = this.generateAnonKey();
+      const newKeyEncrypted = EncryptionManager.encrypt(newAnonKey);
+      await client.query(
+        `INSERT INTO system.secrets (key, value_ciphertext, is_active, is_reserved)
+         VALUES ('ANON_KEY', $1, true, true)`,
+        [newKeyEncrypted]
+      );
+
+      await client.query('COMMIT');
+      this.invalidateAnonKeyCache();
+
+      logger.info('Anon key rotated successfully', {
+        gracePeriodKey,
+        oldKeyExpiresAt: oldKeyExpiresAt.toISOString(),
+      });
+
+      return { newAnonKey, oldKeyExpiresAt };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      logger.error('Failed to rotate anon key', { error });
+      throw new Error('Failed to rotate anon key');
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Initialize the anon key on startup.
+   * Mirrors initializeApiKey: an existing stored key wins, then the
+   * ACCESS_ANON_KEY environment variable, then random generation.
+   * - No ANON_KEY stored: seed from env or generate a fresh opaque key.
+   * - Legacy JWT-format ANON_KEY stored (pre-opaque-key deployments):
+   *   replace it with an opaque key. The legacy anon JWT cannot be revoked
+   *   (it is a valid signature with no expiry), so it keeps verifying through
+   *   the JWT path; this migration only switches what new clients receive.
+   */
+  async initializeAnonKey(): Promise<string> {
+    const existing = await this.getSecretByKey('ANON_KEY');
+
+    if (existing && existing.startsWith('anon_')) {
+      logger.info('✅ Anon key exists in database');
+      return existing;
+    }
+
+    // Seed from environment if provided, ensure it has 'anon_' prefix
+    const envAnonKey = appConfig.auth.accessAnonKey?.trim();
+    const fromEnv = !!envAnonKey;
+    const anonKey = envAnonKey
+      ? envAnonKey.startsWith('anon_')
+        ? envAnonKey
+        : 'anon_' + envAnonKey
+      : this.generateAnonKey();
+
+    if (existing === null) {
+      await this.createSecret({ key: 'ANON_KEY', value: anonKey, isReserved: true });
+      logger.info(
+        fromEnv
+          ? '✅ Anon key initialized from ACCESS_ANON_KEY environment variable'
+          : '✅ Anon key generated and stored'
+      );
+    } else {
+      // Legacy JWT-format value: replace in place
+      await this.updateSecretByKey('ANON_KEY', { value: anonKey, isReserved: true });
+      logger.info('✅ Anon key migrated from legacy JWT format to opaque key');
+    }
+
+    this.invalidateAnonKeyCache();
+    return anonKey;
+  }
+
+  /**
+   * Initialize API key on startup
+   * Seeds from environment variable if database is empty
+   */
+  async initializeApiKey(): Promise<string> {
+    let apiKey = await this.getSecretByKey('API_KEY');
+
+    if (!apiKey) {
+      // Check if ACCESS_API_KEY is provided via environment
+      const envApiKey = appConfig.auth.accessApiKey?.trim();
+
+      if (envApiKey) {
+        // Use the provided API key from environment, ensure it has 'ik_' prefix
+        apiKey = envApiKey.startsWith('ik_') ? envApiKey : 'ik_' + envApiKey;
+        await this.createSecret({ key: 'API_KEY', value: apiKey, isReserved: true });
+        logger.info('✅ API key initialized from ACCESS_API_KEY environment variable');
+      } else {
+        // Generate a new API key if none provided
+        apiKey = this.generateApiKey();
+        await this.createSecret({ key: 'API_KEY', value: apiKey, isReserved: true });
+        logger.info('✅ API key generated and stored');
+      }
+    } else {
+      logger.info('✅ API key exists in database');
+    }
+
+    return apiKey;
+  }
+
+  /**
+   * Initialize JWT asymmetric keypair on startup.
+   */
+  async initializeJwtKeyPair(): Promise<{ privateKey: string; publicKey: string; kid: string }> {
+    const [existingPrivateKey, existingPublicKey, existingKid] = await Promise.all([
+      this.getSecretByKey('JWT_PRIVATE_KEY'),
+      this.getSecretByKey('JWT_PUBLIC_KEY'),
+      this.getSecretByKey('JWT_KEY_ID'),
+    ]);
+
+    if (existingPrivateKey && existingPublicKey && existingKid) {
+      logger.info('✅ JWT asymmetric keypair exists in database');
+      return {
+        privateKey: existingPrivateKey,
+        publicKey: existingPublicKey,
+        kid: existingKid,
+      };
+    }
+
+    // Generate new RSA-2048 keypair
+    const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
+      modulusLength: 2048,
+      publicKeyEncoding: {
+        type: 'spki',
+        format: 'pem',
+      },
+      privateKeyEncoding: {
+        type: 'pkcs8',
+        format: 'pem',
+      },
+    });
+
+    const kid = 'kid_' + crypto.randomBytes(16).toString('hex');
+
+    const client = await this.getPool().connect();
+    try {
+      await client.query('BEGIN');
+
+      // Check one more time inside transaction to prevent race conditions
+      const checkRes = await client.query(
+        "SELECT key FROM system.secrets WHERE key IN ('JWT_PRIVATE_KEY', 'JWT_PUBLIC_KEY', 'JWT_KEY_ID') FOR UPDATE"
+      );
+
+      if (checkRes.rows.length === 3) {
+        await client.query('ROLLBACK');
+        // Retrieve them again
+        const pKey = await this.getSecretByKey('JWT_PRIVATE_KEY');
+        const pubKey = await this.getSecretByKey('JWT_PUBLIC_KEY');
+        const kId = await this.getSecretByKey('JWT_KEY_ID');
+        if (!pKey || !pubKey || !kId) {
+          throw new Error('Asymmetric keys were missing or corrupted in database');
+        }
+        return {
+          privateKey: pKey,
+          publicKey: pubKey,
+          kid: kId,
+        };
+      }
+
+      // Delete any partial keys just in case
+      await client.query(
+        "DELETE FROM system.secrets WHERE key IN ('JWT_PRIVATE_KEY', 'JWT_PUBLIC_KEY', 'JWT_KEY_ID')"
+      );
+
+      // Create new ones
+      const privEncrypted = EncryptionManager.encrypt(privateKey);
+      const pubEncrypted = EncryptionManager.encrypt(publicKey);
+      const kidEncrypted = EncryptionManager.encrypt(kid);
+
+      await client.query(
+        `INSERT INTO system.secrets (key, value_ciphertext, is_reserved, is_active)
+         VALUES 
+           ('JWT_PRIVATE_KEY', $1, true, true),
+           ('JWT_PUBLIC_KEY', $2, true, true),
+           ('JWT_KEY_ID', $3, true, true)`,
+        [privEncrypted, pubEncrypted, kidEncrypted]
+      );
+
+      await client.query('COMMIT');
+      logger.info('✅ JWT asymmetric keypair generated and stored');
+      return { privateKey, publicKey, kid };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      logger.error('Failed to initialize JWT keypair', { error });
+      throw new Error('Failed to initialize JWT keypair');
+    } finally {
+      client.release();
+    }
+  }
+}

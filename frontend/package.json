@@ -1,0 +1,28 @@
+{
+  "name": "insforge-dashboard",
+  "version": "1.0.0",
+  "author": "Insforge",
+  "description": "Self-hosting host app for the shared InsForge dashboard package",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@insforge/dashboard": "*",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.11",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^6.0.3",
+    "tailwindcss": "^4.1.11",
+    "vite": "^8.1.5",
+    "vite-plugin-svgr": "^4.3.0"
+  }
+}

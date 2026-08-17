@@ -1,0 +1,165 @@
+import { useMemo, useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from '#lib/contexts/AuthContext';
+import { AppRoutes } from '#router/AppRoutes';
+import { ToastProvider } from '@insforge/ui';
+import { DashboardEventsProvider } from '#lib/contexts/DashboardEventsContext';
+import { PostHogAnalyticsProvider } from '#lib/analytics/posthog';
+import { SQLEditorProvider } from '#features/database/contexts/SQLEditorContext';
+import { DashboardHostProvider, DashboardProjectProvider } from '#lib/config/DashboardHostContext';
+import { setDashboardBackendUrl } from '#lib/config/runtime';
+import { advisorService } from '#features/dashboard/services/advisor.service';
+import type {
+  InsForgeDashboardProps,
+  DashboardAdvisorIssuesQuery,
+  DashboardAdvisorSuppressRequest,
+} from '#types';
+
+function normalizeBackendUrl(url?: string) {
+  return url?.replace(/\/$/, '') || undefined;
+}
+
+export function InsForgeDashboard(props: InsForgeDashboardProps) {
+  const {
+    project,
+    backendUrl,
+    mode,
+    showNavbar,
+    onRouteChange,
+    onShowUpgradeDialog,
+    onOpenWhatsNew,
+    onRenameProject,
+    onDeleteProject,
+    onRequestBackupInfo,
+    onCreateBackup,
+    onDeleteBackup,
+    onRenameBackup,
+    onRestoreBackup,
+    onRequestInstanceInfo,
+    onRequestInstanceTypeChange,
+    onUpdateVersion,
+    onRequestUserInfo,
+    onUpdatePreferredLocale,
+    onRequestUserApiKey,
+    onRequestModelCredits,
+    onRequestProjectMetrics,
+    onConnectPosthog,
+    subscribePosthogConnectionStatus,
+    onOpenPosthog,
+    onConnectApify,
+    subscribeApifyConnectionStatus,
+  } = props;
+  const getAuthorizationCode =
+    props.mode === 'cloud-hosting' ? props.getAuthorizationCode : undefined;
+  const useAuthorizationCodeRefresh =
+    props.mode === 'cloud-hosting' ? props.useAuthorizationCodeRefresh : undefined;
+  const host = useMemo(
+    () => ({
+      backendUrl: normalizeBackendUrl(backendUrl),
+      mode,
+      showNavbar,
+      getAuthorizationCode,
+      useAuthorizationCodeRefresh,
+      onRouteChange,
+      onShowUpgradeDialog,
+      onOpenWhatsNew,
+      onRenameProject,
+      onDeleteProject,
+      onRequestBackupInfo,
+      onCreateBackup,
+      onDeleteBackup,
+      onRenameBackup,
+      onRestoreBackup,
+      onRequestInstanceInfo,
+      onRequestInstanceTypeChange,
+      onUpdateVersion,
+      onRequestUserInfo,
+      onUpdatePreferredLocale,
+      onRequestUserApiKey,
+      onRequestModelCredits,
+      onRequestProjectMetrics,
+      onRequestAdvisorLatest: () => advisorService.getLatest(),
+      onRequestAdvisorIssues: (q: DashboardAdvisorIssuesQuery) => advisorService.getIssues(q),
+      onTriggerAdvisorScan: () => advisorService.triggerScan(),
+      onRequestAdvisorSuppressions: () =>
+        advisorService.getSuppressions().then((r) => r.suppressions),
+      onSuppressAdvisorIssue: (req: DashboardAdvisorSuppressRequest) =>
+        advisorService.suppress(req),
+      onUnsuppressAdvisorIssue: (id: string) => advisorService.unsuppress(id),
+      onConnectPosthog,
+      subscribePosthogConnectionStatus,
+      onOpenPosthog,
+      onConnectApify,
+      subscribeApifyConnectionStatus,
+    }),
+    [
+      backendUrl,
+      mode,
+      showNavbar,
+      getAuthorizationCode,
+      useAuthorizationCodeRefresh,
+      onRouteChange,
+      onShowUpgradeDialog,
+      onOpenWhatsNew,
+      onRenameProject,
+      onDeleteProject,
+      onRequestBackupInfo,
+      onCreateBackup,
+      onDeleteBackup,
+      onRenameBackup,
+      onRestoreBackup,
+      onRequestInstanceInfo,
+      onRequestInstanceTypeChange,
+      onUpdateVersion,
+      onRequestUserInfo,
+      onUpdatePreferredLocale,
+      onRequestUserApiKey,
+      onRequestModelCredits,
+      onRequestProjectMetrics,
+      onConnectPosthog,
+      subscribePosthogConnectionStatus,
+      onOpenPosthog,
+      onConnectApify,
+      subscribeApifyConnectionStatus,
+    ]
+  );
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 5 * 60 * 1000,
+            gcTime: 10 * 60 * 1000,
+            refetchOnWindowFocus: false,
+          },
+        },
+      })
+  );
+
+  setDashboardBackendUrl(host.backendUrl);
+
+  return (
+    <div className="insforge-dashboard flex h-full min-h-0 min-w-0 flex-col">
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <DashboardHostProvider value={host}>
+            <DashboardProjectProvider value={project}>
+              <AuthProvider>
+                <DashboardEventsProvider>
+                  <ToastProvider>
+                    <PostHogAnalyticsProvider>
+                      <SQLEditorProvider>
+                        <AppRoutes />
+                      </SQLEditorProvider>
+                    </PostHogAnalyticsProvider>
+                  </ToastProvider>
+                </DashboardEventsProvider>
+              </AuthProvider>
+            </DashboardProjectProvider>
+          </DashboardHostProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </div>
+  );
+}

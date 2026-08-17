@@ -1,0 +1,299 @@
+import { appConfig } from '@/infra/config/app.config.js';
+import { isCloudEnvironment } from '@/utils/environment.js';
+import { TokenManager } from '@/infra/security/token.manager.js';
+import { AppError } from '@/utils/errors.js';
+import { ERROR_CODES } from '@insforge/shared-schemas';
+import {
+  MachineGoneError,
+  translateMachineGone,
+  flyNetworkName,
+  flyAppNameFor,
+  flyEndpointUrl,
+  type ComputeProvider,
+  type ComputeCapabilities,
+  type LaunchMachineParams,
+  type UpdateMachineParams,
+  type MachineSummary,
+  type ComputeEvent,
+  type ComputeLogsResult,
+} from './compute.provider.js';
+
+export class CloudComputeProvider implements ComputeProvider {
+  private static instance: CloudComputeProvider;
+
+  static getInstance(): CloudComputeProvider {
+    if (!CloudComputeProvider.instance) {
+      CloudComputeProvider.instance = new CloudComputeProvider();
+    }
+    return CloudComputeProvider.instance;
+  }
+
+  isConfigured(): boolean {
+    return isCloudEnvironment();
+  }
+
+  // Cloud mode is Fly behind a control plane and shares Fly's app/machine
+  // identifiers, so rows it creates are recorded as 'fly'.
+  readonly name = 'fly' as const;
+
+  // Cloud-managed mode runs on Fly, so the machine-level capabilities match
+  // FlyProvider's. The one difference is deploy-token issuance: the cloud holds
+  // an org-wide token and must narrow it to one app before it leaves the
+  // backend, which is exactly what makes source mode work without the user
+  // holding any Fly credentials.
+  readonly capabilities: ComputeCapabilities = {
+    scaleToZero: true,
+    regions: true,
+    // Every Fly app gets public IPs and a `.fly.dev` hostname at create time, so
+    // there is no private-only or bare-port option to offer.
+    ingressModes: ['host'],
+    sourceBuild: 'flyctl',
+    deployTokenIssuance: true,
+  };
+
+  // Identical naming and URL rules to the Fly path — cloud mode is Fly behind a
+  // control plane, so both call the shared helpers rather than one borrowing
+  // from the other (which would drag fly.provider's imports in here).
+  resolveAppName = flyAppNameFor;
+  endpointUrl = flyEndpointUrl;
+
+  /** Fly's only mode, for the same reason: apps are public from the moment they exist. */
+  defaultIngress(): 'host' {
+    return 'host';
+  }
+
+  private url(path: string): string {
+    return `${appConfig.cloud.apiHost}/projects/v1/${appConfig.cloud.projectId}/compute${path}`;
+  }
+
+  private async call<T>(method: string, path: string, body?: unknown): Promise<T | undefined> {
+    // Signed outside the try below: COMPUTE_NOT_CONFIGURED has to surface to the
+    // caller, not get masked as CLOUD_UNAVAILABLE by the fetch catch-all.
+    const sign = TokenManager.getInstance().signCloudToken(
+      'Cloud compute',
+      ERROR_CODES.COMPUTE_NOT_CONFIGURED
+    );
+
+    let response: Response;
+    try {
+      response = await fetch(this.url(path), {
+        method,
+        headers: {
+          sign,
+          'Content-Type': 'application/json',
+        },
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+        // 60s: launchMachine can legitimately take 15-25s (Fly app create +
+        // IP allocation retry loop + machine provisioning). 15s was too tight
+        // and produced false-positive COMPUTE_CLOUD_UNAVAILABLE errors that
+        // caused orphaned Fly resources.
+        signal: AbortSignal.timeout(60_000),
+      });
+    } catch (err) {
+      // Only network/fetch errors arrive here — re-wrap as COMPUTE_CLOUD_UNAVAILABLE
+      throw new AppError(
+        `COMPUTE_CLOUD_UNAVAILABLE: ${(err as Error).message}`,
+        503,
+        ERROR_CODES.COMPUTE_CLOUD_UNAVAILABLE,
+        'Check CLOUD_API_HOST is reachable and verify cloud backend health.'
+      );
+    }
+    const text = await response.text();
+    if (!response.ok) {
+      throw new AppError(
+        text || `Cloud compute error (${response.status})`,
+        response.status,
+        ERROR_CODES.COMPUTE_PROVIDER_ERROR
+      );
+    }
+    return text ? (JSON.parse(text) as T) : undefined;
+  }
+
+  async createApp(params: { name: string }) {
+    // `network` is kept short (APP_KEY, ~8 chars) so Fly's network-name
+    // validator accepts it. Live e2e on prod (project 2163e1eb-…) showed
+    // the previous long `${projectId}-network` (~44 chars) 422'd as
+    // "Name not a valid network name". Derived here rather than passed in so
+    // the payload stays byte-identical to what the service used to send.
+    const body: Record<string, unknown> = { name: params.name, network: flyNetworkName() };
+    const result = await this.call<{ appId: string; serviceId?: string }>('POST', '/apps', body);
+    return { appId: result?.appId ?? params.name };
+  }
+
+  async destroyApp(appId: string): Promise<void> {
+    await this.call('DELETE', `/apps/${encodeURIComponent(appId)}`);
+  }
+
+  // Fetch a Fly deploy token for one app from the cloud. The cloud mints
+  // the token using its own org-scoped FLY_API_TOKEN, so the OSS instance
+  // (and ultimately the CLI) never needs its own Fly credentials. Token is
+  // 20-min lifetime, scoped to one app — see cloud's
+  // POST /projects/v1/{projectId}/compute/apps/{appId}/deploy-token.
+  async issueDeployToken(appId: string): Promise<{ token: string; expirySeconds: number }> {
+    const result = await this.call<{ token: string; expirySeconds: number }>(
+      'POST',
+      `/apps/${encodeURIComponent(appId)}/deploy-token`
+    );
+    if (!result) {
+      throw new AppError(
+        'Cloud returned empty deploy-token response',
+        500,
+        ERROR_CODES.COMPUTE_PROVIDER_ERROR
+      );
+    }
+    return result;
+  }
+
+  async launchMachine(params: LaunchMachineParams): Promise<{ machineId: string }> {
+    const result = await this.call<{ machineId: string }>('POST', '/machines', params);
+    if (!result?.machineId) {
+      throw new AppError(
+        `Cloud compute returned empty machine payload for app ${params.appId}`,
+        502,
+        ERROR_CODES.COMPUTE_PROVIDER_ERROR
+      );
+    }
+    return { machineId: result.machineId };
+  }
+
+  // The cloud control plane answers a machine-scoped call for a machine that
+  // no longer exists with 404 + code COMPUTE_MACHINE_NOT_FOUND (it verified
+  // against Fly and healed its own row). Translate exactly that into
+  // MachineGoneError so the service layer heals local DB state. The body-code
+  // check matters: a bare 404 can also mean the cloud-side service row is
+  // missing or CLOUD_API_HOST is mis-routed — healing on those would orphan a
+  // live, billing machine.
+  private machineScoped<T>(appId: string, machineId: string, fn: () => Promise<T>): Promise<T> {
+    return translateMachineGone(
+      appId,
+      machineId,
+      (err) =>
+        err instanceof AppError &&
+        err.statusCode === 404 &&
+        err.message.includes('COMPUTE_MACHINE_NOT_FOUND'),
+      fn
+    );
+  }
+
+  // Fly updates a machine in place, so the instance identity never changes.
+  async updateMachine(params: UpdateMachineParams): Promise<{ machineId?: string }> {
+    await this.machineScoped(params.appId, params.machineId, () =>
+      this.call('PATCH', `/machines/${encodeURIComponent(params.machineId)}`, params)
+    );
+    return {};
+  }
+
+  async stopMachine(appId: string, machineId: string): Promise<void> {
+    await this.machineScoped(appId, machineId, () =>
+      this.call('POST', `/machines/${encodeURIComponent(machineId)}/stop`, { appId })
+    );
+  }
+
+  async startMachine(appId: string, machineId: string): Promise<void> {
+    await this.machineScoped(appId, machineId, () =>
+      this.call('POST', `/machines/${encodeURIComponent(machineId)}/start`, { appId })
+    );
+  }
+
+  async destroyMachine(appId: string, machineId: string): Promise<void> {
+    await this.machineScoped(appId, machineId, () =>
+      this.call('DELETE', `/machines/${encodeURIComponent(machineId)}`, { appId })
+    );
+  }
+
+  async listMachines(appId: string): Promise<MachineSummary[]> {
+    return (
+      (await this.call<MachineSummary[]>('GET', `/machines?appId=${encodeURIComponent(appId)}`)) ??
+      []
+    );
+  }
+
+  async getMachineStatus(appId: string, machineId: string): Promise<{ state: string }> {
+    const result = await this.machineScoped(appId, machineId, () =>
+      this.call<{ state: string }>(
+        'GET',
+        `/machines/${encodeURIComponent(machineId)}?appId=${encodeURIComponent(appId)}`
+      )
+    );
+    if (!result?.state) {
+      throw new AppError(
+        `Cloud compute returned empty status payload for ${appId}/${machineId}`,
+        502,
+        ERROR_CODES.COMPUTE_PROVIDER_ERROR
+      );
+    }
+    return result;
+  }
+
+  async getEvents(
+    appId: string,
+    machineId: string,
+    options?: { limit?: number }
+  ): Promise<ComputeEvent[]> {
+    const qs =
+      `?appId=${encodeURIComponent(appId)}` + (options?.limit ? `&limit=${options.limit}` : '');
+    return (
+      (await this.machineScoped(appId, machineId, () =>
+        this.call<ComputeEvent[]>('GET', `/machines/${encodeURIComponent(machineId)}/events${qs}`)
+      )) ?? []
+    );
+  }
+
+  /**
+   * Fetch container logs by delegating to the cloud control plane's
+   * `GET /machines/:id/logs`, which holds the Fly org token and proxies to Fly.
+   * Returns empty results if the control plane responds with no body.
+   */
+  async getLogs(
+    appId: string,
+    machineId: string,
+    options?: { limit?: number; nextToken?: string }
+  ): Promise<ComputeLogsResult> {
+    const params = new URLSearchParams({ appId });
+    if (options?.limit) {
+      params.set('limit', String(options.limit));
+    }
+    if (options?.nextToken) {
+      params.set('next_token', options.nextToken);
+    }
+    const result = await this.machineScoped(appId, machineId, () =>
+      this.call<ComputeLogsResult>(
+        'GET',
+        `/machines/${encodeURIComponent(machineId)}/logs?${params.toString()}`
+      )
+    );
+    return result ?? { lines: [], nextToken: null };
+  }
+
+  async waitForState(
+    appId: string,
+    machineId: string,
+    targetStates: string[],
+    timeoutMs = 60_000
+  ): Promise<string> {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      try {
+        const { state } = await this.getMachineStatus(appId, machineId);
+        if (targetStates.includes(state)) {
+          return state;
+        }
+      } catch (err) {
+        // Definitive machine-gone: polling won't bring it back — fail fast so
+        // the service layer can heal the stale row. Mirrors
+        // FlyProvider.waitForState.
+        if (err instanceof MachineGoneError) {
+          throw err;
+        }
+        // Transient network/cloud blip — keep polling until the deadline
+        // rather than aborting the wait.
+      }
+      await new Promise((r) => setTimeout(r, 1500));
+    }
+    throw new AppError(
+      `Machine ${machineId} did not reach ${targetStates.join('|')} within ${timeoutMs}ms`,
+      504,
+      ERROR_CODES.COMPUTE_PROVIDER_ERROR
+    );
+  }
+}

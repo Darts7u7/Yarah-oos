@@ -1,0 +1,137 @@
+import { EmailProvider } from '@/providers/email/base.provider.js';
+import { CloudEmailProvider } from '@/providers/email/cloud.provider.js';
+import { SmtpEmailProvider } from '@/providers/email/smtp.provider.js';
+import { SmtpConfigService, RawSmtpConfig } from '@/services/email/smtp-config.service.js';
+import { AppError } from '@/utils/errors.js';
+import { isCloudEnvironment } from '@/utils/environment.js';
+import { NEXT_ACTIONS } from '@/utils/next-actions.js';
+import { EmailTemplate } from '@/types/email.js';
+import logger from '@/utils/logger.js';
+import { ERROR_CODES, SendRawEmailRequest } from '@insforge/shared-schemas';
+
+/**
+ * Email service — resolves provider per-call so SMTP config changes take effect without restart
+ */
+export class EmailService {
+  private static instance: EmailService;
+  private cloudProvider = new CloudEmailProvider();
+  private smtpProvider = new SmtpEmailProvider();
+  private lastEmailSentAt = new Map<string, number>();
+
+  private constructor() {
+    logger.info('EmailService initialized');
+  }
+
+  public static getInstance(): EmailService {
+    if (!EmailService.instance) {
+      EmailService.instance = new EmailService();
+    }
+    return EmailService.instance;
+  }
+
+  private async resolveProvider(): Promise<[EmailProvider, RawSmtpConfig | null]> {
+    try {
+      const smtpConfig = await SmtpConfigService.getInstance().getRawSmtpConfig();
+      if (smtpConfig) {
+        return [this.smtpProvider, smtpConfig];
+      }
+    } catch (error) {
+      logger.warn('Error checking SMTP config, falling back to cloud provider', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+    // Off our infrastructure there is no managed provider to fall back to. On cloud the
+    // provider itself reports which of PROJECT_ID or JWT_SECRET is missing.
+    if (!isCloudEnvironment()) {
+      throw new AppError(
+        'No email provider is configured.',
+        503,
+        ERROR_CODES.EMAIL_PROVIDER_NOT_CONFIGURED,
+        NEXT_ACTIONS.CONFIGURE_EMAIL_PROVIDER
+      );
+    }
+    return [this.cloudProvider, null];
+  }
+
+  // -------------------------------------------------------------------------
+  // Rate limiting — check before send, record after success
+  // -------------------------------------------------------------------------
+
+  private checkMinInterval(email: string, minIntervalSeconds: number): void {
+    if (minIntervalSeconds <= 0) {
+      return;
+    }
+
+    const now = Date.now();
+    const lastSent = this.lastEmailSentAt.get(email);
+
+    if (lastSent && now - lastSent < minIntervalSeconds * 1000) {
+      const retryAfter = Math.ceil((minIntervalSeconds * 1000 - (now - lastSent)) / 1000);
+      throw new AppError(
+        `Too many emails to this address. Retry after ${retryAfter}s.`,
+        429,
+        ERROR_CODES.RATE_LIMITED
+      );
+    }
+  }
+
+  private recordEmailSent(email: string, minIntervalSeconds: number): void {
+    this.lastEmailSentAt.set(email, Date.now());
+
+    // Prune stale entries to prevent unbounded memory growth
+    if (this.lastEmailSentAt.size > 10000) {
+      const cutoff = Date.now() - minIntervalSeconds * 2000;
+      for (const [key, ts] of this.lastEmailSentAt) {
+        if (ts < cutoff) {
+          this.lastEmailSentAt.delete(key);
+        }
+      }
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Public API
+  // -------------------------------------------------------------------------
+
+  public async sendWithTemplate(
+    email: string,
+    name: string,
+    template: EmailTemplate,
+    variables?: Record<string, string>
+  ): Promise<void> {
+    const [provider, smtpConfig] = await this.resolveProvider();
+
+    if (smtpConfig) {
+      this.checkMinInterval(email, smtpConfig.minIntervalSeconds);
+    }
+
+    await provider.sendWithTemplate(email, name, template, variables);
+
+    if (smtpConfig) {
+      this.recordEmailSent(email, smtpConfig.minIntervalSeconds);
+    }
+  }
+
+  public async sendRaw(options: SendRawEmailRequest): Promise<void> {
+    const [provider, smtpConfig] = await this.resolveProvider();
+
+    const recipients = Array.isArray(options.to) ? options.to : [options.to];
+
+    if (smtpConfig) {
+      for (const recipient of recipients) {
+        this.checkMinInterval(recipient, smtpConfig.minIntervalSeconds);
+      }
+    }
+
+    if (!provider.sendRaw) {
+      throw new Error('Current email provider does not support raw email sending');
+    }
+    await provider.sendRaw(options);
+
+    if (smtpConfig) {
+      for (const recipient of recipients) {
+        this.recordEmailSent(recipient, smtpConfig.minIntervalSeconds);
+      }
+    }
+  }
+}

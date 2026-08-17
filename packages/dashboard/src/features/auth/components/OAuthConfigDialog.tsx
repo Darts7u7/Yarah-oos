@@ -1,0 +1,458 @@
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useForm, Controller, useFormState } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { ExternalLink } from 'lucide-react';
+import {
+  Button,
+  CopyButton,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Switch,
+} from '@insforge/ui';
+import WarningIcon from '#assets/icons/warning.svg';
+import {
+  oAuthConfigSchema,
+  OAuthConfigSchema,
+  OAuthProvidersSchema,
+} from '@insforge/shared-schemas';
+import { type OAuthProviderInfo } from '#features/auth/helpers';
+import { SecretInput } from './SecretInput';
+import { useOAuthConfig } from '#features/auth/hooks/useOAuthConfig';
+import { getBackendUrl, isInsForgeCloudProject } from '#lib/utils/utils';
+
+const getCallbackUrl = (provider?: string) => {
+  // Use backend API URL for OAuth callback
+  let backendUrl = getBackendUrl();
+
+  // Check if backend URL contains "localhost" and provider is "x"
+  if (provider === 'x' && backendUrl.includes('localhost')) {
+    backendUrl = backendUrl.replace('://localhost', '://www.localhost');
+  }
+  return `${backendUrl}/api/auth/oauth/${provider}/callback`;
+};
+
+interface OAuthConfigDialogProps {
+  provider?: OAuthProviderInfo;
+  mode: 'create' | 'edit';
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
+}
+
+export type OAuthDialogMode = OAuthConfigDialogProps['mode'];
+
+function NativeClientIdsInput({
+  value,
+  onChange,
+  onBlur,
+  onTextChange,
+}: {
+  value?: string[];
+  onChange: (value: string[]) => void;
+  onBlur: () => void;
+  onTextChange: (value: string) => void;
+}) {
+  const [text, setText] = useState((value ?? []).join(', '));
+
+  useEffect(() => {
+    const nextText = (value ?? []).join(', ');
+    setText(nextText);
+    onTextChange(nextText);
+  }, [onTextChange, value]);
+
+  return (
+    <Input
+      type="text"
+      value={text}
+      onChange={(event) => {
+        setText(event.target.value);
+        onTextChange(event.target.value);
+      }}
+      onBlur={() => {
+        onChange(
+          text
+            .split(',')
+            .map((clientId) => clientId.trim())
+            .filter(Boolean)
+        );
+        onBlur();
+      }}
+      placeholder="com.example.ios-app"
+      className="w-[340px]"
+    />
+  );
+}
+
+export function OAuthConfigDialog({
+  provider,
+  mode,
+  isOpen,
+  onClose,
+  onSuccess,
+}: OAuthConfigDialogProps) {
+  const { t } = useTranslation('chrome');
+  const { providerConfig, createConfig, updateConfig, isCreating, isUpdating, isLoadingProvider } =
+    useOAuthConfig(mode === 'edit' ? provider?.id : null);
+
+  const form = useForm<OAuthConfigSchema & { clientSecret?: string }>({
+    resolver: zodResolver(oAuthConfigSchema.extend({ clientSecret: z.string().optional() })),
+    defaultValues: {
+      provider: provider?.id || 'google',
+      clientId: '',
+      nativeClientIds: [],
+      clientSecret: '',
+      useSharedKey: false,
+    },
+  });
+
+  const useSharedKey = form.watch('useSharedKey');
+  const clientId = form.watch('clientId');
+  const clientSecret = form.watch('clientSecret');
+  const [nativeClientIdsText, setNativeClientIdsText] = useState('');
+  const [isClientSecretVisible, setIsClientSecretVisible] = useState(false);
+
+  // Our Cloud only support shared keys of these OAuth Providers for now
+  const sharedKeyProviders: readonly OAuthProvidersSchema[] = [
+    'google',
+    'github',
+    'discord',
+    'linkedin',
+    'facebook',
+    'apple',
+    'microsoft',
+  ] satisfies readonly OAuthProvidersSchema[];
+  const isSharedKeysAvailable =
+    isInsForgeCloudProject() && provider?.id && sharedKeyProviders.includes(provider.id);
+
+  // Use useFormState hook for better reactivity
+  const { isDirty } = useFormState({
+    control: form.control,
+  });
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsClientSecretVisible(false);
+    }
+  }, [isOpen, provider?.id]);
+
+  // Load OAuth configuration after fetching
+  useEffect(() => {
+    if (!isOpen || !provider) {
+      return;
+    }
+
+    if (mode === 'create') {
+      form.reset({
+        provider: provider.id,
+        clientId: '',
+        nativeClientIds: [],
+        clientSecret: '',
+        useSharedKey: isSharedKeysAvailable,
+      });
+      return;
+    }
+
+    if (!isLoadingProvider && providerConfig) {
+      form.reset({
+        provider: provider.id,
+        clientId: providerConfig.clientId || '',
+        nativeClientIds: providerConfig.nativeClientIds || [],
+        clientSecret: providerConfig.clientSecret || '',
+        useSharedKey: providerConfig.useSharedKey || false,
+      });
+    }
+  }, [form, isLoadingProvider, isOpen, isSharedKeysAvailable, mode, provider, providerConfig]);
+
+  const handleSubmitData = (data: OAuthConfigSchema & { clientSecret?: string }) => {
+    if (!provider) {
+      return;
+    }
+
+    try {
+      const isNativeOnlyApple =
+        provider.id === 'apple' &&
+        (data.nativeClientIds?.length ?? 0) > 0 &&
+        !data.clientId &&
+        !data.clientSecret;
+
+      if (mode === 'edit') {
+        if (!providerConfig) {
+          return;
+        }
+
+        // Update existing config
+        updateConfig({
+          provider: provider.id,
+          config: data.useSharedKey
+            ? { useSharedKey: true, nativeClientIds: data.nativeClientIds }
+            : isNativeOnlyApple
+              ? { useSharedKey: false, nativeClientIds: data.nativeClientIds }
+              : {
+                  clientId: data.clientId,
+                  nativeClientIds: data.nativeClientIds,
+                  clientSecret: data.clientSecret || undefined,
+                  useSharedKey: false,
+                },
+        });
+      } else {
+        // Create new config
+        createConfig({
+          provider: provider.id,
+          clientId: data.useSharedKey ? undefined : data.clientId,
+          nativeClientIds: data.nativeClientIds,
+          clientSecret: data.useSharedKey ? undefined : clientSecret,
+          useSharedKey: data.useSharedKey,
+        });
+      }
+
+      // Call success callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
+      // Close dialog
+      onClose();
+    } catch (error) {
+      console.error('Error saving OAuth config:', error);
+    }
+  };
+
+  const handleSubmit = () => {
+    void handleSubmitData(form.getValues());
+  };
+
+  const saving = isCreating || isUpdating;
+
+  // Use RHF's built-in validation and dirty state
+  const isDisabled = () => {
+    if (saving) {
+      return true;
+    }
+
+    // In update mode, require dirty state
+    if (mode === 'edit') {
+      if (!providerConfig || !isDirty) {
+        return true;
+      }
+    }
+
+    // If using shared keys, always allow (no credential validation needed)
+    if (useSharedKey) {
+      return false;
+    }
+
+    // Native-only Apple setups require a trusted app audience but no browser credentials.
+    if (
+      provider?.id === 'apple' &&
+      nativeClientIdsText.split(',').some((clientIdValue) => clientIdValue.trim().length > 0)
+    ) {
+      return false;
+    }
+
+    // If NOT using shared keys, require both clientId and clientSecret.
+    return !clientId || !clientSecret;
+  };
+
+  return (
+    <Dialog open={isOpen && !!provider} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{provider?.name}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {t('auth.configureOAuthFor', {
+              name: provider?.name,
+              defaultValue: 'Configure OAuth settings for {{name}}',
+            })}
+          </DialogDescription>
+        </DialogHeader>
+        {isLoadingProvider ? (
+          <div className="p-6 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-sm text-gray-500 dark:text-zinc-400">
+                {t('auth.loadingOAuthConfig', { defaultValue: 'Loading OAuth configuration...' })}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <form onSubmit={(e) => e.preventDefault()} className="flex flex-col">
+              <div className="space-y-6 p-6">
+                {/* Shared Keys Toggle */}
+                {isSharedKeysAvailable && (
+                  <div className="flex items-center justify-start gap-2">
+                    <Controller
+                      name="useSharedKey"
+                      control={form.control}
+                      render={({ field }) => {
+                        return (
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={(value) => {
+                              field.onChange(value);
+                            }}
+                          />
+                        );
+                      }}
+                    />
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {t('auth.sharedKeys', { defaultValue: 'Shared Keys' })}
+                    </span>
+                  </div>
+                )}
+
+                {useSharedKey ? (
+                  /* Shared Keys Enabled */
+                  <div className="space-y-6">
+                    <p className="text-sm text-zinc-500 dark:text-neutral-400">
+                      {t('auth.sharedKeysDescription', {
+                        defaultValue:
+                          'Shared keys are created by the InsForge team for development. It helps you get started, but will show a InsForge logo and name on the OAuth screen.',
+                      })}
+                    </p>
+
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={WarningIcon}
+                        alt={t('auth.warning', { defaultValue: 'Warning' })}
+                        className="h-6 w-6"
+                      />
+                      <span className="text-sm font-medium text-zinc-950 dark:text-white">
+                        {t('auth.sharedKeysProductionWarning', {
+                          defaultValue: 'Shared keys should never be used in production',
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  /* Shared Keys Disabled */
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <ExternalLink className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <a
+                        href={provider?.setupUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 font-medium underline"
+                      >
+                        {t('auth.createOAuthApp', {
+                          name: provider?.name.split(' ')[0],
+                          defaultValue: 'Create a {{name}} OAuth App',
+                        })}
+                      </a>
+                      <span className="text-sm font-normal text-zinc-950 dark:text-white">
+                        {' '}
+                        {t('auth.andSetCallbackUrl', {
+                          defaultValue: 'and set the callback url to:',
+                        })}
+                      </span>
+                    </div>
+
+                    <div className="space-x-3">
+                      <div className="flex items-center gap-2">
+                        <code className="flex items-center py-1 px-3 bg-blue-100 dark:bg-neutral-700 text-blue-800 dark:text-blue-300 font-mono break-all rounded-md text-sm">
+                          {getCallbackUrl(provider?.id)}
+                        </code>
+                        <CopyButton text={getCallbackUrl(provider?.id)} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {!useSharedKey && (
+                <div className="space-y-6 p-6 border-t border-zinc-200 dark:border-neutral-700">
+                  <div className="flex flex-row items-center justify-between gap-10">
+                    <label className="text-sm text-zinc-950 dark:text-white">
+                      {t('auth.clientId', { defaultValue: 'Client ID' })}
+                    </label>
+                    <Input
+                      type="text"
+                      {...form.register('clientId')}
+                      placeholder={t('auth.enterOAuthAppId', {
+                        name: provider?.name.split(' ')[0],
+                        defaultValue: 'Enter {{name}} OAuth App ID',
+                      })}
+                      className="w-[340px]"
+                    />
+                  </div>
+
+                  <div className="flex flex-row items-center justify-between gap-10">
+                    <label className="text-sm text-zinc-950 dark:text-white">
+                      {t('auth.clientSecret', { defaultValue: 'Client Secret' })}
+                    </label>
+                    <SecretInput
+                      {...form.register('clientSecret')}
+                      value={clientSecret ?? ''}
+                      isVisible={isClientSecretVisible}
+                      onToggleVisibility={() => setIsClientSecretVisible((visible) => !visible)}
+                      placeholder={t('auth.enterOAuthAppSecret', {
+                        name: provider?.name.split(' ')[0],
+                        defaultValue: 'Enter {{name}} OAuth App Secret',
+                      })}
+                      className="w-[340px]"
+                    />
+                  </div>
+                </div>
+              )}
+              {provider?.id === 'apple' && (
+                <div className="p-6 border-t border-zinc-200 dark:border-neutral-700">
+                  <div className="flex flex-row items-start justify-between gap-10">
+                    <div className="space-y-1">
+                      <label className="text-sm text-zinc-950 dark:text-white">
+                        {t('auth.nativeClientIds', { defaultValue: 'Native App IDs' })}
+                      </label>
+                      <p className="max-w-52 text-xs text-zinc-500 dark:text-neutral-400">
+                        {t('auth.nativeClientIdsDescription', {
+                          defaultValue:
+                            'Comma-separated bundle IDs trusted for native Apple ID tokens.',
+                        })}
+                      </p>
+                    </div>
+                    <Controller
+                      name="nativeClientIds"
+                      control={form.control}
+                      render={({ field }) => (
+                        <NativeClientIdsInput
+                          value={field.value}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          onTextChange={setNativeClientIdsText}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+              )}
+            </form>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                className="w-30"
+                variant="secondary"
+                onClick={onClose}
+                disabled={saving}
+              >
+                {t('auth.cancel', { defaultValue: 'Cancel' })}
+              </Button>
+              <Button type="button" onClick={handleSubmit} disabled={isDisabled()} className="w-30">
+                {saving
+                  ? mode === 'edit'
+                    ? t('auth.updating', { defaultValue: 'Updating...' })
+                    : t('auth.adding', { defaultValue: 'Adding...' })
+                  : mode === 'edit'
+                    ? t('auth.update', { defaultValue: 'Update' })
+                    : t('auth.addProvider', { defaultValue: 'Add Provider' })}
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}

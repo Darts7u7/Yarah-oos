@@ -1,0 +1,223 @@
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Link2, AlertCircle, X } from 'lucide-react';
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@insforge/ui';
+import {
+  TypeBadge,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  ConvertedValue,
+  DataGrid,
+  type DatabaseRecord,
+} from '#components';
+import { useTables } from '#features/database/hooks/useTables';
+import { useRecords } from '#features/database/hooks/useRecords';
+import { convertSchemaToColumns } from './DatabaseDataGrid';
+import { formatValueForDisplay } from '#lib/utils/utils';
+import { useQuery } from '@tanstack/react-query';
+import { useUsers } from '#features/auth/hooks/useUsers';
+import { AUTH_USERS_TABLE, authUsersSchema } from '#features/database/constants';
+import { parseDatabaseTableReference } from '#features/database/helpers';
+
+const POPOVER_WIDTH = 520;
+
+interface ForeignKeyCellProps {
+  value: string;
+  foreignKey: {
+    table: string;
+    columns: { sourceColumn: string; referenceColumn: string }[];
+  };
+  row: DatabaseRecord;
+  onJumpToTable?: (tableName: string, schemaName?: string) => void;
+}
+
+export function ForeignKeyCell({ value, foreignKey, row, onJumpToTable }: ForeignKeyCellProps) {
+  const { t } = useTranslation('chrome');
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const isAuthUsers = foreignKey.table === AUTH_USERS_TABLE;
+  const { schemaName, tableName } = parseDatabaseTableReference(foreignKey.table);
+  const { useTableSchema } = useTables(schemaName);
+
+  // Regular table records hook (disabled for auth.users)
+  const recordsHook = useRecords(tableName, schemaName);
+
+  // Auth users hook
+  const { getUser } = useUsers({ enabled: false });
+
+  // Helper function to safely render any value type (including JSON objects)
+  const renderValue = (val: ConvertedValue): string => {
+    return formatValueForDisplay(val);
+  };
+
+  // Guard: all FK column entries must have both sourceColumn and referenceColumn
+  const hasValidColumns = foreignKey.columns.every((c) => c.sourceColumn && c.referenceColumn);
+
+  // Collect all FK column values from the current row for multi-column lookup
+  const lookupColumns = hasValidColumns ? foreignKey.columns.map((c) => c.referenceColumn) : [];
+  const lookupValues = hasValidColumns
+    ? foreignKey.columns.map((c) => {
+        const raw = row[c.sourceColumn];
+        return raw !== null && raw !== undefined ? String(raw) : '';
+      })
+    : [];
+
+  // For auth.users, fetch user by ID (single-column lookup)
+  const searchValue = value ? renderValue(value) : '';
+  const { data: authUserData, error: authUserError } = useQuery({
+    queryKey: ['user', searchValue],
+    queryFn: () => getUser(searchValue),
+    enabled: isAuthUsers && open && !!value,
+  });
+
+  // For regular tables, fetch by foreign key (supports composite)
+  const { data: recordData, error: recordError } = recordsHook.useRecordByForeignKey(
+    lookupColumns,
+    lookupValues,
+    !isAuthUsers && open && hasValidColumns && lookupValues.every((v) => !!v)
+  );
+
+  // Use appropriate data source based on table type
+  const record = isAuthUsers ? authUserData : recordData;
+  const error = isAuthUsers ? authUserError : recordError;
+
+  // Fetch schema for the referenced table (skip for auth.users)
+  const { data: fetchedSchema } = useTableSchema(
+    tableName,
+    schemaName,
+    !isAuthUsers && open && !!value
+  );
+  const schema = isAuthUsers ? authUsersSchema : fetchedSchema;
+
+  // Convert schema to columns for the mini DataGrid
+  const columns = useMemo(() => {
+    if (!schema) {
+      return [];
+    }
+    // Use convertSchemaToColumns but disable foreign keys to prevent nested popovers
+    const baseCols = convertSchemaToColumns(schema, undefined, undefined);
+    const containerWidth = POPOVER_WIDTH;
+    const colWidth = Math.max(200, Math.floor(containerWidth / baseCols.length));
+    return baseCols.map((col) => ({
+      ...col,
+      width: colWidth,
+      minWidth: colWidth,
+      resizable: false,
+      editable: false,
+    }));
+  }, [schema]);
+
+  if (!value) {
+    return <span className="text-muted-foreground">null</span>;
+  }
+  const displayValue = renderValue(value);
+
+  return (
+    <div className="w-full flex items-center justify-between gap-1">
+      <span className="text-sm truncate min-w-0" title={displayValue}>
+        {displayValue}
+      </span>
+
+      <Popover open={open} onOpenChange={setOpen}>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 shrink-0 p-1 bg-white dark:bg-neutral-700"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Link2 className="h-5 w-5 text-black dark:text-white" />
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              {t('database.viewLinkedRecord', { defaultValue: 'View linked record' })}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <PopoverContent
+          style={{ width: POPOVER_WIDTH }}
+          className="relative p-0 bg-white dark:bg-[#2D2D2D] dark:border-neutral-700 overflow-hidden"
+          align="center"
+          side="bottom"
+          sideOffset={5}
+        >
+          <div className="flex flex-col">
+            <button className="absolute top-4 right-4">
+              <X onClick={() => setOpen(false)} className="h-5 w-5 dark:text-neutral-400" />
+            </button>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border-gray dark:border-neutral-700">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-medium text-muted-foreground dark:text-white">
+                  {t('database.referencingRecordFrom', { defaultValue: 'Referencing record from' })}
+                </span>
+                <TypeBadge
+                  type={`${foreignKey.table}.${foreignKey.columns.map((c) => c.referenceColumn).join(',')}`}
+                  className="dark:bg-neutral-800"
+                />
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 min-h-0">
+              {error && (
+                <div className="flex items-center gap-2 p-3 text-sm text-destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>
+                    {t('database.failedToLoadRecord', { defaultValue: 'Failed to load record' })}
+                  </span>
+                </div>
+              )}
+
+              {record && schema && columns.length > 0 && (
+                <div className="h-full flex flex-col">
+                  {/* Mini DataGrid */}
+                  <div className="flex-1">
+                    <DataGrid
+                      data={[record]} // Single record array
+                      columns={columns}
+                      loading={false}
+                      showSelection={false}
+                      showPagination={false}
+                      className="bg-transparent"
+                    />
+                  </div>
+
+                  {/* Jump to Table Button */}
+                  {(onJumpToTable || isAuthUsers) && (
+                    <div className="flex justify-end p-6 border-t border-border-gray dark:border-neutral-700">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 px-3 py-2 text-sm font-medium dark:text-white bg-bg-gray dark:bg-neutral-600"
+                        onClick={() => {
+                          if (isAuthUsers) {
+                            void navigate('/dashboard/authentication/users');
+                          } else if (onJumpToTable) {
+                            onJumpToTable(tableName, schemaName);
+                          }
+                          setOpen(false);
+                        }}
+                      >
+                        {isAuthUsers
+                          ? t('database.openUsers', { defaultValue: 'Open Users' })
+                          : t('database.openTable', { defaultValue: 'Open Table' })}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}

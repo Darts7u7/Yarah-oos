@@ -1,0 +1,45 @@
+---
+title: Payments
+description: Choose between the Stripe or Razorpay payments helpers exposed by the InsForge TypeScript SDK for hosted checkout, subscriptions, and billing flows.
+---
+
+import Installation from '/snippets/sdk-installation.mdx';
+
+<Installation />
+
+InsForge Payments is provider-specific. Stripe uses hosted Checkout and Billing Portal. Razorpay uses provider-native Orders and Subscriptions plus Razorpay Checkout. The TypeScript SDK exposes separate provider modules for both.
+
+<CardGroup cols={2}>
+  <Card title="Stripe Payments" icon="stripe" href="/sdks/typescript/payments-stripe">
+    Create Checkout and Billing Portal sessions with `insforge.payments.stripe`.
+  </Card>
+
+  <Card title="Razorpay Payments" icon="credit-card" href="/sdks/typescript/payments-razorpay">
+    Create Orders or Subscriptions with `insforge.payments.razorpay`, then open Razorpay Checkout.
+  </Card>
+</CardGroup>
+
+## Shared setup
+
+```typescript
+import { createClient } from '@insforge/sdk';
+
+const insforge = createClient({
+  baseUrl: 'https://your-project.insforge.app',
+  anonKey: 'your-anon-key'
+});
+```
+
+Payment runtime calls require an InsForge user token. Guest one-time checkout can use an anonymous InsForge token. Provider secret keys must stay server-side and should be configured through Dashboard -> Payments -> Settings, the CLI, or admin APIs.
+
+## Fulfillment
+
+For both providers, create app-owned tables such as `public.orders`, `public.credit_ledger`, or `public.team_entitlements`, then populate them from verified provider webhook events in `payments.webhook_events`.
+
+`payments.transactions` is a dashboard/reporting projection. Do not use it as the primary business workflow.
+
+## Next steps
+
+- Use [Stripe Payments](/sdks/typescript/payments-stripe) for `insforge.payments.stripe.createCheckoutSession(...)` and `insforge.payments.stripe.createCustomerPortalSession(...)`.
+- Use [Razorpay Payments](/sdks/typescript/payments-razorpay) for `insforge.payments.razorpay.createOrder(...)`, `createSubscription(...)`, verification, and subscription management.
+- Read [Payments overview](/core-concepts/payments/overview) for the shared database architecture and fulfillment model.

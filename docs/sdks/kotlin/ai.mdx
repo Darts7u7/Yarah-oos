@@ -1,0 +1,91 @@
+---
+title: Model Gateway
+description: Call chat, streaming, and embedding models from Kotlin with the OpenRouter API key provisioned by the InsForge Model Gateway, from trusted server code.
+---
+
+## Overview
+
+InsForge provisions an OpenRouter API key for Model Gateway projects. New Kotlin applications should call OpenRouter from trusted server-side code, a backend API, or another secure boundary. Do not embed the OpenRouter key in Android or desktop client binaries.
+
+The previous InsForge Kotlin AI SDK methods are deprecated compatibility wrappers. Use the InsForge SDK for database, auth, storage, functions, and realtime; use OpenRouter for model calls.
+
+## Recommended Architecture
+
+```mermaid
+sequenceDiagram
+    participant App as Kotlin App
+    participant API as Your Backend
+    participant OR as OpenRouter
+
+    App->>API: User prompt or app request
+    API->>OR: OpenRouter request with server-side key
+    OR-->>API: Model response
+    API-->>App: App-specific response
+```
+
+## Server-Side OpenRouter Call
+
+Use the OpenAI SDK or REST from your backend. For TypeScript backends:
+
+```typescript
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: process.env.OPENROUTER_API_KEY,
+});
+
+const completion = await openai.chat.completions.create({
+  model: 'openai/gpt-4o-mini',
+  messages: [{ role: 'user', content: 'Summarize this note.' }],
+});
+```
+
+## Calling Your Backend from Kotlin
+
+```kotlin
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class ChatRequest(val prompt: String)
+
+@Serializable
+data class ChatResponse(val text: String)
+
+val http = HttpClient {
+    install(ContentNegotiation) {
+        json()
+    }
+}
+
+suspend fun sendPrompt(prompt: String, sessionToken: String): ChatResponse {
+    return http.post("https://your-app.example/api/chat") {
+        header("Authorization", "Bearer $sessionToken")
+        contentType(ContentType.Application.Json)
+        setBody(ChatRequest(prompt))
+    }.body()
+}
+```
+
+Use an app session token or another user-scoped credential for your backend route. Never send the OpenRouter key from a Kotlin client.
+
+## Legacy InsForge AI Methods
+
+These Kotlin SDK methods are deprecated for new AI integrations:
+
+- `client.ai.listModels()`
+- `client.ai.chatCompletion(...)`
+- `client.ai.chatCompletionStream(...)`
+- `client.ai.generateEmbeddings(...)`
+- `client.ai.generateImage(...)`
+
+They target the deprecated InsForge AI proxy. New integrations should use the OpenRouter key from the dashboard and follow OpenRouter's current API docs for model parameters and capabilities.

@@ -1,0 +1,177 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { computeServicesApi } from '#features/compute/services/compute.service';
+import type { CreateServiceRequestInput, UpdateServiceRequest } from '@insforge/shared-schemas';
+import { useToast } from '@insforge/ui';
+import { deriveHealth, type ServiceHealth } from '#features/compute/lib/health';
+
+/**
+ * @param enabled Gate the list request. Pass false once it is known that compute
+ *   is not configured: the request would only 503, and spinning on a call whose
+ *   failure is already known reads as a broken page rather than an unconfigured
+ *   feature.
+ */
+export function useComputeServices(enabled = true) {
+  const { t } = useTranslation('chrome');
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+
+  const {
+    data: services = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['compute', 'services'],
+    queryFn: () => computeServicesApi.list(),
+    staleTime: 30_000,
+    enabled,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: CreateServiceRequestInput) => computeServicesApi.create(data),
+    onSuccess: (svc) => {
+      void queryClient.invalidateQueries({ queryKey: ['compute', 'services'] });
+      showToast(
+        t('compute.toastCreated', { defaultValue: 'Service "{{name}}" created', name: svc.name }),
+        'success'
+      );
+    },
+    onError: (err: Error) => {
+      showToast(
+        err.message || t('compute.toastCreateFailed', { defaultValue: 'Failed to create service' }),
+        'error'
+      );
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateServiceRequest }) =>
+      computeServicesApi.update(id, data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['compute', 'services'] });
+      showToast(t('compute.toastUpdated', { defaultValue: 'Service updated' }), 'success');
+    },
+    onError: (err: Error) => {
+      showToast(
+        err.message || t('compute.toastUpdateFailed', { defaultValue: 'Failed to update service' }),
+        'error'
+      );
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => computeServicesApi.remove(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['compute', 'services'] });
+      showToast(t('compute.toastDeleted', { defaultValue: 'Service deleted' }), 'success');
+    },
+    onError: (err: Error) => {
+      showToast(
+        err.message || t('compute.toastDeleteFailed', { defaultValue: 'Failed to delete service' }),
+        'error'
+      );
+    },
+  });
+
+  const stopMutation = useMutation({
+    mutationFn: (id: string) => computeServicesApi.stop(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['compute', 'services'] });
+      showToast(t('compute.toastStopped', { defaultValue: 'Service stopped' }), 'success');
+    },
+    onError: (err: Error) => {
+      showToast(
+        err.message || t('compute.toastStopFailed', { defaultValue: 'Failed to stop service' }),
+        'error'
+      );
+    },
+  });
+
+  const startMutation = useMutation({
+    mutationFn: (id: string) => computeServicesApi.start(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['compute', 'services'] });
+      showToast(t('compute.toastStarted', { defaultValue: 'Service started' }), 'success');
+    },
+    onError: (err: Error) => {
+      showToast(
+        err.message || t('compute.toastStartFailed', { defaultValue: 'Failed to start service' }),
+        'error'
+      );
+    },
+  });
+
+  return {
+    // Data
+    services,
+
+    // Loading states
+    isLoading,
+    isCreating: createMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+    isStopping: stopMutation.isPending,
+    isStarting: startMutation.isPending,
+
+    // Errors
+    error,
+    // Exposed so a failed list can offer Try again, the way payments' pages do,
+    // instead of telling the reader to refresh the page themselves.
+    refetch,
+
+    // Actions
+    create: createMutation.mutateAsync,
+    update: updateMutation.mutateAsync,
+    remove: deleteMutation.mutateAsync,
+    stop: stopMutation.mutateAsync,
+    start: startMutation.mutateAsync,
+  };
+}
+
+export function useServiceEvents(serviceId: string | null) {
+  return useQuery({
+    queryKey: ['compute', 'services', serviceId, 'events'],
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- guarded by enabled
+    queryFn: () => computeServicesApi.events(serviceId!, 50),
+    enabled: !!serviceId,
+    staleTime: 0,
+  });
+}
+
+// Container stdout/stderr for the detail-view Logs panel. When `live` is on we
+// re-pull the recent window every 2s (simple, stateless tail — no cursor
+// accumulation/dedup to get wrong for v1); otherwise it's a one-shot recent
+// fetch the user can refresh manually.
+export function useServiceLogs(serviceId: string | null, opts?: { live?: boolean }) {
+  return useQuery({
+    queryKey: ['compute', 'services', serviceId, 'logs'],
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- guarded by enabled
+    queryFn: () => computeServicesApi.logs(serviceId!, { limit: 200 }),
+    enabled: !!serviceId,
+    staleTime: 0,
+    refetchInterval: opts?.live ? 2000 : false,
+  });
+}
+
+// Per-service crash-loop indicator for the grid view. Polls the events
+// endpoint at 30s cadence — same data the detail-view ServiceEvents panel uses,
+// so we don't introduce a new backend surface, and React Query dedupes the
+// underlying fetch when the user expands a card.
+//
+// `enabled` should be false for stopped/failed/destroying/destroyed services:
+// those don't crash-loop, and we don't want to ping Fly for them on every
+// dashboard render. Caller is expected to gate on service.status.
+export function useServiceHealth(
+  serviceId: string,
+  enabled: boolean
+): { health: ServiceHealth | null; isLoading: boolean } {
+  const query = useQuery({
+    queryKey: ['compute', 'services', serviceId, 'events'],
+    queryFn: () => computeServicesApi.events(serviceId, 50),
+    enabled,
+    staleTime: 30_000,
+    refetchInterval: enabled ? 30_000 : false,
+  });
+  const health = query.data ? deriveHealth(query.data) : null;
+  return { health, isLoading: query.isLoading };
+}

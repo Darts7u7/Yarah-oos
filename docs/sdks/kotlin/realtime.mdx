@@ -1,0 +1,171 @@
+---
+title: Kotlin realtime SDK reference
+description: Connect over Socket.IO, subscribe to channels, publish events, track presence, and handle reconnects with the InsForge Kotlin realtime client.
+---
+
+import KotlinSdkInstallation from '/snippets/kotlin-sdk-installation.mdx';
+
+## Installation
+
+<KotlinSdkInstallation />
+
+## Mental model
+
+The Kotlin SDK connects to InsForge Realtime over Socket.IO. Subscribe to channel names such as `order:123` or `chat:room-1`, then listen for event names published to those channels.
+
+Events are published by database triggers that call `realtime.publish(...)` or by clients that publish to a channel they have already joined. See [Realtime overview](/core-concepts/realtime/overview) for the channel and RLS model.
+
+## Quick start
+
+```kotlin
+import dev.insforge.realtime.models.SocketMessage
+
+client.realtime.connect()
+
+val response = client.realtime.subscribe("order:$orderId")
+
+if (!response.ok) {
+    println("Subscribe failed: ${response.error?.message}")
+    return
+}
+
+client.realtime.on<SocketMessage>("status_changed") { message ->
+    message?.let {
+        println("Status changed: ${it.payload}")
+    }
+}
+```
+
+## connect()
+
+Establish a realtime connection.
+
+```kotlin
+client.realtime.connect()
+
+println("Connected: ${client.realtime.isConnected}")
+println("Socket ID: ${client.realtime.socketId}")
+```
+
+Monitor connection state:
+
+```kotlin
+client.realtime.connectionState.collect { state ->
+    when (state) {
+        is Realtime.ConnectionState.Connected -> println("Connected")
+        is Realtime.ConnectionState.Connecting -> println("Connecting")
+        is Realtime.ConnectionState.Disconnected -> println("Disconnected")
+        is Realtime.ConnectionState.Error -> println("Error: ${state.message}")
+    }
+}
+```
+
+## subscribe()
+
+Subscribe to a channel and receive the current presence snapshot.
+
+```kotlin
+val response = client.realtime.subscribe("chat:room-1")
+
+if (response.ok) {
+    println("Subscribed to: ${response.channel}")
+    println("Members: ${response.presence?.members}")
+} else {
+    println("Error: ${response.error?.message}")
+}
+```
+
+## publish()
+
+Publish an event to a channel.
+
+```kotlin
+client.realtime.publish(
+    channel = "chat:room-1",
+    event = "new_message",
+    payload = mapOf(
+        "text" to "Hello from Kotlin",
+        "sentAt" to System.currentTimeMillis()
+    )
+)
+```
+
+<Note>
+  The client must subscribe to a channel before publishing to that same channel.
+</Note>
+
+If RLS is enabled on `realtime.messages`, publish is also checked against `INSERT` policies.
+
+## on()
+
+Register an event listener.
+
+```kotlin
+client.realtime.on<SocketMessage>("new_message") { message ->
+    message?.let {
+        println("Message: ${it.payload}")
+    }
+}
+```
+
+Connection and system events:
+
+| Event | Description |
+|-------|-------------|
+| `presence:join` | A logical member became present in the channel. |
+| `presence:leave` | A logical member is no longer present in the channel. |
+| `realtime:error` | Subscribe or publish failed. |
+
+## once()
+
+Listen for an event once.
+
+```kotlin
+client.realtime.once<SocketMessage>("checkout_completed") { message ->
+    println("Checkout completed: ${message?.payload}")
+}
+```
+
+## off()
+
+Remove an event listener.
+
+```kotlin
+val callback = Realtime.EventCallback<SocketMessage> { message ->
+    println("Event received: $message")
+}
+
+client.realtime.on("status_changed", callback)
+client.realtime.off("status_changed", callback)
+```
+
+## unsubscribe()
+
+Leave a channel.
+
+```kotlin
+client.realtime.unsubscribe("chat:room-1")
+```
+
+## disconnect()
+
+Close the realtime connection.
+
+```kotlin
+client.realtime.disconnect()
+```
+
+## getSubscribedChannels()
+
+Return locally subscribed channels.
+
+```kotlin
+val channels = client.realtime.getSubscribedChannels()
+println(channels)
+```
+
+## Presence
+
+Successful subscriptions return a presence snapshot. Listen for `presence:join` and `presence:leave` to update local online state.
+
+Presence is ephemeral. It is not a durable room membership table.

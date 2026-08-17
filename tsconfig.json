@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./frontend" },
+    { "path": "./backend" },
+    { "path": "./packages/shared-schemas" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/dashboard" }
+  ]
+}

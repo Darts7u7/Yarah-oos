@@ -1,0 +1,194 @@
+import { Router, Response, NextFunction } from 'express';
+import { AuthRequest, verifyAdmin } from '@/api/middlewares/auth.js';
+import { functionsWriteLimiter } from '@/api/middlewares/rate-limiters.js';
+import { FunctionService } from '@/services/functions/function.service.js';
+import { AuditService } from '@/services/logs/audit.service.js';
+import { AppError } from '@/utils/errors.js';
+import logger from '@/utils/logger.js';
+import {
+  ERROR_CODES,
+  uploadFunctionRequestSchema,
+  updateFunctionRequestSchema,
+} from '@insforge/shared-schemas';
+import { dashboardEventService } from '@/services/dashboard/dashboard-event.service.js';
+import { successResponse } from '@/utils/response.js';
+
+const router = Router();
+const functionService = FunctionService.getInstance();
+const auditService = AuditService.getInstance();
+
+/**
+ * GET /api/functions
+ * List all edge functions
+ */
+router.get('/', verifyAdmin, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const result = await functionService.listFunctions();
+    successResponse(res, result);
+  } catch (error) {
+    logger.error('Failed to list functions', { error });
+    next(new AppError('Failed to list functions', 500, ERROR_CODES.INTERNAL_ERROR));
+  }
+});
+
+/**
+ * GET /api/functions/:slug
+ * Get specific function details including code
+ */
+router.get('/:slug', verifyAdmin, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { slug } = req.params;
+    const func = await functionService.getFunction(slug);
+
+    if (!func) {
+      throw new AppError('Function not found', 404, ERROR_CODES.FUNCTION_NOT_FOUND);
+    }
+
+    successResponse(res, func);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * POST /api/functions
+ * Create a new function
+ */
+router.post(
+  '/',
+  verifyAdmin,
+  functionsWriteLimiter,
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const validation = uploadFunctionRequestSchema.safeParse(req.body);
+      if (!validation.success) {
+        throw new AppError(JSON.stringify(validation.error.issues), 400, ERROR_CODES.INVALID_INPUT);
+      }
+
+      const result = await functionService.createFunction(validation.data);
+
+      // Log audit event
+      logger.info(
+        `Function ${result.function.name} (${result.function.slug}) created by ${req.hasApiKey ? 'api-key' : req.user?.id}`
+      );
+      await auditService.log({
+        actor: req.hasApiKey ? 'api-key' : req.user?.id,
+        action: 'CREATE_FUNCTION',
+        module: 'FUNCTIONS',
+        details: {
+          functionId: result.function.id,
+          slug: result.function.slug,
+          name: result.function.name,
+          status: result.function.status,
+        },
+        ip_address: req.ip,
+      });
+
+      dashboardEventService.publishDataUpdate({ resource: 'functions' });
+
+      successResponse(
+        res,
+        {
+          success: !result.deployment || result.deployment.status === 'success',
+          function: result.function,
+          deployment: result.deployment,
+        },
+        201
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+/**
+ * PUT /api/functions/:slug
+ * Update an existing function
+ */
+router.put(
+  '/:slug',
+  verifyAdmin,
+  functionsWriteLimiter,
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const { slug } = req.params;
+      const validation = updateFunctionRequestSchema.safeParse(req.body);
+
+      if (!validation.success) {
+        throw new AppError(JSON.stringify(validation.error.issues), 400, ERROR_CODES.INVALID_INPUT);
+      }
+
+      const result = await functionService.updateFunction(slug, validation.data);
+
+      if (!result) {
+        throw new AppError('Function not found', 404, ERROR_CODES.FUNCTION_NOT_FOUND);
+      }
+
+      // Log audit event
+      logger.info(`Function ${slug} updated by ${req.hasApiKey ? 'api-key' : req.user?.id}`);
+      await auditService.log({
+        actor: req.hasApiKey ? 'api-key' : req.user?.id,
+        action: 'UPDATE_FUNCTION',
+        module: 'FUNCTIONS',
+        details: {
+          slug,
+          changes: validation.data,
+        },
+        ip_address: req.ip,
+      });
+
+      dashboardEventService.publishDataUpdate({ resource: 'functions', data: { slug } });
+
+      successResponse(res, {
+        success: !result.deployment || result.deployment.status === 'success',
+        function: result.function,
+        deployment: result.deployment,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+/**
+ * DELETE /api/functions/:slug
+ * Delete a function
+ */
+router.delete(
+  '/:slug',
+  verifyAdmin,
+  functionsWriteLimiter,
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const { slug } = req.params;
+      const deleted = await functionService.deleteFunction(slug);
+
+      if (!deleted) {
+        throw new AppError('Function not found', 404, ERROR_CODES.FUNCTION_NOT_FOUND);
+      }
+
+      // Log audit event
+      logger.info(`Function ${slug} deleted by ${req.hasApiKey ? 'api-key' : req.user?.id}`);
+      await auditService.log({
+        actor: req.hasApiKey ? 'api-key' : req.user?.id,
+        action: 'DELETE_FUNCTION',
+        module: 'FUNCTIONS',
+        details: {
+          slug,
+        },
+        ip_address: req.ip,
+      });
+
+      dashboardEventService.publishDataUpdate({ resource: 'functions' });
+
+      successResponse(res, {
+        success: true,
+        message: `Function ${slug} deleted successfully`,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+export default router;

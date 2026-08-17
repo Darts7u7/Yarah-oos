@@ -1,0 +1,440 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { Check, Copy, Loader2, RotateCw } from 'lucide-react';
+import {
+  useAdvisorCategoryCounts,
+  useAdvisorIssues,
+  useAdvisorLatest,
+  useAdvisorSuppressions,
+  useTriggerAdvisorScan,
+} from '#features/dashboard/hooks/useAdvisor';
+import type {
+  DashboardAdvisorCategory,
+  DashboardAdvisorIssue,
+  DashboardAdvisorSeverity,
+} from '#types';
+import { useDashboardHost } from '#lib/config/DashboardHostContext';
+import { useToast } from '@insforge/ui';
+import { useCopyToClipboard } from '#lib/hooks/useCopyToClipboard';
+import { EmptyState, PaginationControls } from '#components';
+import { AdvisoryItem } from './AdvisoryItem';
+import { AdvisoryTabs, type AdvisoryTabValue } from './AdvisoryTabs';
+import { IgnoredList, selectIgnoredRows } from './IgnoredList';
+import { SeverityFilterDropdown } from './SeverityFilterDropdown';
+import { formatRemediationPromptBatch } from './remediationPrompt';
+
+const ADVISOR_FETCH_PAGE_SIZE = 100;
+const ADVISOR_PAGE_SIZE = 10;
+const SCAN_POLL_INTERVAL_MS = 3_000;
+const SCAN_POLL_MAX_DURATION_MS = 30_000;
+
+const ALL_SEVERITIES: readonly DashboardAdvisorSeverity[] = ['critical', 'warning', 'info'];
+
+function formatRelative(iso: string | undefined): { key: string; count?: number } {
+  if (!iso) {
+    return { key: 'advisor.time.never' };
+  }
+  const timestamp = new Date(iso).getTime();
+  if (Number.isNaN(timestamp)) {
+    return { key: 'advisor.time.never' };
+  }
+  const minutes = Math.floor((Date.now() - timestamp) / 60_000);
+  if (minutes < 1) {
+    return { key: 'advisor.time.justNow' };
+  }
+  if (minutes < 60) {
+    return { key: 'advisor.time.minutesAgo', count: minutes };
+  }
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return { key: 'advisor.time.hoursAgo', count: hours };
+  }
+  const days = Math.floor(hours / 24);
+  return { key: 'advisor.time.daysAgo', count: days };
+}
+
+const ADVISOR_BUTTON_CLASS =
+  'flex h-8 items-center gap-1 rounded border border-[var(--alpha-8)] bg-card px-2 text-sm leading-5 text-foreground transition-colors hover:bg-[var(--alpha-4)] disabled:opacity-50';
+
+export function BackendAdvisorSection() {
+  const { t } = useTranslation('chrome');
+  const [tab, setTab] = useState<AdvisoryTabValue>('all');
+  const [view, setView] = useState<'active' | 'ignored'>('active');
+  const [selectedSeverities, setSelectedSeverities] = useState<Set<DashboardAdvisorSeverity>>(
+    () => new Set(ALL_SEVERITIES)
+  );
+  const pageSize = ADVISOR_PAGE_SIZE;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [expandedIssueId, setExpandedIssueId] = useState<string | null>(null);
+
+  const allSeveritiesSelected = selectedSeverities.size === ALL_SEVERITIES.length;
+  const noSeveritiesSelected = selectedSeverities.size === 0;
+  // Server-side severity filter only when exactly one is selected; otherwise we filter client-side.
+  const serverSeverity =
+    selectedSeverities.size === 1 ? ([...selectedSeverities][0] ?? undefined) : undefined;
+  const clientSideSeverityFilter = !allSeveritiesSelected && selectedSeverities.size !== 1;
+
+  const categoryFilter: DashboardAdvisorCategory | undefined =
+    tab === 'all' ? undefined : (tab as DashboardAdvisorCategory);
+
+  // Reset to first page when filters or the active/ignored view change.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [tab, pageSize, selectedSeverities, view]);
+
+  // Collapse any expanded item when filters or page change so the visible row set stays in sync.
+  useEffect(() => {
+    setExpandedIssueId(null);
+  }, [tab, pageSize, selectedSeverities, currentPage]);
+
+  const issuesQuery = useMemo(
+    () => ({
+      severity: serverSeverity,
+      category: categoryFilter,
+      // When client-side filtering severity, fetch the largest page so all items
+      // for the active category are available locally for filter+paginate.
+      limit: clientSideSeverityFilter ? ADVISOR_FETCH_PAGE_SIZE : pageSize,
+      offset: clientSideSeverityFilter ? 0 : (currentPage - 1) * pageSize,
+    }),
+    [serverSeverity, categoryFilter, clientSideSeverityFilter, pageSize, currentPage]
+  );
+  const latest = useAdvisorLatest();
+  // Active-scan queries pause on the Ignored view; the suppressions query only
+  // runs when the Ignored view needs it.
+  const issues = useAdvisorIssues(issuesQuery, view === 'active');
+  const categoryCounts = useAdvisorCategoryCounts(view === 'active');
+  const suppressions = useAdvisorSuppressions(view === 'ignored');
+  const trigger = useTriggerAdvisorScan();
+  const host = useDashboardHost();
+  const { showToast } = useToast();
+  const queryClient = useQueryClient();
+
+  const [isScanning, setIsScanning] = useState(false);
+  const { copied: copiedAll, copy } = useCopyToClipboard();
+  const baselineScanIdRef = useRef<string | undefined>(undefined);
+  const pollStartRef = useRef<number | null>(null);
+  const refetchLatest = latest.refetch;
+
+  useEffect(() => {
+    if (!isScanning) {
+      pollStartRef.current = null;
+      return;
+    }
+    if (pollStartRef.current === null) {
+      pollStartRef.current = Date.now();
+    }
+    let cancelled = false;
+    const interval = window.setInterval(() => {
+      if (cancelled) {
+        return;
+      }
+      void refetchLatest().then((result) => {
+        if (cancelled) {
+          return;
+        }
+        const data = result.data;
+        const scanIdChanged = !!data && data.scanId !== baselineScanIdRef.current;
+        if (scanIdChanged && data.status !== 'running') {
+          cancelled = true;
+          window.clearInterval(interval);
+          setIsScanning(false);
+          void queryClient.invalidateQueries({ queryKey: ['advisor', 'issues'] });
+          void queryClient.invalidateQueries({ queryKey: ['advisor', 'category-counts'] });
+          // Suppressions are enriched (title/severity/category) from the latest
+          // completed scan, so refresh them too or the Ignored view and its tab
+          // counts go stale after a re-scan.
+          void queryClient.invalidateQueries({ queryKey: ['advisor', 'suppressions'] });
+          if (data.status === 'failed') {
+            showToast(t('advisor.toast.scanFailed'), 'error');
+          } else {
+            showToast(t('advisor.toast.scanComplete'), 'success');
+          }
+          return;
+        }
+        const pollStart = pollStartRef.current ?? Date.now();
+        if (Date.now() - pollStart >= SCAN_POLL_MAX_DURATION_MS) {
+          cancelled = true;
+          window.clearInterval(interval);
+          setIsScanning(false);
+          showToast(t('advisor.toast.scanRunning'), 'info');
+        }
+      });
+    }, SCAN_POLL_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [isScanning, refetchLatest, queryClient, showToast, t]);
+
+  const handleRunScan = () => {
+    baselineScanIdRef.current = latest.data?.scanId;
+    setIsScanning(true);
+    showToast(t('advisor.toast.scanStarted'), 'info');
+    trigger.mutate(undefined, {
+      onError: (error) => {
+        setIsScanning(false);
+        showToast(t('advisor.toast.startFailed', { message: error.message }), 'error');
+      },
+    });
+  };
+
+  const lastScanRelative = formatRelative(latest.data?.scannedAt);
+  const lastScanLabel = t(lastScanRelative.key, { count: lastScanRelative.count });
+  const hasScan = !!latest.data?.scanId;
+
+  const summary = latest.data?.summary;
+  const summaryTotal = summary?.total;
+  const filteredAllCount =
+    summary === undefined
+      ? undefined
+      : allSeveritiesSelected
+        ? summary.total
+        : [...selectedSeverities].reduce((sum, sev) => sum + summary[sev], 0);
+  const matrix = categoryCounts.data;
+  const filteredCategoryCounts: Record<DashboardAdvisorCategory, number> | undefined = matrix
+    ? {
+        security: [...selectedSeverities].reduce((s, sev) => s + matrix.security[sev], 0),
+        performance: [...selectedSeverities].reduce((s, sev) => s + matrix.performance[sev], 0),
+        health: [...selectedSeverities].reduce((s, sev) => s + matrix.health[sev], 0),
+      }
+    : undefined;
+
+  // Ignored-view tab counts come from the suppressions themselves (not the
+  // active scan), computed via the same selector the list uses so they match.
+  const ignoredRows = suppressions.data ?? [];
+  const ignoredAllCount = selectIgnoredRows(ignoredRows, undefined, selectedSeverities).length;
+  const ignoredCategoryCounts: Record<DashboardAdvisorCategory, number> = {
+    security: selectIgnoredRows(ignoredRows, 'security', selectedSeverities).length,
+    performance: selectIgnoredRows(ignoredRows, 'performance', selectedSeverities).length,
+    health: selectIgnoredRows(ignoredRows, 'health', selectedSeverities).length,
+  };
+  // Total rows the Ignored view will render for the current filters — drives
+  // its client-side pagination (same 10/page scheme as the Active view).
+  const ignoredVisibleTotal = selectIgnoredRows(
+    ignoredRows,
+    categoryFilter,
+    selectedSeverities
+  ).length;
+  const ignoredTotalPages = Math.max(1, Math.ceil(ignoredVisibleTotal / pageSize));
+
+  // Predict filtered total so reserved height matches what this page will render.
+  const predictedFilteredTotal = noSeveritiesSelected
+    ? 0
+    : tab === 'all'
+      ? (filteredAllCount ?? summaryTotal ?? 0)
+      : (filteredCategoryCounts?.[tab as DashboardAdvisorCategory] ??
+        filteredAllCount ??
+        summaryTotal ??
+        0);
+  const expectedPageItemCount = Math.max(
+    0,
+    Math.min(pageSize, predictedFilteredTotal - (currentPage - 1) * pageSize)
+  );
+  const reservedItemsHeight =
+    hasScan && expectedPageItemCount > 0 ? expectedPageItemCount * 68 + 64 : 0;
+
+  // Apply client-side severity filter when needed, then derive pagination.
+  const fetchedIssues = issues.data?.issues ?? [];
+  const fetchedTotal = issues.data?.total ?? 0;
+  const filteredIssues = clientSideSeverityFilter
+    ? fetchedIssues.filter((i) => selectedSeverities.has(i.severity))
+    : fetchedIssues;
+  const visibleIssues = noSeveritiesSelected
+    ? []
+    : clientSideSeverityFilter
+      ? filteredIssues.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+      : filteredIssues;
+  const totalRecords = noSeveritiesSelected
+    ? 0
+    : clientSideSeverityFilter
+      ? filteredIssues.length
+      : fetchedTotal;
+  const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
+
+  // Clamp the page if the visible set shrinks under it — e.g. restoring the
+  // last ignored item on the last page, or ignoring the last active item —
+  // so the user never lands on a blank page.
+  const activePageBound = view === 'ignored' ? ignoredTotalPages : totalPages;
+  useEffect(() => {
+    if (currentPage > activePageBound) {
+      setCurrentPage(activePageBound);
+    }
+  }, [currentPage, activePageBound]);
+
+  const handleCopyAll = async () => {
+    const fetcher = host.onRequestAdvisorIssues;
+    if (!fetcher || totalRecords === 0) {
+      showToast(t('advisor.toast.nothingToCopy'), 'info');
+      return;
+    }
+    try {
+      const all: DashboardAdvisorIssue[] = [];
+      // Backend caps `limit` at 100 — paginate when severity filter is server-side.
+      // When client-side, we already have everything in `filteredIssues`.
+      if (clientSideSeverityFilter) {
+        all.push(...filteredIssues);
+      } else {
+        for (let offset = 0; offset < fetchedTotal; offset += ADVISOR_FETCH_PAGE_SIZE) {
+          const page = await fetcher({
+            severity: serverSeverity,
+            category: categoryFilter,
+            limit: ADVISOR_FETCH_PAGE_SIZE,
+            offset,
+          });
+          all.push(...page.issues);
+          if (page.issues.length < ADVISOR_FETCH_PAGE_SIZE) {
+            break;
+          }
+        }
+      }
+      const actionable = all.filter((issue) => issue.recommendation);
+      if (actionable.length === 0) {
+        showToast(t('advisor.toast.noRemediations'), 'info');
+        return;
+      }
+      const copiedOk = await copy(formatRemediationPromptBatch(actionable));
+      if (!copiedOk) {
+        showToast(t('advisor.toast.copyFailed'), 'error');
+      }
+    } catch {
+      // Guards the paginated advisor fetch above — `copy()` handles its own
+      // failure via the `copiedOk` check, so this only fires for fetch errors.
+      showToast(t('advisor.toast.copyFailed'), 'error');
+    }
+  };
+
+  return (
+    <section className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <h2 className="text-xl font-medium leading-7 text-foreground">{t('advisor.title')}</h2>
+        <span className="text-xs leading-4 text-muted-foreground">
+          {t('advisor.lastScan', { label: lastScanLabel })}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center rounded border border-[var(--alpha-8)] p-0.5">
+            {(['active', 'ignored'] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setView(v)}
+                className={`rounded px-2 py-1 text-sm leading-5 capitalize ${
+                  view === v
+                    ? 'bg-[var(--alpha-8)] text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {t(`advisor.${v}`)}
+              </button>
+            ))}
+          </div>
+          <AdvisoryTabs
+            value={tab}
+            onChange={setTab}
+            totalCount={view === 'ignored' ? ignoredAllCount : filteredAllCount}
+            categoryCounts={view === 'ignored' ? ignoredCategoryCounts : filteredCategoryCounts}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            disabled={isScanning}
+            onClick={handleRunScan}
+            className={ADVISOR_BUTTON_CLASS}
+          >
+            {isScanning ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RotateCw className="h-4 w-4" />
+            )}
+            <span>{isScanning ? t('advisor.scanning') : t('advisor.rescan')}</span>
+          </button>
+          <SeverityFilterDropdown selected={selectedSeverities} onChange={setSelectedSeverities} />
+          {view === 'active' && (
+            <button
+              type="button"
+              onClick={() => void handleCopyAll()}
+              className={ADVISOR_BUTTON_CLASS}
+            >
+              {copiedAll ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              <span>{copiedAll ? t('advisor.copied') : t('advisor.copyAll')}</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div
+        style={{ minHeight: reservedItemsHeight ? `${reservedItemsHeight}px` : undefined }}
+        className="flex flex-col gap-4"
+      >
+        <div className="flex flex-col rounded border border-[var(--alpha-8)] bg-[var(--alpha-4)]">
+          {view === 'ignored' ? (
+            <IgnoredList
+              category={categoryFilter}
+              selectedSeverities={selectedSeverities}
+              page={currentPage}
+              pageSize={pageSize}
+            />
+          ) : !hasScan && !latest.isLoading ? (
+            <EmptyState
+              className="h-32 gap-1"
+              title={t('advisor.noScanYet')}
+              description={t('advisor.clickRescan')}
+            />
+          ) : issues.isLoading ? (
+            <div className="flex h-24 items-center justify-center text-sm text-muted-foreground">
+              Loading…
+            </div>
+          ) : issues.isError ? (
+            <div className="flex h-24 items-center justify-center text-sm text-destructive">
+              Failed to load advisor issues
+            </div>
+          ) : visibleIssues.length > 0 ? (
+            <div className="flex flex-col">
+              {visibleIssues.map((issue) => (
+                <AdvisoryItem
+                  key={issue.id}
+                  issue={issue}
+                  expanded={expandedIssueId === issue.id}
+                  onToggle={() =>
+                    setExpandedIssueId((current) => (current === issue.id ? null : issue.id))
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex h-24 items-center justify-center text-sm text-muted-foreground">
+              No issues found
+            </div>
+          )}
+        </div>
+
+        {view === 'active' && hasScan && totalRecords > 0 && (
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalRecords={totalRecords}
+            pageSize={pageSize}
+            recordLabel="issues"
+          />
+        )}
+
+        {view === 'ignored' && ignoredVisibleTotal > 0 && (
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={ignoredTotalPages}
+            onPageChange={setCurrentPage}
+            totalRecords={ignoredVisibleTotal}
+            pageSize={pageSize}
+            recordLabel="ignored issues"
+          />
+        )}
+      </div>
+    </section>
+  );
+}

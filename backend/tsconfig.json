@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022"],
+    "outDir": "../dist",
+    "rootDir": "..",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@insforge/shared-schemas": ["../packages/shared-schemas/src/index.ts"]
+    },
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["node", "vitest"]
+  },
+  "include": ["src/**/*", "../packages/shared-schemas/src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

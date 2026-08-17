@@ -1,0 +1,105 @@
+import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { Lock } from 'lucide-react';
+import { Button } from '@insforge/ui';
+import { useDashboardHost, useDashboardProject } from '#lib/config/DashboardHostContext';
+import { useAuth } from '#lib/contexts/AuthContext';
+import { getFeatureFlag } from '#lib/analytics/posthog';
+import { FEATURE_FLAGS, FEATURE_FLAG_VARIANTS } from '#lib/analytics/constants';
+import { useMcpUsage } from '#features/logs/hooks/useMcpUsage';
+
+export default function CloudLoginPage() {
+  const { t } = useTranslation('chrome');
+  const navigate = useNavigate();
+  const host = useDashboardHost();
+  const project = useDashboardProject();
+  const { isAuthenticated, isLoading, error, refreshAuth } = useAuth();
+  const { hasCompletedOnboarding, isLoading: isMcpUsageLoading } = useMcpUsage();
+  const hasRequestedAuthRef = useRef(false);
+  const isCloudHosting = host.mode === 'cloud-hosting';
+  const isDTest =
+    getFeatureFlag(FEATURE_FLAGS.DASHBOARD_V4_EXPERIMENT) === FEATURE_FLAG_VARIANTS.D_TEST;
+  const isBranch = project?.isBranch === true;
+
+  useEffect(() => {
+    if (!isCloudHosting || hasRequestedAuthRef.current || isAuthenticated || isLoading || error) {
+      return;
+    }
+
+    hasRequestedAuthRef.current = true;
+    void refreshAuth();
+  }, [error, isAuthenticated, isCloudHosting, isLoading, refreshAuth]);
+
+  useEffect(() => {
+    if (!isCloudHosting || !isAuthenticated) {
+      return;
+    }
+
+    if (isDTest && (isMcpUsageLoading || project === undefined)) {
+      return;
+    }
+    const target =
+      isDTest && !hasCompletedOnboarding && !isBranch ? '/dashboard/install' : '/dashboard';
+    void navigate(target, { replace: true });
+  }, [
+    isAuthenticated,
+    isCloudHosting,
+    isDTest,
+    hasCompletedOnboarding,
+    isMcpUsageLoading,
+    project,
+    isBranch,
+    navigate,
+  ]);
+
+  if (!isCloudHosting) {
+    return <Navigate to="/dashboard/login" replace />;
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-neutral-800 flex items-center justify-center px-4">
+        <div className="text-center text-white max-w-md">
+          <Lock className="h-12 w-12 mx-auto mb-4 text-red-400" />
+          <h2 className="text-xl font-semibold mb-2">
+            {t('loginPage.authenticationFailed', { defaultValue: 'Authentication Failed' })}
+          </h2>
+          <p className="text-gray-400 text-sm">{error.message}</p>
+          <Button
+            className="mt-6"
+            onClick={() => {
+              void refreshAuth();
+            }}
+          >
+            {t('loginPage.retry', { defaultValue: 'Retry' })}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-neutral-800 flex items-center justify-center px-4">
+      <div className="text-center">
+        {isLoading ? (
+          <div className="animate-spin mb-4">
+            <Lock className="h-12 w-12 text-white mx-auto" />
+          </div>
+        ) : (
+          <Lock className="h-12 w-12 text-white mx-auto mb-4" />
+        )}
+        <h2 className="text-xl font-semibold text-white mb-2">
+          {isLoading
+            ? t('loginPage.authenticating', { defaultValue: 'Authenticating...' })
+            : t('loginPage.preparingDashboard', { defaultValue: 'Preparing dashboard...' })}
+        </h2>
+        <p className="text-sm text-gray-400">
+          {t('loginPage.verifyingIdentity', {
+            defaultValue: 'Please wait while we verify your identity',
+          })}
+        </p>
+      </div>
+    </div>
+  );
+}

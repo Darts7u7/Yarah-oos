@@ -1,0 +1,105 @@
+{
+  "name": "@insforge/dashboard",
+  "version": "0.0.0-dev.11",
+  "description": "Shared InsForge dashboard package for self-hosting and cloud-hosting hosts",
+  "license": "Apache-2.0",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": [
+    "./dist/styles.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "imports": {
+    "#app/*": "./dist/app/*.js",
+    "#assets/*": "./src/assets/*",
+    "#components": "./dist/components/index.js",
+    "#components/*": "./dist/components/*.js",
+    "#features/*": "./dist/features/*.js",
+    "#layout/*": "./dist/layout/*.js",
+    "#lib/*": "./dist/lib/*.js",
+    "#navigation/*": "./dist/navigation/*.js",
+    "#router/*": "./dist/router/*.js",
+    "#types": "./dist/types/index.d.ts",
+    "#types/*": "./dist/types/*.d.ts"
+  },
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run --config vitest.unit.config.ts",
+    "test:component": "vitest run --config vitest.component.config.ts",
+    "test:ui": "playwright test -c playwright.config.ts",
+    "prepublishOnly": "npm run build",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/lang-sql": "^6.10.0",
+    "@hookform/resolvers": "^5.1.1",
+    "@insforge/shared-schemas": "^1.1.51",
+    "@insforge/ui": "^0.1.7",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-popover": "^1.1.14",
+    "@radix-ui/react-scroll-area": "^1.2.9",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@tanstack/react-query": "^5.83.0",
+    "@types/uuid": "^10.0.0",
+    "@uiw/codemirror-theme-vscode": "^4.25.2",
+    "@uiw/react-codemirror": "^4.25.2",
+    "@xyflow/react": "^12.8.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "i18next": "^26.3.6",
+    "lucide-react": "^0.536.0",
+    "posthog-js": "^1.404.1",
+    "react-data-grid": "7.0.0-beta.47",
+    "react-hook-form": "^7.61.1",
+    "react-i18next": "^17.0.9",
+    "react-router-dom": "^7.15.1",
+    "recharts": "^3.8.1",
+    "tailwind-merge": "^3.3.1",
+    "uuid": "^14.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@tailwindcss/vite": "^4.1.11",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^6.0.3",
+    "jsdom": "^29.1.1",
+    "tailwindcss": "^4.1.11",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.8.3",
+    "vite": "^8.1.5",
+    "vite-plugin-svgr": "^4.3.0",
+    "vitest": "^4.1.6"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

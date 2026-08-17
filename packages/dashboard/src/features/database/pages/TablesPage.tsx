@@ -1,0 +1,824 @@
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { CirclePlus, FolderInput, FolderOutput } from 'lucide-react';
+import PencilIcon from '#assets/icons/pencil.svg?react';
+import RefreshIcon from '#assets/icons/refresh.svg?react';
+import { useDatabaseSchemas } from '#features/database/hooks/useDatabase';
+import { useDatabaseSchemaSelection } from '#features/database/hooks/useDatabaseSchemaSelection';
+import { useTables } from '#features/database/hooks/useTables';
+import { useRecords } from '#features/database/hooks/useRecords';
+import { DatabaseSidebar } from '#features/database/components/DatabaseSidebar';
+import { RecordFormDialog } from '#features/database/components/RecordFormDialog';
+import { TableForm } from '#features/database/components/TableForm';
+import { TablesEmptyState } from '#features/database/components/TablesEmptyState';
+import { TemplatePreview } from '#features/database/components/TemplatePreview';
+import { DATABASE_TEMPLATES, DatabaseTemplate } from '#features/database/templates';
+import {
+  Button,
+  ConfirmDialog,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+  useToast,
+} from '@insforge/ui';
+import {
+  Alert,
+  AlertDescription,
+  EmptyState,
+  EmptyStateIllustration,
+  SelectionClearButton,
+  DeleteActionButton,
+  TableHeader,
+} from '#components';
+import { useConfirm } from '#lib/hooks/useConfirm';
+import { DatabaseDataGrid } from '#features/database/components/DatabaseDataGrid';
+import { SortColumn } from 'react-data-grid';
+import { convertValueForColumn } from '#lib/utils/utils';
+import { useCSVImport } from '#features/database/hooks/useCSVImport';
+import { useCSVExport } from '#features/database/hooks/useCSVExport';
+import { useTablePreferences } from '#features/database/hooks/useTablePreferences';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { usePageSize } from '#lib/hooks/usePageSize';
+import {
+  DEFAULT_DATABASE_SCHEMA,
+  decodeRecordKey,
+  encodeRecordKey,
+  getDatabaseSchemaInfo,
+  getPrimaryKeyColumns,
+} from '#features/database/helpers';
+
+export default function TablesPage() {
+  const { t } = useTranslation('chrome');
+  const location = useLocation();
+  const { selectedSchema, setSelectedSchema } = useDatabaseSchemaSelection();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const shouldSlideBackToTables =
+    (location.state as { slideFromStudio?: boolean } | null)?.slideFromStudio === true;
+  const selectedTableFromQuery = searchParams.get('table')?.trim();
+  const [showRecordForm, setShowRecordForm] = useState(false);
+  const [isTableFormDirty, setIsTableFormDirty] = useState(false);
+  const [showTableForm, setShowTableForm] = useState(false);
+  const [editingTable, setEditingTable] = useState<string | null>(null);
+  const [searchByTable, setSearchByTable] = useState<Record<string, string>>({});
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [sortColumns, setSortColumns] = useState<SortColumn[]>([]);
+  const { pageSize, pageSizeOptions, onPageSizeChange } = usePageSize('db-table');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isSorting, setIsSorting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [previewingTemplate, setPreviewingTemplate] = useState<DatabaseTemplate | null>(null);
+
+  const { confirm, confirmDialogProps } = useConfirm();
+  const { showToast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { schemas, isLoading: isLoadingSchemas } = useDatabaseSchemas();
+  const selectedSchemaInfo = useMemo(
+    () => getDatabaseSchemaInfo(schemas, selectedSchema),
+    [schemas, selectedSchema]
+  );
+  const { tables, isLoadingTables, tablesError, deleteTable, useTableSchema, refetchTables } =
+    useTables(selectedSchema);
+  const selectedTable = useMemo(() => {
+    if (isLoadingTables || !tables.length) {
+      return null;
+    }
+
+    if (selectedTableFromQuery && tables.includes(selectedTableFromQuery)) {
+      return selectedTableFromQuery;
+    }
+
+    return tables[0];
+  }, [isLoadingTables, tables, selectedTableFromQuery]);
+  const tableKey = `${selectedSchema}\x00${selectedTable ?? ''}`;
+  const searchValue = searchByTable[tableKey] ?? '';
+  const searchQuery = searchValue.trim();
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchByTable((prev) => ({ ...prev, [tableKey]: value }));
+    },
+    [tableKey]
+  );
+  const selectTable = useCallback(
+    (tableName: string | null, replace: boolean = false) => {
+      const nextSearchParams = new URLSearchParams(searchParams);
+      if (tableName) {
+        nextSearchParams.set('table', tableName);
+      } else {
+        nextSearchParams.delete('table');
+      }
+      setSearchParams(nextSearchParams, { replace });
+    },
+    [searchParams, setSearchParams]
+  );
+
+  const selectTableInSchema = useCallback(
+    (tableName: string | null, schemaName: string = selectedSchema, replace: boolean = false) => {
+      const nextSearchParams = new URLSearchParams(searchParams);
+      if (schemaName === DEFAULT_DATABASE_SCHEMA) {
+        nextSearchParams.delete('schema');
+      } else {
+        nextSearchParams.set('schema', schemaName);
+      }
+
+      if (tableName) {
+        nextSearchParams.set('table', tableName);
+      } else {
+        nextSearchParams.delete('table');
+      }
+
+      setSearchParams(nextSearchParams, { replace });
+    },
+    [searchParams, selectedSchema, setSearchParams]
+  );
+
+  const recordsHook = useRecords(selectedTable || '', selectedSchema);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && selectedTable) {
+      importCSV(file);
+    }
+    // Reset file input to allow re-uploading the same file
+    if (event.target) {
+      event.target.value = '';
+    }
+  };
+
+  // Keep URL query param in sync with active table selection with fallback-to-first behavior.
+  useEffect(() => {
+    if (isLoadingTables) {
+      return;
+    }
+
+    if ((selectedTableFromQuery ?? null) === selectedTable) {
+      return;
+    }
+
+    selectTable(selectedTable, true);
+  }, [selectedTable, selectedTableFromQuery, isLoadingTables, selectTable]);
+
+  useEffect(() => {
+    if (isLoadingSchemas || schemas.length === 0) {
+      return;
+    }
+
+    const schemaExists = schemas.some((schema) => schema.name === selectedSchema);
+    if (!schemaExists) {
+      setSelectedSchema(DEFAULT_DATABASE_SCHEMA, { replace: true, clearTable: true });
+    }
+  }, [isLoadingSchemas, schemas, selectedSchema, setSelectedSchema]);
+
+  const handlePageSizeChange = useCallback(
+    (newPageSize: number) => {
+      onPageSizeChange(newPageSize);
+      setCurrentPage(1);
+    },
+    [onPageSizeChange]
+  );
+
+  // Reset page when search query or selected table changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedTable]);
+
+  // Clear selected rows when table changes
+  useEffect(() => {
+    setSelectedRows(new Set());
+  }, [selectedTable, selectedSchema]);
+
+  // Safe sort columns change handler
+  const handleSortColumnsChange = useCallback(
+    (newSortColumns: SortColumn[]) => {
+      try {
+        setIsSorting(true);
+        setSortColumns(newSortColumns);
+        // isSorting will be reset when the query completes
+      } catch {
+        // Clear sorting on error
+        setSortColumns([]);
+        setIsSorting(false);
+        showToast(
+          t('database.sortingFailed', {
+            defaultValue: 'Sorting failed. Please try a different sort option.',
+          }),
+          'error'
+        );
+      }
+    },
+    [showToast, t]
+  );
+
+  // Fetch schema for selected table
+  const { data: schemaData } = useTableSchema(selectedTable || '', selectedSchema, !!selectedTable);
+  const availableColumns = useMemo(
+    () => schemaData?.columns.map((column) => column.columnName) ?? [],
+    [schemaData]
+  );
+  const dataGridKey = useMemo(
+    () => `${selectedTable ?? 'no-table'}:${availableColumns.join('|')}`,
+    [selectedTable, availableColumns]
+  );
+  const { columnOrder, columnWidths, reorderColumns, setColumnWidth } = useTablePreferences(
+    selectedTable,
+    selectedSchema,
+    availableColumns
+  );
+
+  // Fetch schema for editing table
+  const { data: editingTableSchema } = useTableSchema(
+    editingTable || '',
+    selectedSchema,
+    !!editingTable
+  );
+
+  // Full primary-key tuple (supports composite keys) used for row identity,
+  // updates, and deletes.
+  const primaryKeyColumns = useMemo(() => getPrimaryKeyColumns(schemaData?.columns), [schemaData]);
+
+  const {
+    mutate: importCSV,
+    isPending: isImporting,
+    reset: resetImport,
+  } = useCSVImport(selectedTable || '', selectedSchema, {
+    onSuccess: (data) => {
+      if (data.success) {
+        showToast(
+          data.message || t('database.importSuccessful', { defaultValue: 'Import successful!' }),
+          'success'
+        );
+        void refetchTableData();
+      } else {
+        // This case handles validation errors returned with a 200 OK but success: false
+        const errorMessage =
+          data.message ||
+          t('database.csvImportFailed', {
+            defaultValue: 'CSV import failed due to validation errors. Please check the file.',
+          });
+        showToast(errorMessage, 'error');
+      }
+      resetImport();
+    },
+    onError: (error: Error) => {
+      // This handles 400/500 errors from the API client
+      const message =
+        error?.message ||
+        t('database.importUnexpectedError', {
+          defaultValue: 'An unexpected error occurred during import. Please try again.',
+        });
+      showToast(message, 'error');
+      resetImport();
+    },
+  });
+
+  const {
+    mutate: exportCSV,
+    isPending: isExporting,
+    reset: resetExport,
+  } = useCSVExport(selectedTable || '', selectedSchema, {
+    onSuccess: () => {
+      showToast(t('database.exportSuccessful', { defaultValue: 'Export successful!' }), 'success');
+      resetExport();
+    },
+    onWarning: (message: string) => {
+      showToast(message, 'warn');
+    },
+    onError: (error: Error) => {
+      const message =
+        error?.message ||
+        t('database.exportUnexpectedError', {
+          defaultValue: 'An unexpected error occurred during export. Please try again.',
+        });
+      showToast(message, 'error');
+      resetExport();
+    },
+  });
+
+  // Fetch table records using the hook
+  const offset = (currentPage - 1) * pageSize;
+  const {
+    data: recordsData,
+    isLoading: isLoadingRecords,
+    error: recordsError,
+    refetch: refetchRecords,
+  } = recordsHook.useTableRecords(
+    pageSize,
+    offset,
+    searchQuery,
+    sortColumns,
+    !!selectedTable && !!schemaData
+  );
+
+  // Combine schema and records data
+  const tableData =
+    selectedTable && schemaData && recordsData
+      ? {
+          name: selectedTable,
+          schema: schemaData,
+          records: recordsData.records,
+          totalRecords: searchQuery.trim()
+            ? (recordsData.pagination?.total ?? recordsData.records.length)
+            : Math.max(schemaData.recordCount ?? 0, recordsData.pagination?.total ?? 0),
+        }
+      : null;
+
+  const isLoadingTable = isLoadingRecords;
+  const tableError = recordsError;
+  const refetchTableData = refetchRecords;
+
+  // Reset sorting flag when loading completes
+  useEffect(() => {
+    if (!isLoadingTable && isSorting) {
+      setIsSorting(false);
+    }
+  }, [isLoadingTable, isSorting]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      // Reset all state
+      setSelectedRows(new Set());
+      setSortColumns([]);
+      setSearchByTable((prev) => ({ ...prev, [tableKey]: '' }));
+      setIsSorting(false);
+
+      // Refresh current table data (if table is selected)
+      if (selectedTable) {
+        await refetchTableData();
+      }
+      await refetchTables();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const handleTableFormClose = async (): Promise<boolean> => {
+    if (isTableFormDirty) {
+      const confirmOptions = {
+        title: t('database.unsavedChanges', { defaultValue: 'Unsaved Changes' }),
+        description: t('database.unsavedChangesDescription', {
+          defaultValue:
+            'You have unsaved changes. Do you want to discard the changes and exit the form?',
+        }),
+        confirmText: t('common.discard', { defaultValue: 'Discard' }),
+        destructive: true,
+      };
+
+      const shouldDiscard = await confirm(confirmOptions);
+      if (shouldDiscard) {
+        setShowTableForm(false);
+        setEditingTable(null);
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      setShowTableForm(false);
+      return true;
+    }
+  };
+
+  const handleSelectTable = (tableName: string) => {
+    if (showTableForm) {
+      void handleTableFormClose().then((discarded) => {
+        if (discarded) {
+          selectTable(tableName);
+        }
+      });
+    } else {
+      selectTable(tableName);
+    }
+  };
+
+  const handleSelectSchema = (schemaName: string) => {
+    if (showTableForm) {
+      void handleTableFormClose().then((discarded) => {
+        if (discarded) {
+          setSelectedSchema(schemaName, { clearTable: true });
+        }
+      });
+      return;
+    }
+
+    setSelectedSchema(schemaName, { clearTable: true });
+  };
+
+  const handleCreateTable = () => {
+    setEditingTable(null);
+    setShowTableForm(true);
+  };
+
+  const handleEditTable = (tableName: string) => {
+    selectTable(tableName);
+    setEditingTable(tableName);
+    setShowTableForm(true);
+  };
+
+  const handleDeleteTable = async (tableName: string) => {
+    const confirmOptions = {
+      title: t('database.deleteTable', { defaultValue: 'Delete Table' }),
+      description: t('database.deleteTableConfirm', {
+        tableName,
+        defaultValue:
+          'Are you sure you want to delete the table "{{tableName}}"? This will permanently delete all records in this table. This action cannot be undone.',
+      }),
+      confirmText: t('common.delete', { defaultValue: 'Delete' }),
+      destructive: true,
+    };
+
+    const shouldDelete = await confirm(confirmOptions);
+
+    if (shouldDelete) {
+      // Update selected table in URL BEFORE deleting to prevent queries on deleted table.
+      if (selectedTable === tableName) {
+        const nextTable = tables.find((table) => table !== tableName) ?? null;
+        selectTable(nextTable, true);
+      }
+
+      deleteTable(tableName);
+    }
+  };
+
+  const handleTemplateClick = (template: DatabaseTemplate) => {
+    setPreviewingTemplate(template);
+  };
+
+  const handleCancelPreview = () => {
+    setPreviewingTemplate(null);
+  };
+
+  // Handle record update. `rowKey` is the encoded primary-key tuple from the grid.
+  const handleRecordUpdate = async (rowKey: string, columnKey: string, newValue: string) => {
+    if (!selectedTable || selectedSchemaInfo.isProtected) {
+      return;
+    }
+
+    try {
+      // Find column schema to determine the correct type conversion
+      const columnSchema = tableData?.schema?.columns?.find((col) => col.columnName === columnKey);
+      if (columnSchema) {
+        // Convert value based on column type using utility function
+        const conversionResult = convertValueForColumn(columnSchema.type, newValue);
+
+        if (!conversionResult.success) {
+          showToast(
+            conversionResult.error || t('database.invalidValue', { defaultValue: 'Invalid value' }),
+            'error'
+          );
+          return;
+        }
+        const updates = { [columnKey]: conversionResult.value };
+        await recordsHook.updateRecord({
+          primaryKey: decodeRecordKey(rowKey),
+          data: updates,
+        });
+      }
+    } catch (error) {
+      showToast(
+        t('database.failedToUpdateRecord', { defaultValue: 'Failed to update record' }),
+        'error'
+      );
+      throw error;
+    }
+  };
+
+  // Handle bulk delete. `rowKeys` are the encoded primary-key tuples from the grid.
+  const handleBulkDelete = async (rowKeys: string[]) => {
+    if (!selectedTable || !rowKeys.length || selectedSchemaInfo.isProtected) {
+      return;
+    }
+
+    const shouldDelete = await confirm({
+      title: t('database.deleteRecordsTitle', {
+        count: rowKeys.length,
+        defaultValue: rowKeys.length === 1 ? 'Delete {{count}} Record' : 'Delete {{count}} Records',
+      }),
+      description: t('database.deleteRecordsConfirm', {
+        count: rowKeys.length,
+        defaultValue:
+          rowKeys.length === 1
+            ? 'Are you sure you want to delete {{count}} record? This action cannot be undone.'
+            : 'Are you sure you want to delete {{count}} records? This action cannot be undone.',
+      }),
+      confirmText: t('common.delete', { defaultValue: 'Delete' }),
+      destructive: true,
+    });
+
+    if (shouldDelete) {
+      await recordsHook.deleteRecords({ primaryKeys: rowKeys.map(decodeRecordKey) });
+      // Query invalidation is handled by the mutation, no manual refetch needed
+      setSelectedRows(new Set());
+    }
+  };
+
+  const error = tablesError || tableError;
+
+  // Calculate pagination
+  const totalPages = Math.ceil((tableData?.totalRecords || 0) / pageSize);
+
+  // Show empty state when there are no tables and not loading
+  const showEmptyState = !isLoadingTables && tables?.length === 0 && !showTableForm;
+  const canMutateSelectedSchema = !selectedSchemaInfo.isProtected;
+
+  // Show template preview - takes full width without sidebar
+  if (previewingTemplate) {
+    return <TemplatePreview template={previewingTemplate} onCancel={handleCancelPreview} />;
+  }
+
+  return (
+    <div className="flex h-full min-h-0 min-w-0 overflow-hidden bg-[rgb(var(--semantic-1))]">
+      {/* Secondary Sidebar - Table List */}
+      <DatabaseSidebar
+        schemas={schemas}
+        selectedSchema={selectedSchema}
+        onSchemaSelect={handleSelectSchema}
+        tables={tables}
+        selectedTable={selectedTable || undefined}
+        onTableSelect={handleSelectTable}
+        loading={isLoadingTables}
+        onNewTable={canMutateSelectedSchema ? handleCreateTable : undefined}
+        onEditTable={canMutateSelectedSchema ? handleEditTable : undefined}
+        onDeleteTable={
+          canMutateSelectedSchema ? (tableName) => void handleDeleteTable(tableName) : undefined
+        }
+        initialMode={shouldSlideBackToTables ? 'studio' : 'tables'}
+        animateToMode={shouldSlideBackToTables ? 'tables' : undefined}
+      />
+
+      {/* Main Content Area */}
+      <div className="min-w-0 flex-1 flex flex-col overflow-hidden">
+        {showTableForm ? (
+          // Show TableForm replacing entire main content area
+          <TableForm
+            schemaName={selectedSchema}
+            open={showTableForm}
+            onOpenChange={(open) => {
+              if (!open) {
+                void handleTableFormClose();
+              }
+            }}
+            mode={editingTable ? 'edit' : 'create'}
+            editTable={editingTable ? editingTableSchema : undefined}
+            setFormIsDirty={setIsTableFormDirty}
+            onSuccess={(newTableName?: string) => {
+              void refetchTables();
+              void refetchTableData();
+              setShowTableForm(false);
+              if (newTableName) {
+                selectTable(newTableName);
+              }
+            }}
+          />
+        ) : (
+          // Show normal content with header
+          <>
+            {selectedTable && (
+              <TableHeader
+                key={tableKey}
+                leftContent={
+                  selectedRows.size > 0 ? (
+                    <div className="flex items-center gap-2">
+                      <SelectionClearButton
+                        selectedCount={selectedRows.size}
+                        itemType="record"
+                        onClear={() => setSelectedRows(new Set())}
+                      />
+                      <DeleteActionButton
+                        selectedCount={selectedRows.size}
+                        itemType="record"
+                        onDelete={() => void handleBulkDelete(Array.from(selectedRows))}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex min-w-0 items-center gap-3">
+                      <h1 className="shrink-0 text-base font-medium leading-7 text-foreground">
+                        {selectedTable}
+                      </h1>
+                      {selectedSchemaInfo.isProtected && (
+                        <span className="rounded bg-alpha-4 px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                          {t('database.protectedBadge', { defaultValue: 'Protected' })}
+                        </span>
+                      )}
+                      <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+                        <div className="h-5 w-px bg-[var(--alpha-8)]" />
+                      </div>
+                      <TooltipProvider>
+                        {canMutateSelectedSchema && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleEditTable(selectedTable)}
+                                className="h-8 w-8 rounded p-1.5 text-muted-foreground hover:bg-[var(--alpha-4)] active:bg-[var(--alpha-8)]"
+                              >
+                                <PencilIcon className="h-5 w-5" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" align="center">
+                              <p>
+                                {t('database.editTableTooltip', { defaultValue: 'Edit table' })}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => void handleRefresh()}
+                              disabled={isRefreshing}
+                              className="h-8 w-8 rounded p-1.5 text-muted-foreground hover:bg-[var(--alpha-4)] active:bg-[var(--alpha-8)]"
+                            >
+                              <RefreshIcon
+                                className={isRefreshing ? 'h-5 w-5 animate-spin' : 'h-5 w-5'}
+                              />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" align="center">
+                            <p>
+                              {isRefreshing
+                                ? t('common.refreshing', { defaultValue: 'Refreshing...' })
+                                : t('database.refreshRecords', {
+                                    defaultValue: 'Refresh records',
+                                  })}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      {canMutateSelectedSchema && (
+                        <>
+                          <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+                            <div className="h-5 w-px bg-[var(--alpha-8)]" />
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 rounded px-1.5 text-primary hover:bg-[var(--alpha-4)] hover:text-primary active:bg-[var(--alpha-8)]"
+                            onClick={() => setShowRecordForm(true)}
+                          >
+                            <CirclePlus className="h-6 w-6 stroke-[1.5] text-primary" />
+                            <span className="px-1 text-sm font-medium leading-5">
+                              {t('database.addRecord', { defaultValue: 'Add Record' })}
+                            </span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 rounded px-1.5 text-muted-foreground hover:bg-[var(--alpha-4)] hover:text-foreground active:bg-[var(--alpha-8)]"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isImporting}
+                          >
+                            <FolderInput className="h-6 w-6 stroke-[1.5]" />
+                            <span className="px-1 text-sm font-medium leading-5">
+                              {isImporting
+                                ? t('database.importing', { defaultValue: 'Importing...' })
+                                : t('database.importCsv', { defaultValue: 'Import CSV' })}
+                            </span>
+                          </Button>
+                        </>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 rounded px-1.5 text-muted-foreground hover:bg-[var(--alpha-4)] hover:text-foreground active:bg-[var(--alpha-8)]"
+                        onClick={() => exportCSV()}
+                        disabled={isExporting}
+                      >
+                        <FolderOutput className="h-6 w-6 stroke-[1.5]" />
+                        <span className="px-1 text-sm font-medium leading-5">
+                          {isExporting
+                            ? t('database.exporting', { defaultValue: 'Exporting...' })
+                            : t('database.exportCsv', { defaultValue: 'Export CSV' })}
+                        </span>
+                      </Button>
+                    </div>
+                  )
+                }
+                searchValue={searchValue}
+                onSearchChange={handleSearchChange}
+                searchDebounceTime={300}
+                searchPlaceholder={t('database.searchRecordsPlaceholder', {
+                  defaultValue: 'Search records',
+                })}
+              />
+            )}
+
+            {/* Content - Full height without padding for table to fill */}
+            <div className="min-h-0 flex-1 flex flex-col overflow-hidden">
+              {error && (
+                <Alert variant="destructive" className="mx-4 mt-4">
+                  <AlertDescription>{String(error)}</AlertDescription>
+                </Alert>
+              )}
+
+              {showEmptyState && canMutateSelectedSchema ? (
+                <TablesEmptyState
+                  templates={DATABASE_TEMPLATES}
+                  onCreateTable={handleCreateTable}
+                  onTemplateClick={handleTemplateClick}
+                />
+              ) : showEmptyState ? (
+                <div className="flex-1 flex items-center justify-center">
+                  <EmptyState
+                    title={t('database.noTablesInSchema', { schema: selectedSchema })}
+                    description={
+                      selectedSchemaInfo.isProtected
+                        ? t('database.schemaProtected')
+                        : t('database.fromSidebar')
+                    }
+                  />
+                </div>
+              ) : !selectedTable ? (
+                <div className="flex-1 flex items-center justify-center">
+                  <EmptyState
+                    title={t('database.noTableSelected', { defaultValue: 'No Table Selected' })}
+                    description={t('database.noTableSelectedDescription', {
+                      defaultValue: 'Select a table from the sidebar to view its data',
+                    })}
+                  />
+                </div>
+              ) : (
+                <DatabaseDataGrid
+                  key={dataGridKey}
+                  data={tableData?.records || []}
+                  schema={tableData?.schema}
+                  columnOrder={columnOrder}
+                  columnWidths={columnWidths}
+                  onColumnsReorder={reorderColumns}
+                  loading={isLoadingTable && !tableData}
+                  isSorting={isSorting}
+                  isRefreshing={isRefreshing}
+                  rowKeyGetter={(row) => encodeRecordKey(row, primaryKeyColumns)}
+                  selectedRows={selectedRows}
+                  onSelectedRowsChange={setSelectedRows}
+                  sortColumns={sortColumns}
+                  onSortColumnsChange={handleSortColumnsChange}
+                  onColumnResize={setColumnWidth}
+                  onCellEdit={canMutateSelectedSchema ? handleRecordUpdate : undefined}
+                  onJumpToTable={(tableName, schemaName) =>
+                    selectTableInSchema(tableName, schemaName ?? selectedSchema)
+                  }
+                  readOnly={selectedSchemaInfo.isProtected}
+                  showSelection={!selectedSchemaInfo.isProtected}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  pageSize={pageSize}
+                  pageSizeOptions={pageSizeOptions}
+                  totalRecords={tableData?.totalRecords || 0}
+                  paginationRecordLabel={t('database.recordsRecordLabel', {
+                    defaultValue: 'records',
+                  })}
+                  onPageChange={setCurrentPage}
+                  onPageSizeChange={handlePageSizeChange}
+                  emptyState={
+                    <div className="flex flex-col items-center gap-2 pb-12 pt-6 text-center">
+                      <EmptyStateIllustration />
+                      <p className="text-sm font-medium leading-6 text-muted-foreground">
+                        {t('database.noRecordsFoundTitle', { defaultValue: 'No Records Found' })}
+                      </p>
+                      {!searchQuery && canMutateSelectedSchema && (
+                        <button
+                          type="button"
+                          className="text-xs leading-4 text-primary hover:underline"
+                          onClick={() => setShowRecordForm(true)}
+                        >
+                          {t('database.addRecord', { defaultValue: 'Add Record' })}
+                        </button>
+                      )}
+                    </div>
+                  }
+                />
+              )}
+            </div>
+          </>
+        )}
+      </div>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileSelect}
+        accept=".csv,text/csv"
+        style={{ display: 'none' }}
+      />
+
+      {/* Add Record Form */}
+      {selectedTable && schemaData && canMutateSelectedSchema && (
+        // In the RecordForm onSuccess callback
+        <RecordFormDialog
+          open={showRecordForm}
+          onOpenChange={setShowRecordForm}
+          tableName={selectedTable}
+          schemaName={selectedSchema}
+          schema={schemaData.columns}
+          foreignKeys={schemaData.foreignKeys}
+        />
+      )}
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog {...confirmDialogProps} />
+    </div>
+  );
+}

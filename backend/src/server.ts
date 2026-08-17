@@ -1,0 +1,482 @@
+import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import authRouter from '@/api/routes/auth/index.routes.js';
+import databaseRouter from '@/api/routes/database/index.routes.js';
+import { storageRouter } from '@/api/routes/storage/index.routes.js';
+import { metadataRouter } from '@/api/routes/metadata/index.routes.js';
+import { githubRouter } from '@/api/routes/github/index.routes.js';
+import { logsRouter } from '@/api/routes/logs/index.routes.js';
+import { docsRouter } from '@/api/routes/docs/index.routes.js';
+import functionsRouter from '@/api/routes/functions/index.routes.js';
+import secretsRouter from '@/api/routes/secrets/index.routes.js';
+import { usageRouter } from '@/api/routes/usage/index.routes.js';
+import { aiRouter } from '@/api/routes/ai/index.routes.js';
+import { memoryRouter } from '@/api/routes/memory/index.routes.js';
+import { realtimeRouter } from '@/api/routes/realtime/index.routes.js';
+import { emailRouter } from '@/api/routes/email/index.routes.js';
+import { deploymentsRouter } from '@/api/routes/deployments/index.routes.js';
+import { webhooksRouter } from '@/api/routes/webhooks/index.routes.js';
+import { s3GatewayRouter } from '@/api/routes/s3-gateway/index.routes.js';
+import { paymentsRouter } from '@/api/routes/payments/index.routes.js';
+import { advisorRouter } from '@/api/routes/advisor/index.routes.js';
+import { errorMiddleware } from '@/api/middlewares/error.js';
+import { destroyEmailCooldownInterval } from '@/api/middlewares/rate-limiters.js';
+import { isCloudEnvironment } from '@/utils/environment.js';
+import { RealtimeManager } from '@/infra/realtime/realtime.manager.js';
+import fetch from 'node-fetch';
+import { DatabaseManager } from '@/infra/database/database.manager.js';
+import { LogService } from '@/services/logs/log.service.js';
+import { StorageService } from '@/services/storage/storage.service.js';
+import { SocketManager } from '@/infra/socket/socket.manager.js';
+import { OAuthPKCEService } from '@/services/auth/oauth-pkce.service.js';
+import { seedBackend } from '@/utils/seed.js';
+import logger from '@/utils/logger.js';
+import { initSqlParser } from '@/utils/sql-parser.js';
+import { FunctionService } from '@/services/functions/function.service.js';
+import packageJson from '../../package.json';
+import { schedulesRouter } from '@/api/routes/schedules/index.routes.js';
+import { servicesRouter } from '@/api/routes/compute/services.routes.js';
+import { analyticsRouter } from '@/api/routes/analytics/index.routes.js';
+import { webscraperRouter } from '@/api/routes/webscraper/index.routes.js';
+import { dashboardEventsRouter } from '@/api/routes/dashboard/events.routes.js';
+import { appConfig } from '@/infra/config/app.config.js';
+import {
+  TelemetryService,
+  isTelemetryRuntimeDisabled,
+} from '@/services/telemetry/telemetry.service.js';
+import { FeatureUsageCollector } from '@/services/telemetry/feature-usage.collector.js';
+import { TokenManager } from '@/infra/security/token.manager.js';
+import { DatabaseBackupService } from '@/services/database/database-backup.service.js';
+import {
+  ComputeServicesService,
+  warnIfFlyCredentialsIncomplete,
+} from '@/services/compute/services.service.js';
+import { ComputeConfigService } from '@/services/compute/compute-config.service.js';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env file from the root directory (parent of backend)
+const envPath = path.resolve(__dirname, '../../.env');
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+} else {
+  // Fallback to default behavior (looks in current working directory)
+  dotenv.config();
+}
+
+export async function createApp() {
+  // Initialize database first
+  const dbManager = DatabaseManager.getInstance();
+  await dbManager.initialize(); // create data/app.db
+
+  // Initialize storage service
+  const storageService = StorageService.getInstance();
+  await storageService.initialize(); // create data/storage
+
+  // Initialize logs service
+  const logService = LogService.getInstance();
+  await logService.initialize(); // connect to CloudWatch
+
+  // Initialize SQL parser WASM module
+  await initSqlParser();
+
+  const app = express();
+
+  // Enable trust proxy setting for rate limiting behind proxies/load balancers.
+  app.set('trust proxy', appConfig.server.trustProxy);
+
+  // Basic middleware
+  app.use(
+    cors({
+      origin: true, // Allow all origins (matches Better Auth's trustedOrigins: ['*'])
+      credentials: true, // Allow cookies/credentials
+      exposedHeaders: ['Content-Range', 'Preference-Applied'],
+    })
+  );
+  app.use(cookieParser()); // Parse cookies for refresh token handling
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const startTime = Date.now();
+    const originalSend = res.send;
+    const originalJson = res.json;
+
+    // Track response size
+    let responseSize = 0;
+
+    // Override send method
+    res.send = function (
+      data: string | Buffer | Record<string, unknown> | unknown[] | number | boolean
+    ) {
+      if (data !== undefined && data !== null) {
+        if (typeof data === 'string') {
+          responseSize = Buffer.byteLength(data);
+        } else if (Buffer.isBuffer(data)) {
+          responseSize = data.length;
+        } else if (typeof data === 'number' || typeof data === 'boolean') {
+          responseSize = Buffer.byteLength(String(data));
+        } else {
+          try {
+            responseSize = Buffer.byteLength(JSON.stringify(data));
+          } catch {
+            // Handle circular references or unstringifiable objects
+            responseSize = 0;
+          }
+        }
+      }
+      return originalSend.call(this, data);
+    };
+
+    // Override json method
+    res.json = function (
+      data: Record<string, unknown> | unknown[] | string | number | boolean | null
+    ) {
+      if (data !== undefined) {
+        try {
+          responseSize = Buffer.byteLength(JSON.stringify(data));
+        } catch {
+          // Handle circular references or unstringifiable objects
+          responseSize = 0;
+        }
+      }
+      return originalJson.call(this, data);
+    };
+
+    // Log after response is finished
+    res.on('finish', () => {
+      // Skip logging for logs endpoints to avoid infinite loops
+      if (req.path.includes('/logs/')) {
+        return;
+      }
+
+      const duration = Date.now() - startTime;
+      logger.info('HTTP Request', {
+        method: req.method,
+        path: req.path,
+        status: res.statusCode,
+        size: responseSize,
+        duration: `${duration}ms`,
+        ip: req.ip || req.socket.remoteAddress,
+        userAgent: req.headers['user-agent'],
+        timestamp: new Date().toISOString(),
+      });
+    });
+
+    next();
+  });
+
+  // Count feature usage for anonymous telemetry. Registered before every route
+  // so the /api routers, the S3 protocol gateway, and direct edge-function
+  // invocations are all covered, and before any router rewrites req.url for
+  // its mount path. Skipped entirely when telemetry is off, so no counters
+  // accumulate that nothing will ever drain.
+  if (!isTelemetryRuntimeDisabled()) {
+    const featureUsage = FeatureUsageCollector.getInstance();
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      featureUsage.track(req, res);
+      next();
+    });
+  }
+
+  // Mount webhooks with raw body parser BEFORE JSON middleware
+  // This ensures signature verification uses the original bytes
+  app.use('/api/webhooks', express.raw({ type: 'application/json' }), webhooksRouter);
+
+  // Mount the S3 protocol gateway BEFORE JSON middleware so request bodies
+  // stream through untouched. The gateway handles raw streams itself
+  // (including STREAMING-AWS4-HMAC-SHA256-PAYLOAD chunked signatures).
+  app.use('/storage/v1/s3', s3GatewayRouter);
+
+  // Apply JSON and URL-encoded middleware for all other routes.
+  // We use high defaults (100mb/10mb) to ensure a smooth "out-of-the-box" experience
+  // for large metadata/storage requests, as per project standards.
+  // Users can override these via environment variables for hardened security.
+  const jsonLimit = appConfig.server.maxJsonBodySize;
+  const urlencodedLimit = appConfig.server.maxUrlencodedBodySize;
+
+  app.use(express.json({ limit: jsonLimit }));
+  app.use(express.urlencoded({ extended: true, limit: urlencodedLimit }));
+
+  // Create API router and mount all API routes under /api
+  const apiRouter = express.Router();
+
+  const jwksHandler = async (_req: Request, res: Response) => {
+    try {
+      const jwks = await TokenManager.getInstance().getJwks();
+      res.json(jwks);
+    } catch (error) {
+      logger.error('Failed to serve JWKS', { error });
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
+
+  app.get('/.well-known/jwks.json', jwksHandler);
+  apiRouter.get('/.well-known/jwks.json', jwksHandler);
+
+  apiRouter.get('/health', (_req: Request, res: Response) => {
+    const version = packageJson.version;
+    res.json({
+      status: 'ok',
+      version,
+      service: 'Insforge OSS Backend',
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  // Mount all routes
+  apiRouter.use('/auth', authRouter);
+  apiRouter.use('/database', databaseRouter);
+  apiRouter.use('/storage', storageRouter);
+  apiRouter.use('/metadata', metadataRouter);
+  apiRouter.use('/logs', logsRouter);
+  apiRouter.use('/docs', docsRouter);
+  apiRouter.use('/functions', functionsRouter);
+  apiRouter.use('/secrets', secretsRouter);
+  apiRouter.use('/usage', usageRouter);
+  apiRouter.use('/ai', aiRouter);
+  apiRouter.use('/memory', memoryRouter);
+  apiRouter.use('/realtime', realtimeRouter);
+  apiRouter.use('/email', emailRouter);
+  apiRouter.use('/deployments', deploymentsRouter);
+  apiRouter.use('/schedules', schedulesRouter);
+  apiRouter.use('/payments', paymentsRouter);
+  apiRouter.use('/compute/services', servicesRouter);
+  apiRouter.use('/analytics', analyticsRouter);
+  apiRouter.use('/github', githubRouter);
+  apiRouter.use('/webscraper', webscraperRouter);
+  apiRouter.use('/advisor', advisorRouter);
+  apiRouter.use('/dashboard', dashboardEventsRouter);
+
+  // Mount all API routes under /api prefix
+  app.use('/api', apiRouter);
+
+  // Proxy function execution to Deno Deploy or local runtime
+  // this logic is used for backward compatibility, we will let the sdk directly call the edge function
+  app.all('/functions/:slug', async (req: Request, res: Response) => {
+    const { slug } = req.params;
+
+    try {
+      const functionService = FunctionService.getInstance();
+      const localRuntime = appConfig.functions.denoRuntimeUrl;
+
+      // Get target base URL: prefer Subhosting deployment, fallback to local runtime
+      const baseUrl =
+        (functionService.isSubhostingConfigured() && (await functionService.getDeploymentUrl())) ||
+        localRuntime;
+
+      // Build target URL with query string
+      const targetUrl = new URL(`/${slug}`, baseUrl);
+      targetUrl.search = new URL(req.url, `http://${req.headers.host}`).search;
+
+      // Build headers, filtering out non-string values and overriding host
+      const headers: Record<string, string> = {};
+      for (const [key, value] of Object.entries(req.headers)) {
+        if (typeof value === 'string') {
+          headers[key] = value;
+        }
+      }
+      headers.host = targetUrl.host;
+
+      const response = await fetch(targetUrl, {
+        method: req.method,
+        headers,
+        body: ['GET', 'HEAD'].includes(req.method) ? undefined : JSON.stringify(req.body),
+      });
+
+      // Read response as raw bytes to preserve binary data (images, PDFs, etc.)
+      const responseBody = Buffer.from(await response.arrayBuffer());
+
+      // Forward response headers, excluding:
+      // - transfer-encoding, content-length: recalculated by Express
+      // - connection: hop-by-hop header
+      // - content-encoding: node-fetch already decompresses the response,
+      //   so we must not tell the client it's still compressed
+      const responseHeaders: Record<string, string> = {};
+      for (const [key, value] of response.headers.entries()) {
+        if (
+          ['transfer-encoding', 'content-length', 'connection', 'content-encoding'].includes(key)
+        ) {
+          continue;
+        }
+        responseHeaders[key] = value;
+      }
+
+      res
+        .status(response.status)
+        .set(responseHeaders)
+        .set('Access-Control-Allow-Origin', '*')
+        .send(responseBody);
+    } catch (error) {
+      logger.error('Failed to proxy function', { slug, error: String(error) });
+      res.status(502).json({ error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  // Redirect root to dashboard login (only for non-insforge cloud environments)
+  if (!isCloudEnvironment()) {
+    app.get('/', (_req: Request, res: Response) => {
+      res.redirect('/dashboard/login');
+    });
+  }
+
+  // Serve main frontend if it exists
+  const frontendPath = path.join(__dirname, 'frontend');
+  if (fs.existsSync(frontendPath)) {
+    app.use(express.static(frontendPath, { index: false }));
+    // Catch all handler for SPA routes
+    app.get(['/cloud*', '/dashboard*'], (_req: Request, res: Response) => {
+      res.sendFile(path.join(frontendPath, 'index.html'));
+    });
+  } else {
+    // Catch-all for 404 errors - Traditional REST format
+    app.use('*', (req: Request, res: Response) => {
+      res.status(404).json({
+        error: 'NOT_FOUND',
+        message: `Endpoint ${req.originalUrl} not found`,
+        statusCode: 404,
+        nextActions: 'Please check the API documentation for available endpoints',
+      });
+    });
+  }
+
+  app.use(errorMiddleware);
+  await seedBackend();
+
+  return app;
+}
+
+// Use PORT from config (already parsed from env, falls back to 7130)
+const PORT = appConfig.app.port;
+
+async function initializeServer() {
+  try {
+    const app = await createApp();
+
+    // Before the listener opens, so no request can construct the compute registry from
+    // environment-only credentials. primeSnapshot never throws — a secret-store outage
+    // leaves compute on whatever the environment provides — so this cannot stop the
+    // server from serving.
+    await ComputeConfigService.getInstance().primeSnapshot();
+    warnIfFlyCredentialsIncomplete();
+
+    const server = app.listen(PORT, () => {
+      logger.info(`Backend API service listening on port ${PORT}`);
+    });
+    // Node's 5s default keepAliveTimeout lets long-interval keep-alive clients
+    // reuse sockets the server already closed; keep it above LB idle timeouts,
+    // with headersTimeout just past it so header reads never lose the race.
+    server.keepAliveTimeout = appConfig.server.keepAliveTimeoutMs;
+    server.headersTimeout = server.keepAliveTimeout + 1000;
+
+    // Initialize Socket.IO service
+    const socketService = SocketManager.getInstance();
+    socketService.initialize(server);
+
+    // Initialize RealtimeManager (pg_notify listener)
+    const realtimeManager = RealtimeManager.getInstance();
+    await realtimeManager.initialize();
+
+    // Sync existing functions to Deno Deploy (non-blocking)
+    const functionService = FunctionService.getInstance();
+    functionService.syncDeployment().catch((err) => {
+      logger.error('Failed to sync functions to Deno Deploy', {
+        error: err instanceof Error ? err.message : String(err),
+      });
+    });
+
+    // Probe each compute driver and heal rows that drifted while we were down
+    // (a container removed out-of-band, a `docker system prune`, a reclaimed
+    // machine). Non-blocking and non-fatal: compute is optional, and it must not
+    // hold up serving. Constructing the service throws when no driver is
+    // configured at all, which is the normal case, so that is caught too.
+    void (async () => {
+      try {
+        // Load stored Fly credentials before the registry is built, so a deployment
+        // configured through the dashboard comes up with Fly available instead of
+        // waiting for the first write to rebuild.
+        // Credentials were primed before the listener opened, so the registry any
+        // request builds already sees them. Reset anyway: it costs nothing and keeps
+        // this correct if the priming above ever moves back off the startup path.
+        ComputeServicesService.resetForConfigChange();
+        await ComputeServicesService.getInstance().runStartupTasks();
+      } catch (err) {
+        logger.info('Compute startup tasks skipped', {
+          reason: err instanceof Error ? err.message : String(err),
+        });
+      }
+    })();
+
+    TelemetryService.getInstance().start();
+
+    // Scheduled backups are self-hosting only; the cloud control plane owns
+    // backups there (the backup routes are not even mounted in cloud env).
+    if (!isCloudEnvironment()) {
+      DatabaseBackupService.getInstance().startScheduler();
+    }
+  } catch (error) {
+    logger.error('Failed to initialize server', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    process.exit(1);
+  }
+}
+
+void initializeServer();
+
+async function cleanup() {
+  logger.info('Shutting down gracefully...');
+
+  DatabaseBackupService.getInstance().stopScheduler();
+
+  try {
+    const realtimeManager = RealtimeManager.getInstance();
+    await realtimeManager.close();
+  } catch (error) {
+    logger.error('Error closing RealtimeManager', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  try {
+    const socketService = SocketManager.getInstance();
+    socketService.close();
+  } catch (error) {
+    logger.error('Error closing SocketManager', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  try {
+    const oAuthPKCEService = OAuthPKCEService.getInstance();
+    oAuthPKCEService.destroy();
+  } catch (error) {
+    logger.error('Error closing OAuthPKCEService', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  try {
+    await TelemetryService.getInstance().shutdown();
+  } catch (error) {
+    logger.error('Error closing TelemetryService', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  try {
+    destroyEmailCooldownInterval();
+  } catch (error) {
+    logger.error('Error clearing email cooldown interval', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  process.exit(0);
+}
+
+process.on('SIGINT', () => void cleanup());
+process.on('SIGTERM', () => void cleanup());

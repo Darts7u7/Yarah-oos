@@ -1,0 +1,337 @@
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Database, Pencil, Plus, Settings, Trash2 } from 'lucide-react';
+import { Link, useLocation, useMatch, useNavigate } from 'react-router-dom';
+import {
+  EmptyStateIllustration,
+  FeatureSidebar,
+  type FeatureSidebarActionButton,
+  type FeatureSidebarItemAction,
+  type FeatureSidebarListItem,
+} from '#components';
+import { ScrollArea } from '#components/radix/ScrollArea';
+import { Button, cn } from '@insforge/ui';
+import { DatabaseSchemaSelect } from '#features/database/components/DatabaseSchemaSelect';
+import { DatabaseSettingsDialog } from '#features/database/components/DatabaseSettingsDialog';
+import { useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
+import type { DatabaseSchemaInfo } from '@insforge/shared-schemas';
+
+const DATABASE_STUDIO_SIDEBAR_BASE_ITEMS: Array<{
+  id: string;
+  label: string;
+  href: string;
+  sectionEnd?: boolean;
+}> = [
+  {
+    id: 'indexes',
+    label: 'Indexes',
+    href: '/dashboard/database/indexes',
+  },
+  {
+    id: 'triggers',
+    label: 'Triggers',
+    href: '/dashboard/database/triggers',
+  },
+  {
+    id: 'functions',
+    label: 'Functions',
+    href: '/dashboard/database/functions',
+  },
+  {
+    id: 'policies',
+    label: 'Policies',
+    href: '/dashboard/database/policies',
+    sectionEnd: true,
+  },
+  {
+    id: 'migrations',
+    label: 'Migrations',
+    href: '/dashboard/database/migrations',
+  },
+  {
+    id: 'templates',
+    label: 'Templates',
+    href: '/dashboard/database/templates',
+  },
+];
+
+export interface DatabaseSidebarProps {
+  schemas: DatabaseSchemaInfo[];
+  selectedSchema: string;
+  onSchemaSelect: (schemaName: string) => void;
+  tables: string[];
+  selectedTable?: string;
+  onTableSelect: (tableName: string) => void;
+  loading?: boolean;
+  onNewTable?: () => void;
+  onEditTable?: (table: string) => void;
+  onDeleteTable?: (table: string) => void;
+  initialMode?: 'tables' | 'studio';
+  animateToMode?: 'tables' | 'studio';
+}
+
+export interface DatabaseStudioSidebarPanelProps {
+  onBack: () => void;
+}
+
+interface DatabaseStudioSidebarItemProps {
+  label: string;
+  href: string;
+  sectionEnd?: boolean;
+}
+
+function DatabaseStudioSidebarItem({ label, href, sectionEnd }: DatabaseStudioSidebarItemProps) {
+  const location = useLocation();
+  const match = useMatch({ path: href, end: false });
+  const isSelected = !!match;
+
+  return (
+    <>
+      <div
+        className={cn(
+          'flex w-full items-center gap-1 rounded px-1.5 py-1.5 transition-colors',
+          isSelected
+            ? 'bg-alpha-8 text-foreground'
+            : 'text-muted-foreground hover:bg-alpha-4 hover:text-foreground'
+        )}
+      >
+        <Link
+          to={{
+            pathname: href,
+            search: location.search,
+          }}
+          className="flex min-w-0 flex-1 items-center px-2"
+        >
+          <p className={cn('truncate text-sm leading-5', isSelected && 'text-inherit')}>{label}</p>
+        </Link>
+      </div>
+
+      {sectionEnd && <div className="my-1.5 h-px w-full bg-alpha-8" />}
+    </>
+  );
+}
+
+const STUDIO_MENU_TRANSITION_MS = 260;
+
+export function DatabaseStudioSidebarPanel({ onBack }: DatabaseStudioSidebarPanelProps) {
+  const { t } = useTranslation('chrome');
+  return (
+    <aside className="h-full w-60 flex flex-col border-r border-border bg-semantic-1 flex-shrink-0">
+      <div className="p-3">
+        <Button
+          variant="ghost"
+          className="h-8 w-full justify-start gap-1 rounded px-1.5 text-sm leading-5 font-medium text-muted-foreground hover:bg-transparent hover:text-foreground"
+          onClick={onBack}
+        >
+          <ArrowLeft className="h-5 w-5" />
+          {t('database.back')}
+        </Button>
+      </div>
+
+      <ScrollArea className="flex-1 px-3 pb-2">
+        <div className="flex flex-col gap-1.5">
+          {[
+            ...DATABASE_STUDIO_SIDEBAR_BASE_ITEMS,
+            {
+              id: 'backups',
+              label: 'Backup & Restore',
+              href: '/dashboard/database/backups',
+            },
+          ].map((item) => (
+            <DatabaseStudioSidebarItem
+              key={item.id}
+              label={t(`database.studio.${item.id === 'backups' ? 'backupRestore' : item.id}`, {
+                defaultValue: item.label,
+              })}
+              href={item.href}
+              sectionEnd={item.sectionEnd}
+            />
+          ))}
+        </div>
+      </ScrollArea>
+    </aside>
+  );
+}
+
+export function DatabaseSidebar({
+  schemas,
+  selectedSchema,
+  onSchemaSelect,
+  tables,
+  selectedTable,
+  onTableSelect,
+  loading,
+  onNewTable,
+  onEditTable,
+  onDeleteTable,
+  initialMode = 'tables',
+  animateToMode,
+}: DatabaseSidebarProps) {
+  const { t } = useTranslation('chrome');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [mode, setMode] = useState<'tables' | 'studio'>(initialMode);
+  // The settings dialog only holds backup schedule config, which the cloud
+  // control plane owns in cloud-hosting mode.
+  const isCloudHostingMode = useIsCloudHostingMode();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const showEmptyState = tables.length === 0;
+  const navigateTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (navigateTimerRef.current) {
+        window.clearTimeout(navigateTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!animateToMode || animateToMode === initialMode) {
+      return;
+    }
+
+    const rafId = window.requestAnimationFrame(() => {
+      setMode(animateToMode);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+    };
+  }, [animateToMode, initialMode]);
+
+  const tableMenuItems: FeatureSidebarListItem[] = tables.map((table) => ({
+    id: table,
+    label: table,
+    onClick: () => onTableSelect(table),
+  }));
+
+  const actionButtons: FeatureSidebarActionButton[] = [
+    ...(onNewTable
+      ? [
+          {
+            id: 'create-table',
+            label: t('database.createTable'),
+            icon: Plus,
+            onClick: onNewTable,
+          },
+        ]
+      : []),
+    {
+      id: 'database-studio',
+      label: t('database.databaseStudio'),
+      icon: Database,
+      onClick: () => {
+        setMode('studio');
+        if (navigateTimerRef.current) {
+          window.clearTimeout(navigateTimerRef.current);
+        }
+        navigateTimerRef.current = window.setTimeout(() => {
+          void navigate({
+            pathname: '/dashboard/database/indexes',
+            search: location.search,
+          });
+        }, STUDIO_MENU_TRANSITION_MS);
+      },
+    },
+  ];
+
+  const getItemActions = (item: FeatureSidebarListItem): FeatureSidebarItemAction[] => {
+    const actions: FeatureSidebarItemAction[] = [];
+
+    if (onEditTable) {
+      actions.push({
+        id: `edit-${item.id}`,
+        label: t('database.editTable'),
+        icon: Pencil,
+        onClick: () => onEditTable(item.id),
+      });
+    }
+
+    if (onDeleteTable) {
+      actions.push({
+        id: `delete-${item.id}`,
+        label: t('database.deleteTable'),
+        icon: Trash2,
+        destructive: true,
+        onClick: () => onDeleteTable(item.id),
+      });
+    }
+
+    return actions;
+  };
+
+  return (
+    <div className="h-full w-60 flex-shrink-0 overflow-hidden">
+      <div
+        className={cn(
+          'flex h-full w-[200%] transition-transform duration-300 ease-in-out',
+          mode === 'tables' ? 'translate-x-0' : '-translate-x-1/2'
+        )}
+      >
+        <div className="h-full w-1/2">
+          <FeatureSidebar
+            title={t('database.paneTitle')}
+            headerButtons={
+              isCloudHostingMode
+                ? undefined
+                : [
+                    {
+                      id: 'database-settings',
+                      label: t('database.settingsTitle', { defaultValue: 'Database Settings' }),
+                      icon: Settings,
+                      onClick: () => setSettingsOpen(true),
+                    },
+                  ]
+            }
+            headerContent={
+              <DatabaseSchemaSelect
+                schemas={schemas}
+                value={selectedSchema}
+                onValueChange={onSchemaSelect}
+              />
+            }
+            items={tableMenuItems}
+            activeItemId={selectedTable}
+            loading={loading}
+            actionButtons={actionButtons}
+            emptyState={
+              showEmptyState ? (
+                <div className="flex flex-col items-center gap-2 pt-2 text-center">
+                  <EmptyStateIllustration />
+                  <p className="text-sm font-medium leading-6 text-muted-foreground">
+                    {t('database.noTableYet')}
+                  </p>
+                  <div className="text-xs leading-4">
+                    <button
+                      type="button"
+                      className="font-medium text-primary disabled:cursor-not-allowed disabled:opacity-60"
+                      onClick={onNewTable}
+                      disabled={!onNewTable}
+                    >
+                      {t('database.createFirstTableLink')}
+                    </button>
+                    <p className="text-muted-foreground">{t('database.toGetStarted')}</p>
+                  </div>
+                </div>
+              ) : undefined
+            }
+            itemActions={getItemActions}
+            showSearch={!showEmptyState}
+            searchPlaceholder={t('database.searchTables', { defaultValue: 'Search tables...' })}
+          />
+        </div>
+
+        <div className="h-full w-1/2">
+          <DatabaseStudioSidebarPanel onBack={() => setMode('tables')} />
+        </div>
+      </div>
+
+      {/* Stays mounted (Radix close animation); its config query only runs
+          while open. */}
+      {!isCloudHostingMode && (
+        <DatabaseSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,59 @@
+---
+title: TypeScript and JavaScript SDK for InsForge
+description: Install and initialize the official InsForge TypeScript SDK in Node, browsers, and edge runtimes to use auth, database, storage, and realtime.
+---
+
+The InsForge TypeScript SDK provides a type-safe client for interacting with InsForge services from JavaScript and TypeScript applications.
+
+## Installation
+
+import Installation from '/snippets/sdk-installation.mdx';
+
+<Installation />
+
+## Quick start
+
+```typescript
+import { createClient } from '@insforge/sdk';
+
+const insforge = createClient({
+  baseUrl: 'https://your-app.insforge.app',
+  anonKey: 'your-anon-key'  // Optional: for public/unauthenticated requests
+});
+```
+
+## Features
+
+- **Database** - Type-safe CRUD operations with PostgREST
+- **Authentication** - Email/password and OAuth authentication
+- **Storage** - File upload, download, and management
+- **Functions** - Invoke serverless edge functions
+- **AI** - Chat completions and image generation
+- **Realtime** - WebSocket-based pub/sub messaging
+- **Payments** - Provider-scoped Stripe and Razorpay payment helpers
+
+## SDK reference
+
+<CardGroup cols={2}>
+  <Card title="Database" icon="database" href="/sdks/typescript/database">
+    CRUD operations, filters, and queries
+  </Card>
+  <Card title="Authentication" icon="lock" href="/sdks/typescript/auth">
+    Sign up, sign in, OAuth, and user management
+  </Card>
+  <Card title="Storage" icon="cloud-arrow-up" href="/sdks/typescript/storage">
+    File upload, download, and management
+  </Card>
+  <Card title="Functions" icon="bolt" href="/sdks/typescript/functions">
+    Invoke serverless edge functions
+  </Card>
+  <Card title="AI" icon="brain" href="/sdks/typescript/ai">
+    Chat completions and image generation
+  </Card>
+  <Card title="Realtime" icon="signal-stream" href="/sdks/typescript/realtime">
+    WebSocket pub/sub messaging
+  </Card>
+  <Card title="Payments" icon="credit-card" href="/sdks/typescript/payments">
+    Provider-scoped Stripe and Razorpay payment helpers
+  </Card>
+</CardGroup>

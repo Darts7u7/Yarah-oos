@@ -1,0 +1,185 @@
+import { Router, Request, Response } from 'express';
+import { s3Sigv4Middleware, S3AuthenticatedRequest } from '@/api/middlewares/s3-sigv4.js';
+import { dispatchOp, parseBucketAndKey, S3Op } from './dispatch.js';
+import { S3GatewayRequest } from './request.js';
+import { sendS3Error, S3ProtocolError } from './errors.js';
+import { StorageService } from '@/services/storage/storage.service.js';
+import { appConfig } from '@/infra/config/app.config.js';
+import logger from '@/utils/logger.js';
+import * as listBuckets from './commands/list-buckets.js';
+import * as headBucket from './commands/head-bucket.js';
+import * as createBucket from './commands/create-bucket.js';
+import * as deleteBucket from './commands/delete-bucket.js';
+import * as listObjectsV2 from './commands/list-objects-v2.js';
+import * as headObject from './commands/head-object.js';
+import * as getObject from './commands/get-object.js';
+import * as putObject from './commands/put-object.js';
+import * as deleteObject from './commands/delete-object.js';
+import * as deleteObjects from './commands/delete-objects.js';
+import * as copyObject from './commands/copy-object.js';
+import * as createMultipartUpload from './commands/create-multipart-upload.js';
+import * as uploadPart from './commands/upload-part.js';
+import * as completeMultipartUpload from './commands/complete-multipart-upload.js';
+import * as abortMultipartUpload from './commands/abort-multipart-upload.js';
+import * as listParts from './commands/list-parts.js';
+import * as getBucketLocation from './commands/get-bucket-location.js';
+import * as getBucketVersioning from './commands/get-bucket-versioning.js';
+import * as getBucketCors from './commands/get-bucket-cors.js';
+import * as putBucketCors from './commands/put-bucket-cors.js';
+import * as deleteBucketCors from './commands/delete-bucket-cors.js';
+import * as getObjectTagging from './commands/get-object-tagging.js';
+import * as putObjectTagging from './commands/put-object-tagging.js';
+import * as deleteObjectTagging from './commands/delete-object-tagging.js';
+import * as putBucketVersioning from './commands/put-bucket-versioning.js';
+
+type Handler = (req: S3GatewayRequest, res: Response) => Promise<void>;
+
+const handlers: Record<S3Op, Handler> = {
+  ListBuckets: listBuckets.handle,
+  HeadBucket: headBucket.handle,
+  CreateBucket: createBucket.handle,
+  DeleteBucket: deleteBucket.handle,
+  ListObjectsV2: listObjectsV2.handle,
+  HeadObject: headObject.handle,
+  GetObject: getObject.handle,
+  PutObject: putObject.handle,
+  DeleteObject: deleteObject.handle,
+  DeleteObjects: deleteObjects.handle,
+  CopyObject: copyObject.handle,
+  CreateMultipartUpload: createMultipartUpload.handle,
+  UploadPart: uploadPart.handle,
+  CompleteMultipartUpload: completeMultipartUpload.handle,
+  AbortMultipartUpload: abortMultipartUpload.handle,
+  ListParts: listParts.handle,
+  GetBucketLocation: getBucketLocation.handle,
+  GetBucketVersioning: getBucketVersioning.handle,
+  PutBucketVersioning: putBucketVersioning.handle,
+  GetBucketCors: getBucketCors.handle,
+  PutBucketCors: putBucketCors.handle,
+  DeleteBucketCors: deleteBucketCors.handle,
+  GetObjectTagging: getObjectTagging.handle,
+  PutObjectTagging: putObjectTagging.handle,
+  DeleteObjectTagging: deleteObjectTagging.handle,
+};
+
+export const s3GatewayRouter: Router = Router();
+
+// 1) Refuse at mount if backend isn't S3-compatible.
+s3GatewayRouter.use((req: Request, res: Response, next) => {
+  if (!StorageService.getInstance().isS3Provider()) {
+    sendS3Error(
+      res,
+      'NotImplemented',
+      'S3 protocol requires an S3 storage backend. Set S3_BUCKET.',
+      { resource: req.path }
+    );
+    return;
+  }
+  next();
+});
+
+// 2) SigV4 authentication. Express 4 doesn't auto-forward rejected promises
+// from async middleware — chain .catch(next) so DB/service errors inside
+// the middleware hit the error handler instead of hanging the request.
+s3GatewayRouter.use((req, res, next) => {
+  s3Sigv4Middleware(req, res, next).catch(next);
+});
+
+// 3) Early Content-Length check for body-consuming operations.
+// For aws-chunked streaming uploads the wire Content-Length includes
+// chunk framing overhead; use x-amz-decoded-content-length instead.
+s3GatewayRouter.use((req: Request, res: Response, next) => {
+  const rawDecoded = req.headers['x-amz-decoded-content-length'];
+  const isStreaming = typeof rawDecoded === 'string' && /^\d+$/.test(rawDecoded);
+  const rawCl = req.headers['content-length'];
+  const contentLength = isStreaming
+    ? Number(rawDecoded)
+    : typeof rawCl === 'string' && /^\d+$/.test(rawCl)
+      ? Number(rawCl)
+      : null;
+  if (contentLength === null || contentLength <= appConfig.storage.maxS3UploadSize) {
+    next();
+    return;
+  }
+  const m = req.method.toUpperCase();
+  const p = req.path;
+  const q = new Set(Object.keys(req.query));
+  const hasKey = p.replace(/^\/+/, '').includes('/');
+  const isLargeBodyOp =
+    m === 'PUT' && hasKey && !q.has('tagging') && !req.headers['x-amz-copy-source'];
+  if (isLargeBodyOp) {
+    sendS3Error(
+      res,
+      'EntityTooLarge',
+      `Object exceeds max upload size (${appConfig.storage.maxS3UploadSize} bytes)`,
+      {
+        resource: req.path,
+        requestId: (req as S3AuthenticatedRequest).s3Auth?.requestId,
+      }
+    );
+    return;
+  }
+  next();
+});
+
+// 4) Dispatch to the operation handler.
+s3GatewayRouter.use(async (req: Request, res: Response) => {
+  const query: Record<string, string | string[] | undefined> = {};
+  for (const [k, v] of Object.entries(req.query)) {
+    if (typeof v === 'string' || Array.isArray(v) || v === undefined) {
+      query[k] = v as string | string[] | undefined;
+    }
+  }
+  const op: S3Op | null = dispatchOp({
+    method: req.method,
+    path: req.path,
+    query,
+    headers: req.headers,
+  });
+  if (!op) {
+    sendS3Error(res, 'MethodNotAllowed', `Method ${req.method} not allowed`, {
+      resource: req.path,
+      requestId: (req as S3AuthenticatedRequest).s3Auth?.requestId,
+    });
+    return;
+  }
+  const { bucket, key } = parseBucketAndKey(req.path);
+  const authed = req as S3GatewayRequest;
+  authed.s3Op = op;
+  authed.s3Bucket = bucket;
+  authed.s3Key = key;
+  logger.debug('S3 gateway dispatch', { op, bucket, key });
+  try {
+    await handlers[op](authed, res);
+  } catch (err) {
+    if (res.headersSent) {
+      logger.error('S3 gateway handler error after headers sent', { op, err });
+      return;
+    }
+    // Typed protocol error — use its S3 code/status directly.
+    if (err instanceof S3ProtocolError) {
+      sendS3Error(res, err.code, err.message, {
+        resource: req.path,
+        requestId: authed.s3Auth?.requestId,
+      });
+      return;
+    }
+    // Chunk signature failures bubble out of the streaming parser as plain
+    // Error with 'SignatureDoesNotMatch' in the message — translate to the
+    // S3 auth error rather than a generic 500.
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes('SignatureDoesNotMatch')) {
+      logger.warn('S3 gateway chunk signature failure', { op, err });
+      sendS3Error(res, 'SignatureDoesNotMatch', msg, {
+        resource: req.path,
+        requestId: authed.s3Auth?.requestId,
+      });
+      return;
+    }
+    logger.error('S3 gateway handler error', { op, err });
+    sendS3Error(res, 'InternalError', msg, {
+      resource: req.path,
+      requestId: authed.s3Auth?.requestId,
+    });
+  }
+});

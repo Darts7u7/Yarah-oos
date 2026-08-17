@@ -1,0 +1,218 @@
+import { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { secretService } from '#features/functions/services/secret.service';
+import type { SecretSchema, CreateSecretRequest } from '@insforge/shared-schemas';
+import { useToast } from '@insforge/ui';
+import { useConfirm } from '#lib/hooks/useConfirm';
+
+export function useSecretValue(secret: Pick<SecretSchema, 'key' | 'updatedAt'>) {
+  const { t } = useTranslation('chrome');
+  const { showToast } = useToast();
+  const updatedAtKey = secret.updatedAt ?? 'never';
+  const [isValueVisible, setIsValueVisible] = useState(false);
+  const [valueError, setValueError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setIsValueVisible(false);
+    setValueError(null);
+  }, [secret.key, updatedAtKey]);
+
+  const {
+    data: revealedSecret,
+    isFetching: isFetchingValue,
+    refetch: refetchSecretValue,
+  } = useQuery({
+    queryKey: ['secret-value', secret.key, updatedAtKey],
+    queryFn: () => secretService.getSecretValue(secret.key),
+    enabled: false,
+    retry: false,
+  });
+
+  const toggleValue = useCallback(async () => {
+    if (isValueVisible) {
+      setIsValueVisible(false);
+      return;
+    }
+
+    setValueError(null);
+
+    if (!revealedSecret) {
+      const { data, error } = await refetchSecretValue();
+
+      if (error || !data) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : t('functions.failedToFetchSecretValue', {
+                defaultValue: 'Failed to fetch secret value',
+              });
+        setValueError(errorMessage);
+        showToast(errorMessage, 'error');
+        return;
+      }
+    }
+
+    setIsValueVisible(true);
+  }, [isValueVisible, revealedSecret, refetchSecretValue, showToast, t]);
+
+  return {
+    isValueVisible,
+    valueError,
+    revealedSecret,
+    isFetchingValue,
+    toggleValue,
+  };
+}
+
+export function useSecrets() {
+  const { t } = useTranslation('chrome');
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+  const { confirm, confirmDialogProps } = useConfirm();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Query to fetch all secrets
+  const {
+    data: allSecrets = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['secrets'],
+    queryFn: () => secretService.listSecrets(),
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes
+  });
+
+  // Filter out inactive secrets
+  const secrets = allSecrets.filter((secret: SecretSchema) => secret.isActive);
+
+  // Create secret mutation
+  const createSecretMutation = useMutation({
+    mutationFn: (input: CreateSecretRequest) => secretService.createSecret(input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['secrets'] });
+      showToast(
+        t('functions.secretCreated', { defaultValue: 'Secret created successfully' }),
+        'success'
+      );
+    },
+    onError: (error: Error) => {
+      console.error('Failed to create secret:', error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : t('functions.failedToCreateSecret', { defaultValue: 'Failed to create secret' });
+      showToast(errorMessage, 'error');
+    },
+  });
+
+  // Delete secret mutation
+  const deleteSecretMutation = useMutation({
+    mutationFn: (key: string) => secretService.deleteSecret(key),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['secrets'] });
+      showToast(
+        t('functions.secretDeleted', { defaultValue: 'Secret deleted successfully' }),
+        'success'
+      );
+    },
+    onError: (error: Error) => {
+      console.error('Failed to delete secret:', error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : t('functions.failedToDeleteSecret', { defaultValue: 'Failed to delete secret' });
+      showToast(errorMessage, 'error');
+    },
+  });
+
+  // Create secret with validation
+  const createSecret = useCallback(
+    async (key: string, value: string) => {
+      if (!key.trim() || !value.trim()) {
+        showToast(
+          t('functions.fillKeyAndValue', { defaultValue: 'Please fill in both key and value' }),
+          'error'
+        );
+        return false;
+      }
+
+      try {
+        await createSecretMutation.mutateAsync({
+          key: key.trim(),
+          value: value.trim(),
+        });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [createSecretMutation, showToast, t]
+  );
+
+  // Delete secret with confirmation
+  const deleteSecret = useCallback(
+    async (secret: SecretSchema) => {
+      if (secret.isReserved) {
+        showToast(
+          t('functions.cannotDeleteReserved', { defaultValue: 'Cannot delete reserved secrets' }),
+          'error'
+        );
+        return false;
+      }
+
+      const shouldDelete = await confirm({
+        title: t('functions.deleteSecretTitle', { defaultValue: 'Delete Secret' }),
+        description: t('functions.deleteSecretConfirm', {
+          key: secret.key,
+          defaultValue: 'You sure to delete "{{key}}"?',
+        }),
+        confirmText: t('functions.delete', { defaultValue: 'Delete' }),
+        cancelText: t('functions.cancel', { defaultValue: 'Cancel' }),
+        destructive: true,
+      });
+
+      if (shouldDelete) {
+        try {
+          await deleteSecretMutation.mutateAsync(secret.key);
+          return true;
+        } catch {
+          return false;
+        }
+      }
+      return false;
+    },
+    [confirm, deleteSecretMutation, showToast, t]
+  );
+
+  // Filter secrets based on search query
+  const filteredSecrets = secrets.filter((secret: SecretSchema) =>
+    secret.key.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return {
+    // Data
+    secrets,
+    filteredSecrets,
+    secretsCount: secrets.length,
+    searchQuery,
+
+    // Loading states
+    isLoading,
+    isCreating: createSecretMutation.isPending,
+    isDeleting: deleteSecretMutation.isPending,
+
+    // Error
+    error,
+
+    // Actions
+    createSecret,
+    deleteSecret,
+    setSearchQuery,
+    refetch,
+
+    // Confirm dialog props
+    confirmDialogProps,
+  };
+}

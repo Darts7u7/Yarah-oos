@@ -1,0 +1,384 @@
+openapi: 3.0.3
+info:
+  title: Insforge Metadata API
+  version: 1.0.0
+
+paths:
+  /api/metadata:
+    get:
+      summary: Get app metadata
+      description: >-
+        Returns aggregated application metadata (auth, database, storage,
+        functions, realtime, deployments). Use the `format` query parameter
+        to choose between JSON and Markdown output.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [json, markdown]
+            default: json
+          description: >-
+            Response format. `json` returns structured JSON (default).
+            `markdown` returns a human-readable Markdown document suitable
+            for AI coding tools and developer onboarding.
+      responses:
+        '200':
+          description: Application metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth:
+                    type: object
+                    properties:
+                      oAuthProviders:
+                        type: array
+                        items:
+                          type: string
+                      requireEmailVerification:
+                        type: boolean
+                      disableSignup:
+                        type: boolean
+                  database:
+                    type: object
+                    properties:
+                      tables:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            tableName:
+                              type: string
+                            recordCount:
+                              type: integer
+                      totalSizeInGB:
+                        type: number
+                      hint:
+                        type: string
+                  storage:
+                    type: object
+                    properties:
+                      buckets:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            public:
+                              type: boolean
+                            objectCount:
+                              type: integer
+                      totalSizeInGB:
+                        type: number
+                  functions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        slug:
+                          type: string
+                        name:
+                          type: string
+                        status:
+                          type: string
+                        description:
+                          type: string
+                  realtime:
+                    type: object
+                    description: Optional; present when realtime is configured
+                    properties:
+                      channels:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            pattern:
+                              type: string
+                  deployments:
+                    type: object
+                    description: Optional; present on cloud-hosted projects only
+                    properties:
+                      customSlug:
+                        type: string
+                        nullable: true
+                  compute:
+                    type: object
+                    description: >-
+                      Optional; absent when no compute driver is configured, which is
+                      how a client detects that compute is unavailable. Capabilities
+                      are per provider so a client can stop offering what the
+                      configured driver cannot honour.
+                    properties:
+                      defaultProvider:
+                        type: string
+                        enum: [fly, docker]
+                        description: Provider new services are created on.
+                      providers:
+                        type: object
+                        description: Keyed by provider name; only configured providers appear.
+                        additionalProperties:
+                          type: object
+                          properties:
+                            scaleToZero:
+                              type: boolean
+                              description: Whether idle instances can stop and wake on request.
+                            regions:
+                              type: boolean
+                              description: Whether a region can be chosen. False for a single daemon.
+                            ingressModes:
+                              type: array
+                              description: Which ingress modes this provider supports.
+                              items:
+                                type: string
+                                enum: [none, port, host]
+                            defaultIngress:
+                              type: string
+                              enum: [none, port, host]
+                              description: >-
+                                Mode applied when a request omits `ingress`. Always one of
+                                `ingressModes`. For a single-host provider it is an operator
+                                setting, so it cannot be inferred from the list. Absent on a
+                                backend older than this field.
+                            sourceBuild:
+                              type: string
+                              enum: [none, flyctl, context-upload]
+                              description: >-
+                                How source builds happen. `flyctl` builds on the
+                                caller's machine; `context-upload` accepts a tarball at
+                                POST /api/compute/services/{id}/build.
+                            deployTokenIssuance:
+                              type: boolean
+                              description: Whether the backend can issue a provider deploy token.
+                  version:
+                    type: string
+              example:
+                auth:
+                  oAuthProviders: ["google", "github"]
+                  requireEmailVerification: true
+                  disableSignup: false
+                database:
+                  tables:
+                    - tableName: "users"
+                      recordCount: 150
+                    - tableName: "posts"
+                      recordCount: 1200
+                  totalSizeInGB: 0.3
+                storage:
+                  buckets:
+                    - name: "avatars"
+                      public: true
+                      objectCount: 42
+                  totalSizeInGB: 0.5
+                functions:
+                  - slug: "hello-world"
+                    name: "hello-world"
+                    status: "active"
+                    description: "Test function"
+                compute:
+                  defaultProvider: "docker"
+                  providers:
+                    docker:
+                      scaleToZero: false
+                      regions: false
+                      ingressModes: ["none", "port", "host"]
+                      defaultIngress: "none"
+                      sourceBuild: "context-upload"
+                      deployTokenIssuance: false
+                version: "2.0.0"
+            text/markdown:
+              schema:
+                type: string
+              example: |
+                # Project Metadata
+                > v2.0.0
+
+                ## Auth
+                - **OAuth providers**: google, github
+                - **Email verification**: required
+                - **Signup**: enabled
+        '400':
+          description: Invalid format parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — missing or invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — authenticated but not an admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/metadata/database:
+    get:
+      summary: Get database metadata
+      description: Get database statistics and table information for dashboard
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      responses:
+        '200':
+          description: Database metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tables:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        recordCount:
+                          type: integer
+                  totalTables:
+                    type: integer
+                  totalRecords:
+                    type: integer
+                  databaseSize:
+                    type: string
+                  lastUpdated:
+                    type: string
+                    format: date-time
+              example:
+                tables:
+                  - name: "posts"
+                    recordCount: 5678
+                  - name: "comments"
+                    recordCount: 9012
+                totalTables: 15
+                totalRecords: 16924
+                databaseSize: "125 MB"
+                lastUpdated: "2024-01-21T10:30:00Z"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "UNAUTHORIZED"
+                message: "Invalid or missing authentication"
+                statusCode: 401
+                nextAction: "Please provide valid authentication credentials"
+
+  /api/metadata/api-key:
+    get:
+      summary: Get API key
+      description: Admin-only endpoint to retrieve the API key
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  apiKey:
+                    type: string
+              example:
+                apiKey: "ins_1234567890abcdef1234567890abcdef"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "INSUFFICIENT_PERMISSIONS"
+                message: "Only admin users can access API keys"
+                statusCode: 403
+                nextAction: "Contact an administrator for API key access"
+
+  /api/metadata/anon-key:
+    get:
+      summary: Get anon key
+      description: >-
+        Admin-only endpoint to retrieve the project's opaque anon key
+        (`anon_...`). The anon key is a non-secret client identifier that maps
+        requests to the `anon` role - safe to embed in frontend bundles; row
+        level security is the security boundary. Rotatable via
+        POST /api/secrets/anon-key/rotate.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Anon key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  anonKey:
+                    type: string
+              example:
+                anonKey: "anon_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Anon key not initialized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+        - statusCode
+      properties:
+        error:
+          type: string
+          description: Error code for programmatic handling
+        message:
+          type: string
+          description: Human-readable error message
+        statusCode:
+          type: integer
+          description: HTTP status code
+        nextAction:
+          type: string
+          description: Suggested action to resolve the error

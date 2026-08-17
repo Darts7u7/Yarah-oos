@@ -1,0 +1,342 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Eye, EyeOff, Settings } from 'lucide-react';
+import TerminalIcon from '#assets/icons/terminal.svg?react';
+import {
+  Button,
+  CopyButton,
+  Input,
+  MenuDialog,
+  MenuDialogBody,
+  MenuDialogCloseButton,
+  MenuDialogContent,
+  MenuDialogHeader,
+  MenuDialogMain,
+  MenuDialogNav,
+  MenuDialogNavItem,
+  MenuDialogNavList,
+  MenuDialogSideNav,
+  MenuDialogSideNavHeader,
+  MenuDialogSideNavTitle,
+  MenuDialogTitle,
+  useToast,
+} from '@insforge/ui';
+import type { PosthogConnection } from '@insforge/shared-schemas';
+import { useDashboardHost, useIsCloudHostingMode } from '#lib/config/DashboardHostContext';
+import { PosthogKeyForm } from './posthog/PosthogKeyForm';
+import {
+  ANALYTICS_SETUP_PROMPT,
+  ANALYTICS_SETUP_PROMPT_SELF_HOSTED,
+} from '#features/analytics/lib/constants';
+import { DisconnectDialog } from './posthog/DisconnectDialog';
+
+type Section = 'general' | 'setup-prompt';
+
+interface AnalyticsConfigDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  connection: PosthogConnection | null;
+  projectId: string;
+}
+
+export function AnalyticsConfigDialog({
+  open,
+  onOpenChange,
+  connection,
+  projectId,
+}: AnalyticsConfigDialogProps) {
+  const { t } = useTranslation('chrome');
+  const [section, setSection] = useState<Section>('general');
+  const [revealed, setRevealed] = useState(false);
+  const [disconnecting, setDisconnecting] = useState(false);
+
+  const { onOpenPosthog, onConnectPosthog } = useDashboardHost();
+  // Self-hosted deployments paste their own PostHog key here; cloud projects
+  // hand off to the host's OAuth flow. Mirrors WebScraperSettingsDialog.
+  const isSelfHosted = !useIsCloudHostingMode();
+  const setupPrompt = isSelfHosted ? ANALYTICS_SETUP_PROMPT_SELF_HOSTED : ANALYTICS_SETUP_PROMPT;
+  const { showToast } = useToast();
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setRevealed(false);
+      setSection('general');
+    }
+    onOpenChange(nextOpen);
+  };
+
+  const maskedKey = connection
+    ? connection.apiKey.length > 8
+      ? `${connection.apiKey.slice(0, 4)}${'•'.repeat(connection.apiKey.length - 8)}${connection.apiKey.slice(-4)}`
+      : '•'.repeat(connection.apiKey.length)
+    : '';
+
+  const title =
+    section === 'general'
+      ? t('analytics.config.general', { defaultValue: 'General' })
+      : t('analytics.config.setupPrompt', { defaultValue: 'Setup Prompt' });
+
+  const directUrl = connection ? `${connection.host}/project/${connection.posthogProjectId}` : '';
+
+  const handleOpenPosthog = () => {
+    if (!connection) {
+      return;
+    }
+    if (!onOpenPosthog) {
+      window.open(directUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    const newTab = window.open('about:blank', '_blank');
+    if (!newTab) {
+      showToast(
+        t('analytics.config.openPosthogPopupBlocked', {
+          defaultValue: 'Could not open PostHog. Please allow popups and try again.',
+        }),
+        'error'
+      );
+      return;
+    }
+    try {
+      newTab.opener = null;
+    } catch {
+      newTab.close();
+      showToast(
+        t('analytics.config.openPosthogFailed', {
+          defaultValue: 'Could not open PostHog. Please try again.',
+        }),
+        'error'
+      );
+      return;
+    }
+    onOpenPosthog(projectId)
+      .then((result) => {
+        if (result.url) {
+          newTab.location.href = result.url;
+        } else {
+          newTab.close();
+          showToast(
+            t('analytics.config.openPosthogFailed', {
+              defaultValue: 'Could not open PostHog. Please try again.',
+            }),
+            'error'
+          );
+        }
+      })
+      .catch(() => {
+        newTab.close();
+        showToast(
+          t('analytics.config.openPosthogFailed', {
+            defaultValue: 'Could not open PostHog. Please try again.',
+          }),
+          'error'
+        );
+      });
+  };
+
+  return (
+    <>
+      <MenuDialog open={open} onOpenChange={handleOpenChange}>
+        <MenuDialogContent>
+          <MenuDialogSideNav>
+            <MenuDialogSideNavHeader>
+              <MenuDialogSideNavTitle>
+                {t('analytics.config.title', { defaultValue: 'Analytics Config' })}
+              </MenuDialogSideNavTitle>
+            </MenuDialogSideNavHeader>
+            <MenuDialogNav>
+              <MenuDialogNavList>
+                <MenuDialogNavItem
+                  icon={<Settings className="h-5 w-5" />}
+                  active={section === 'general'}
+                  onClick={() => setSection('general')}
+                >
+                  {t('analytics.config.general', { defaultValue: 'General' })}
+                </MenuDialogNavItem>
+                <MenuDialogNavItem
+                  icon={<TerminalIcon className="h-5 w-5" />}
+                  active={section === 'setup-prompt'}
+                  onClick={() => setSection('setup-prompt')}
+                >
+                  {t('analytics.config.setupPrompt', { defaultValue: 'Setup Prompt' })}
+                </MenuDialogNavItem>
+              </MenuDialogNavList>
+            </MenuDialogNav>
+          </MenuDialogSideNav>
+
+          <MenuDialogMain>
+            <MenuDialogHeader>
+              <MenuDialogTitle>{title}</MenuDialogTitle>
+              <MenuDialogCloseButton className="ml-auto" />
+            </MenuDialogHeader>
+
+            <MenuDialogBody>
+              {section === 'general' ? (
+                connection ? (
+                  <div className="flex flex-col gap-2">
+                    {/* Project info row + actions */}
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex min-w-0 flex-col">
+                        <p className="truncate text-base font-normal leading-7 text-foreground">
+                          {connection.projectName}
+                        </p>
+                        <div className="flex items-center gap-2 text-sm leading-5 text-muted-foreground">
+                          <span>{connection.region}</span>
+                          {connection.organizationName && (
+                            <>
+                              <span
+                                aria-hidden
+                                className="size-1 rounded-full bg-muted-foreground"
+                              />
+                              <span className="truncate">{connection.organizationName}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <Button variant="secondary" onClick={handleOpenPosthog}>
+                          {t('analytics.config.openInPosthog', {
+                            defaultValue: 'Open in PostHog',
+                          })}
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          className="border-warning bg-warning/10 text-warning hover:bg-warning/20"
+                          onClick={() => setDisconnecting(true)}
+                        >
+                          {t('analytics.config.disconnect', { defaultValue: 'Disconnect' })}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="h-px w-full bg-[var(--alpha-8)]" />
+
+                    <FieldRow
+                      label={t('analytics.config.projectApiKey', {
+                        defaultValue: 'Project API Key',
+                      })}
+                    >
+                      <div className="relative flex-1">
+                        <Input
+                          readOnly
+                          value={revealed ? connection.apiKey : maskedKey}
+                          className="pr-9 font-mono"
+                        />
+                        <button
+                          type="button"
+                          aria-label={
+                            revealed
+                              ? t('analytics.config.hideApiKey', { defaultValue: 'Hide API key' })
+                              : t('analytics.config.revealApiKey', {
+                                  defaultValue: 'Reveal API key',
+                                })
+                          }
+                          onClick={() => setRevealed((v) => !v)}
+                          className="absolute right-1.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-[var(--alpha-8)] hover:text-foreground"
+                        >
+                          {revealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                      <CopyButton
+                        text={connection.apiKey}
+                        showText={false}
+                        aria-label={t('analytics.config.copyApiKey', {
+                          defaultValue: 'Copy API key',
+                        })}
+                      />
+                    </FieldRow>
+
+                    <div className="h-px w-full bg-[var(--alpha-8)]" />
+
+                    <FieldRow label={t('analytics.config.host', { defaultValue: 'Host' })}>
+                      <Input readOnly value={connection.host} className="font-mono" />
+                      <CopyButton
+                        text={connection.host}
+                        showText={false}
+                        aria-label={t('analytics.config.copyHost', { defaultValue: 'Copy host' })}
+                      />
+                    </FieldRow>
+
+                    <div className="h-px w-full bg-[var(--alpha-8)]" />
+
+                    <FieldRow
+                      label={t('analytics.config.projectId', { defaultValue: 'Project ID' })}
+                    >
+                      <Input readOnly value={connection.posthogProjectId} className="font-mono" />
+                      <CopyButton
+                        text={connection.posthogProjectId}
+                        showText={false}
+                        aria-label={t('analytics.config.copyProjectId', {
+                          defaultValue: 'Copy Project ID',
+                        })}
+                      />
+                    </FieldRow>
+                  </div>
+                ) : (
+                  <div className="flex min-h-[240px] flex-col items-center justify-center gap-3 text-center">
+                    <p className="text-sm leading-6 text-foreground">
+                      {t('analytics.config.notConnected', {
+                        defaultValue: "You haven't connected PostHog yet.",
+                      })}
+                    </p>
+                    {isSelfHosted ? (
+                      <div className="w-full max-w-md text-left">
+                        <PosthogKeyForm />
+                      </div>
+                    ) : (
+                      <Button
+                        variant="primary"
+                        disabled={!onConnectPosthog}
+                        onClick={() => onConnectPosthog?.(projectId)}
+                      >
+                        {t('analytics.connectPosthog', { defaultValue: 'Connect PostHog' })}
+                      </Button>
+                    )}
+                  </div>
+                )
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {t('analytics.setupPromptDescription', {
+                      defaultValue:
+                        'Paste this into your coding agent to set up PostHog analytics for your app',
+                    })}
+                  </p>
+                  <div className="flex flex-col gap-2 rounded border border-[var(--alpha-8)] bg-semantic-0 p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex h-5 items-center rounded bg-[var(--alpha-8)] px-2">
+                        <span className="text-xs font-medium leading-4 text-muted-foreground">
+                          {t('analytics.setupPromptBadge', { defaultValue: 'setup prompt' })}
+                        </span>
+                      </div>
+                      <CopyButton text={setupPrompt} showText={false} className="shrink-0" />
+                    </div>
+                    <p className="font-mono text-sm leading-6 text-foreground">{setupPrompt}</p>
+                  </div>
+                </div>
+              )}
+            </MenuDialogBody>
+          </MenuDialogMain>
+        </MenuDialogContent>
+      </MenuDialog>
+
+      {connection && (
+        <DisconnectDialog
+          open={disconnecting}
+          onClose={() => {
+            setDisconnecting(false);
+            onOpenChange(false);
+          }}
+        />
+      )}
+    </>
+  );
+}
+
+function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-6 self-stretch">
+      <label className="w-28 shrink-0 pt-2 text-sm text-foreground">{label}</label>
+      <div className="ml-auto flex w-[400px] items-center gap-2">{children}</div>
+    </div>
+  );
+}

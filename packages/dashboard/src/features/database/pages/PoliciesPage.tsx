@@ -1,0 +1,342 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import RefreshIcon from '#assets/icons/refresh.svg?react';
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@insforge/ui';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  DataGridEmptyState,
+  DataGrid,
+  type ConvertedValue,
+  type DataGridColumn,
+  type DataGridRowType,
+  EmptyState,
+  TableHeader,
+} from '#components';
+import { useDatabaseSchemas, usePolicies } from '#features/database/hooks/useDatabase';
+import { useDatabaseSchemaSelection } from '#features/database/hooks/useDatabaseSchemaSelection';
+import { SQLModal, SQLCellButton } from '#features/database/components/SQLModal';
+import { DatabaseStudioSidebarPanel } from '#features/database/components/DatabaseSidebar';
+import { type DatabasePoliciesResponse } from '@insforge/shared-schemas';
+import { DatabaseSchemaSelect } from '#features/database/components/DatabaseSchemaSelect';
+import { usePageSize } from '#lib/hooks/usePageSize';
+import { DEFAULT_DATABASE_SCHEMA, getDatabaseSchemaInfo } from '#features/database/helpers';
+
+interface PolicyRow extends DataGridRowType {
+  id: string;
+  tableName: string;
+  policyName: string;
+  cmd: string;
+  roles: string;
+  qual: string | null;
+  withCheck: string | null;
+  [key: string]: ConvertedValue | { [key: string]: string }[];
+}
+
+function parsePoliciesFromResponse(response: DatabasePoliciesResponse | undefined): PolicyRow[] {
+  if (!response?.policies) {
+    return [];
+  }
+
+  const policies: PolicyRow[] = [];
+
+  response.policies.forEach((policy) => {
+    policies.push({
+      id: `${policy.tableName}_${policy.policyName}`,
+      tableName: policy.tableName,
+      policyName: policy.policyName,
+      cmd: policy.cmd,
+      roles: Array.isArray(policy.roles) ? policy.roles.join(', ') : String(policy.roles),
+      qual: policy.qual,
+      withCheck: policy.withCheck,
+    });
+  });
+
+  return policies;
+}
+
+export default function PoliciesPage() {
+  const { t } = useTranslation('chrome');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { selectedSchema, setSelectedSchema } = useDatabaseSchemaSelection();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { schemas, isLoading: isLoadingSchemas } = useDatabaseSchemas();
+  const selectedSchemaInfo = getDatabaseSchemaInfo(schemas, selectedSchema);
+  const { data, isLoading, error, refetch } = usePolicies(selectedSchema, true);
+  const [sqlModal, setSqlModal] = useState({ open: false, title: '', value: '' });
+  const { pageSize, pageSizeOptions, onPageSizeChange } = usePageSize('db-policies');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const allPolicies = useMemo(() => parsePoliciesFromResponse(data), [data]);
+
+  const filteredPolicies = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return allPolicies;
+    }
+
+    const query = searchQuery.toLowerCase();
+    return allPolicies.filter(
+      (policy) =>
+        policy.policyName.toLowerCase().includes(query) ||
+        policy.tableName.toLowerCase().includes(query)
+    );
+  }, [allPolicies, searchQuery]);
+
+  const totalPages = Math.ceil(filteredPolicies.length / pageSize);
+  const safeCurrentPage = Math.min(currentPage, Math.max(1, totalPages));
+
+  const paginatedPolicies = useMemo(() => {
+    const start = (safeCurrentPage - 1) * pageSize;
+    return filteredPolicies.slice(start, start + pageSize);
+  }, [filteredPolicies, safeCurrentPage, pageSize]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedSchema, pageSize]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      setSearchQuery('');
+      setCurrentPage(1);
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const columns: DataGridColumn<PolicyRow>[] = useMemo(
+    () => [
+      {
+        key: 'tableName',
+        name: t('database.tableColumn', { defaultValue: 'Table' }),
+        width: 'minmax(180px, 1.5fr)',
+        resizable: true,
+        sortable: true,
+      },
+      {
+        key: 'policyName',
+        name: t('common.nameColumn', { defaultValue: 'Name' }),
+        width: 'minmax(200px, 2fr)',
+        resizable: true,
+        sortable: true,
+      },
+      {
+        key: 'cmd',
+        name: t('database.commandColumn', { defaultValue: 'Command' }),
+        width: 'minmax(100px, 1fr)',
+        resizable: true,
+        sortable: true,
+        renderCell: ({ row }) => {
+          const cmd = row.cmd;
+          const cmdLabel = cmd === '*' ? 'ALL' : cmd;
+          return (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+              {cmdLabel}
+            </span>
+          );
+        },
+      },
+      {
+        key: 'roles',
+        name: t('database.rolesColumn', { defaultValue: 'Roles' }),
+        width: 'minmax(150px, 1.5fr)',
+        resizable: true,
+      },
+      {
+        key: 'qual',
+        name: t('database.usingColumn', { defaultValue: 'Using' }),
+        width: 'minmax(200px, 2fr)',
+        resizable: true,
+        renderCell: ({ row }) => (
+          <SQLCellButton
+            value={row.qual}
+            onClick={() =>
+              row.qual &&
+              setSqlModal({
+                open: true,
+                title: t('database.usingColumn', { defaultValue: 'Using' }),
+                value: row.qual,
+              })
+            }
+          />
+        ),
+      },
+      {
+        key: 'withCheck',
+        name: t('database.withCheckColumn', { defaultValue: 'With Check' }),
+        width: 'minmax(200px, 2fr)',
+        resizable: true,
+        renderCell: ({ row }) => (
+          <SQLCellButton
+            value={row.withCheck}
+            onClick={() =>
+              row.withCheck &&
+              setSqlModal({
+                open: true,
+                title: t('database.withCheckColumn', { defaultValue: 'With Check' }),
+                value: row.withCheck,
+              })
+            }
+          />
+        ),
+      },
+    ],
+    [setSqlModal, t]
+  );
+
+  useEffect(() => {
+    if (isLoadingSchemas || schemas.length === 0) {
+      return;
+    }
+
+    if (!schemas.some((schema) => schema.name === selectedSchema)) {
+      setSelectedSchema(DEFAULT_DATABASE_SCHEMA, { replace: true });
+    }
+  }, [isLoadingSchemas, schemas, selectedSchema, setSelectedSchema]);
+
+  const refreshButton = (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded p-1.5 text-muted-foreground hover:bg-[var(--alpha-4)] active:bg-[var(--alpha-8)]"
+            onClick={() => void handleRefresh()}
+            disabled={isRefreshing}
+          >
+            <RefreshIcon className={isRefreshing ? 'h-5 w-5 animate-spin' : 'h-5 w-5'} />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" align="center">
+          <p>
+            {isRefreshing
+              ? t('common.refreshing', { defaultValue: 'Refreshing...' })
+              : t('database.refreshPolicies', { defaultValue: 'Refresh policies' })}
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+
+  if (error) {
+    return (
+      <div className="flex h-full min-h-0 overflow-hidden bg-[rgb(var(--semantic-1))]">
+        <DatabaseStudioSidebarPanel
+          onBack={() =>
+            void navigate(
+              {
+                pathname: '/dashboard/database/tables',
+                search: location.search,
+              },
+              { state: { slideFromStudio: true } }
+            )
+          }
+        />
+        <div className="min-w-0 flex-1 flex items-center justify-center bg-[rgb(var(--semantic-1))]">
+          <EmptyState
+            title={t('database.failedToLoadPolicies', {
+              defaultValue: 'Failed to load policies',
+            })}
+            description={
+              error instanceof Error
+                ? error.message
+                : t('common.anErrorOccurred', { defaultValue: 'An error occurred' })
+            }
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full min-h-0 overflow-hidden bg-[rgb(var(--semantic-1))]">
+      <DatabaseStudioSidebarPanel
+        onBack={() =>
+          void navigate(
+            {
+              pathname: '/dashboard/database/tables',
+              search: location.search,
+            },
+            { state: { slideFromStudio: true } }
+          )
+        }
+      />
+      <div className="min-w-0 flex-1 flex flex-col overflow-hidden bg-[rgb(var(--semantic-1))]">
+        <TableHeader
+          title={t('database.rlsPolicies', { defaultValue: 'RLS Policies' })}
+          showDividerAfterTitle
+          titleButtons={
+            <div className="w-56">
+              <DatabaseSchemaSelect
+                schemas={schemas}
+                value={selectedSchemaInfo.name}
+                onValueChange={(schemaName) => {
+                  setSearchQuery('');
+                  setCurrentPage(1);
+                  setSelectedSchema(schemaName, { replace: true });
+                }}
+                disabled={isLoadingSchemas}
+              />
+            </div>
+          }
+          leftSlot={refreshButton}
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={t('database.searchPolicy', { defaultValue: 'Search policy' })}
+        />
+        {isLoading ? (
+          <div className="min-h-0 flex-1 flex items-center justify-center">
+            <EmptyState
+              title={t('database.loadingPolicies', { defaultValue: 'Loading policies...' })}
+              description={t('common.pleaseWait', { defaultValue: 'Please wait' })}
+            />
+          </div>
+        ) : (
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <DataGrid
+              data={paginatedPolicies}
+              columns={columns}
+              showSelection={false}
+              showPagination={true}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              pageSizeOptions={pageSizeOptions}
+              totalRecords={filteredPolicies.length}
+              paginationRecordLabel={t('database.policiesRecordLabel', {
+                defaultValue: 'policies',
+              })}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={onPageSizeChange}
+              noPadding={true}
+              className="h-full"
+              isRefreshing={isRefreshing}
+              emptyState={
+                <DataGridEmptyState
+                  message={
+                    searchQuery
+                      ? t('database.noPoliciesMatchSearch', {
+                          defaultValue: 'No policies match your search criteria',
+                        })
+                      : t('database.noPoliciesFound', { defaultValue: 'No policies found' })
+                  }
+                />
+              }
+            />
+          </div>
+        )}
+
+        {/* SQL Detail Modal */}
+        <SQLModal
+          open={sqlModal.open}
+          onOpenChange={(open) => setSqlModal((prev) => ({ ...prev, open }))}
+          title={sqlModal.title}
+          value={sqlModal.value}
+        />
+      </div>
+    </div>
+  );
+}

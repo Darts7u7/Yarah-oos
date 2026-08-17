@@ -1,0 +1,328 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import RefreshIcon from '#assets/icons/refresh.svg?react';
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@insforge/ui';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  ConvertedValue,
+  DataGridEmptyState,
+  DataGrid,
+  type DataGridColumn,
+  type DataGridRowType,
+  EmptyState,
+  TableHeader,
+} from '#components';
+import { useDatabaseSchemas, useTriggers } from '#features/database/hooks/useDatabase';
+import { useDatabaseSchemaSelection } from '#features/database/hooks/useDatabaseSchemaSelection';
+import { SQLModal, SQLCellButton } from '#features/database/components/SQLModal';
+import { DatabaseStudioSidebarPanel } from '#features/database/components/DatabaseSidebar';
+import { type DatabaseTriggersResponse } from '@insforge/shared-schemas';
+import { DatabaseSchemaSelect } from '#features/database/components/DatabaseSchemaSelect';
+import { usePageSize } from '#lib/hooks/usePageSize';
+import { DEFAULT_DATABASE_SCHEMA, getDatabaseSchemaInfo } from '#features/database/helpers';
+
+interface TriggerRow extends DataGridRowType {
+  id: string;
+  tableName: string;
+  triggerName: string;
+  actionTiming: string;
+  eventManipulation: string;
+  actionStatement: string;
+  [key: string]: ConvertedValue | { [key: string]: string }[];
+}
+
+function parseTriggersFromResponse(response: DatabaseTriggersResponse | undefined): TriggerRow[] {
+  if (!response?.triggers) {
+    return [];
+  }
+
+  const triggers: TriggerRow[] = [];
+
+  response.triggers.forEach((trigger) => {
+    triggers.push({
+      id: `${trigger.tableName}_${trigger.triggerName}`,
+      tableName: trigger.tableName,
+      triggerName: trigger.triggerName,
+      actionTiming: trigger.actionTiming,
+      eventManipulation: trigger.eventManipulation,
+      actionStatement: trigger.actionStatement,
+    });
+  });
+
+  return triggers;
+}
+
+export default function TriggersPage() {
+  const { t } = useTranslation('chrome');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { selectedSchema, setSelectedSchema } = useDatabaseSchemaSelection();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { schemas, isLoading: isLoadingSchemas } = useDatabaseSchemas();
+  const selectedSchemaInfo = getDatabaseSchemaInfo(schemas, selectedSchema);
+  const { data, isLoading, error, refetch } = useTriggers(selectedSchema, true);
+  const [sqlModal, setSqlModal] = useState({ open: false, title: '', value: '' });
+  const { pageSize, pageSizeOptions, onPageSizeChange } = usePageSize('db-triggers');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const allTriggers = useMemo(() => parseTriggersFromResponse(data), [data]);
+
+  const filteredTriggers = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return allTriggers;
+    }
+
+    const query = searchQuery.toLowerCase();
+    return allTriggers.filter(
+      (trigger) =>
+        trigger.triggerName.toLowerCase().includes(query) ||
+        trigger.tableName.toLowerCase().includes(query)
+    );
+  }, [allTriggers, searchQuery]);
+
+  const totalPages = Math.ceil(filteredTriggers.length / pageSize);
+  const safeCurrentPage = Math.min(currentPage, Math.max(1, totalPages));
+
+  const paginatedTriggers = useMemo(() => {
+    const start = (safeCurrentPage - 1) * pageSize;
+    return filteredTriggers.slice(start, start + pageSize);
+  }, [filteredTriggers, safeCurrentPage, pageSize]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedSchema, pageSize]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      setSearchQuery('');
+      setCurrentPage(1);
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const columns: DataGridColumn<TriggerRow>[] = useMemo(
+    () => [
+      {
+        key: 'tableName',
+        name: t('database.tableColumn', { defaultValue: 'Table' }),
+        width: 'minmax(180px, 1.5fr)',
+        resizable: true,
+        sortable: true,
+      },
+      {
+        key: 'triggerName',
+        name: t('common.nameColumn', { defaultValue: 'Name' }),
+        width: 'minmax(200px, 2fr)',
+        resizable: true,
+        sortable: true,
+      },
+      {
+        key: 'actionTiming',
+        name: t('database.timingColumn', { defaultValue: 'Timing' }),
+        width: 'minmax(100px, 1fr)',
+        resizable: true,
+        sortable: true,
+        renderCell: ({ row }) => {
+          const timing = row.actionTiming.toUpperCase();
+          return (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+              {timing}
+            </span>
+          );
+        },
+      },
+      {
+        key: 'eventManipulation',
+        name: t('database.eventColumn', { defaultValue: 'Event' }),
+        width: 'minmax(100px, 1fr)',
+        resizable: true,
+        sortable: true,
+        renderCell: ({ row }) => {
+          const event = row.eventManipulation.toUpperCase();
+          return (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+              {event}
+            </span>
+          );
+        },
+      },
+      {
+        key: 'actionStatement',
+        name: t('database.statementColumn', { defaultValue: 'Statement' }),
+        width: 'minmax(300px, 3fr)',
+        resizable: true,
+        renderCell: ({ row }) => (
+          <SQLCellButton
+            value={row.actionStatement}
+            onClick={() =>
+              setSqlModal({
+                open: true,
+                title: t('database.triggerStatement', { defaultValue: 'Trigger Statement' }),
+                value: row.actionStatement,
+              })
+            }
+          />
+        ),
+      },
+    ],
+    [setSqlModal, t]
+  );
+
+  useEffect(() => {
+    if (isLoadingSchemas || schemas.length === 0) {
+      return;
+    }
+
+    if (!schemas.some((schema) => schema.name === selectedSchema)) {
+      setSelectedSchema(DEFAULT_DATABASE_SCHEMA, { replace: true });
+    }
+  }, [isLoadingSchemas, schemas, selectedSchema, setSelectedSchema]);
+
+  const refreshButton = (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded p-1.5 text-muted-foreground hover:bg-[var(--alpha-4)] active:bg-[var(--alpha-8)]"
+            onClick={() => void handleRefresh()}
+            disabled={isRefreshing}
+          >
+            <RefreshIcon className={isRefreshing ? 'h-5 w-5 animate-spin' : 'h-5 w-5'} />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" align="center">
+          <p>
+            {isRefreshing
+              ? t('common.refreshing', { defaultValue: 'Refreshing...' })
+              : t('database.refreshTriggers', { defaultValue: 'Refresh triggers' })}
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+
+  if (error) {
+    return (
+      <div className="flex h-full min-h-0 overflow-hidden bg-[rgb(var(--semantic-1))]">
+        <DatabaseStudioSidebarPanel
+          onBack={() =>
+            void navigate(
+              {
+                pathname: '/dashboard/database/tables',
+                search: location.search,
+              },
+              { state: { slideFromStudio: true } }
+            )
+          }
+        />
+        <div className="min-w-0 flex-1 flex items-center justify-center bg-[rgb(var(--semantic-1))]">
+          <EmptyState
+            title={t('database.failedToLoadTriggers', {
+              defaultValue: 'Failed to load triggers',
+            })}
+            description={
+              error instanceof Error
+                ? error.message
+                : t('common.anErrorOccurred', { defaultValue: 'An error occurred' })
+            }
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full min-h-0 overflow-hidden bg-[rgb(var(--semantic-1))]">
+      <DatabaseStudioSidebarPanel
+        onBack={() =>
+          void navigate(
+            {
+              pathname: '/dashboard/database/tables',
+              search: location.search,
+            },
+            { state: { slideFromStudio: true } }
+          )
+        }
+      />
+      <div className="min-w-0 flex-1 flex flex-col overflow-hidden bg-[rgb(var(--semantic-1))]">
+        <TableHeader
+          title={t('database.databaseTriggers', { defaultValue: 'Database Triggers' })}
+          showDividerAfterTitle
+          titleButtons={
+            <div className="w-56">
+              <DatabaseSchemaSelect
+                schemas={schemas}
+                value={selectedSchemaInfo.name}
+                onValueChange={(schemaName) => {
+                  setSearchQuery('');
+                  setCurrentPage(1);
+                  setSelectedSchema(schemaName, { replace: true });
+                }}
+                disabled={isLoadingSchemas}
+              />
+            </div>
+          }
+          leftSlot={refreshButton}
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={t('database.searchTrigger', { defaultValue: 'Search trigger' })}
+        />
+        {isLoading ? (
+          <div className="min-h-0 flex-1 flex items-center justify-center">
+            <EmptyState
+              title={t('database.loadingTriggers', { defaultValue: 'Loading triggers...' })}
+              description={t('common.pleaseWait', { defaultValue: 'Please wait' })}
+            />
+          </div>
+        ) : (
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <DataGrid
+              data={paginatedTriggers}
+              columns={columns}
+              showSelection={false}
+              showPagination={true}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              pageSizeOptions={pageSizeOptions}
+              totalRecords={filteredTriggers.length}
+              paginationRecordLabel={t('database.triggersRecordLabel', {
+                defaultValue: 'triggers',
+              })}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={onPageSizeChange}
+              noPadding={true}
+              className="h-full"
+              isRefreshing={isRefreshing}
+              emptyState={
+                <DataGridEmptyState
+                  message={
+                    searchQuery
+                      ? t('database.noTriggersMatchSearch', {
+                          defaultValue: 'No triggers match your search criteria',
+                        })
+                      : t('database.noTriggersFound', { defaultValue: 'No triggers found' })
+                  }
+                />
+              }
+            />
+          </div>
+        )}
+
+        {/* SQL Detail Modal */}
+        <SQLModal
+          open={sqlModal.open}
+          onOpenChange={(open) => setSqlModal((prev) => ({ ...prev, open }))}
+          title={sqlModal.title}
+          value={sqlModal.value}
+        />
+      </div>
+    </div>
+  );
+}

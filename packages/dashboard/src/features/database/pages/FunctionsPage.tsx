@@ -1,0 +1,305 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import RefreshIcon from '#assets/icons/refresh.svg?react';
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@insforge/ui';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  DataGridEmptyState,
+  EmptyState,
+  DataGrid,
+  type DataGridColumn,
+  type DataGridRowType,
+  type ConvertedValue,
+  TableHeader,
+} from '#components';
+import { useDatabaseSchemas, useFunctions } from '#features/database/hooks/useDatabase';
+import { useDatabaseSchemaSelection } from '#features/database/hooks/useDatabaseSchemaSelection';
+import { usePageSize } from '#lib/hooks/usePageSize';
+import { SQLModal, SQLCellButton } from '#features/database/components/SQLModal';
+import { DatabaseStudioSidebarPanel } from '#features/database/components/DatabaseSidebar';
+import { type DatabaseFunctionsResponse } from '@insforge/shared-schemas';
+import { DatabaseSchemaSelect } from '#features/database/components/DatabaseSchemaSelect';
+import { DEFAULT_DATABASE_SCHEMA, getDatabaseSchemaInfo } from '#features/database/helpers';
+
+interface FunctionRow extends DataGridRowType {
+  id: string;
+  functionName: string;
+  kind: string;
+  functionDef: string;
+  [key: string]: ConvertedValue | { [key: string]: string }[];
+}
+
+function parseFunctionsFromResponse(
+  response: DatabaseFunctionsResponse | undefined
+): FunctionRow[] {
+  if (!response?.functions) {
+    return [];
+  }
+
+  const functions: FunctionRow[] = [];
+
+  response.functions.forEach((func) => {
+    functions.push({
+      id: func.functionName,
+      functionName: func.functionName,
+      kind: func.kind,
+      functionDef: func.functionDef,
+    });
+  });
+
+  return functions;
+}
+
+export default function FunctionsPage() {
+  const { t } = useTranslation('chrome');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { selectedSchema, setSelectedSchema } = useDatabaseSchemaSelection();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { schemas, isLoading: isLoadingSchemas } = useDatabaseSchemas();
+  const selectedSchemaInfo = getDatabaseSchemaInfo(schemas, selectedSchema);
+  const { data, isLoading, error, refetch } = useFunctions(selectedSchema, true);
+  const [sqlModal, setSqlModal] = useState({ open: false, title: '', value: '' });
+  const { pageSize, pageSizeOptions, onPageSizeChange } = usePageSize('db-functions');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const allFunctions = useMemo(() => parseFunctionsFromResponse(data), [data]);
+
+  const filteredFunctions = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return allFunctions;
+    }
+
+    const query = searchQuery.toLowerCase();
+    return allFunctions.filter((func) => func.functionName.toLowerCase().includes(query));
+  }, [allFunctions, searchQuery]);
+
+  const totalPages = Math.ceil(filteredFunctions.length / pageSize);
+  const safeCurrentPage = Math.min(currentPage, Math.max(1, totalPages));
+
+  const paginatedFunctions = useMemo(() => {
+    const start = (safeCurrentPage - 1) * pageSize;
+    return filteredFunctions.slice(start, start + pageSize);
+  }, [filteredFunctions, safeCurrentPage, pageSize]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedSchema, pageSize]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      setSearchQuery('');
+      setCurrentPage(1);
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const columns: DataGridColumn<FunctionRow>[] = useMemo(
+    () => [
+      {
+        key: 'functionName',
+        name: t('common.nameColumn', { defaultValue: 'Name' }),
+        width: 'minmax(200px, 2fr)',
+        resizable: true,
+        sortable: true,
+      },
+      {
+        key: 'kind',
+        name: t('common.typeColumn', { defaultValue: 'Type' }),
+        width: 'minmax(120px, 1fr)',
+        resizable: true,
+        sortable: true,
+        renderCell: ({ row }) => {
+          const kindLabel =
+            row.kind === 'f'
+              ? t('database.functionKind', { defaultValue: 'Function' })
+              : row.kind === 'p'
+                ? t('database.procedureKind', { defaultValue: 'Procedure' })
+                : row.kind;
+          return (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+              {kindLabel}
+            </span>
+          );
+        },
+      },
+      {
+        key: 'functionDef',
+        name: t('database.definitionColumn', { defaultValue: 'Definition' }),
+        width: 'minmax(400px, 8fr)',
+        resizable: true,
+        renderCell: ({ row }) => (
+          <SQLCellButton
+            value={row.functionDef}
+            onClick={() =>
+              setSqlModal({
+                open: true,
+                title: t('database.functionDefinition', { defaultValue: 'Function Definition' }),
+                value: row.functionDef,
+              })
+            }
+          />
+        ),
+      },
+    ],
+    [setSqlModal, t]
+  );
+
+  useEffect(() => {
+    if (isLoadingSchemas || schemas.length === 0) {
+      return;
+    }
+
+    if (!schemas.some((schema) => schema.name === selectedSchema)) {
+      setSelectedSchema(DEFAULT_DATABASE_SCHEMA, { replace: true });
+    }
+  }, [isLoadingSchemas, schemas, selectedSchema, setSelectedSchema]);
+
+  const refreshButton = (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded p-1.5 text-muted-foreground hover:bg-[var(--alpha-4)] active:bg-[var(--alpha-8)]"
+            onClick={() => void handleRefresh()}
+            disabled={isRefreshing}
+          >
+            <RefreshIcon className={isRefreshing ? 'h-5 w-5 animate-spin' : 'h-5 w-5'} />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" align="center">
+          <p>
+            {isRefreshing
+              ? t('common.refreshing', { defaultValue: 'Refreshing...' })
+              : t('database.refreshFunctions', { defaultValue: 'Refresh functions' })}
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+
+  if (error) {
+    return (
+      <div className="flex h-full min-h-0 overflow-hidden bg-[rgb(var(--semantic-1))]">
+        <DatabaseStudioSidebarPanel
+          onBack={() =>
+            void navigate(
+              {
+                pathname: '/dashboard/database/tables',
+                search: location.search,
+              },
+              { state: { slideFromStudio: true } }
+            )
+          }
+        />
+        <div className="min-w-0 flex-1 flex items-center justify-center bg-[rgb(var(--semantic-1))]">
+          <EmptyState
+            title={t('database.failedToLoadFunctions', {
+              defaultValue: 'Failed to load functions',
+            })}
+            description={
+              error instanceof Error
+                ? error.message
+                : t('common.anErrorOccurred', { defaultValue: 'An error occurred' })
+            }
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full min-h-0 overflow-hidden bg-[rgb(var(--semantic-1))]">
+      <DatabaseStudioSidebarPanel
+        onBack={() =>
+          void navigate(
+            {
+              pathname: '/dashboard/database/tables',
+              search: location.search,
+            },
+            { state: { slideFromStudio: true } }
+          )
+        }
+      />
+      <div className="min-w-0 flex-1 flex flex-col overflow-hidden bg-[rgb(var(--semantic-1))]">
+        <TableHeader
+          title={t('database.databaseFunctions', { defaultValue: 'Database Functions' })}
+          showDividerAfterTitle
+          titleButtons={
+            <div className="w-56">
+              <DatabaseSchemaSelect
+                schemas={schemas}
+                value={selectedSchemaInfo.name}
+                onValueChange={(schemaName) => {
+                  setSearchQuery('');
+                  setCurrentPage(1);
+                  setSelectedSchema(schemaName, { replace: true });
+                }}
+                disabled={isLoadingSchemas}
+              />
+            </div>
+          }
+          leftSlot={refreshButton}
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={t('database.searchFunction', { defaultValue: 'Search function' })}
+        />
+        {isLoading ? (
+          <div className="min-h-0 flex-1 flex items-center justify-center">
+            <EmptyState
+              title={t('database.loadingFunctions', { defaultValue: 'Loading functions...' })}
+              description={t('common.pleaseWait', { defaultValue: 'Please wait' })}
+            />
+          </div>
+        ) : (
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <DataGrid
+              data={paginatedFunctions}
+              columns={columns}
+              showSelection={false}
+              showPagination={true}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              pageSizeOptions={pageSizeOptions}
+              totalRecords={filteredFunctions.length}
+              paginationRecordLabel={t('database.functionsRecordLabel', {
+                defaultValue: 'functions',
+              })}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={onPageSizeChange}
+              noPadding={true}
+              className="h-full"
+              isRefreshing={isRefreshing}
+              emptyState={
+                <DataGridEmptyState
+                  message={
+                    searchQuery
+                      ? t('database.noFunctionsMatchSearch', {
+                          defaultValue: 'No functions match your search criteria',
+                        })
+                      : t('database.noFunctionsFound', { defaultValue: 'No functions found' })
+                  }
+                />
+              }
+            />
+          </div>
+        )}
+
+        {/* SQL Detail Modal */}
+        <SQLModal
+          open={sqlModal.open}
+          onOpenChange={(open) => setSqlModal((prev) => ({ ...prev, open }))}
+          title={sqlModal.title}
+          value={sqlModal.value}
+        />
+      </div>
+    </div>
+  );
+}

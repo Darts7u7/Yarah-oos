@@ -1,0 +1,143 @@
+---
+title: Swift realtime SDK reference
+description: Connect over Socket.IO, subscribe to channels, publish events, track presence, and handle reconnects with the InsForge Swift realtime client on Apple.
+---
+
+import SwiftSdkInstallation from '/snippets/swift-sdk-installation.mdx';
+
+## Installation
+
+<SwiftSdkInstallation />
+
+## Mental model
+
+The Swift SDK connects to InsForge Realtime over Socket.IO. Subscribe to channel names such as `order:123` or `chat:room-1`, then listen for event names published to those channels.
+
+Events are published by database triggers that call `realtime.publish(...)` or by clients that publish to a channel they have already joined. See [Realtime overview](/core-concepts/realtime/overview) for the channel and RLS model.
+
+## Quick start
+
+```swift
+try await insforge.realtime.connect()
+
+await insforge.realtime.subscribe(to: "order:\(orderId)") { message in
+    if message.eventName == "status_changed" {
+        print("Payload: \(String(describing: message.payload))")
+    }
+}
+```
+
+## connect()
+
+Establish a realtime connection.
+
+```swift
+do {
+    try await insforge.realtime.connect()
+    print("Connected to realtime")
+} catch {
+    print("Connection failed: \(error)")
+}
+```
+
+## subscribe()
+
+Subscribe to a channel and receive messages published to it.
+
+```swift
+await insforge.realtime.subscribe(to: "chat:room-1") { message in
+    print("Event: \(message.eventName ?? "")")
+    print("Channel: \(message.channelName ?? "")")
+
+    if let payload = message.payload {
+        print("Payload: \(payload)")
+    }
+}
+```
+
+If RLS is enabled on `realtime.channels`, subscription is checked against `SELECT` policies.
+
+## publish()
+
+Publish an event to a channel.
+
+```swift
+try await insforge.realtime.publish(
+    to: "chat:room-1",
+    event: "new_message",
+    payload: [
+        "text": "Hello from Swift",
+        "sentAt": ISO8601DateFormatter().string(from: Date())
+    ]
+)
+```
+
+<Note>
+  The client must subscribe to a channel before publishing to that same channel.
+</Note>
+
+If RLS is enabled on `realtime.messages`, publish is also checked against `INSERT` policies.
+
+## unsubscribe()
+
+Leave a channel.
+
+```swift
+await insforge.realtime.unsubscribe(from: "chat:room-1")
+```
+
+## disconnect()
+
+Close the realtime connection.
+
+```swift
+await insforge.realtime.disconnect()
+```
+
+## Channel API
+
+The channel API groups operations for one channel name.
+
+```swift
+let channel = await insforge.realtime.channel("chat:room-1")
+try await channel.subscribe()
+```
+
+### Broadcast messages
+
+Listen for an event:
+
+```swift
+let channel = await insforge.realtime.channel("chat:room-1")
+try await channel.subscribe()
+
+for await message in await channel.broadcast(event: "new_message") {
+    print("Payload: \(message.payload)")
+}
+```
+
+Publish through the channel:
+
+```swift
+struct ChatMessage: Codable {
+    let text: String
+    let author: String
+}
+
+try await channel.broadcast(
+    event: "new_message",
+    message: ChatMessage(text: "Hello", author: currentUser.name)
+)
+```
+
+Remove a channel object when it is no longer needed:
+
+```swift
+await insforge.realtime.removeChannel("chat:room-1")
+```
+
+## Presence
+
+Successful subscriptions return the current presence snapshot where supported by the SDK API. Listen for presence updates through the channel or lower-level event APIs exposed by the SDK.
+
+Presence is ephemeral online state. It is not stored in Postgres.

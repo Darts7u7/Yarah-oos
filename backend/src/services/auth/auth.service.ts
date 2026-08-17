@@ -1,0 +1,1607 @@
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import { Pool } from 'pg';
+import { DatabaseManager } from '@/infra/database/database.manager.js';
+import { TokenManager } from '@/infra/security/token.manager.js';
+import logger from '@/utils/logger.js';
+import { OAuthConfigService } from '@/services/auth/oauth-config.service.js';
+import { CustomOAuthConfigService } from '@/services/auth/custom-oauth-config.service.js';
+import { AuthConfigService } from './auth-config.service.js';
+import { AuthOTPService, OTPPurpose, OTPType } from './auth-otp.service.js';
+import { SmtpConfigService } from '@/services/email/smtp-config.service.js';
+import { GoogleOAuthProvider } from '@/providers/oauth/google.provider.js';
+import { GitHubOAuthProvider } from '@/providers/oauth/github.provider.js';
+import { DiscordOAuthProvider } from '@/providers/oauth/discord.provider.js';
+import { LinkedInOAuthProvider } from '@/providers/oauth/linkedin.provider.js';
+import { FacebookOAuthProvider } from '@/providers/oauth/facebook.provider.js';
+import { MicrosoftOAuthProvider } from '@/providers/oauth/microsoft.provider.js';
+import { validatePassword } from '@/utils/validations.js';
+import { getPasswordRequirementsMessage } from '@/utils/utils.js';
+import {
+  FacebookUserInfo,
+  GitHubUserInfo,
+  GoogleUserInfo,
+  MicrosoftUserInfo,
+  LinkedInUserInfo,
+  DiscordUserInfo,
+  XUserInfo,
+  AppleUserInfo,
+  UserRecord,
+  OAuthUserData,
+} from '@/types/auth.js';
+import { AppError } from '@/utils/errors.js';
+import { NEXT_ACTIONS } from '@/utils/next-actions.js';
+import { EmailService } from '@/services/email/email.service.js';
+import { XOAuthProvider } from '@/providers/oauth/x.provider.js';
+import { AppleOAuthProvider } from '@/providers/oauth/apple.provider.js';
+import { getApiBaseUrl } from '@/utils/environment.js';
+import { appConfig } from '@/infra/config/app.config.js';
+import {
+  ERROR_CODES,
+  type AuthMetadataSchema,
+  type CreateAdminSessionResponse,
+  type CreateSessionResponse,
+  type CreateUserResponse,
+  type GetPublicAuthConfigResponse,
+  type OAuthProvidersSchema,
+  type ResetPasswordResponse,
+  type UserSchema,
+  type VerifyEmailResponse,
+} from '@insforge/shared-schemas';
+
+/**
+ * Simplified JWT-based auth service
+ * Handles all authentication operations including OAuth
+ */
+export class AuthService {
+  private static instance: AuthService;
+  private adminUsernameHash: Buffer;
+  private adminPasswordHash: Buffer;
+  private pool: Pool | null = null;
+  private tokenManager: TokenManager;
+
+  // OAuth provider instances (cached singletons)
+  private googleOAuthProvider: GoogleOAuthProvider;
+  private githubOAuthProvider: GitHubOAuthProvider;
+  private discordOAuthProvider: DiscordOAuthProvider;
+  private linkedinOAuthProvider: LinkedInOAuthProvider;
+  private facebookOAuthProvider: FacebookOAuthProvider;
+  private microsoftOAuthProvider: MicrosoftOAuthProvider;
+  private xOAuthProvider: XOAuthProvider;
+  private appleOAuthProvider: AppleOAuthProvider;
+
+  private constructor() {
+    const adminUsername = appConfig.auth.rootAdminUsername;
+    const adminPassword = appConfig.auth.rootAdminPassword;
+
+    if (!adminUsername || !adminPassword) {
+      throw new Error(
+        'ROOT_ADMIN_USERNAME and ROOT_ADMIN_PASSWORD environment variables are required'
+      );
+    }
+
+    if (adminUsername.length > 4096 || adminPassword.length > 4096) {
+      throw new Error(
+        'ROOT_ADMIN_USERNAME and ROOT_ADMIN_PASSWORD must not exceed 4096 characters to prevent DoS vulnerabilities.'
+      );
+    }
+
+    this.adminUsernameHash = crypto.createHash('sha256').update(adminUsername).digest();
+    this.adminPasswordHash = crypto.createHash('sha256').update(adminPassword).digest();
+
+    // Initialize token manager
+    this.tokenManager = TokenManager.getInstance();
+
+    // Initialize OAuth providers (cached singletons)
+    this.googleOAuthProvider = GoogleOAuthProvider.getInstance();
+    this.githubOAuthProvider = GitHubOAuthProvider.getInstance();
+    this.discordOAuthProvider = DiscordOAuthProvider.getInstance();
+    this.linkedinOAuthProvider = LinkedInOAuthProvider.getInstance();
+    this.facebookOAuthProvider = FacebookOAuthProvider.getInstance();
+    this.microsoftOAuthProvider = MicrosoftOAuthProvider.getInstance();
+    this.xOAuthProvider = XOAuthProvider.getInstance();
+    this.appleOAuthProvider = AppleOAuthProvider.getInstance();
+
+    logger.info('AuthService initialized');
+  }
+
+  public static getInstance(): AuthService {
+    if (!AuthService.instance) {
+      AuthService.instance = new AuthService();
+    }
+    return AuthService.instance;
+  }
+
+  private getPool(): Pool {
+    if (!this.pool) {
+      const dbManager = DatabaseManager.getInstance();
+      this.pool = dbManager.getPool();
+    }
+    return this.pool;
+  }
+
+  /**
+   * Build a backend-owned email link for browser-based auth flows.
+   */
+  private buildEmailLink(
+    pathname: '/api/auth/email/verify-link' | '/api/auth/email/reset-password-link',
+    token: string
+  ): string {
+    const url = new URL(pathname, getApiBaseUrl());
+    url.searchParams.set('token', token);
+    return url.toString();
+  }
+
+  /**
+   * User registration
+   * Otherwise, returns user with access token for immediate login
+   */
+  async register(
+    email: string,
+    password: string,
+    name?: string,
+    redirectTo?: string,
+    options?: {
+      isAdminCreation?: boolean;
+      autoConfirm?: boolean;
+    }
+  ): Promise<CreateUserResponse> {
+    // Get email auth configuration and validate password
+    const authConfigService = AuthConfigService.getInstance();
+    const emailAuthConfig = await authConfigService.getAuthConfig();
+    const isAdminCreation = options?.isAdminCreation ?? false;
+    const requiresEmailVerification = emailAuthConfig.requireEmailVerification;
+    const usesVerifyEmailLink =
+      emailAuthConfig.requireEmailVerification && emailAuthConfig.verifyEmailMethod === 'link';
+    const shouldSendVerificationEmail = requiresEmailVerification && !isAdminCreation;
+
+    if (!validatePassword(password, emailAuthConfig)) {
+      throw new AppError(
+        getPasswordRequirementsMessage(emailAuthConfig),
+        400,
+        ERROR_CODES.INVALID_INPUT
+      );
+    }
+
+    if (usesVerifyEmailLink && shouldSendVerificationEmail) {
+      if (!redirectTo) {
+        throw new AppError(
+          'redirectTo is required when link-based email verification is enabled',
+          400,
+          ERROR_CODES.INVALID_INPUT
+        );
+      }
+
+      if (!(await authConfigService.validateRedirectUrl(redirectTo))) {
+        throw new AppError(
+          `${redirectTo} is not in the allowed redirect URLs`,
+          400,
+          ERROR_CODES.INVALID_INPUT,
+          'Please add this URL to the allowed redirect URLs in the authentication configuration.'
+        );
+      }
+    }
+
+    const verifiedRedirectTo =
+      usesVerifyEmailLink && shouldSendVerificationEmail ? redirectTo : null;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const userId = crypto.randomUUID();
+
+    const pool = this.getPool();
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const profile = name ? JSON.stringify({ name }) : '{}';
+      await client.query(
+        `INSERT INTO auth.users (id, email, password, profile, email_verified, created_at, updated_at)
+         VALUES ($1, $2, $3, $4::jsonb, $5, NOW(), NOW())`,
+        [
+          userId,
+          email,
+          hashedPassword,
+          profile,
+          options?.autoConfirm && options?.isAdminCreation ? true : false,
+        ]
+      );
+
+      await client.query('COMMIT');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      // Postgres unique_violation
+      if (e && typeof e === 'object' && 'code' in e && e.code === '23505') {
+        throw new AppError('User already exists', 409, ERROR_CODES.AUTH_EMAIL_EXISTS);
+      }
+      throw e;
+    } finally {
+      client.release();
+    }
+
+    const dbUser = await this.getUserById(userId);
+    if (!dbUser) {
+      throw new Error('User not found after registration');
+    }
+    const user = this.transformUserRecordToSchema(dbUser);
+
+    if (requiresEmailVerification) {
+      if (!shouldSendVerificationEmail) {
+        logger.info('Skipping verification email during admin user creation', {
+          email,
+        });
+        if (isAdminCreation && options?.autoConfirm) {
+          return {
+            accessToken: null,
+            requireEmailVerification: false,
+          };
+        }
+        return {
+          accessToken: null,
+          requireEmailVerification: true,
+        };
+      }
+
+      try {
+        if (verifiedRedirectTo) {
+          await this.sendVerificationEmailWithLink(email, verifiedRedirectTo);
+        } else {
+          await this.sendVerificationEmailWithCode(email);
+        }
+      } catch (error) {
+        const statusCode = error instanceof AppError && error.statusCode === 429 ? 429 : 500;
+        logger.error('Verification email send failed during registration', { userId, error });
+        throw new AppError(
+          'The user account was created, but the verification email could not be sent.',
+          statusCode,
+          ERROR_CODES.AUTH_VERIFICATION_EMAIL_DELIVERY_FAILED,
+          NEXT_ACTIONS.RESEND_VERIFICATION_EMAIL
+        );
+      }
+      return {
+        accessToken: null,
+        requireEmailVerification: true,
+      };
+    }
+
+    // Email verification not required, provide access token for immediate login
+    const accessToken = this.tokenManager.generateAccessToken({
+      sub: userId,
+      email,
+      role: 'authenticated',
+    });
+
+    return {
+      user,
+      accessToken,
+      requireEmailVerification: false,
+    };
+  }
+
+  /**
+   * User login
+   */
+  async login(email: string, password: string): Promise<CreateSessionResponse> {
+    const dbUser = await this.getUserByEmail(email);
+
+    if (!dbUser || !dbUser.password) {
+      throw new AppError('Invalid credentials', 401, ERROR_CODES.AUTH_UNAUTHORIZED);
+    }
+
+    const validPassword = await bcrypt.compare(password, dbUser.password);
+    if (!validPassword) {
+      throw new AppError('Invalid credentials', 401, ERROR_CODES.AUTH_UNAUTHORIZED);
+    }
+
+    // Check if email verification is required
+    const authConfigService = AuthConfigService.getInstance();
+    const emailAuthConfig = await authConfigService.getAuthConfig();
+
+    if (emailAuthConfig.requireEmailVerification && !dbUser.email_verified) {
+      throw new AppError(
+        'Email verification required',
+        403,
+        ERROR_CODES.FORBIDDEN,
+        'Please verify your email address before logging in'
+      );
+    }
+
+    const user = this.transformUserRecordToSchema(dbUser);
+    const accessToken = this.tokenManager.generateAccessToken({
+      sub: dbUser.id,
+      email: dbUser.email,
+      role: 'authenticated',
+    });
+
+    const response: CreateSessionResponse = {
+      user,
+      accessToken,
+    };
+
+    return response;
+  }
+
+  /**
+   * Send an OTP that can be exchanged for a user session.
+   *
+   * This deliberately does not require or create a user record. Sending the
+   * same challenge flow for existing and unknown emails avoids account
+   * enumeration; signup policy is enforced only after the OTP is verified.
+   */
+  async sendSignInOTP(email: string): Promise<void> {
+    const { otp } = await AuthOTPService.getInstance().createEmailOTP(
+      email,
+      OTPPurpose.SIGN_IN,
+      OTPType.NUMERIC_CODE,
+      { expiresInMinutes: 5 }
+    );
+
+    await EmailService.getInstance().sendWithTemplate(email, 'User', 'request-otp', {
+      token: otp,
+    });
+  }
+
+  /**
+   * Verify an email OTP and create a session.
+   *
+   * OTP consumption and first-time user creation happen in one transaction.
+   * A verified OTP proves email ownership, so pre-existing unverified password
+   * accounts have their password cleared before sign-in.
+   */
+  async signInWithOTP(
+    email: string,
+    verificationCode: string,
+    name?: string
+  ): Promise<CreateSessionResponse> {
+    const { disableSignup } = await AuthConfigService.getInstance().getAuthConfig();
+
+    // AuthOTPService owns the transaction: the code is consumed atomically with
+    // the user creation/lookup below, and the persisted attempt counter is
+    // committed even when verification fails.
+    const outcome = await AuthOTPService.getInstance().consumeNumericOTP(
+      email,
+      OTPPurpose.SIGN_IN,
+      verificationCode,
+      async (client): Promise<{ blocked: true } | { userId: string }> => {
+        // auth.users.email is case-sensitive UNIQUE and OAuth stores emails
+        // provider-cased, so case-variant duplicates of one mailbox can exist.
+        // Pick deterministically (oldest) instead of an arbitrary matching row.
+        let existingUser = await client.query(
+          `SELECT id, email_verified
+           FROM auth.users
+           WHERE lower(email) = $1
+           ORDER BY created_at ASC
+           LIMIT 1
+           FOR UPDATE`,
+          [email]
+        );
+
+        let userId: string | undefined;
+        if (!existingUser.rows.length) {
+          // The code is already consumed. Signal a blocked signup so the caller
+          // rejects after the transaction commits — keeping the send path
+          // uniform and avoiding an account-enumeration timing leak.
+          if (disableSignup) {
+            return { blocked: true };
+          }
+
+          const proposedUserId = crypto.randomUUID();
+          const profile = JSON.stringify(name ? { name } : {});
+          const createdUser = await client.query(
+            `INSERT INTO auth.users (
+               id, email, password, profile, email_verified, created_at, updated_at
+             )
+             VALUES ($1, $2, NULL, $3::jsonb, true, NOW(), NOW())
+             ON CONFLICT (email) DO NOTHING
+             RETURNING id`,
+            [proposedUserId, email, profile]
+          );
+
+          if (createdUser.rows.length) {
+            userId = createdUser.rows[0].id;
+          } else {
+            existingUser = await client.query(
+              `SELECT id, email_verified
+               FROM auth.users
+               WHERE lower(email) = $1
+               ORDER BY created_at ASC
+               LIMIT 1
+               FOR UPDATE`,
+              [email]
+            );
+          }
+        }
+
+        if (!userId && existingUser.rows.length) {
+          const dbUser = existingUser.rows[0];
+          userId = dbUser.id;
+
+          // A verified OTP proves email ownership: clear any password on a
+          // pre-existing unverified account and mark it verified.
+          if (!dbUser.email_verified) {
+            await client.query(
+              `UPDATE auth.users
+               SET password = NULL, email_verified = true, updated_at = NOW()
+               WHERE id = $1`,
+              [userId]
+            );
+          }
+        }
+
+        if (!userId) {
+          throw new Error('User not found after concurrent OTP sign-in');
+        }
+
+        await client.query(
+          `INSERT INTO auth.user_providers (
+             user_id, provider, provider_account_id, provider_data, created_at, updated_at
+           )
+           VALUES ($1, 'email', $2, '{"method":"otp"}'::jsonb, NOW(), NOW())
+           ON CONFLICT (provider, provider_account_id)
+           DO UPDATE SET
+             provider_data = EXCLUDED.provider_data,
+             updated_at = NOW()
+           WHERE auth.user_providers.user_id = EXCLUDED.user_id`,
+          [userId, email]
+        );
+
+        return { userId };
+      }
+    );
+
+    if ('blocked' in outcome) {
+      throw new AppError(
+        'User signups are disabled for this project.',
+        403,
+        ERROR_CODES.AUTH_SIGNUP_DISABLED
+      );
+    }
+
+    const dbUser = await this.getUserById(outcome.userId);
+    if (!dbUser) {
+      throw new AppError('Failed to complete sign-in', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+
+    const user = this.transformUserRecordToSchema(dbUser);
+    const accessToken = this.tokenManager.generateAccessToken({
+      sub: dbUser.id,
+      email: dbUser.email,
+      role: 'authenticated',
+    });
+
+    return { user, accessToken };
+  }
+
+  /**
+   * Send verification email with numeric OTP code
+   * Creates a 6-digit OTP and sends it via email for manual entry
+   */
+  async sendVerificationEmailWithCode(email: string): Promise<void> {
+    // Check if user exists
+    const pool = this.getPool();
+    const result = await pool.query('SELECT * FROM auth.users WHERE email = $1', [email]);
+    const dbUser = result.rows[0];
+    if (!dbUser) {
+      // Silently succeed to prevent user enumeration
+      logger.info('Verification email requested for non-existent user', { email });
+      return;
+    }
+
+    // Create numeric OTP code using the OTP service
+    const otpService = AuthOTPService.getInstance();
+    const { otp: code } = await otpService.createEmailOTP(
+      email,
+      OTPPurpose.VERIFY_EMAIL,
+      OTPType.NUMERIC_CODE
+    );
+
+    // Send email with verification code
+    const emailService = EmailService.getInstance();
+    const userName = dbUser.profile?.name || 'User';
+    await emailService.sendWithTemplate(email, userName, 'email-verification-code', {
+      token: code,
+    });
+  }
+
+  /**
+   * Send verification email with clickable link
+   * Creates a long cryptographic token and sends it via email as a clickable link
+   * The link points to a backend-owned action endpoint, which verifies the
+   * token first and only then redirects the browser to the app.
+   */
+  async sendVerificationEmailWithLink(email: string, redirectTo: string): Promise<void> {
+    // Check if user exists
+    const pool = this.getPool();
+    const result = await pool.query('SELECT * FROM auth.users WHERE email = $1', [email]);
+    const dbUser = result.rows[0];
+    if (!dbUser) {
+      // Silently succeed to prevent user enumeration
+      logger.info('Verification email requested for non-existent user', { email });
+      return;
+    }
+
+    // Create long cryptographic token for clickable verification link
+    const otpService = AuthOTPService.getInstance();
+    const { otp: token } = await otpService.createEmailOTP(
+      email,
+      OTPPurpose.VERIFY_EMAIL,
+      OTPType.HASH_TOKEN,
+      { redirectTo }
+    );
+
+    const linkUrl = this.buildEmailLink('/api/auth/email/verify-link', token);
+
+    // Send email with verification link
+    const emailService = EmailService.getInstance();
+    const userName = dbUser.profile?.name || 'User';
+    await emailService.sendWithTemplate(email, userName, 'email-verification-link', {
+      link: linkUrl,
+    });
+  }
+
+  /**
+   * Verify email with numeric code
+   * Verifies the email OTP code and updates the account in a single transaction
+   */
+  async verifyEmailWithCode(email: string, verificationCode: string): Promise<VerifyEmailResponse> {
+    // AuthOTPService owns the transaction: the code is consumed atomically with
+    // the email-verification update, and the attempt counter is committed even
+    // when verification fails.
+    const userId = await AuthOTPService.getInstance().consumeNumericOTP(
+      email,
+      OTPPurpose.VERIFY_EMAIL,
+      verificationCode,
+      async (client): Promise<string> => {
+        const result = await client.query(
+          `UPDATE auth.users
+           SET email_verified = true, updated_at = NOW()
+           WHERE email = $1
+           RETURNING id`,
+          [email]
+        );
+
+        if (result.rows.length === 0) {
+          throw new Error('User not found');
+        }
+
+        return result.rows[0].id;
+      }
+    );
+
+    // Fetch full user record with provider data
+    const dbUser = await this.getUserById(userId);
+    if (!dbUser) {
+      throw new AppError('Failed to complete verification', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+    const user = this.transformUserRecordToSchema(dbUser);
+    const accessToken = this.tokenManager.generateAccessToken({
+      sub: dbUser.id,
+      email: dbUser.email,
+      role: 'authenticated',
+    });
+
+    return {
+      user,
+      accessToken,
+    };
+  }
+
+  /**
+   * Verify email with hash token from clickable link
+   * Verifies the token (without needing email), looks up the email, and updates the account
+   * This is more secure as the email is not exposed in the URL
+   */
+  async verifyEmailWithToken(token: string): Promise<VerifyEmailResponse> {
+    const dbManager = DatabaseManager.getInstance();
+    const pool = dbManager.getPool();
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      // Verify token and get the associated email
+      const otpService = AuthOTPService.getInstance();
+      const { email } = await otpService.verifyEmailOTPWithToken(
+        OTPPurpose.VERIFY_EMAIL,
+        token,
+        client
+      );
+
+      // Update account email verification status
+      const result = await client.query(
+        `UPDATE auth.users
+         SET email_verified = true, updated_at = NOW()
+         WHERE email = $1
+         RETURNING id`,
+        [email]
+      );
+
+      if (result.rows.length === 0) {
+        throw new Error('User not found');
+      }
+
+      await client.query('COMMIT');
+
+      // Fetch full user record with provider data
+      const userId = result.rows[0].id;
+      const dbUser = await this.getUserById(userId);
+      if (!dbUser) {
+        throw new Error('User not found after verification');
+      }
+      const user = this.transformUserRecordToSchema(dbUser);
+      const accessToken = this.tokenManager.generateAccessToken({
+        sub: dbUser.id,
+        email: dbUser.email,
+        role: 'authenticated',
+      });
+
+      return {
+        user,
+        accessToken,
+      };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Send reset password email with numeric OTP code
+   * Creates a 6-digit OTP and sends it via email for manual entry
+   */
+  async sendResetPasswordEmailWithCode(email: string): Promise<void> {
+    // Check if user exists
+    const pool = this.getPool();
+    const result = await pool.query('SELECT * FROM auth.users WHERE email = $1', [email]);
+    const dbUser = result.rows[0];
+    if (!dbUser) {
+      // Silently succeed to prevent user enumeration
+      logger.info('Password reset requested for non-existent user', { email });
+      return;
+    }
+
+    // Create numeric OTP code using the OTP service
+    const otpService = AuthOTPService.getInstance();
+    const { otp: code } = await otpService.createEmailOTP(
+      email,
+      OTPPurpose.RESET_PASSWORD,
+      OTPType.NUMERIC_CODE
+    );
+
+    // Send email with reset password code
+    const emailService = EmailService.getInstance();
+    const userName = dbUser.profile?.name || 'User';
+    await emailService.sendWithTemplate(email, userName, 'reset-password-code', {
+      token: code,
+    });
+  }
+
+  /**
+   * Send reset password email with clickable link
+   * Creates a long cryptographic token and sends it via email as a clickable link
+   * The link contains only the token (no email) for better privacy and security
+   */
+  async sendResetPasswordEmailWithLink(email: string, redirectTo: string): Promise<void> {
+    // Check if user exists
+    const pool = this.getPool();
+    const result = await pool.query('SELECT * FROM auth.users WHERE email = $1', [email]);
+    const dbUser = result.rows[0];
+    if (!dbUser) {
+      // Silently succeed to prevent user enumeration
+      logger.info('Password reset requested for non-existent user', { email });
+      return;
+    }
+
+    // Create long cryptographic token for clickable reset link
+    const otpService = AuthOTPService.getInstance();
+    const { otp: token } = await otpService.createEmailOTP(
+      email,
+      OTPPurpose.RESET_PASSWORD,
+      OTPType.HASH_TOKEN,
+      { redirectTo }
+    );
+
+    const linkUrl = this.buildEmailLink('/api/auth/email/reset-password-link', token);
+
+    // Send email with password reset link
+    const emailService = EmailService.getInstance();
+    const userName = dbUser.profile?.name || 'User';
+    await emailService.sendWithTemplate(email, userName, 'reset-password-link', {
+      link: linkUrl,
+    });
+  }
+
+  /**
+   * Exchange reset password code for a temporary reset token
+   * This separates code verification from password reset for better security
+   * The reset token can be used later to reset the password without needing email
+   */
+  async exchangeResetPasswordToken(
+    email: string,
+    verificationCode: string
+  ): Promise<{ token: string; expiresAt: Date }> {
+    const otpService = AuthOTPService.getInstance();
+
+    // Exchange the numeric verification code for a long-lived reset token
+    // All OTP logic (verification, consumption, token generation) is handled by AuthOTPService
+    const result = await otpService.exchangeCodeForToken(
+      email,
+      OTPPurpose.RESET_PASSWORD,
+      verificationCode
+    );
+
+    return {
+      token: result.token,
+      expiresAt: result.expiresAt,
+    };
+  }
+
+  /**
+   * Reset password with token
+   * Verifies the token (without needing email), looks up the email, and updates the password
+   * Both clickable link tokens and code-verified reset tokens use RESET_PASSWORD purpose
+   * Note: Does not return access token - user must login again with new password
+   */
+  async resetPasswordWithToken(newPassword: string, token: string): Promise<ResetPasswordResponse> {
+    // Validate password first before verifying token
+    // This allows the user to retry with the same token if password is invalid
+    const authConfigService = AuthConfigService.getInstance();
+    const emailAuthConfig = await authConfigService.getAuthConfig();
+
+    if (!validatePassword(newPassword, emailAuthConfig)) {
+      throw new AppError(
+        getPasswordRequirementsMessage(emailAuthConfig),
+        400,
+        ERROR_CODES.INVALID_INPUT
+      );
+    }
+
+    const dbManager = DatabaseManager.getInstance();
+    const pool = dbManager.getPool();
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      // Verify token and get the associated email
+      // Both clickable link tokens and code-verified reset tokens use RESET_PASSWORD purpose
+      const otpService = AuthOTPService.getInstance();
+      const { email } = await otpService.verifyEmailOTPWithToken(
+        OTPPurpose.RESET_PASSWORD,
+        token,
+        client
+      );
+
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update password in the database
+      const result = await client.query(
+        `UPDATE auth.users
+         SET password = $1, updated_at = NOW()
+         WHERE email = $2
+         RETURNING id`,
+        [hashedPassword, email]
+      );
+
+      if (result.rows.length === 0) {
+        throw new Error('User not found');
+      }
+
+      const userId = result.rows[0].id;
+
+      await client.query('COMMIT');
+
+      logger.info('Password reset successfully with token', { userId });
+
+      return {
+        message: 'Password reset successfully. Please login with your new password.',
+      };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Admin login (validates against env variables only)
+   */
+  adminLogin(username: string, password: string): CreateAdminSessionResponse {
+    // input-sanity guard (defense-in-depth against route validation bypasses)
+    if (username.length > 4096 || password.length > 4096) {
+      throw new AppError('Invalid admin credentials', 401, ERROR_CODES.AUTH_UNAUTHORIZED);
+    }
+
+    const hashedUserProvided = crypto.createHash('sha256').update(username).digest();
+    const hashedPassProvided = crypto.createHash('sha256').update(password).digest();
+
+    const usernameMatch = crypto.timingSafeEqual(hashedUserProvided, this.adminUsernameHash);
+    const passwordMatch = crypto.timingSafeEqual(hashedPassProvided, this.adminPasswordHash);
+
+    if (!usernameMatch || !passwordMatch) {
+      throw new AppError('Invalid admin credentials', 401, ERROR_CODES.AUTH_UNAUTHORIZED);
+    }
+
+    const sub = `local:${username}`;
+    const accessToken = this.tokenManager.generateAccessToken({
+      sub,
+      role: 'project_admin',
+    });
+
+    return {
+      admin: { sub },
+      accessToken,
+    };
+  }
+
+  /**
+   * Admin login with authorization token (validates JWT from external issuer)
+   */
+  async adminLoginWithAuthorizationCode(code: string): Promise<CreateAdminSessionResponse> {
+    const { userId } = await this.tokenManager.verifyCloudProjectAuthorization(code);
+    const sub = `cloud:${userId}`;
+    const accessToken = this.tokenManager.generateAccessToken({
+      sub,
+      role: 'project_admin',
+    });
+
+    return {
+      admin: { sub },
+      accessToken,
+    };
+  }
+
+  /**
+   * Find or create third-party user (main OAuth user handler)
+   * Adapted from 3-table to 2-table structure
+   */
+  async findOrCreateThirdPartyUser(
+    provider: string,
+    providerId: string,
+    email: string,
+    userName: string,
+    avatarUrl: string,
+    identityData:
+      | GoogleUserInfo
+      | GitHubUserInfo
+      | DiscordUserInfo
+      | LinkedInUserInfo
+      | MicrosoftUserInfo
+      | FacebookUserInfo
+      | XUserInfo
+      | AppleUserInfo
+      | Record<string, unknown>,
+    options?: { requireEmailForNewAccount?: boolean }
+  ): Promise<CreateSessionResponse> {
+    const pool = this.getPool();
+
+    // First, try to find existing user by provider ID in auth.user_providers table
+    const accountResult = await pool.query(
+      'SELECT * FROM auth.user_providers WHERE provider = $1 AND provider_account_id = $2',
+      [provider, providerId]
+    );
+    const account = accountResult.rows[0];
+
+    if (account) {
+      // Found existing OAuth user, update last login time
+      await pool.query(
+        'UPDATE auth.user_providers SET updated_at = CURRENT_TIMESTAMP WHERE provider = $1 AND provider_account_id = $2',
+        [provider, providerId]
+      );
+
+      // Update email_verified to true if not already verified (OAuth login means email is trusted)
+      await pool.query(
+        'UPDATE auth.users SET email_verified = true WHERE id = $1 AND email_verified = false',
+        [account.user_id]
+      );
+
+      const dbUser = await this.getUserById(account.user_id);
+      if (!dbUser) {
+        throw new Error('User not found after OAuth login');
+      }
+
+      const user = this.transformUserRecordToSchema(dbUser);
+      const accessToken = this.tokenManager.generateAccessToken({
+        sub: user.id,
+        email: user.email,
+        role: 'authenticated',
+      });
+
+      return { user, accessToken };
+    }
+
+    if (options?.requireEmailForNewAccount && !email) {
+      throw new AppError(
+        'A verified email address is required to create or link an OAuth account.',
+        400,
+        ERROR_CODES.INVALID_INPUT
+      );
+    }
+
+    // If not found by provider_id, try to find by email in _user table
+    const existingUserResult = await pool.query(
+      `SELECT *
+       FROM auth.users
+       WHERE lower(email) = lower($1)
+       ORDER BY created_at ASC
+       LIMIT 1`,
+      [email]
+    );
+    const existingUser = existingUserResult.rows[0];
+
+    if (existingUser) {
+      // Found existing user by email, create auth.user_providers record to link OAuth
+      await pool.query(
+        `
+        INSERT INTO auth.user_providers (
+          user_id, provider, provider_account_id,
+          provider_data, created_at, updated_at
+        )
+        VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `,
+        [existingUser.id, provider, providerId, JSON.stringify(identityData)]
+      );
+
+      // Update email_verified to true (OAuth login means email is trusted)
+      await pool.query(
+        'UPDATE auth.users SET email_verified = true WHERE id = $1 AND email_verified = false',
+        [existingUser.id]
+      );
+
+      // Fetch updated user data with provider information
+      const dbUser = await this.getUserById(existingUser.id);
+      if (!dbUser) {
+        throw new Error('User not found after linking OAuth provider');
+      }
+
+      const user = this.transformUserRecordToSchema(dbUser);
+      const accessToken = this.tokenManager.generateAccessToken({
+        sub: existingUser.id,
+        email: existingUser.email,
+        role: 'authenticated',
+      });
+
+      return { user, accessToken };
+    }
+
+    // No existing provider account and no existing user by email — this would
+    // create a brand-new user. Honor the project-level signup gate before
+    // creating, so a flipped "disable new user signups" toggle also blocks
+    // first-time OAuth signups (existing OAuth users can still sign in above).
+    const { disableSignup } = await AuthConfigService.getInstance().getAuthConfig();
+    if (disableSignup) {
+      throw new AppError(
+        'User signups are disabled for this project.',
+        403,
+        ERROR_CODES.AUTH_SIGNUP_DISABLED
+      );
+    }
+
+    // Create new user with OAuth data
+    return this.createThirdPartyUser(
+      provider,
+      userName,
+      email,
+      providerId,
+      identityData,
+      avatarUrl
+    );
+  }
+
+  /**
+   * Create new third-party user
+   */
+  private async createThirdPartyUser(
+    provider: string,
+    userName: string,
+    email: string,
+    providerId: string,
+    identityData:
+      | GoogleUserInfo
+      | GitHubUserInfo
+      | DiscordUserInfo
+      | LinkedInUserInfo
+      | MicrosoftUserInfo
+      | FacebookUserInfo
+      | XUserInfo
+      | AppleUserInfo
+      | Record<string, unknown>,
+    avatarUrl: string
+  ): Promise<CreateSessionResponse> {
+    const userId = crypto.randomUUID();
+
+    const pool = this.getPool();
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      // Create user record (without password for OAuth users)
+      const profile = JSON.stringify({ name: userName, avatar_url: avatarUrl });
+      await client.query(
+        `
+        INSERT INTO auth.users (id, email, profile, email_verified, created_at, updated_at)
+        VALUES ($1, $2, $3::jsonb, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `,
+        [userId, email, profile]
+      );
+
+      // Create auth.user_providers record
+      await client.query(
+        `
+        INSERT INTO auth.user_providers (
+          user_id, provider, provider_account_id,
+          provider_data, created_at, updated_at
+        )
+        VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `,
+        [userId, provider, providerId, JSON.stringify({ ...identityData, avatar_url: avatarUrl })]
+      );
+
+      await client.query('COMMIT');
+
+      const user: UserSchema = {
+        id: userId,
+        email,
+        emailVerified: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        profile: { name: userName, avatar_url: avatarUrl },
+        metadata: null,
+      };
+
+      const accessToken = this.tokenManager.generateAccessToken({
+        sub: userId,
+        email,
+        role: 'authenticated',
+      });
+
+      return { user, accessToken };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Public auth metadata for the unauthenticated /api/auth/public-config route.
+   * Reads via getPublicAuthConfig(), which intentionally omits allowedRedirectUrls
+   * and other admin-only fields.
+   */
+  async getPublicMetadata(): Promise<GetPublicAuthConfigResponse> {
+    const authConfigService = AuthConfigService.getInstance();
+    const oAuthConfigService = OAuthConfigService.getInstance();
+    const customOAuthConfigService = CustomOAuthConfigService.getInstance();
+    const [oAuthProviders, customOAuthConfigs, authConfig] = await Promise.all([
+      oAuthConfigService.getConfiguredProviders(),
+      customOAuthConfigService.listConfigs(),
+      authConfigService.getPublicAuthConfig(),
+    ]);
+    return {
+      oAuthProviders,
+      customOAuthProviders: customOAuthConfigs.map((config) => config.key),
+      ...authConfig,
+    };
+  }
+
+  /**
+   * Admin auth metadata for /api/metadata (gated behind verifyAdmin).
+   * Includes allowedRedirectUrls and smtpConfig so the CLI can render
+   * insforge.toml and probe backend capability for declarative config.
+   *
+   * smtpConfig.hasPassword is the only credential signal — the actual
+   * password is never returned by the SmtpConfigService.
+   */
+  async getMetadata(): Promise<AuthMetadataSchema> {
+    const authConfigService = AuthConfigService.getInstance();
+    const oAuthConfigService = OAuthConfigService.getInstance();
+    const customOAuthConfigService = CustomOAuthConfigService.getInstance();
+    const smtpConfigService = SmtpConfigService.getInstance();
+    const [oAuthProviders, customOAuthConfigs, authConfig, smtpConfig] = await Promise.all([
+      oAuthConfigService.getConfiguredProviders(),
+      customOAuthConfigService.listConfigs(),
+      authConfigService.getAuthConfig(),
+      smtpConfigService.getSmtpConfig(),
+    ]);
+    return {
+      oAuthProviders,
+      customOAuthProviders: customOAuthConfigs.map((config) => config.key),
+      smtpConfig: {
+        enabled: smtpConfig.enabled,
+        host: smtpConfig.host,
+        port: smtpConfig.port,
+        username: smtpConfig.username,
+        hasPassword: smtpConfig.hasPassword,
+        senderEmail: smtpConfig.senderEmail,
+        senderName: smtpConfig.senderName,
+        minIntervalSeconds: smtpConfig.minIntervalSeconds,
+      },
+      requireEmailVerification: authConfig.requireEmailVerification,
+      passwordMinLength: authConfig.passwordMinLength,
+      requireNumber: authConfig.requireNumber,
+      requireLowercase: authConfig.requireLowercase,
+      requireUppercase: authConfig.requireUppercase,
+      requireSpecialChar: authConfig.requireSpecialChar,
+      verifyEmailMethod: authConfig.verifyEmailMethod,
+      resetPasswordMethod: authConfig.resetPasswordMethod,
+      allowedRedirectUrls: authConfig.allowedRedirectUrls ?? [],
+      disableSignup: authConfig.disableSignup,
+    };
+  }
+
+  /**
+   * Generate OAuth authorization URL for any supported provider
+   */
+  async generateOAuthUrl(
+    provider: OAuthProvidersSchema,
+    state?: string,
+    additionalParams?: Record<string, string>
+  ): Promise<string> {
+    switch (provider) {
+      case 'google':
+        return this.googleOAuthProvider.generateOAuthUrl(state, additionalParams);
+      case 'github':
+        return this.githubOAuthProvider.generateOAuthUrl(state, additionalParams);
+      case 'discord':
+        return this.discordOAuthProvider.generateOAuthUrl(state, additionalParams);
+      case 'linkedin':
+        return this.linkedinOAuthProvider.generateOAuthUrl(state, additionalParams);
+      case 'facebook':
+        return this.facebookOAuthProvider.generateOAuthUrl(state, additionalParams);
+      case 'microsoft':
+        return this.microsoftOAuthProvider.generateOAuthUrl(state, additionalParams);
+      case 'x':
+        return this.xOAuthProvider.generateOAuthUrl(state, additionalParams);
+      case 'apple':
+        return this.appleOAuthProvider.generateOAuthUrl(state, additionalParams);
+      default:
+        throw new AppError(
+          `OAuth provider '${provider}' is not implemented yet.`,
+          501,
+          ERROR_CODES.AUTH_UNSUPPORTED_PROVIDER
+        );
+    }
+  }
+
+  /**
+   * Handle OAuth callback for any supported provider
+   */
+  async handleOAuthCallback(
+    provider: OAuthProvidersSchema,
+    payload: { code?: string; token?: string; state?: string }
+  ): Promise<CreateSessionResponse> {
+    let userData: OAuthUserData;
+
+    switch (provider) {
+      case 'google':
+        userData = await this.googleOAuthProvider.handleCallback(payload);
+        break;
+      case 'github':
+        userData = await this.githubOAuthProvider.handleCallback(payload);
+        break;
+      case 'discord':
+        userData = await this.discordOAuthProvider.handleCallback(payload);
+        break;
+      case 'linkedin':
+        userData = await this.linkedinOAuthProvider.handleCallback(payload);
+        break;
+      case 'facebook':
+        userData = await this.facebookOAuthProvider.handleCallback(payload);
+        break;
+      case 'microsoft':
+        userData = await this.microsoftOAuthProvider.handleCallback(payload);
+        break;
+      case 'x':
+        userData = await this.xOAuthProvider.handleCallback(payload);
+        break;
+      case 'apple':
+        userData = await this.appleOAuthProvider.handleCallback(payload);
+        break;
+      default:
+        throw new AppError(
+          `OAuth provider '${provider}' is not implemented yet.`,
+          501,
+          ERROR_CODES.AUTH_UNSUPPORTED_PROVIDER
+        );
+    }
+
+    return this.findOrCreateThirdPartyUser(
+      userData.provider,
+      userData.providerId,
+      userData.email,
+      userData.userName,
+      userData.avatarUrl,
+      userData.identityData
+    );
+  }
+
+  /**
+   * Handle shared callback for any supported provider
+   * Transforms payload and creates/finds user
+   */
+  async handleSharedCallback(
+    provider: OAuthProvidersSchema,
+    payloadData: Record<string, unknown>
+  ): Promise<CreateSessionResponse> {
+    let userData: OAuthUserData;
+
+    switch (provider) {
+      case 'google':
+        userData = this.googleOAuthProvider.handleSharedCallback(payloadData);
+        break;
+      case 'github':
+        userData = this.githubOAuthProvider.handleSharedCallback(payloadData);
+        break;
+      case 'discord':
+        userData = this.discordOAuthProvider.handleSharedCallback(payloadData);
+        break;
+      case 'linkedin':
+        userData = this.linkedinOAuthProvider.handleSharedCallback(payloadData);
+        break;
+      case 'facebook':
+        userData = this.facebookOAuthProvider.handleSharedCallback(payloadData);
+        break;
+      case 'x':
+        userData = this.xOAuthProvider.handleSharedCallback(payloadData);
+        break;
+      case 'apple':
+        userData = this.appleOAuthProvider.handleSharedCallback(payloadData);
+        break;
+      case 'microsoft':
+        userData = this.microsoftOAuthProvider.handleSharedCallback(payloadData);
+        break;
+      default:
+        throw new AppError(
+          `OAuth provider '${provider}' is not supported for shared callback.`,
+          501,
+          ERROR_CODES.AUTH_UNSUPPORTED_PROVIDER
+        );
+    }
+
+    return this.findOrCreateThirdPartyUser(
+      userData.provider,
+      userData.providerId,
+      userData.email,
+      userData.userName,
+      userData.avatarUrl,
+      userData.identityData
+    );
+  }
+
+  /**
+   * Sign in with ID token from a native provider SDK.
+   */
+  async signInWithIdToken(
+    provider: 'google' | 'apple',
+    idToken: string,
+    options?: { nonce?: string; name?: string }
+  ): Promise<CreateSessionResponse> {
+    let userData: OAuthUserData;
+
+    switch (provider) {
+      case 'google': {
+        // Verify the ID token with Google's public keys
+        let googleUserInfo;
+        try {
+          googleUserInfo = await this.googleOAuthProvider.verifyToken(idToken);
+        } catch (error) {
+          logger.error('Failed to verify Google ID token:', error);
+          throw new AppError('Failed to verify Google ID token', 400, ERROR_CODES.INVALID_INPUT);
+        }
+
+        // Validate required claims (sub is always present, email may be empty if scope wasn't granted)
+        if (!googleUserInfo.sub) {
+          throw new AppError(
+            'Invalid Google ID token: missing sub claim',
+            400,
+            ERROR_CODES.INVALID_INPUT
+          );
+        }
+        if (!googleUserInfo.email) {
+          throw new AppError(
+            'Invalid Google ID token: missing email claim',
+            400,
+            ERROR_CODES.INVALID_INPUT
+          );
+        }
+
+        const userName = googleUserInfo.name || googleUserInfo.email.split('@')[0];
+        userData = {
+          provider: 'google',
+          providerId: googleUserInfo.sub,
+          email: googleUserInfo.email,
+          userName,
+          avatarUrl: googleUserInfo.picture || '',
+          identityData: googleUserInfo,
+        };
+        break;
+      }
+
+      case 'apple': {
+        const nonce = options?.nonce;
+        if (!nonce || !nonce.trim()) {
+          throw new AppError(
+            'Nonce is required for Apple ID token sign-in',
+            400,
+            ERROR_CODES.INVALID_INPUT
+          );
+        }
+
+        let appleUserInfo: AppleUserInfo;
+        try {
+          appleUserInfo = await this.appleOAuthProvider.verifyIdToken(idToken, {
+            nonce,
+            native: true,
+          });
+        } catch (error) {
+          logger.error('Failed to verify Apple ID token', {
+            error: error instanceof Error ? error.message : 'Unknown verification error',
+          });
+          throw new AppError('Failed to verify Apple ID token', 401, ERROR_CODES.AUTH_UNAUTHORIZED);
+        }
+
+        const email =
+          appleUserInfo.email_verified && appleUserInfo.email
+            ? appleUserInfo.email.trim().toLowerCase()
+            : '';
+        const suppliedName = options?.name?.trim();
+        const userName = suppliedName || (email ? email.split('@')[0] : 'Apple User');
+
+        userData = {
+          provider: 'apple',
+          providerId: appleUserInfo.sub,
+          email,
+          userName,
+          avatarUrl: '',
+          identityData: appleUserInfo,
+        };
+        break;
+      }
+
+      default:
+        throw new AppError(
+          `Provider ${provider} is not supported for ID token sign-in. Supported: google, apple`,
+          400,
+          ERROR_CODES.INVALID_INPUT
+        );
+    }
+
+    // Create or find the user and return session
+    return this.findOrCreateThirdPartyUser(
+      userData.provider,
+      userData.providerId,
+      userData.email,
+      userData.userName,
+      userData.avatarUrl,
+      userData.identityData,
+      provider === 'apple' ? { requireEmailForNewAccount: true } : undefined
+    );
+  }
+
+  /**
+   * Get user by email (helper method for internal use)
+   * @private
+   */
+  private async getUserByEmail(email: string): Promise<UserRecord | null> {
+    const pool = this.getPool();
+    const result = await pool.query(
+      `
+      SELECT
+        u.id,
+        u.email,
+        u.profile,
+        u.metadata,
+        u.email_verified,
+        u.is_anonymous,
+        u.created_at,
+        u.updated_at,
+        u.password,
+        STRING_AGG(DISTINCT a.provider, ',') as providers
+      FROM auth.users u
+      LEFT JOIN auth.user_providers a ON u.id = a.user_id
+      WHERE u.email = $1
+      GROUP BY u.id
+    `,
+      [email]
+    );
+
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Get user by ID (returns raw database record)
+   */
+  async getUserById(userId: string): Promise<UserRecord | null> {
+    const pool = this.getPool();
+    const result = await pool.query(
+      `
+      SELECT
+        u.id,
+        u.email,
+        u.profile,
+        u.metadata,
+        u.email_verified,
+        u.is_anonymous,
+        u.created_at,
+        u.updated_at,
+        u.password,
+        STRING_AGG(DISTINCT a.provider, ',') as providers
+      FROM auth.users u
+      LEFT JOIN auth.user_providers a ON u.id = a.user_id
+      WHERE u.id = $1
+      GROUP BY u.id
+    `,
+      [userId]
+    );
+
+    if (result.rows[0]) {
+      return result.rows[0];
+    }
+
+    return null;
+  }
+
+  /**
+   * Transform database user record to API response format (snake_case to camelCase + provider logic)
+   */
+  transformUserRecordToSchema(dbUser: UserRecord): UserSchema {
+    const providers: string[] = [];
+
+    // Add social providers if any
+    if (dbUser.providers) {
+      dbUser.providers.split(',').forEach((provider: string) => {
+        providers.push(provider);
+      });
+    }
+
+    // Add email provider if password exists
+    if (dbUser.password && !providers.includes('email')) {
+      providers.push('email');
+    }
+
+    return {
+      id: dbUser.id,
+      email: dbUser.email,
+      emailVerified: dbUser.email_verified,
+      createdAt: dbUser.created_at,
+      updatedAt: dbUser.updated_at,
+      providers: providers,
+      profile: dbUser.profile,
+      metadata: dbUser.metadata,
+    };
+  }
+
+  /**
+   * List users with pagination and search
+   */
+  async listUsers(
+    limit: number,
+    offset: number,
+    search?: string
+  ): Promise<{ users: UserSchema[]; total: number }> {
+    const pool = this.getPool();
+    let query = `
+      SELECT
+        u.id,
+        u.email,
+        u.profile,
+        u.metadata,
+        u.email_verified,
+        u.is_anonymous,
+        u.created_at,
+        u.updated_at,
+        u.password,
+        STRING_AGG(DISTINCT a.provider, ',') as providers
+      FROM auth.users u
+      LEFT JOIN auth.user_providers a ON u.id = a.user_id
+      WHERE u.is_anonymous = false
+        AND u.is_project_admin = false
+    `;
+    const params: (string | number)[] = [];
+
+    if (search) {
+      query += ` AND (u.email LIKE $1 OR u.profile->>'name' LIKE $2)`;
+      params.push(`%${search}%`, `%${search}%`);
+    }
+
+    query += ` GROUP BY u.id ORDER BY u.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
+
+    const result = await pool.query(query, params);
+    const dbUsers = result.rows as UserRecord[];
+
+    // Transform users
+    const users = dbUsers.map((dbUser) => this.transformUserRecordToSchema(dbUser));
+
+    // Get total count (exclude anonymous and legacy project-admin users)
+    let countQuery =
+      'SELECT COUNT(*) as count FROM auth.users WHERE is_anonymous = false AND is_project_admin = false';
+    const countParams: string[] = [];
+    if (search) {
+      countQuery += ` AND (email LIKE $1 OR profile->>'name' LIKE $2)`;
+      countParams.push(`%${search}%`, `%${search}%`);
+    }
+    const countResult = await pool.query(countQuery, countParams);
+    const count = countResult.rows[0].count;
+
+    return {
+      users,
+      total: parseInt(count, 10),
+    };
+  }
+
+  /**
+   * Get user by ID (returns UserSchema for API)
+   */
+  async getUserSchemaById(userId: string): Promise<UserSchema | null> {
+    const dbUser = await this.getUserById(userId);
+    if (!dbUser) {
+      return null;
+    }
+    return this.transformUserRecordToSchema(dbUser);
+  }
+
+  /**
+   * Get user profile by ID (public endpoint - returns id and profile)
+   */
+  async getProfileById(
+    userId: string
+  ): Promise<{ id: string; profile: Record<string, unknown> | null } | null> {
+    const pool = this.getPool();
+    const result = await pool.query(`SELECT id, profile FROM auth.users WHERE id = $1`, [userId]);
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return {
+      id: result.rows[0].id,
+      profile: result.rows[0].profile,
+    };
+  }
+
+  /**
+   * Update user profile (for authenticated user updating their own profile)
+   */
+  async updateProfile(
+    userId: string,
+    profile: Record<string, unknown>
+  ): Promise<{ id: string; profile: Record<string, unknown> | null }> {
+    const pool = this.getPool();
+    const result = await pool.query(
+      `UPDATE auth.users
+       SET profile = COALESCE(profile, '{}'::jsonb) || $1::jsonb, updated_at = NOW()
+       WHERE id = $2
+       RETURNING id, profile`,
+      [profile, userId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new AppError('User not found', 404, ERROR_CODES.AUTH_USER_NOT_FOUND);
+    }
+
+    return {
+      id: result.rows[0].id,
+      profile: result.rows[0].profile,
+    };
+  }
+
+  /**
+   * Delete multiple users by IDs
+   */
+  async deleteUsers(userIds: string[]): Promise<number> {
+    const pool = this.getPool();
+    const placeholders = userIds.map((_, i) => `$${i + 1}`).join(',');
+    const result = await pool.query(
+      `DELETE FROM auth.users WHERE id IN (${placeholders})`,
+      userIds
+    );
+
+    return result.rowCount || 0;
+  }
+}

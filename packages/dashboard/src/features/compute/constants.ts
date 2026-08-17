@@ -1,0 +1,93 @@
+import type { ServiceSchema, ServiceStatus } from '@insforge/shared-schemas';
+
+export const statusColors: Record<ServiceStatus, string> = {
+  running: 'bg-green-500',
+  deploying: 'bg-yellow-500',
+  creating: 'bg-yellow-500',
+  stopped: 'bg-gray-400',
+  failed: 'bg-red-500',
+  destroying: 'bg-orange-500',
+};
+
+export const CPU_TIERS = [
+  { value: 'shared-1x', label: 'Shared 1x' },
+  { value: 'shared-2x', label: 'Shared 2x' },
+  { value: 'performance-1x', label: 'Performance 1x' },
+  { value: 'performance-2x', label: 'Performance 2x' },
+  { value: 'performance-4x', label: 'Performance 4x' },
+] as const;
+
+export const MEMORY_OPTIONS = [256, 512, 1024, 2048, 4096, 8192] as const;
+
+/**
+ * Ingress modes, shown only when the configured provider offers more than one
+ * (see useComputeCapabilities). `none` leads because most compute takes no
+ * inbound traffic, and it is the backend's default too.
+ */
+export const INGRESS_MODES = [
+  { value: 'none', label: 'Private (internal network only)' },
+  { value: 'port', label: 'Published host port' },
+  { value: 'host', label: 'Hostname (routed by your gateway)' },
+] as const;
+
+export const REGIONS = [
+  { value: 'iad', label: 'Ashburn, VA (iad)' },
+  { value: 'sin', label: 'Singapore (sin)' },
+  { value: 'lax', label: 'Los Angeles (lax)' },
+  { value: 'lhr', label: 'London (lhr)' },
+  { value: 'nrt', label: 'Tokyo (nrt)' },
+  { value: 'ams', label: 'Amsterdam (ams)' },
+  { value: 'syd', label: 'Sydney (syd)' },
+] as const;
+
+/**
+ * Return the service endpoint as a display string + optional href.
+ *
+ * For HTTP services we surface the full `https://<app>.fly.dev` URL and link
+ * it (clickable, opens in browser).
+ *
+ * For TCP services the backend's `endpointUrl` is still an `https://` form
+ * (the cloud-backend hasn't been made protocol-aware), but there is no HTTPS
+ * listener on the Fly app — clicking that link gets a TLS handshake timeout.
+ * Strip the scheme and append the user's port instead. `href` is null so
+ * callers render it as plain text rather than a misleading anchor. Users
+ * connect with the protocol-native client (redis-cli, psql, etc.).
+ */
+export interface ServiceEndpoint {
+  display: string;
+  /** null for TCP — browsers cannot navigate to raw TCP endpoints. */
+  href: string | null;
+}
+
+export function getReachableUrl(service: ServiceSchema): ServiceEndpoint | null {
+  if (!service.endpointUrl) {
+    return null;
+  }
+  if (service.protocol === 'tcp') {
+    const host = service.endpointUrl.replace(/^https?:\/\//, '');
+    return { display: `${host}:${service.port}`, href: null };
+  }
+  return { display: service.endpointUrl, href: service.endpointUrl };
+}
+
+/**
+ * The providers the compute tab navigates between, in sidebar order.
+ *
+ * Both are listed whether or not they are configured: a self-hoster who cannot see
+ * Docker in the nav has no way to discover that it is an option, which is exactly the
+ * confusion this replaced. Selecting an unconfigured one shows how to enable it.
+ */
+export const COMPUTE_PROVIDERS = [
+  { slug: 'docker', label: 'Docker' },
+  { slug: 'fly', label: 'Fly.io' },
+] as const;
+
+export type ComputeProviderSlug = (typeof COMPUTE_PROVIDERS)[number]['slug'];
+
+export function isComputeProviderSlug(value: string | undefined): value is ComputeProviderSlug {
+  return COMPUTE_PROVIDERS.some((p) => p.slug === value);
+}
+
+export function computeProviderLabel(slug: string): string {
+  return COMPUTE_PROVIDERS.find((p) => p.slug === slug)?.label ?? slug;
+}

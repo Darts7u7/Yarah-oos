@@ -1,0 +1,3854 @@
+openapi: 3.0.3
+info:
+  title: Insforge Payments API
+  version: 1.0.0
+  description: Provider-specific Stripe and Razorpay payment setup, runtime flows, catalog management, sync, and webhook projections
+
+tags:
+  - name: Stripe Payments
+    description: Stripe Checkout, Billing Portal, catalog, sync, customer, subscription, and transaction routes
+  - name: Razorpay Payments
+    description: Razorpay Orders, Subscriptions, catalog, manual webhook setup, sync, customer, and transaction routes
+  - name: Payment Webhooks
+    description: Provider webhook ingestion routes
+
+paths:
+  /api/payments/stripe/{environment}/checkout-sessions:
+    post:
+      summary: Create Stripe Checkout Session
+      description: Create a local checkout attempt with the caller's user context and then create a Stripe Checkout Session. Subscription mode requires a billing subject.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCheckoutSessionBody'
+            example:
+              mode: "subscription"
+              lineItems:
+                - priceId: "price_123"
+                  quantity: 1
+              successUrl: "https://app.example.com/billing/success"
+              cancelUrl: "https://app.example.com/billing/cancel"
+              subject:
+                type: "team"
+                id: "team_123"
+              customerEmail: "buyer@example.com"
+              idempotencyKey: "checkout-team_123-pro"
+      responses:
+        '201':
+          description: Checkout Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCheckoutSessionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/payments/stripe/{environment}/customer-portal-sessions:
+    post:
+      summary: Create Stripe Customer Portal Session
+      description: Create a Stripe Billing Portal Session for an authenticated user's mapped billing subject.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerPortalSessionBody'
+            example:
+              subject:
+                type: "team"
+                id: "team_123"
+              returnUrl: "https://app.example.com/billing"
+      responses:
+        '201':
+          description: Customer Portal Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCustomerPortalSessionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/payments/stripe/status:
+    get:
+      summary: Get Stripe Payments Status
+      description: Return Stripe connection, sync, and managed webhook status for each environment.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      responses:
+        '200':
+          description: Stripe payments status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetStripeStatusResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/stripe/config:
+    get:
+      summary: Get Stripe Key Configuration
+      description: Return masked Stripe key configuration for test and live environments.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      responses:
+        '200':
+          description: Stripe key configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetStripeConfigResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/stripe/{environment}/config:
+    put:
+      summary: Configure Stripe Secret Key
+      description: Validate and store a Stripe secret key. New Stripe accounts attempt managed webhook setup and then run a unified sync.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertStripeConfigBody'
+            example:
+              secretKey: "sk_test_xxx"
+      responses:
+        '200':
+          description: Updated Stripe key configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetStripeConfigResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      summary: Remove Stripe Secret Key
+      description: Remove the configured Stripe secret key for one environment and best-effort remove managed webhook endpoints.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      responses:
+        '200':
+          description: Updated Stripe key configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetStripeConfigResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/payments/stripe/sync:
+    post:
+      summary: Sync Stripe Payments State
+      description: Sync products, prices, customers, and subscriptions for every configured Stripe environment. Stripe remains the source of truth.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      responses:
+        '200':
+          description: Sync result for configured environments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncStripePaymentsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/stripe/{environment}/sync:
+    post:
+      summary: Sync Stripe Payments State For One Environment
+      description: Sync products, prices, customers, and subscriptions for one Stripe environment. Stripe remains the source of truth.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      responses:
+        '200':
+          description: Sync result for the requested environment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncStripePaymentsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/stripe/{environment}/webhook:
+    post:
+      summary: Configure Managed Stripe Webhook
+      description: Create or recreate the InsForge-managed Stripe webhook endpoint for one environment.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      responses:
+        '200':
+          description: Managed webhook configuration result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigureStripeWebhookResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/stripe/{environment}/catalog:
+    get:
+      summary: List Stripe Catalog
+      description: Return mirrored Stripe products and prices for one environment.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      responses:
+        '200':
+          description: Synced Stripe products and prices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListStripeCatalogResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/stripe/{environment}/catalog/products:
+    get:
+      summary: List Stripe Products
+      description: List mirrored Stripe products for one environment.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      responses:
+        '200':
+          description: Stripe products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListStripeProductsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      summary: Create Stripe Product
+      description: Create a Stripe product in the requested environment, then mirror it locally after Stripe succeeds.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStripeProductBody'
+            example:
+              name: "Pro Plan"
+              description: "Monthly access to Pro features"
+              active: true
+              metadata:
+                tier: "pro"
+              idempotencyKey: "product-pro-plan"
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutateStripeProductResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/stripe/{environment}/catalog/products/{productId}:
+    get:
+      summary: Get Stripe Product
+      description: Get one mirrored Stripe product and its associated prices.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/ProductIdPath'
+      responses:
+        '200':
+          description: Product and prices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetStripeProductResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      summary: Update Stripe Product
+      description: Update a Stripe product, then mirror it locally after Stripe succeeds.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/ProductIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStripeProductBody'
+            example:
+              name: "Pro Plan"
+              active: true
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutateStripeProductResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Delete Stripe Product
+      description: Delete a Stripe product from one environment, then remove it from the local mirror.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/ProductIdPath'
+      responses:
+        '200':
+          description: Product deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteStripeProductResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/payments/stripe/{environment}/catalog/prices:
+    get:
+      summary: List Stripe Prices
+      description: List mirrored Stripe prices for one environment, optionally filtered by product.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - name: productId
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+          description: Filter prices by Stripe product ID.
+          example: "prod_123"
+      responses:
+        '200':
+          description: Stripe prices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListStripePricesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      summary: Create Stripe Price
+      description: Create a Stripe price in the requested environment, then mirror it locally after Stripe succeeds.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStripePriceBody'
+            example:
+              productId: "prod_123"
+              currency: "usd"
+              unitAmount: 2900
+              recurring:
+                interval: "month"
+                intervalCount: 1
+              lookupKey: "pro_monthly"
+              idempotencyKey: "price-pro-monthly"
+      responses:
+        '201':
+          description: Price created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutateStripePriceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/stripe/{environment}/catalog/prices/{priceId}:
+    get:
+      summary: Get Stripe Price
+      description: Get one mirrored Stripe price.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/PriceIdPath'
+      responses:
+        '200':
+          description: Price
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetStripePriceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      summary: Update Stripe Price
+      description: Update mutable Stripe price fields, then mirror the price locally after Stripe succeeds.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/PriceIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStripePriceBody'
+            example:
+              active: true
+              lookupKey: "pro_monthly"
+      responses:
+        '200':
+          description: Price updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutateStripePriceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Archive Stripe Price
+      description: Archive a Stripe price in one environment, then mirror the archived state locally.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/PriceIdPath'
+      responses:
+        '200':
+          description: Price archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveStripePriceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/payments/stripe/{environment}/subscriptions:
+    get:
+      summary: List Stripe Subscriptions
+      description: Admin/debug read for mirrored Stripe subscriptions. Use app-owned tables with RLS for end-user payment state.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/SubjectTypeQuery'
+        - $ref: '#/components/parameters/SubjectIdQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Stripe subscriptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListStripeSubscriptionsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/stripe/{environment}/customers:
+    get:
+      summary: List Stripe Customers
+      description: Admin/debug read for mirrored Stripe customers. This is a display mirror only and should not replace app-owned billing tables.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Stripe customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPaymentCustomersResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/stripe/{environment}/transactions:
+    get:
+      summary: List Stripe Transactions
+      description: Admin/debug read for InsForge's Stripe transaction projection. Use app-owned fulfillment tables with RLS for end-user order, credit, or entitlement state.
+      tags:
+        - Stripe Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/SubjectTypeQuery'
+        - $ref: '#/components/parameters/SubjectIdQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Stripe transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPaymentTransactionsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/status:
+    get:
+      summary: Get Razorpay Payments Status
+      description: Return Razorpay connection and sync status for each environment.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      responses:
+        '200':
+          description: Razorpay payments status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRazorpayStatusResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/config:
+    get:
+      summary: Get Razorpay Key Configuration
+      description: Return masked Razorpay key configuration for test and live environments.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      responses:
+        '200':
+          description: Razorpay key configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRazorpayConfigResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/sync:
+    post:
+      summary: Sync Razorpay Payments State
+      description: Sync items, plans, customers, subscriptions, invoices, and payments for every configured Razorpay environment. Razorpay remains the source of truth.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      responses:
+        '200':
+          description: Sync result for configured Razorpay environments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncRazorpayPaymentsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/{environment}/config:
+    put:
+      summary: Configure Razorpay Keys
+      description: Validate and store Razorpay API keys for one environment. A webhook secret is generated automatically when one does not already exist.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertRazorpayConfigBody'
+            example:
+              keyId: "rzp_test_xxx"
+              keySecret: "razorpay_secret_xxx"
+              webhookSecret: "webhook_secret_xxx"
+      responses:
+        '200':
+          description: Updated Razorpay key configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRazorpayConfigResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    delete:
+      summary: Remove Razorpay Keys
+      description: Remove the configured Razorpay keys for one environment.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      responses:
+        '200':
+          description: Updated Razorpay key configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRazorpayConfigResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/payments/razorpay/{environment}/sync:
+    post:
+      summary: Sync Razorpay Payments State For One Environment
+      description: Sync items, plans, customers, subscriptions, invoices, and payments for one Razorpay environment. Razorpay remains the source of truth.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      responses:
+        '200':
+          description: Sync result for the requested Razorpay environment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncRazorpayPaymentsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/{environment}/webhook:
+    get:
+      summary: Get Razorpay Webhook Setup Values
+      description: Return the Razorpay webhook URL and signing secret that must be copied into the Razorpay Dashboard for manual webhook setup.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      responses:
+        '200':
+          description: Razorpay webhook setup values
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRazorpayWebhookSetupResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/{environment}/webhook/rotate-secret:
+    post:
+      summary: Rotate Razorpay Webhook Secret
+      description: Generate a new Razorpay webhook signing secret. Update the webhook secret in the Razorpay Dashboard after calling this endpoint.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      responses:
+        '200':
+          description: Razorpay webhook setup values with the rotated secret
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RotateRazorpayWebhookSecretResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/{environment}/orders:
+    post:
+      summary: Create Razorpay Order
+      description: Create a local Razorpay Order record with the caller's user context, create a Razorpay Order, and return Checkout options for the client-side Razorpay Checkout script.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRazorpayOrderBody'
+            example:
+              amount: 50000
+              currency: "INR"
+              receipt: "order-team_123-pro"
+              description: "Pro upgrade"
+              subject:
+                type: "team"
+                id: "team_123"
+              customerEmail: "buyer@example.com"
+      responses:
+        '201':
+          description: Razorpay Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRazorpayOrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/payments/razorpay/{environment}/orders/verify:
+    post:
+      summary: Verify Razorpay Order Payment
+      description: Verify the Razorpay Checkout signature for an order payment before recording the verified payment ID locally.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRazorpayOrderBody'
+            example:
+              orderId: "order_123"
+              paymentId: "pay_123"
+              signature: "razorpay_signature"
+      responses:
+        '200':
+          description: Razorpay order payment verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyRazorpayOrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/payments/razorpay/{environment}/catalog:
+    get:
+      summary: List Razorpay Payment Catalog
+      description: Return mirrored Razorpay items and plans for one environment.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      responses:
+        '200':
+          description: Synced Razorpay items and plans
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRazorpayCatalogResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/{environment}/catalog/items:
+    post:
+      summary: Create Razorpay Item
+      description: Create a Razorpay Item, then mirror it locally after Razorpay succeeds.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRazorpayItemBody'
+            example:
+              name: "One-time setup"
+              amount: 50000
+              currency: "INR"
+      responses:
+        '201':
+          description: Razorpay item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutateRazorpayItemResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/{environment}/catalog/items/{itemId}:
+    patch:
+      summary: Update Razorpay Item
+      description: Update mutable Razorpay Item fields, then mirror the item locally after Razorpay succeeds.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/RazorpayItemIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRazorpayItemBody'
+            example:
+              active: false
+      responses:
+        '200':
+          description: Razorpay item updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutateRazorpayItemResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/payments/razorpay/{environment}/catalog/plans:
+    post:
+      summary: Create Razorpay Plan
+      description: Create a Razorpay Plan with its amount-bearing item definition, then mirror it locally after Razorpay succeeds.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRazorpayPlanBody'
+            example:
+              period: "monthly"
+              interval: 1
+              item:
+                name: "Pro monthly"
+                amount: 199900
+                currency: "INR"
+      responses:
+        '201':
+          description: Razorpay plan created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutateRazorpayPlanResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/{environment}/subscriptions:
+    post:
+      summary: Create Razorpay Subscription
+      description: Create a Razorpay Subscription and mirror it locally, then return Checkout options for authorization. The backend first evaluates the caller's INSERT policy on payments.razorpay_subscriptions so apps can restrict which subjects can start subscriptions.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRazorpaySubscriptionBody'
+            example:
+              planId: "plan_123"
+              totalCount: 12
+              subject:
+                type: "team"
+                id: "team_123"
+              customerEmail: "buyer@example.com"
+      responses:
+        '201':
+          description: Razorpay subscription created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRazorpaySubscriptionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    get:
+      summary: List Razorpay Subscriptions
+      description: Admin/debug read for mirrored Razorpay subscriptions. Use app-owned tables with RLS for end-user payment state.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/SubjectTypeQuery'
+        - $ref: '#/components/parameters/SubjectIdQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Razorpay subscriptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRazorpaySubscriptionsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/{environment}/subscriptions/verify:
+    post:
+      summary: Verify Razorpay Subscription Authorization
+      description: Verify the Razorpay Checkout signature for the subscription authorization payment before recording the authorization payment ID locally.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRazorpaySubscriptionBody'
+            example:
+              subscriptionId: "sub_123"
+              paymentId: "pay_123"
+              signature: "razorpay_signature"
+      responses:
+        '200':
+          description: Razorpay subscription authorization verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyRazorpaySubscriptionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/payments/razorpay/{environment}/subscriptions/{subscriptionId}/cancel:
+    post:
+      summary: Cancel Razorpay Subscription
+      description: Cancel a Razorpay subscription after evaluating the caller's UPDATE policy on payments.razorpay_subscriptions.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/RazorpaySubscriptionIdPath'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelRazorpaySubscriptionBody'
+            example:
+              cancelAtCycleEnd: true
+      responses:
+        '200':
+          description: Razorpay subscription cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelRazorpaySubscriptionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/payments/razorpay/{environment}/subscriptions/{subscriptionId}/pause:
+    post:
+      summary: Pause Razorpay Subscription
+      description: Pause a Razorpay subscription immediately after evaluating the caller's UPDATE policy on payments.razorpay_subscriptions.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/RazorpaySubscriptionIdPath'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PauseRazorpaySubscriptionBody'
+      responses:
+        '200':
+          description: Razorpay subscription paused
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PauseRazorpaySubscriptionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/payments/razorpay/{environment}/subscriptions/{subscriptionId}/resume:
+    post:
+      summary: Resume Razorpay Subscription
+      description: Resume a paused Razorpay subscription immediately after evaluating the caller's UPDATE policy on payments.razorpay_subscriptions.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/RazorpaySubscriptionIdPath'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResumeRazorpaySubscriptionBody'
+      responses:
+        '200':
+          description: Razorpay subscription resumed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResumeRazorpaySubscriptionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/payments/razorpay/{environment}/customers:
+    get:
+      summary: List Razorpay Customers
+      description: Admin/debug read for mirrored Razorpay customers. This is a display mirror only and should not replace app-owned billing tables.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Razorpay customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPaymentCustomersResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/payments/razorpay/{environment}/transactions:
+    get:
+      summary: List Razorpay Transactions
+      description: Admin/debug read for InsForge's Razorpay transaction projection. Use app-owned fulfillment tables with RLS for end-user order, credit, or entitlement state.
+      tags:
+        - Razorpay Payments
+      security:
+        - bearerAuth: []
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+        - $ref: '#/components/parameters/SubjectTypeQuery'
+        - $ref: '#/components/parameters/SubjectIdQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Razorpay transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPaymentTransactionsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/webhooks/stripe/{environment}:
+    post:
+      summary: Receive Stripe Webhook
+      description: Receive Stripe events for one environment. The request body must be the raw Stripe JSON body and must include the Stripe signature header.
+      tags:
+        - Payment Webhooks
+      security:
+        - stripeSignature: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StripeWebhookResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/webhooks/razorpay/{environment}:
+    post:
+      summary: Receive Razorpay Webhook
+      description: Receive Razorpay events for one environment. The request body must be the raw Razorpay JSON body and must include the Razorpay signature header.
+      tags:
+        - Payment Webhooks
+      security:
+        - razorpaySignature: []
+      parameters:
+        - $ref: '#/components/parameters/EnvironmentPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RazorpayWebhookResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+    stripeSignature:
+      type: apiKey
+      in: header
+      name: stripe-signature
+    razorpaySignature:
+      type: apiKey
+      in: header
+      name: x-razorpay-signature
+
+  parameters:
+    EnvironmentPath:
+      name: environment
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/PaymentEnvironment'
+      description: Payment provider environment.
+    ProductIdPath:
+      name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: Stripe product ID.
+      example: "prod_123"
+    PriceIdPath:
+      name: priceId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: Stripe price ID.
+      example: "price_123"
+    RazorpayItemIdPath:
+      name: itemId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: Razorpay item ID.
+      example: "item_123"
+    RazorpaySubscriptionIdPath:
+      name: subscriptionId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: Razorpay subscription ID.
+      example: "sub_123"
+    SubjectTypeQuery:
+      name: subjectType
+      in: query
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+      description: Billing subject type. Must be provided together with subjectId.
+      example: "team"
+    SubjectIdQuery:
+      name: subjectId
+      in: query
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 255
+      description: Billing subject ID. Must be provided together with subjectType.
+      example: "team_123"
+    LimitQuery:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+      description: Maximum rows to return.
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    PaymentEnvironment:
+      type: string
+      enum:
+        - test
+        - live
+
+    StripeEnvironment:
+      $ref: '#/components/schemas/PaymentEnvironment'
+
+    RazorpayEnvironment:
+      $ref: '#/components/schemas/PaymentEnvironment'
+
+    PaymentProvider:
+      type: string
+      enum:
+        - stripe
+        - razorpay
+
+    StripeConnectionStatus:
+      type: string
+      enum:
+        - unconfigured
+        - connected
+        - error
+
+    StripeLatestSyncStatus:
+      type: string
+      enum:
+        - succeeded
+        - failed
+
+    RazorpayConnectionStatus:
+      type: string
+      enum:
+        - unconfigured
+        - connected
+        - error
+
+    RazorpayLatestSyncStatus:
+      type: string
+      enum:
+        - succeeded
+        - failed
+
+    Metadata:
+      type: object
+      additionalProperties:
+        type: string
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+        - statusCode
+      properties:
+        error:
+          type: string
+          example: "INVALID_INPUT"
+        message:
+          type: string
+          example: "environment: Invalid enum value"
+        statusCode:
+          type: integer
+          example: 400
+        nextActions:
+          type: string
+          nullable: true
+
+    StripeConnection:
+      type: object
+      required:
+        - environment
+        - status
+        - accountId
+        - accountEmail
+        - accountLivemode
+        - webhookEndpointId
+        - webhookEndpointUrl
+        - webhookConfiguredAt
+        - maskedKey
+        - lastSyncedAt
+        - lastSyncStatus
+        - lastSyncError
+        - lastSyncCounts
+      properties:
+        environment:
+          $ref: '#/components/schemas/StripeEnvironment'
+        status:
+          $ref: '#/components/schemas/StripeConnectionStatus'
+        accountId:
+          type: string
+          nullable: true
+          example: "acct_123"
+        accountEmail:
+          type: string
+          nullable: true
+          example: "owner@example.com"
+        accountLivemode:
+          type: boolean
+          nullable: true
+        webhookEndpointId:
+          type: string
+          nullable: true
+          example: "we_123"
+        webhookEndpointUrl:
+          type: string
+          nullable: true
+          example: "https://api.example.com/api/webhooks/stripe/test"
+        webhookConfiguredAt:
+          type: string
+          format: date-time
+          nullable: true
+        maskedKey:
+          type: string
+          nullable: true
+          example: "sk_test_...abcd"
+        lastSyncedAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastSyncStatus:
+          allOf:
+            - $ref: '#/components/schemas/StripeLatestSyncStatus'
+          nullable: true
+        lastSyncError:
+          type: string
+          nullable: true
+        lastSyncCounts:
+          type: object
+          additionalProperties:
+            type: number
+
+    RazorpayConnection:
+      type: object
+      required:
+        - environment
+        - status
+        - accountId
+        - merchantName
+        - accountLivemode
+        - webhookEndpointId
+        - webhookEndpointUrl
+        - webhookConfiguredAt
+        - maskedKey
+        - lastSyncedAt
+        - lastSyncStatus
+        - lastSyncError
+        - lastSyncCounts
+      properties:
+        environment:
+          $ref: '#/components/schemas/RazorpayEnvironment'
+        status:
+          $ref: '#/components/schemas/RazorpayConnectionStatus'
+        accountId:
+          type: string
+          nullable: true
+          example: "acc_123"
+        merchantName:
+          type: string
+          nullable: true
+          example: "Example Merchant"
+        accountLivemode:
+          type: boolean
+          nullable: true
+        webhookEndpointId:
+          type: string
+          nullable: true
+          example: "manual"
+        webhookEndpointUrl:
+          type: string
+          nullable: true
+          example: "https://api.example.com/api/webhooks/razorpay/test"
+        webhookConfiguredAt:
+          type: string
+          format: date-time
+          nullable: true
+        maskedKey:
+          type: string
+          nullable: true
+          example: "rzp_test_...abcd"
+        lastSyncedAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastSyncStatus:
+          allOf:
+            - $ref: '#/components/schemas/RazorpayLatestSyncStatus'
+          nullable: true
+        lastSyncError:
+          type: string
+          nullable: true
+        lastSyncCounts:
+          type: object
+          additionalProperties:
+            type: number
+
+    StripeProduct:
+      type: object
+      required:
+        - environment
+        - productId
+        - name
+        - description
+        - active
+        - defaultPriceId
+        - metadata
+        - syncedAt
+      properties:
+        environment:
+          $ref: '#/components/schemas/StripeEnvironment'
+        productId:
+          type: string
+          example: "prod_123"
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+        defaultPriceId:
+          type: string
+          nullable: true
+          example: "price_123"
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        syncedAt:
+          type: string
+          format: date-time
+
+    StripePrice:
+      type: object
+      required:
+        - environment
+        - priceId
+        - productId
+        - active
+        - currency
+        - unitAmount
+        - unitAmountDecimal
+        - type
+        - lookupKey
+        - billingScheme
+        - taxBehavior
+        - recurringInterval
+        - recurringIntervalCount
+        - metadata
+        - syncedAt
+      properties:
+        environment:
+          $ref: '#/components/schemas/StripeEnvironment'
+        priceId:
+          type: string
+          example: "price_123"
+        productId:
+          type: string
+          nullable: true
+          example: "prod_123"
+        active:
+          type: boolean
+        currency:
+          type: string
+          example: "usd"
+        unitAmount:
+          type: integer
+          nullable: true
+          example: 2900
+        unitAmountDecimal:
+          type: string
+          nullable: true
+          example: "2900"
+        type:
+          type: string
+          example: "recurring"
+        lookupKey:
+          type: string
+          nullable: true
+          example: "pro_monthly"
+        billingScheme:
+          type: string
+          nullable: true
+          example: "per_unit"
+        taxBehavior:
+          type: string
+          nullable: true
+          enum:
+            - exclusive
+            - inclusive
+            - unspecified
+          example: "unspecified"
+        recurringInterval:
+          type: string
+          nullable: true
+          enum:
+            - day
+            - week
+            - month
+            - year
+          example: "month"
+        recurringIntervalCount:
+          type: integer
+          nullable: true
+          example: 1
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        syncedAt:
+          type: string
+          format: date-time
+
+    RazorpayItem:
+      type: object
+      required:
+        - environment
+        - itemId
+        - name
+        - description
+        - active
+        - amount
+        - unitAmount
+        - currency
+        - type
+        - providerCreatedAt
+        - syncedAt
+      properties:
+        environment:
+          $ref: '#/components/schemas/RazorpayEnvironment'
+        itemId:
+          type: string
+          example: "item_123"
+        name:
+          type: string
+          example: "Pro monthly"
+        description:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+        amount:
+          type: integer
+          nullable: true
+          example: 290000
+        unitAmount:
+          type: integer
+          nullable: true
+          description: Razorpay per-unit amount mirror. Usually equals amount for catalog items.
+          example: 290000
+        currency:
+          type: string
+          example: "inr"
+        type:
+          type: string
+          nullable: true
+          example: "invoice"
+        providerCreatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        syncedAt:
+          type: string
+          format: date-time
+
+    RazorpayPlan:
+      type: object
+      required:
+        - environment
+        - planId
+        - itemId
+        - period
+        - interval
+        - amount
+        - unitAmount
+        - currency
+        - active
+        - notes
+        - providerCreatedAt
+        - syncedAt
+      properties:
+        environment:
+          $ref: '#/components/schemas/RazorpayEnvironment'
+        planId:
+          type: string
+          example: "plan_123"
+        itemId:
+          type: string
+          example: "item_123"
+        period:
+          type: string
+          enum:
+            - daily
+            - weekly
+            - monthly
+            - yearly
+          example: "monthly"
+        interval:
+          type: integer
+          example: 1
+        amount:
+          type: integer
+          nullable: true
+          example: 290000
+        unitAmount:
+          type: integer
+          nullable: true
+          description: Razorpay nested item per-unit amount mirror. Usually equals amount.
+          example: 290000
+        currency:
+          type: string
+          example: "inr"
+        active:
+          type: boolean
+        notes:
+          $ref: '#/components/schemas/Metadata'
+        providerCreatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        syncedAt:
+          type: string
+          format: date-time
+
+    PaymentCustomer:
+      type: object
+      required:
+        - environment
+        - provider
+        - providerCustomerId
+        - email
+        - name
+        - phone
+        - deleted
+        - metadata
+        - providerCreatedAt
+        - syncedAt
+      properties:
+        environment:
+          $ref: '#/components/schemas/PaymentEnvironment'
+        provider:
+          $ref: '#/components/schemas/PaymentProvider'
+        providerCustomerId:
+          type: string
+          example: "cus_123"
+        email:
+          type: string
+          nullable: true
+          example: "buyer@example.com"
+        name:
+          type: string
+          nullable: true
+          example: "Buyer Example"
+        phone:
+          type: string
+          nullable: true
+          example: "+1 555-0100"
+        deleted:
+          type: boolean
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        providerCreatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        syncedAt:
+          type: string
+          format: date-time
+
+    PaymentCustomerListItem:
+      allOf:
+        - $ref: '#/components/schemas/PaymentCustomer'
+        - type: object
+          required:
+            - paymentsCount
+            - lastPaymentAt
+            - totalSpend
+            - totalSpendCurrency
+            - paymentMethodBrand
+            - paymentMethodLast4
+            - countryCode
+          properties:
+            paymentsCount:
+              type: integer
+              minimum: 0
+            lastPaymentAt:
+              type: string
+              format: date-time
+              nullable: true
+            totalSpend:
+              type: integer
+              minimum: 0
+              nullable: true
+            totalSpendCurrency:
+              type: string
+              nullable: true
+            paymentMethodBrand:
+              type: string
+              nullable: true
+            paymentMethodLast4:
+              type: string
+              nullable: true
+            countryCode:
+              type: string
+              nullable: true
+              minLength: 2
+              maxLength: 2
+
+    BillingSubject:
+      type: object
+      required:
+        - type
+        - id
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "team"
+        id:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: "team_123"
+
+    CheckoutMode:
+      type: string
+      enum:
+        - payment
+        - subscription
+
+    CheckoutSessionStatus:
+      type: string
+      enum:
+        - initialized
+        - open
+        - completed
+        - expired
+        - failed
+
+    CheckoutSessionPaymentStatus:
+      type: string
+      enum:
+        - paid
+        - unpaid
+        - no_payment_required
+
+    CheckoutSession:
+      type: object
+      required:
+        - id
+        - environment
+        - mode
+        - status
+        - paymentStatus
+        - subjectType
+        - subjectId
+        - customerEmail
+        - checkoutSessionId
+        - customerId
+        - paymentIntentId
+        - subscriptionId
+        - url
+        - lastError
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        environment:
+          $ref: '#/components/schemas/StripeEnvironment'
+        mode:
+          $ref: '#/components/schemas/CheckoutMode'
+        status:
+          $ref: '#/components/schemas/CheckoutSessionStatus'
+        paymentStatus:
+          allOf:
+            - $ref: '#/components/schemas/CheckoutSessionPaymentStatus'
+          nullable: true
+        subjectType:
+          type: string
+          nullable: true
+        subjectId:
+          type: string
+          nullable: true
+        customerEmail:
+          type: string
+          format: email
+          nullable: true
+        checkoutSessionId:
+          type: string
+          nullable: true
+          example: "cs_test_123"
+        customerId:
+          type: string
+          nullable: true
+          example: "cus_123"
+        paymentIntentId:
+          type: string
+          nullable: true
+          example: "pi_123"
+        subscriptionId:
+          type: string
+          nullable: true
+          example: "sub_123"
+        url:
+          type: string
+          nullable: true
+          example: "https://checkout.stripe.com/c/pay/cs_test_123"
+        lastError:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CustomerPortalSessionStatus:
+      type: string
+      enum:
+        - initialized
+        - created
+        - failed
+
+    CustomerPortalSession:
+      type: object
+      required:
+        - id
+        - environment
+        - status
+        - subjectType
+        - subjectId
+        - customerId
+        - returnUrl
+        - configuration
+        - url
+        - lastError
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        environment:
+          $ref: '#/components/schemas/StripeEnvironment'
+        status:
+          $ref: '#/components/schemas/CustomerPortalSessionStatus'
+        subjectType:
+          type: string
+        subjectId:
+          type: string
+        customerId:
+          type: string
+          nullable: true
+          example: "cus_123"
+        returnUrl:
+          type: string
+          nullable: true
+          example: "https://app.example.com/billing"
+        configuration:
+          type: string
+          nullable: true
+        url:
+          type: string
+          nullable: true
+          example: "https://billing.stripe.com/p/session/test_123"
+        lastError:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    StripeSubscriptionStatus:
+      type: string
+      enum:
+        - incomplete
+        - incomplete_expired
+        - trialing
+        - active
+        - past_due
+        - canceled
+        - unpaid
+        - paused
+
+    StripeSubscriptionItem:
+      type: object
+      required:
+        - environment
+        - subscriptionItemId
+        - subscriptionId
+        - productId
+        - priceId
+        - quantity
+        - metadata
+        - createdAt
+        - updatedAt
+      properties:
+        environment:
+          $ref: '#/components/schemas/StripeEnvironment'
+        subscriptionItemId:
+          type: string
+          example: "si_123"
+        subscriptionId:
+          type: string
+          example: "sub_123"
+        productId:
+          type: string
+          nullable: true
+          example: "prod_123"
+        priceId:
+          type: string
+          nullable: true
+          example: "price_123"
+        quantity:
+          type: integer
+          nullable: true
+          example: 1
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    StripeSubscription:
+      type: object
+      required:
+        - environment
+        - subscriptionId
+        - customerId
+        - subjectType
+        - subjectId
+        - status
+        - currentPeriodStart
+        - currentPeriodEnd
+        - cancelAtPeriodEnd
+        - cancelAt
+        - canceledAt
+        - trialStart
+        - trialEnd
+        - latestInvoiceId
+        - metadata
+        - syncedAt
+        - createdAt
+        - updatedAt
+        - items
+      properties:
+        environment:
+          $ref: '#/components/schemas/StripeEnvironment'
+        subscriptionId:
+          type: string
+          example: "sub_123"
+        customerId:
+          type: string
+          nullable: true
+          example: "cus_123"
+        subjectType:
+          type: string
+          nullable: true
+        subjectId:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StripeSubscriptionStatus'
+        currentPeriodStart:
+          type: string
+          format: date-time
+          nullable: true
+        currentPeriodEnd:
+          type: string
+          format: date-time
+          nullable: true
+        cancelAtPeriodEnd:
+          type: boolean
+        cancelAt:
+          type: string
+          format: date-time
+          nullable: true
+        canceledAt:
+          type: string
+          format: date-time
+          nullable: true
+        trialStart:
+          type: string
+          format: date-time
+          nullable: true
+        trialEnd:
+          type: string
+          format: date-time
+          nullable: true
+        latestInvoiceId:
+          type: string
+          nullable: true
+          example: "in_123"
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        syncedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StripeSubscriptionItem'
+
+    RazorpaySubscriptionStatus:
+      type: string
+      enum:
+        - created
+        - authenticated
+        - active
+        - pending
+        - halted
+        - cancelled
+        - completed
+        - expired
+        - paused
+
+    RazorpaySubscription:
+      type: object
+      required:
+        - environment
+        - subscriptionId
+        - planId
+        - customerId
+        - subjectType
+        - subjectId
+        - status
+        - currentStart
+        - currentEnd
+        - endedAt
+        - quantity
+        - chargeAt
+        - startAt
+        - endAt
+        - totalCount
+        - authAttempts
+        - paidCount
+        - remainingCount
+        - shortUrl
+        - hasScheduledChanges
+        - changeScheduledAt
+        - offerId
+        - authorizationPaymentId
+        - authorizationVerifiedAt
+        - notes
+        - providerCreatedAt
+        - syncedAt
+        - createdAt
+        - updatedAt
+      properties:
+        environment:
+          $ref: '#/components/schemas/RazorpayEnvironment'
+        subscriptionId:
+          type: string
+          example: "sub_123"
+        planId:
+          type: string
+          example: "plan_123"
+        customerId:
+          type: string
+          nullable: true
+          example: "cust_123"
+        subjectType:
+          type: string
+          nullable: true
+        subjectId:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/RazorpaySubscriptionStatus'
+        currentStart:
+          type: string
+          format: date-time
+          nullable: true
+        currentEnd:
+          type: string
+          format: date-time
+          nullable: true
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+        quantity:
+          type: integer
+          nullable: true
+        chargeAt:
+          type: string
+          format: date-time
+          nullable: true
+        startAt:
+          type: string
+          format: date-time
+          nullable: true
+        endAt:
+          type: string
+          format: date-time
+          nullable: true
+        totalCount:
+          type: integer
+          nullable: true
+        authAttempts:
+          type: integer
+          nullable: true
+        paidCount:
+          type: integer
+          nullable: true
+        remainingCount:
+          type: integer
+          nullable: true
+        shortUrl:
+          type: string
+          nullable: true
+        hasScheduledChanges:
+          type: boolean
+        changeScheduledAt:
+          type: string
+          format: date-time
+          nullable: true
+        offerId:
+          type: string
+          nullable: true
+        authorizationPaymentId:
+          type: string
+          nullable: true
+          example: "pay_123"
+        authorizationVerifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+        notes:
+          $ref: '#/components/schemas/Metadata'
+        providerCreatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        syncedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaymentTransactionType:
+      type: string
+      enum:
+        - one_time_payment
+        - subscription_invoice
+        - refund
+        - failed_payment
+
+    PaymentTransactionStatus:
+      type: string
+      enum:
+        - succeeded
+        - failed
+        - pending
+        - refunded
+        - partially_refunded
+
+    PaymentTransaction:
+      type: object
+      required:
+        - environment
+        - provider
+        - type
+        - status
+        - subjectType
+        - subjectId
+        - providerCustomerId
+        - customerEmailSnapshot
+        - providerReferenceId
+        - providerReferenceType
+        - amount
+        - amountRefunded
+        - currency
+        - description
+        - paidAt
+        - failedAt
+        - refundedAt
+        - providerCreatedAt
+        - createdAt
+        - updatedAt
+      properties:
+        environment:
+          $ref: '#/components/schemas/PaymentEnvironment'
+        provider:
+          $ref: '#/components/schemas/PaymentProvider'
+        type:
+          $ref: '#/components/schemas/PaymentTransactionType'
+        status:
+          $ref: '#/components/schemas/PaymentTransactionStatus'
+        subjectType:
+          type: string
+          nullable: true
+        subjectId:
+          type: string
+          nullable: true
+        providerCustomerId:
+          type: string
+          nullable: true
+          example: "cus_123"
+        customerEmailSnapshot:
+          type: string
+          format: email
+          nullable: true
+        providerReferenceId:
+          type: string
+          nullable: true
+          example: "pi_123"
+        providerReferenceType:
+          type: string
+          nullable: true
+          example: "payment_intent"
+        amount:
+          type: integer
+          nullable: true
+          example: 2900
+        amountRefunded:
+          type: integer
+          nullable: true
+          example: 0
+        currency:
+          type: string
+          nullable: true
+          example: "usd"
+        description:
+          type: string
+          nullable: true
+        paidAt:
+          type: string
+          format: date-time
+          nullable: true
+        failedAt:
+          type: string
+          format: date-time
+          nullable: true
+        refundedAt:
+          type: string
+          format: date-time
+          nullable: true
+        providerCreatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    StripeWebhookProcessingStatus:
+      type: string
+      enum:
+        - pending
+        - processed
+        - failed
+        - ignored
+
+    StripeWebhookEvent:
+      type: object
+      required:
+        - environment
+        - eventId
+        - eventType
+        - livemode
+        - accountId
+        - objectType
+        - objectId
+        - processingStatus
+        - attemptCount
+        - lastError
+        - receivedAt
+        - processedAt
+        - createdAt
+        - updatedAt
+      properties:
+        environment:
+          $ref: '#/components/schemas/StripeEnvironment'
+        eventId:
+          type: string
+          example: "evt_123"
+        eventType:
+          type: string
+          example: "checkout.session.completed"
+        livemode:
+          type: boolean
+        accountId:
+          type: string
+          nullable: true
+          example: "acct_123"
+        objectType:
+          type: string
+          nullable: true
+          example: "checkout.session"
+        objectId:
+          type: string
+          nullable: true
+          example: "cs_test_123"
+        processingStatus:
+          $ref: '#/components/schemas/StripeWebhookProcessingStatus'
+        attemptCount:
+          type: integer
+        lastError:
+          type: string
+          nullable: true
+        receivedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    StripeKeyConfig:
+      type: object
+      required:
+        - environment
+        - hasKey
+        - maskedKey
+      properties:
+        environment:
+          $ref: '#/components/schemas/StripeEnvironment'
+        hasKey:
+          type: boolean
+        maskedKey:
+          type: string
+          nullable: true
+          example: "sk_test_...abcd"
+
+    RazorpayKeyConfig:
+      type: object
+      required:
+        - environment
+        - keyType
+        - hasKey
+        - maskedKey
+      properties:
+        environment:
+          $ref: '#/components/schemas/RazorpayEnvironment'
+        keyType:
+          type: string
+          enum:
+            - api_key
+            - api_secret
+            - webhook_secret
+        hasKey:
+          type: boolean
+        maskedKey:
+          type: string
+          nullable: true
+          example: "rzp_test_...abcd"
+
+    CreateStripeProductBody:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          nullable: true
+          maxLength: 5000
+        active:
+          type: boolean
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        idempotencyKey:
+          type: string
+          minLength: 1
+          maxLength: 200
+
+    UpdateStripeProductBody:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          nullable: true
+          maxLength: 5000
+        active:
+          type: boolean
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+      minProperties: 1
+
+    StripePriceRecurringInterval:
+      type: string
+      enum:
+        - day
+        - week
+        - month
+        - year
+
+    StripePriceTaxBehavior:
+      type: string
+      enum:
+        - exclusive
+        - inclusive
+        - unspecified
+
+    CreateStripePriceBody:
+      type: object
+      required:
+        - productId
+        - currency
+        - unitAmount
+      additionalProperties: false
+      properties:
+        productId:
+          type: string
+          minLength: 1
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: "usd"
+        unitAmount:
+          type: integer
+          minimum: 0
+          example: 2900
+        lookupKey:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 200
+        active:
+          type: boolean
+        recurring:
+          type: object
+          additionalProperties: false
+          required:
+            - interval
+          properties:
+            interval:
+              $ref: '#/components/schemas/StripePriceRecurringInterval'
+            intervalCount:
+              type: integer
+              minimum: 1
+        taxBehavior:
+          $ref: '#/components/schemas/StripePriceTaxBehavior'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        idempotencyKey:
+          type: string
+          minLength: 1
+          maxLength: 200
+
+    UpdateStripePriceBody:
+      type: object
+      additionalProperties: false
+      properties:
+        active:
+          type: boolean
+        lookupKey:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 200
+        taxBehavior:
+          $ref: '#/components/schemas/StripePriceTaxBehavior'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+      minProperties: 1
+
+    CreateCheckoutSessionLineItem:
+      type: object
+      required:
+        - priceId
+      additionalProperties: false
+      properties:
+        priceId:
+          type: string
+          minLength: 1
+          example: "price_123"
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 999
+          default: 1
+
+    CreateCheckoutSessionBody:
+      type: object
+      required:
+        - mode
+        - lineItems
+        - successUrl
+        - cancelUrl
+      additionalProperties: false
+      description: Metadata keys starting with insforge_ are reserved and rejected.
+      properties:
+        mode:
+          $ref: '#/components/schemas/CheckoutMode'
+        lineItems:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/CreateCheckoutSessionLineItem'
+        successUrl:
+          type: string
+          format: uri
+        cancelUrl:
+          type: string
+          format: uri
+        subject:
+          $ref: '#/components/schemas/BillingSubject'
+        customerEmail:
+          type: string
+          format: email
+          nullable: true
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        idempotencyKey:
+          type: string
+          minLength: 1
+          maxLength: 200
+
+    CreateCheckoutSessionResponse:
+      type: object
+      required:
+        - checkoutSession
+      properties:
+        checkoutSession:
+          $ref: '#/components/schemas/CheckoutSession'
+
+    RazorpayOrderStatus:
+      type: string
+      enum:
+        - initialized
+        - created
+        - attempted
+        - paid
+        - failed
+
+    RazorpayOrder:
+      type: object
+      required:
+        - id
+        - environment
+        - status
+        - subjectType
+        - subjectId
+        - customerName
+        - customerEmail
+        - customerContact
+        - orderId
+        - receipt
+        - amount
+        - amountPaid
+        - amountDue
+        - currency
+        - attempts
+        - verifiedPaymentId
+        - verifiedAt
+        - notes
+        - lastError
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        environment:
+          $ref: '#/components/schemas/RazorpayEnvironment'
+        status:
+          $ref: '#/components/schemas/RazorpayOrderStatus'
+        subjectType:
+          type: string
+          nullable: true
+        subjectId:
+          type: string
+          nullable: true
+        customerName:
+          type: string
+          nullable: true
+        customerEmail:
+          type: string
+          format: email
+          nullable: true
+        customerContact:
+          type: string
+          nullable: true
+        orderId:
+          type: string
+          nullable: true
+          example: "order_123"
+        receipt:
+          type: string
+          nullable: true
+        amount:
+          type: integer
+          example: 50000
+        amountPaid:
+          type: integer
+          nullable: true
+        amountDue:
+          type: integer
+          nullable: true
+        currency:
+          type: string
+          example: "inr"
+        attempts:
+          type: integer
+          nullable: true
+        verifiedPaymentId:
+          type: string
+          nullable: true
+          example: "pay_123"
+        verifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+        notes:
+          $ref: '#/components/schemas/Metadata'
+        lastError:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RazorpayCheckoutPrefill:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+        contact:
+          type: string
+          nullable: true
+
+    CreateRazorpayOrderBody:
+      type: object
+      required:
+        - amount
+        - currency
+      additionalProperties: false
+      description: Notes keys starting with insforge_ are reserved and rejected.
+      properties:
+        amount:
+          type: integer
+          minimum: 1
+          example: 50000
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: "INR"
+        receipt:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 40
+        description:
+          type: string
+          nullable: true
+          maxLength: 2048
+        subject:
+          $ref: '#/components/schemas/BillingSubject'
+        customerName:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 255
+        customerEmail:
+          type: string
+          format: email
+          nullable: true
+        customerContact:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 32
+        callbackUrl:
+          type: string
+          format: uri
+          nullable: true
+        notes:
+          description: Native Razorpay notes. Use stable app identifiers such as `order_id` for webhook fulfillment triggers.
+          allOf:
+            - $ref: '#/components/schemas/Metadata'
+
+    CreateRazorpayOrderResponse:
+      type: object
+      required:
+        - order
+        - checkoutOptions
+      properties:
+        order:
+          $ref: '#/components/schemas/RazorpayOrder'
+        checkoutOptions:
+          type: object
+          required:
+            - key
+            - amount
+            - currency
+            - order_id
+            - prefill
+          additionalProperties: false
+          properties:
+            key:
+              type: string
+              example: "rzp_test_xxx"
+            amount:
+              type: integer
+              minimum: 1
+            currency:
+              type: string
+              example: "INR"
+            order_id:
+              type: string
+              example: "order_123"
+            name:
+              type: string
+              nullable: true
+            description:
+              type: string
+              nullable: true
+            callback_url:
+              type: string
+              nullable: true
+            prefill:
+              $ref: '#/components/schemas/RazorpayCheckoutPrefill'
+
+    VerifyRazorpayOrderBody:
+      type: object
+      required:
+        - orderId
+        - paymentId
+        - signature
+      additionalProperties: false
+      properties:
+        orderId:
+          type: string
+          minLength: 1
+          example: "order_123"
+        paymentId:
+          type: string
+          minLength: 1
+          example: "pay_123"
+        signature:
+          type: string
+          minLength: 1
+
+    VerifyRazorpayOrderResponse:
+      type: object
+      required:
+        - verified
+        - order
+      properties:
+        verified:
+          type: boolean
+        order:
+          $ref: '#/components/schemas/RazorpayOrder'
+
+    CreateRazorpayItemBody:
+      type: object
+      required:
+        - name
+        - amount
+        - currency
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          maxLength: 2048
+        amount:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: "INR"
+
+    UpdateRazorpayItemBody:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          maxLength: 2048
+        amount:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: "INR"
+        active:
+          type: boolean
+
+    CreateRazorpayPlanBody:
+      type: object
+      required:
+        - period
+        - interval
+        - item
+      additionalProperties: false
+      description: Notes keys starting with insforge_ are reserved and rejected.
+      properties:
+        period:
+          type: string
+          enum:
+            - daily
+            - weekly
+            - monthly
+            - yearly
+        interval:
+          type: integer
+          minimum: 1
+        item:
+          type: object
+          required:
+            - name
+            - amount
+            - currency
+          additionalProperties: false
+          properties:
+            name:
+              type: string
+              minLength: 1
+              maxLength: 255
+            description:
+              type: string
+              nullable: true
+              maxLength: 2048
+            amount:
+              type: integer
+              minimum: 1
+            currency:
+              type: string
+              minLength: 3
+              maxLength: 3
+              example: "INR"
+        notes:
+          $ref: '#/components/schemas/Metadata'
+
+    MutateRazorpayItemResponse:
+      type: object
+      required:
+        - item
+      properties:
+        item:
+          $ref: '#/components/schemas/RazorpayItem'
+
+    MutateRazorpayPlanResponse:
+      type: object
+      required:
+        - plan
+      properties:
+        plan:
+          $ref: '#/components/schemas/RazorpayPlan'
+
+    CreateRazorpaySubscriptionBody:
+      type: object
+      required:
+        - planId
+        - subject
+      anyOf:
+        - required:
+            - totalCount
+        - required:
+            - endAt
+      additionalProperties: false
+      description: Notes keys starting with insforge_ are reserved and rejected. Either totalCount or endAt is required.
+      properties:
+        planId:
+          type: string
+          minLength: 1
+          example: "plan_123"
+        totalCount:
+          type: integer
+          minimum: 1
+        endAt:
+          type: integer
+          minimum: 1
+          description: Unix timestamp in seconds.
+        quantity:
+          type: integer
+          minimum: 1
+        startAt:
+          type: integer
+          minimum: 1
+          description: Unix timestamp in seconds.
+        expireBy:
+          type: integer
+          minimum: 1
+          description: Unix timestamp in seconds.
+        customerNotify:
+          type: boolean
+        offerId:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          maxLength: 2048
+        subject:
+          $ref: '#/components/schemas/BillingSubject'
+        customerName:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 255
+        customerEmail:
+          type: string
+          format: email
+          nullable: true
+        customerContact:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 32
+        callbackUrl:
+          type: string
+          format: uri
+          nullable: true
+        notes:
+          description: Native Razorpay subscription notes, available in webhook payloads.
+          allOf:
+            - $ref: '#/components/schemas/Metadata'
+
+    CreateRazorpaySubscriptionResponse:
+      type: object
+      required:
+        - subscription
+        - checkoutOptions
+      properties:
+        subscription:
+          $ref: '#/components/schemas/RazorpaySubscription'
+        checkoutOptions:
+          type: object
+          required:
+            - key
+            - subscription_id
+            - prefill
+          additionalProperties: false
+          properties:
+            key:
+              type: string
+              example: "rzp_test_xxx"
+            subscription_id:
+              type: string
+              example: "sub_123"
+            name:
+              type: string
+              nullable: true
+            description:
+              type: string
+              nullable: true
+            callback_url:
+              type: string
+              nullable: true
+            prefill:
+              $ref: '#/components/schemas/RazorpayCheckoutPrefill'
+
+    VerifyRazorpaySubscriptionBody:
+      type: object
+      required:
+        - subscriptionId
+        - paymentId
+        - signature
+      additionalProperties: false
+      properties:
+        subscriptionId:
+          type: string
+          minLength: 1
+          example: "sub_123"
+        paymentId:
+          type: string
+          minLength: 1
+          example: "pay_123"
+        signature:
+          type: string
+          minLength: 1
+
+    VerifyRazorpaySubscriptionResponse:
+      type: object
+      required:
+        - verified
+        - subscription
+      properties:
+        verified:
+          type: boolean
+        subscription:
+          $ref: '#/components/schemas/RazorpaySubscription'
+
+    CancelRazorpaySubscriptionBody:
+      type: object
+      additionalProperties: false
+      properties:
+        cancelAtCycleEnd:
+          type: boolean
+          default: false
+          description: When true, cancels at the end of the current billing cycle. Defaults to immediate cancellation.
+
+    PauseRazorpaySubscriptionBody:
+      type: object
+      additionalProperties: false
+
+    ResumeRazorpaySubscriptionBody:
+      type: object
+      additionalProperties: false
+
+    CancelRazorpaySubscriptionResponse:
+      type: object
+      required:
+        - subscription
+      properties:
+        subscription:
+          $ref: '#/components/schemas/RazorpaySubscription'
+
+    PauseRazorpaySubscriptionResponse:
+      type: object
+      required:
+        - subscription
+      properties:
+        subscription:
+          $ref: '#/components/schemas/RazorpaySubscription'
+
+    ResumeRazorpaySubscriptionResponse:
+      type: object
+      required:
+        - subscription
+      properties:
+        subscription:
+          $ref: '#/components/schemas/RazorpaySubscription'
+
+    CreateCustomerPortalSessionBody:
+      type: object
+      required:
+        - subject
+      additionalProperties: false
+      properties:
+        subject:
+          $ref: '#/components/schemas/BillingSubject'
+        returnUrl:
+          type: string
+          format: uri
+        configuration:
+          type: string
+          minLength: 1
+          maxLength: 255
+
+    CreateCustomerPortalSessionResponse:
+      type: object
+      required:
+        - customerPortalSession
+      properties:
+        customerPortalSession:
+          $ref: '#/components/schemas/CustomerPortalSession'
+
+    GetStripeStatusResponse:
+      type: object
+      required:
+        - connections
+      properties:
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/StripeConnection'
+
+    GetStripeConfigResponse:
+      type: object
+      required:
+        - keys
+      properties:
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/StripeKeyConfig'
+
+    GetRazorpayStatusResponse:
+      type: object
+      required:
+        - razorpayConnections
+      properties:
+        razorpayConnections:
+          type: array
+          items:
+            $ref: '#/components/schemas/RazorpayConnection'
+
+    GetRazorpayConfigResponse:
+      type: object
+      required:
+        - keys
+      properties:
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/RazorpayKeyConfig'
+
+    UpsertStripeConfigBody:
+      type: object
+      required:
+        - secretKey
+      additionalProperties: false
+      properties:
+        secretKey:
+          type: string
+          minLength: 1
+          writeOnly: true
+          example: "sk_test_xxx"
+
+    UpsertRazorpayConfigBody:
+      type: object
+      required:
+        - keyId
+        - keySecret
+      additionalProperties: false
+      properties:
+        keyId:
+          type: string
+          minLength: 1
+          example: "rzp_test_xxx"
+        keySecret:
+          type: string
+          minLength: 1
+          writeOnly: true
+          example: "razorpay_secret_xxx"
+        webhookSecret:
+          type: string
+          writeOnly: true
+          example: "webhook_secret_xxx"
+
+    SyncStripePaymentsRequest:
+      type: object
+      properties:
+        environment:
+          oneOf:
+            - $ref: '#/components/schemas/StripeEnvironment'
+            - type: string
+              enum:
+                - all
+          default: "all"
+
+    SyncStripePaymentsSubscriptionsSummary:
+      type: object
+      required:
+        - environment
+        - synced
+        - unmapped
+        - deleted
+      properties:
+        environment:
+          $ref: '#/components/schemas/StripeEnvironment'
+        synced:
+          type: integer
+          minimum: 0
+        unmapped:
+          type: integer
+          minimum: 0
+        deleted:
+          type: integer
+          minimum: 0
+
+    SyncStripePaymentsEnvironmentResult:
+      type: object
+      required:
+        - environment
+        - connection
+        - subscriptions
+      properties:
+        environment:
+          $ref: '#/components/schemas/StripeEnvironment'
+        connection:
+          $ref: '#/components/schemas/StripeConnection'
+        subscriptions:
+          allOf:
+            - $ref: '#/components/schemas/SyncStripePaymentsSubscriptionsSummary'
+          nullable: true
+
+    SyncStripePaymentsResponse:
+      type: object
+      required:
+        - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SyncStripePaymentsEnvironmentResult'
+
+    RazorpaySyncCounts:
+      type: object
+      required:
+        - plans
+        - items
+        - customers
+        - subscriptions
+        - invoices
+        - payments
+      additionalProperties: false
+      properties:
+        plans:
+          type: integer
+          minimum: 0
+        items:
+          type: integer
+          minimum: 0
+        customers:
+          type: integer
+          minimum: 0
+        subscriptions:
+          type: integer
+          minimum: 0
+        invoices:
+          type: integer
+          minimum: 0
+        payments:
+          type: integer
+          minimum: 0
+
+    SyncRazorpayPaymentsEnvironmentResult:
+      type: object
+      required:
+        - environment
+        - status
+        - connection
+        - syncCounts
+        - error
+      additionalProperties: false
+      properties:
+        environment:
+          $ref: '#/components/schemas/RazorpayEnvironment'
+        status:
+          type: string
+          enum:
+            - succeeded
+            - failed
+        connection:
+          $ref: '#/components/schemas/RazorpayConnection'
+        syncCounts:
+          $ref: '#/components/schemas/RazorpaySyncCounts'
+        error:
+          type: string
+          nullable: true
+
+    SyncRazorpayPaymentsResponse:
+      type: object
+      required:
+        - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SyncRazorpayPaymentsEnvironmentResult'
+
+    ConfigureStripeWebhookResponse:
+      type: object
+      required:
+        - connection
+      properties:
+        connection:
+          $ref: '#/components/schemas/StripeConnection'
+
+    GetRazorpayWebhookSetupResponse:
+      type: object
+      required:
+        - connection
+        - webhookUrl
+        - webhookSecret
+      properties:
+        connection:
+          $ref: '#/components/schemas/RazorpayConnection'
+        webhookUrl:
+          type: string
+          description: Webhook endpoint URL to copy into the Razorpay Dashboard.
+          example: "https://api.example.com/api/webhooks/razorpay/test"
+        webhookSecret:
+          type: string
+          description: Raw signing secret to copy into the Razorpay Dashboard.
+          example: "webhook_secret_xxx"
+
+    RotateRazorpayWebhookSecretResponse:
+      allOf:
+        - $ref: '#/components/schemas/GetRazorpayWebhookSetupResponse'
+
+    ListStripeCatalogResponse:
+      type: object
+      required:
+        - products
+        - prices
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/StripeProduct'
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/StripePrice'
+
+    ListRazorpayCatalogResponse:
+      type: object
+      required:
+        - items
+        - plans
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RazorpayItem'
+        plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/RazorpayPlan'
+
+    ListStripeProductsResponse:
+      type: object
+      required:
+        - products
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/StripeProduct'
+
+    ListStripePricesResponse:
+      type: object
+      required:
+        - prices
+      properties:
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/StripePrice'
+
+    GetStripeProductResponse:
+      type: object
+      required:
+        - product
+        - prices
+      properties:
+        product:
+          $ref: '#/components/schemas/StripeProduct'
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/StripePrice'
+
+    MutateStripeProductResponse:
+      type: object
+      required:
+        - product
+      properties:
+        product:
+          $ref: '#/components/schemas/StripeProduct'
+
+    DeleteStripeProductResponse:
+      type: object
+      required:
+        - productId
+        - deleted
+      properties:
+        productId:
+          type: string
+          example: "prod_123"
+        deleted:
+          type: boolean
+
+    GetStripePriceResponse:
+      type: object
+      required:
+        - price
+      properties:
+        price:
+          $ref: '#/components/schemas/StripePrice'
+
+    MutateStripePriceResponse:
+      type: object
+      required:
+        - price
+      properties:
+        price:
+          $ref: '#/components/schemas/StripePrice'
+
+    ArchiveStripePriceResponse:
+      type: object
+      required:
+        - price
+        - archived
+      properties:
+        price:
+          $ref: '#/components/schemas/StripePrice'
+        archived:
+          type: boolean
+
+    ListStripeSubscriptionsResponse:
+      type: object
+      required:
+        - subscriptions
+      properties:
+        subscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/StripeSubscription'
+
+    ListRazorpaySubscriptionsResponse:
+      type: object
+      required:
+        - subscriptions
+      properties:
+        subscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/RazorpaySubscription'
+
+    ListPaymentCustomersResponse:
+      type: object
+      required:
+        - customers
+      properties:
+        customers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentCustomerListItem'
+
+    ListPaymentTransactionsResponse:
+      type: object
+      required:
+        - transactions
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentTransaction'
+
+    StripeWebhookResponse:
+      type: object
+      required:
+        - received
+        - handled
+      properties:
+        received:
+          type: boolean
+        handled:
+          type: boolean
+        event:
+          $ref: '#/components/schemas/StripeWebhookEvent'
+
+    RazorpayWebhookResponse:
+      type: object
+      required:
+        - received
+        - handled
+      properties:
+        received:
+          type: boolean
+        handled:
+          type: boolean

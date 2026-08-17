@@ -1,0 +1,254 @@
+import crypto from 'crypto';
+import fs from 'fs/promises';
+import path from 'path';
+import {
+  StorageProvider,
+  ObjectMetadata,
+  GetObjectResult,
+  DeleteObjectsResult,
+} from './base.provider.js';
+import { getApiBaseUrl } from '@/utils/environment.js';
+import { AppError } from '@/utils/errors.js';
+import {
+  ERROR_CODES,
+  DownloadStrategyResponse,
+  UploadStrategyResponse,
+} from '@insforge/shared-schemas';
+import logger from '@/utils/logger.js';
+
+const DELETE_OBJECTS_CONCURRENCY = 25;
+
+/**
+ * Local filesystem storage implementation
+ */
+export class LocalStorageProvider implements StorageProvider {
+  constructor(private baseDir: string) {}
+
+  async initialize(): Promise<void> {
+    await fs.mkdir(this.baseDir, { recursive: true });
+  }
+
+  private getValidatedPath(bucket: string, ...parts: string[]): string {
+    if (!bucket || bucket.trim() === '') {
+      throw new Error('Invalid bucket name');
+    }
+
+    if (!/^[a-zA-Z0-9-_]+$/.test(bucket)) {
+      throw new Error('Bucket name contains invalid characters');
+    }
+
+    const resolvedBaseDir = path.resolve(this.baseDir);
+    const resolvedPath = path.resolve(this.baseDir, bucket, ...parts);
+    const relativePath = path.relative(resolvedBaseDir, resolvedPath);
+
+    if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+      throw new Error('Access denied: Path is outside the base directory');
+    }
+
+    return resolvedPath;
+  }
+
+  private getFilePath(bucket: string, key: string): string {
+    return this.getValidatedPath(bucket, key);
+  }
+
+  async putObject(
+    bucket: string,
+    key: string,
+    file: Express.Multer.File
+  ): Promise<{ etag: string }> {
+    const filePath = this.getFilePath(bucket, key);
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
+    await fs.writeFile(filePath, file.buffer);
+    // Match S3 single-part etag semantics so downstream URL cache-busting
+    // works identically across providers: same bytes → same etag → same URL.
+    return { etag: crypto.createHash('md5').update(file.buffer).digest('hex') };
+  }
+
+  async getObject(bucket: string, key: string): Promise<Buffer | null> {
+    try {
+      const filePath = this.getFilePath(bucket, key);
+      return await fs.readFile(filePath);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  async deleteObject(bucket: string, key: string): Promise<void> {
+    try {
+      const filePath = this.getFilePath(bucket, key);
+      await fs.unlink(filePath);
+    } catch (error) {
+      // Re-throw if it's not a "file not found" error (e.g., validation or permission error)
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw error;
+      }
+    }
+  }
+
+  async deleteObjects(bucket: string, keys: string[]): Promise<DeleteObjectsResult> {
+    const deleted: string[] = [];
+    const failed: Array<{ key: string; message: string }> = [];
+
+    for (let index = 0; index < keys.length; index += DELETE_OBJECTS_CONCURRENCY) {
+      const batchKeys = keys.slice(index, index + DELETE_OBJECTS_CONCURRENCY);
+      const results = await Promise.allSettled(
+        batchKeys.map(async (key) => {
+          await this.deleteObject(bucket, key);
+          return key;
+        })
+      );
+
+      results.forEach((result, resultIndex) => {
+        const key = batchKeys[resultIndex];
+        if (result.status === 'fulfilled') {
+          deleted.push(key);
+        } else {
+          const reason = result.reason;
+          logger.warn('Local storage object delete failed', {
+            bucket,
+            key,
+            error: reason instanceof Error ? reason.message : String(reason),
+          });
+          failed.push({
+            key,
+            message: 'Failed to delete object',
+          });
+        }
+      });
+    }
+
+    return { deleted, failed };
+  }
+
+  async createBucket(bucket: string): Promise<void> {
+    const bucketPath = this.getValidatedPath(bucket);
+    await fs.mkdir(bucketPath, { recursive: true });
+  }
+
+  async deleteBucket(bucket: string): Promise<void> {
+    try {
+      const bucketPath = this.getValidatedPath(bucket);
+      await fs.rm(bucketPath, { recursive: true, force: true });
+    } catch (error) {
+      // Re-throw if it's not a "not found" error
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw error;
+      }
+    }
+  }
+
+  // Local storage doesn't support presigned URLs
+  supportsPresignedUrls(): boolean {
+    return false;
+  }
+
+  getUploadStrategy(
+    bucket: string,
+    key: string,
+    _metadata: { contentType?: string; size?: number },
+    _maxFileSizeBytes: number,
+    _contentType?: string
+  ): Promise<UploadStrategyResponse> {
+    // For local storage, return direct upload strategy with absolute URL
+    const baseUrl = getApiBaseUrl();
+    return Promise.resolve({
+      method: 'direct',
+      uploadUrl: `${baseUrl}/api/storage/buckets/${bucket}/objects/${encodeURIComponent(key)}`,
+      key,
+      confirmRequired: false,
+    });
+  }
+
+  getDownloadStrategy(
+    bucket: string,
+    key: string,
+    _expiresIn?: number,
+    _isPublic?: boolean,
+    version?: string | null
+  ): Promise<DownloadStrategyResponse> {
+    // Direct URL points at our own API — safe to append the cache-bust stamp.
+    const baseUrl = getApiBaseUrl();
+    const base = `${baseUrl}/api/storage/buckets/${bucket}/objects/${encodeURIComponent(key)}`;
+    const url = version ? `${base}?v=${encodeURIComponent(version)}` : base;
+    return Promise.resolve({
+      method: 'direct',
+      url,
+    });
+  }
+
+  async verifyObjectExists(
+    bucket: string,
+    key: string
+  ): Promise<{ exists: boolean; size?: number; etag?: string }> {
+    // For local storage, check if file exists on disk and get its size.
+    // We also compute the MD5 etag here so confirmUpload (called by the
+    // presigned-style flow on local backends) can persist it the same way
+    // the direct PUT path does — keeping the URL cache-bust contract
+    // consistent across upload paths.
+    try {
+      const filePath = this.getFilePath(bucket, key);
+      const stat = await fs.stat(filePath);
+      const buf = await fs.readFile(filePath);
+      const etag = crypto.createHash('md5').update(buf).digest('hex');
+      return { exists: true, size: stat.size, etag };
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        return { exists: false };
+      }
+      throw error;
+    }
+  }
+
+  // ==========================================================================
+  // S3 Protocol extensions — not supported on the local filesystem backend.
+  // Callers should check StorageService.isS3Provider() before invoking these.
+  // ==========================================================================
+
+  private notImplemented(op: string): never {
+    throw new AppError(
+      `S3 protocol operation '${op}' requires an S3 storage backend. ` +
+        `Set S3_BUCKET (and optionally S3_ENDPOINT_URL for MinIO).`,
+      501,
+      ERROR_CODES.S3_PROTOCOL_UNAVAILABLE
+    );
+  }
+
+  // These stubs throw synchronously; declaring them as non-async Promise
+  // returns keeps the interface shape without tripping require-await, and the
+  // thrown AppError surfaces to the caller the same way as any async reject.
+  putObjectStream(): Promise<{ etag: string; size: number }> {
+    this.notImplemented('PutObject/streaming');
+  }
+  headObject(): Promise<ObjectMetadata | null> {
+    this.notImplemented('HeadObject');
+  }
+  copyObject(): Promise<{ etag: string; lastModified: Date }> {
+    this.notImplemented('CopyObject');
+  }
+  getObjectStream(): Promise<GetObjectResult> {
+    this.notImplemented('GetObject/streaming');
+  }
+  createMultipartUpload(): Promise<{ uploadId: string }> {
+    this.notImplemented('CreateMultipartUpload');
+  }
+  uploadPart(): Promise<{ etag: string }> {
+    this.notImplemented('UploadPart');
+  }
+  completeMultipartUpload(): Promise<{ etag: string; size: number }> {
+    this.notImplemented('CompleteMultipartUpload');
+  }
+  abortMultipartUpload(): Promise<void> {
+    this.notImplemented('AbortMultipartUpload');
+  }
+  listParts(): Promise<{
+    parts: Array<{ partNumber: number; etag: string; size: number; lastModified: Date }>;
+    isTruncated: boolean;
+    nextPartNumberMarker?: number;
+  }> {
+    this.notImplemented('ListParts');
+  }
+}

@@ -1,0 +1,852 @@
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  ExternalLink,
+  Copy,
+  Check,
+  Plus,
+  Pencil,
+  Globe,
+  Trash2,
+  RefreshCw,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  Input,
+  Skeleton,
+  useToast,
+} from '@insforge/ui';
+import { useDeployments } from '#features/deployments/hooks/useDeployments';
+import { useDeploymentSlug } from '#features/deployments/hooks/useDeploymentSlug';
+import { useDeploymentMetadata } from '#features/deployments/hooks/useDeploymentMetadata';
+import { useCustomDomains } from '#features/deployments/hooks/useCustomDomains';
+import { useCopyToClipboard } from '#lib/hooks/useCopyToClipboard';
+import type { CustomDomain } from '#features/deployments/services/deployments.service';
+
+/**
+ * Extracts the slug portion from a custom insforge.site domain URL.
+ * e.g. "https://my-slug.insforge.site" -> "my-slug"
+ */
+function extractSlugFromUrl(url: string | null): string {
+  if (!url) {
+    return '';
+  }
+  const match = url.match(/^https?:\/\/([^.]+)\.insforge\.site$/);
+  return match?.[1] ?? '';
+}
+
+/**
+ * Displays a colored badge indicating the verification status of a custom domain.
+ */
+function StatusBadge({ verified, misconfigured }: { verified: boolean; misconfigured: boolean }) {
+  const { t } = useTranslation('chrome');
+  const tone = misconfigured
+    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+    : verified
+      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+      : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
+
+  const label = misconfigured
+    ? t('deployments.invalidConfiguration', { defaultValue: 'Invalid configuration' })
+    : verified
+      ? t('deployments.verified', { defaultValue: 'Verified' })
+      : t('deployments.pendingVerification', { defaultValue: 'Pending verification' });
+
+  return <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${tone}`}>{label}</span>;
+}
+
+/**
+ * Small inline copy button used in DNS record tables.
+ */
+function CopyIconButton({ value, label }: { value: string; label: string }) {
+  const { t } = useTranslation('chrome');
+  const { copied, copy } = useCopyToClipboard(1500);
+
+  const handleCopy = async () => {
+    await copy(value);
+  };
+
+  const copyLabel = t('deployments.copyAria', {
+    defaultValue: 'Copy {{label}}',
+    label,
+  });
+
+  return (
+    <button
+      type="button"
+      onClick={() => void handleCopy()}
+      aria-label={copyLabel}
+      title={copyLabel}
+      className="inline-flex items-center justify-center rounded p-1 text-neutral-500 transition hover:bg-neutral-200 hover:text-zinc-950 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-white"
+    >
+      {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+    </button>
+  );
+}
+
+type DnsRecordRow = {
+  type: string;
+  name: string;
+  value: string;
+};
+
+function getSubdomainLabel(domain: string, apexDomain: string): string {
+  if (domain === apexDomain) {
+    return '@';
+  }
+
+  const suffix = `.${apexDomain}`;
+  return domain.endsWith(suffix) ? domain.slice(0, -suffix.length) : domain;
+}
+
+/**
+ * Vercel-style table layout for DNS records.
+ */
+function RecordsTable({ rows }: { rows: DnsRecordRow[] }) {
+  const { t } = useTranslation('chrome');
+  return (
+    <div className="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
+      <table className="w-full border-collapse text-left text-xs">
+        <thead className="bg-neutral-50 dark:bg-neutral-800/80">
+          <tr className="text-muted-foreground dark:text-neutral-400">
+            <th className="px-4 py-3 font-medium">
+              {t('deployments.type', { defaultValue: 'Type' })}
+            </th>
+            <th className="px-4 py-3 font-medium">
+              {t('deployments.name', { defaultValue: 'Name' })}
+            </th>
+            <th className="px-4 py-3 font-medium">
+              {t('deployments.value', { defaultValue: 'Value' })}
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white dark:bg-[#2f2f2f]">
+          {rows.map((row) => (
+            <tr
+              key={`${row.type}:${row.name}:${row.value}`}
+              className="border-t border-neutral-200 text-zinc-950 dark:border-neutral-700 dark:text-white"
+            >
+              <td className="px-4 py-3 align-top font-medium">{row.type}</td>
+              <td className="px-4 py-3 align-top">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono">{row.name}</span>
+                  <CopyIconButton
+                    value={row.name}
+                    label={t('deployments.recordName', {
+                      defaultValue: '{{type}} record name',
+                      type: row.type,
+                    })}
+                  />
+                </div>
+              </td>
+              <td className="px-4 py-3 align-top">
+                <div className="flex items-start gap-2">
+                  <span className="font-mono break-all">{row.value}</span>
+                  <CopyIconButton
+                    value={row.value}
+                    label={t('deployments.recordValue', {
+                      defaultValue: '{{type}} record value',
+                      type: row.type,
+                    })}
+                  />
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/**
+ * Renders the DNS records returned by Vercel for a domain that is not yet verified.
+ */
+function VerificationChallenges({ domain }: { domain: CustomDomain }) {
+  const { t } = useTranslation('chrome');
+  const isApexDomain = domain.domain === domain.apexDomain;
+  const rows: DnsRecordRow[] = [];
+
+  if (!isApexDomain && domain.cnameTarget) {
+    rows.push({
+      type: 'CNAME',
+      name: getSubdomainLabel(domain.domain, domain.apexDomain),
+      value: domain.cnameTarget,
+    });
+  }
+
+  if (isApexDomain && domain.aRecordValue) {
+    rows.push({
+      type: 'A',
+      name: '@',
+      value: domain.aRecordValue,
+    });
+  }
+
+  rows.push(
+    ...domain.verification.map((record) => ({
+      type: record.type,
+      name: record.domain,
+      value: record.value,
+    }))
+  );
+
+  return (
+    <div className="mt-3 text-xs space-y-3">
+      <p className="text-muted-foreground dark:text-neutral-400 font-medium">
+        {domain.misconfigured
+          ? t('deployments.updateDnsRecords', {
+              defaultValue:
+                'Update the following DNS records with your domain provider, then click ',
+            })
+          : t('deployments.addDnsRecords', {
+              defaultValue: 'Add the following DNS records with your domain provider, then click ',
+            })}
+        <span className="font-semibold">{t('deployments.verify', { defaultValue: 'Verify' })}</span>
+        .
+      </p>
+
+      {rows.length > 0 ? (
+        <RecordsTable rows={rows} />
+      ) : (
+        <p className="text-muted-foreground dark:text-neutral-400">
+          {t('deployments.noDnsRecordsYet', {
+            defaultValue: 'Vercel has not returned any DNS records for this domain yet.',
+          })}
+        </p>
+      )}
+
+      <p className="text-muted-foreground dark:text-neutral-400">
+        {t('deployments.dnsPropagationHint', {
+          defaultValue: 'DNS changes can take time to propagate before verification succeeds.',
+        })}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * A single row in the custom domains list showing the domain name, status badge,
+ * and action buttons (Verify, Visit, Remove). Expands to show DNS instructions
+ * when the domain is not yet verified.
+ */
+function CustomDomainRow({
+  domain,
+  onVerify,
+  onRemove,
+  isVerifying,
+  isRemoving,
+}: {
+  domain: CustomDomain;
+  onVerify: (d: string) => void;
+  onRemove: (d: string) => void;
+  isVerifying: boolean;
+  isRemoving: boolean;
+}) {
+  const { t } = useTranslation('chrome');
+  const isReady = domain.verified && !domain.misconfigured;
+  const [showVerification, setShowVerification] = useState(!isReady);
+  const customDomainUrl = `https://${domain.domain}`;
+
+  return (
+    <div className="bg-white dark:bg-[#333] rounded-lg px-3 py-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3 flex-wrap">
+          {isReady ? (
+            <a
+              href={customDomainUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[13px] font-medium text-zinc-950 dark:text-white underline hover:text-blue-600 dark:hover:text-blue-400"
+            >
+              {customDomainUrl}
+            </a>
+          ) : (
+            <span className="text-[13px] font-medium text-zinc-950 dark:text-white">
+              {customDomainUrl}
+            </span>
+          )}
+          <StatusBadge verified={domain.verified} misconfigured={domain.misconfigured} />
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {!isReady && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowVerification((v) => !v)}
+              className="h-8 px-2 gap-1 text-zinc-950 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-700"
+            >
+              {showVerification ? (
+                <ChevronUp className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5" />
+              )}
+              <span className="text-xs">
+                {t('deployments.records', { defaultValue: 'Records' })}
+              </span>
+            </Button>
+          )}
+          {!isReady && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => onVerify(domain.domain)}
+              disabled={isVerifying}
+              className="h-8 px-3 gap-1 text-xs bg-neutral-200 dark:bg-neutral-600 hover:bg-neutral-300 dark:hover:bg-neutral-500 text-zinc-950 dark:text-white"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isVerifying ? 'animate-spin' : ''}`} />
+              {isVerifying
+                ? t('deployments.verifying', { defaultValue: 'Verifying...' })
+                : t('deployments.verify', { defaultValue: 'Verify' })}
+            </Button>
+          )}
+          {isReady && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.open(customDomainUrl, '_blank', 'noopener,noreferrer')}
+              className="h-8 px-2 gap-1 text-zinc-950 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-700"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span className="text-xs">{t('deployments.visit', { defaultValue: 'Visit' })}</span>
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onRemove(domain.domain)}
+            disabled={isRemoving}
+            aria-label={t('deployments.removeDomainAria', {
+              defaultValue: 'Remove {{domain}}',
+              domain: domain.domain,
+            })}
+            className="h-8 px-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </Button>
+        </div>
+      </div>
+
+      {showVerification && !isReady && <VerificationChallenges domain={domain} />}
+    </div>
+  );
+}
+
+/**
+ * Page for managing deployment domains.
+ * Shows the auto-generated default domain, the insforge.site custom slug,
+ * and user-owned custom domains with full DNS verification workflow.
+ */
+export default function DeploymentDomainsPage() {
+  const { t } = useTranslation('chrome');
+  const { copied: copiedDefault, copy: copyDefault } = useCopyToClipboard();
+  const { copied: copiedCustom, copy: copyCustom } = useCopyToClipboard();
+  const [isEditing, setIsEditing] = useState(false);
+  const [customSlug, setCustomSlug] = useState('');
+  const [isAddDomainOpen, setIsAddDomainOpen] = useState(false);
+  const [newDomain, setNewDomain] = useState('');
+  const [domainError, setDomainError] = useState('');
+  const isSubmittingAddDomainRef = useRef(false);
+
+  const { deployments, isLoadingDeployments } = useDeployments();
+  const { updateSlug, isUpdating } = useDeploymentSlug();
+  const { customDomainUrl, isLoading: isLoadingMetadata, invalidate } = useDeploymentMetadata();
+  const {
+    domains,
+    isLoading: isLoadingDomains,
+    isError: isDomainsError,
+    error: domainsError,
+    refetchDomains,
+    addDomain,
+    isAdding,
+    verifyDomain,
+    isVerifying,
+    verifyingDomain,
+    removeDomain,
+    isRemoving,
+    removingDomain,
+  } = useCustomDomains();
+  const { showToast } = useToast();
+  const RESERVED_HOSTED_DOMAIN_SUFFIX = '.insforge.site';
+
+  const latestReadyDeployment = deployments.find((d) => d.status === 'READY') ?? null;
+  const defaultDomain = latestReadyDeployment?.url ?? null;
+  const deploymentUrl = defaultDomain
+    ? defaultDomain.startsWith('http')
+      ? defaultDomain
+      : `https://${defaultDomain}`
+    : null;
+
+  const savedCustomSlug = extractSlugFromUrl(customDomainUrl);
+
+  const handleCopyDefaultDomain = async () => {
+    if (!defaultDomain) {
+      return;
+    }
+    if (!(await copyDefault(defaultDomain))) {
+      showToast(
+        t('deployments.copyFailed', { defaultValue: 'Failed to copy to clipboard' }),
+        'error'
+      );
+    }
+  };
+
+  const handleCopyCustomDomain = async () => {
+    if (!customDomainUrl) {
+      return;
+    }
+    if (!(await copyCustom(customDomainUrl))) {
+      showToast(
+        t('deployments.copyFailed', { defaultValue: 'Failed to copy to clipboard' }),
+        'error'
+      );
+    }
+  };
+
+  const handleStartEditing = () => {
+    setCustomSlug(savedCustomSlug);
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setCustomSlug('');
+  };
+
+  const handleSave = async () => {
+    const trimmedSlug = customSlug.trim() || null;
+    if (trimmedSlug) {
+      if (trimmedSlug.length < 3) {
+        showToast(
+          t('deployments.slugTooShort', {
+            defaultValue: 'Slug must be at least 3 characters',
+          }),
+          'error'
+        );
+        return;
+      }
+      if (trimmedSlug.length > 63) {
+        showToast(
+          t('deployments.slugTooLong', {
+            defaultValue: 'Slug must be at most 63 characters',
+          }),
+          'error'
+        );
+        return;
+      }
+      if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(trimmedSlug)) {
+        showToast(
+          t('deployments.slugInvalidFormat', {
+            defaultValue:
+              'Slug must be lowercase alphanumeric with hyphens, not starting or ending with hyphen',
+          }),
+          'error'
+        );
+        return;
+      }
+    }
+    try {
+      await updateSlug(trimmedSlug);
+      invalidate();
+      setIsEditing(false);
+    } catch {
+      // Error handling is done in the hook
+    }
+  };
+
+  const DOMAIN_REGEX = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
+
+  const handleAddDomain = async () => {
+    if (isAdding || isSubmittingAddDomainRef.current) {
+      return;
+    }
+
+    const trimmed = newDomain.trim().toLowerCase();
+    if (!trimmed) {
+      return;
+    }
+    if (!DOMAIN_REGEX.test(trimmed)) {
+      setDomainError(
+        t('deployments.invalidDomainFormat', {
+          defaultValue: 'Invalid domain format (e.g. myapp.com or www.myapp.com)',
+        })
+      );
+      return;
+    }
+    if (trimmed.endsWith(RESERVED_HOSTED_DOMAIN_SUFFIX)) {
+      setDomainError(
+        t('deployments.reservedDomainSuffix', {
+          defaultValue: 'Domains ending with .insforge.site are reserved by InsForge',
+        })
+      );
+      return;
+    }
+    setDomainError('');
+    try {
+      isSubmittingAddDomainRef.current = true;
+      await addDomain(trimmed);
+      setNewDomain('');
+      setIsAddDomainOpen(false);
+    } catch {
+      // Error handling is done in the hook
+    } finally {
+      isSubmittingAddDomainRef.current = false;
+    }
+  };
+
+  if (isLoadingDeployments || isLoadingMetadata || isLoadingDomains) {
+    return (
+      <div className="h-full flex flex-col overflow-hidden bg-[rgb(var(--semantic-1))]">
+        <div className="flex-1 min-h-0 overflow-auto p-6">
+          <div className="w-full max-w-[1080px] mx-auto flex flex-col gap-6">
+            <h1 className="text-xl font-semibold text-zinc-950 dark:text-white tracking-[-0.1px]">
+              {t('deployments.domains', { defaultValue: 'Domains' })}
+            </h1>
+            <Skeleton className="h-[80px] w-full rounded-lg" />
+            <Skeleton className="h-[48px] w-full rounded-lg" />
+            <Skeleton className="h-[48px] w-full rounded-lg" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full flex flex-col overflow-hidden bg-[rgb(var(--semantic-1))]">
+      <div className="flex-1 min-h-0 overflow-auto p-6">
+        <div className="w-full max-w-[1080px] mx-auto flex flex-col gap-6">
+          {/* Title */}
+          <h1 className="text-xl font-semibold text-zinc-950 dark:text-white tracking-[-0.1px]">
+            {t('deployments.domains', { defaultValue: 'Domains' })}
+          </h1>
+
+          {/* Description */}
+          <p className="text-sm text-muted-foreground dark:text-neutral-400 leading-5">
+            {t('deployments.domainsDescription1', {
+              defaultValue:
+                'The default domain is automatically generated by the system. You can also define a custom domain for your project.',
+            })}
+            <br />
+            {t('deployments.domainsDescription2', {
+              defaultValue: 'Both domains can be used to access your deployed application.',
+            })}
+          </p>
+
+          {/* Domain Rows */}
+          <div className="flex flex-col gap-4">
+            {/* Default Domain Row */}
+            <div className="bg-white dark:bg-[#333] rounded-lg h-12 flex items-center px-3">
+              <div className="flex items-center gap-6">
+                <span className="text-sm text-muted-foreground dark:text-neutral-400 w-[120px]">
+                  {t('deployments.defaultDomain', { defaultValue: 'Default Domain' })}
+                </span>
+                {defaultDomain ? (
+                  <div className="flex items-center gap-1">
+                    <a
+                      href={deploymentUrl ?? '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[13px] text-zinc-950 dark:text-white underline hover:text-blue-600 dark:hover:text-blue-400"
+                    >
+                      {defaultDomain}
+                    </a>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => void handleCopyDefaultDomain()}
+                      className="h-9 ml-2 px-3 gap-1 text-zinc-950 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                    >
+                      {copiedDefault ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                      <span className="text-[13px]">
+                        {copiedDefault
+                          ? t('deployments.copied', { defaultValue: 'Copied' })
+                          : t('deployments.copy', { defaultValue: 'Copy' })}
+                      </span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        deploymentUrl && window.open(deploymentUrl, '_blank', 'noopener,noreferrer')
+                      }
+                      className="h-9 px-3 gap-1 text-zinc-950 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      <span className="text-[13px]">
+                        {t('deployments.visit', { defaultValue: 'Visit' })}
+                      </span>
+                    </Button>
+                  </div>
+                ) : (
+                  <span className="text-[13px] text-muted-foreground dark:text-neutral-500">
+                    {t('deployments.noDeploymentYet', { defaultValue: 'No deployment yet' })}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Custom Slug Row */}
+            <div className="bg-white dark:bg-[#333] rounded-lg h-12 flex items-center justify-between pl-3 pr-2">
+              <div className="flex items-center gap-6">
+                <span className="text-sm text-muted-foreground dark:text-neutral-400 w-[120px]">
+                  {t('deployments.customDomain', { defaultValue: 'Custom Domain' })}
+                </span>
+                {isEditing ? (
+                  <div className="flex items-center gap-1">
+                    <span className="text-[13px] text-zinc-950 dark:text-white">https://</span>
+                    <Input
+                      value={customSlug}
+                      onChange={(e) => setCustomSlug(e.target.value)}
+                      placeholder=""
+                      className="h-8 w-[200px]"
+                    />
+                    <span className="text-[13px] text-zinc-950 dark:text-white">
+                      .insforge.site
+                    </span>
+                  </div>
+                ) : savedCustomSlug ? (
+                  <div className="flex items-center gap-1">
+                    <a
+                      href={customDomainUrl ?? '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[13px] text-zinc-950 dark:text-white underline hover:text-blue-600 dark:hover:text-blue-400"
+                    >
+                      {customDomainUrl}
+                    </a>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => void handleCopyCustomDomain()}
+                      className="h-9 ml-2 px-3 gap-1 text-zinc-950 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                    >
+                      {copiedCustom ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                      <span className="text-[13px]">
+                        {copiedCustom
+                          ? t('deployments.copied', { defaultValue: 'Copied' })
+                          : t('deployments.copy', { defaultValue: 'Copy' })}
+                      </span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        customDomainUrl &&
+                        window.open(customDomainUrl, '_blank', 'noopener,noreferrer')
+                      }
+                      className="h-9 px-3 gap-1 text-zinc-950 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      <span className="text-[13px]">
+                        {t('deployments.visit', { defaultValue: 'Visit' })}
+                      </span>
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
+
+              {isEditing ? (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleCancel}
+                    disabled={isUpdating}
+                    className="h-9 w-20 bg-neutral-200 dark:bg-neutral-600 hover:bg-neutral-300 dark:hover:bg-neutral-500 text-zinc-950 dark:text-white"
+                  >
+                    {t('deployments.cancel', { defaultValue: 'Cancel' })}
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => void handleSave()}
+                    disabled={!customSlug.trim() || isUpdating}
+                    className="h-9 w-20 bg-zinc-950 text-white hover:bg-zinc-800 disabled:opacity-40 dark:bg-emerald-300 dark:text-zinc-950 dark:hover:bg-emerald-400"
+                  >
+                    {isUpdating
+                      ? t('deployments.saving', { defaultValue: 'Saving...' })
+                      : t('deployments.save', { defaultValue: 'Save' })}
+                  </Button>
+                </div>
+              ) : savedCustomSlug ? (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleStartEditing}
+                  className="h-9 px-3 gap-1.5 bg-neutral-200 dark:bg-neutral-600 hover:bg-neutral-300 dark:hover:bg-neutral-500 text-zinc-950 dark:text-white"
+                >
+                  <Pencil className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {t('deployments.edit', { defaultValue: 'Edit' })}
+                  </span>
+                </Button>
+              ) : (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleStartEditing}
+                  className="h-9 px-3 gap-1.5 bg-neutral-200 dark:bg-neutral-600 hover:bg-neutral-300 dark:hover:bg-neutral-500 text-zinc-950 dark:text-white"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {t('deployments.create', { defaultValue: 'Create' })}
+                  </span>
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Custom (user-owned) Domains Section */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-zinc-950 dark:text-white">
+                {t('deployments.yourOwnDomains', { defaultValue: 'Your own domains' })}
+              </h2>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsAddDomainOpen(true)}
+                className="h-9 px-3 gap-1.5 bg-neutral-200 dark:bg-neutral-600 hover:bg-neutral-300 dark:hover:bg-neutral-500 text-zinc-950 dark:text-white"
+              >
+                <Globe className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  {t('deployments.addDomain', { defaultValue: 'Add domain' })}
+                </span>
+              </Button>
+            </div>
+
+            {isDomainsError ? (
+              <div className="bg-white dark:bg-[#333] rounded-lg px-4 py-6 flex flex-col items-center gap-2 text-center">
+                <p className="text-sm text-red-500">
+                  {domainsError instanceof Error
+                    ? domainsError.message
+                    : t('deployments.loadDomainsFailed', {
+                        defaultValue: 'Failed to load custom domains.',
+                      })}
+                </p>
+                <Button variant="outline" size="sm" onClick={() => void refetchDomains()}>
+                  {t('deployments.retry', { defaultValue: 'Retry' })}
+                </Button>
+              </div>
+            ) : domains.length === 0 ? (
+              <div className="bg-white dark:bg-[#333] rounded-lg px-4 py-6 flex flex-col items-center gap-2 text-center">
+                <Globe className="w-8 h-8 text-muted-foreground dark:text-neutral-500" />
+                <p className="text-sm text-muted-foreground dark:text-neutral-400">
+                  {t('deployments.noCustomDomains', {
+                    defaultValue: 'No custom domains yet. Add your own domain to get started.',
+                  })}
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {domains.map((d) => (
+                  <CustomDomainRow
+                    key={d.domain}
+                    domain={d}
+                    onVerify={(name) => void verifyDomain(name)}
+                    onRemove={(name) => void removeDomain(name)}
+                    isVerifying={isVerifying && verifyingDomain === d.domain}
+                    isRemoving={isRemoving && removingDomain === d.domain}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Add Domain Dialog */}
+          <Dialog
+            open={isAddDomainOpen}
+            onOpenChange={(open) => {
+              setIsAddDomainOpen(open);
+              if (!open) {
+                setNewDomain('');
+                setDomainError('');
+              }
+            }}
+          >
+            <DialogContent>
+              <div className="flex items-center justify-between px-6 py-3 border-b border-neutral-200 dark:border-neutral-700">
+                <DialogTitle className="text-lg font-semibold text-zinc-950 dark:text-white leading-7">
+                  {t('deployments.addYourOwnDomain', { defaultValue: 'Add your own domain' })}
+                </DialogTitle>
+              </div>
+              <DialogDescription className="sr-only">
+                {t('deployments.addDomainDescription', {
+                  defaultValue: 'Add a custom domain to your site',
+                })}
+              </DialogDescription>
+
+              <div className="flex flex-col gap-4 p-6">
+                <p className="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                  {t('deployments.addDomainHintBefore', {
+                    defaultValue: 'Enter the domain you own (e.g.',
+                  })}{' '}
+                  <span className="font-mono text-zinc-950 dark:text-white">myapp.com</span>{' '}
+                  {t('deployments.or', { defaultValue: 'or' })}{' '}
+                  <span className="font-mono text-zinc-950 dark:text-white">www.myapp.com</span>
+                  {').'}{' '}
+                  {t('deployments.addDomainHintAfter', {
+                    defaultValue:
+                      'You will receive DNS configuration instructions after adding it.',
+                  })}
+                </p>
+
+                <Input
+                  value={newDomain}
+                  onChange={(e) => {
+                    setNewDomain(e.target.value);
+                    setDomainError('');
+                  }}
+                  placeholder="myapp.com"
+                  onKeyDown={(e) => {
+                    if (
+                      e.key === 'Enter' &&
+                      newDomain.trim() &&
+                      !isSubmittingAddDomainRef.current
+                    ) {
+                      void handleAddDomain();
+                    }
+                  }}
+                  autoFocus
+                />
+                {domainError && <p className="text-xs text-red-500">{domainError}</p>}
+
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      setIsAddDomainOpen(false);
+                      setNewDomain('');
+                      setDomainError('');
+                    }}
+                    disabled={isAdding}
+                    className="h-9 px-4 bg-neutral-200 dark:bg-neutral-600 hover:bg-neutral-300 dark:hover:bg-neutral-500 text-zinc-950 dark:text-white"
+                  >
+                    {t('deployments.cancel', { defaultValue: 'Cancel' })}
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => void handleAddDomain()}
+                    disabled={!newDomain.trim() || !!domainError || isAdding}
+                    className="h-9 px-4 bg-zinc-950 text-white hover:bg-zinc-800 disabled:opacity-40 dark:bg-emerald-300 dark:text-zinc-950 dark:hover:bg-emerald-400"
+                  >
+                    {isAdding
+                      ? t('deployments.adding', { defaultValue: 'Adding...' })
+                      : t('deployments.addDomainAction', { defaultValue: 'Add Domain' })}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+    </div>
+  );
+}

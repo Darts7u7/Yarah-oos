@@ -1,0 +1,347 @@
+import { Router, Response, NextFunction } from 'express';
+import { DatabaseAdvanceService } from '@/services/database/database-advance.service.js';
+import { AuditService } from '@/services/logs/audit.service.js';
+import { DatabaseManager } from '@/infra/database/database.manager.js';
+import { verifyAdmin, AuthRequest } from '@/api/middlewares/auth.js';
+import { AppError } from '@/utils/errors.js';
+import { upload, handleUploadError } from '@/api/middlewares/upload.js';
+import {
+  ERROR_CODES,
+  rawSQLRequestSchema,
+  exportRequestSchema,
+  importRequestSchema,
+  bulkUpsertRequestSchema,
+} from '@insforge/shared-schemas';
+import logger from '@/utils/logger.js';
+import { successResponse } from '@/utils/response.js';
+import { analyzeQuery, type DatabaseResourceUpdate } from '@/utils/sql-parser.js';
+import { buildQualifiedTableKey } from '@/services/database/helpers.js';
+import { dashboardEventService } from '@/services/dashboard/dashboard-event.service.js';
+
+const router = Router();
+const dbAdvanceService = DatabaseAdvanceService.getInstance();
+const auditService = AuditService.getInstance();
+
+/**
+ * Invalidate column type cache for tables affected by schema-changing SQL
+ */
+function invalidateColumnTypeCacheFromChanges(changes: DatabaseResourceUpdate[]): void {
+  for (const change of changes) {
+    if (change.type === 'table' || change.type === 'tables') {
+      if (change.name) {
+        DatabaseManager.clearColumnTypeCache(change.name);
+      } else {
+        // DROP TABLE / CREATE TABLE don't preserve table name in the parser — clear all
+        DatabaseManager.clearColumnTypeCache();
+      }
+    }
+  }
+}
+
+/**
+ * Execute raw SQL query with root privileges.
+ * POST /api/database/advance/rawsql/unrestricted
+ *
+ * Root back door for project-admin-only operations that need full database owner privileges.
+ */
+router.post(
+  '/rawsql/unrestricted',
+  verifyAdmin,
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      // Validate request body
+      const validation = rawSQLRequestSchema.safeParse(req.body);
+      if (!validation.success) {
+        throw new AppError(
+          validation.error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', '),
+          400,
+          ERROR_CODES.INVALID_INPUT
+        );
+      }
+
+      const { query, params = [], explain = false } = validation.data;
+
+      const response = explain
+        ? await dbAdvanceService.executeExplain(query, params, true)
+        : await dbAdvanceService.executeRawSQL(query, params, true);
+
+      await auditService.log({
+        actor: req.hasApiKey ? 'api-key' : req.user?.id,
+        action: 'EXECUTE_RAW_SQL_UNRESTRICTED',
+        module: 'DATABASE',
+        details: {
+          query: query.substring(0, 300), // Limit query length in audit log
+          paramCount: params.length,
+          executionRole: 'root',
+          explain,
+          ...(explain ? {} : { rowsAffected: response.rowCount }),
+        },
+        ip_address: req.ip,
+      });
+
+      if (!explain) {
+        // Broadcast changes if any modifying statements detected
+        const changes = analyzeQuery(query);
+        if (changes.length > 0) {
+          invalidateColumnTypeCacheFromChanges(changes);
+          dashboardEventService.publishDataUpdate({
+            resource: 'database',
+            data: { changes },
+          });
+        }
+      }
+
+      successResponse(res, response);
+    } catch (error: unknown) {
+      logger.warn('Unrestricted raw SQL execution error:', error);
+      next(error);
+    }
+  }
+);
+
+/**
+ * Execute raw SQL query with project_admin privileges.
+ * POST /api/database/advance/rawsql
+ */
+router.post('/rawsql', verifyAdmin, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    // Validate request body
+    const validation = rawSQLRequestSchema.safeParse(req.body);
+    if (!validation.success) {
+      throw new AppError(
+        validation.error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', '),
+        400,
+        ERROR_CODES.INVALID_INPUT
+      );
+    }
+
+    const { query, params = [], explain = false } = validation.data;
+
+    const response = explain
+      ? await dbAdvanceService.executeExplain(query, params)
+      : await dbAdvanceService.executeRawSQL(query, params);
+
+    await auditService.log({
+      actor: req.hasApiKey ? 'api-key' : req.user?.id,
+      action: 'EXECUTE_RAW_SQL',
+      module: 'DATABASE',
+      details: {
+        query: query.substring(0, 300), // Limit query length in audit log
+        paramCount: params.length,
+        executionRole: 'project_admin',
+        explain,
+        ...(explain ? {} : { rowsAffected: response.rowCount }),
+      },
+      ip_address: req.ip,
+    });
+
+    if (!explain) {
+      // Broadcast changes if any modifying statements detected
+      const changes = analyzeQuery(query);
+      if (changes.length > 0) {
+        invalidateColumnTypeCacheFromChanges(changes);
+        dashboardEventService.publishDataUpdate({
+          resource: 'database',
+          data: { changes },
+        });
+      }
+    }
+
+    successResponse(res, response);
+  } catch (error: unknown) {
+    logger.warn('Raw SQL execution error:', error);
+    next(error);
+  }
+});
+
+/**
+ * Export database data
+ * POST /api/database/advance/export
+ */
+router.post('/export', verifyAdmin, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    // Validate request body
+    const validation = exportRequestSchema.safeParse(req.body);
+    if (!validation.success) {
+      throw new AppError(
+        validation.error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', '),
+        400,
+        ERROR_CODES.INVALID_INPUT
+      );
+    }
+
+    const {
+      tables,
+      format,
+      includeData,
+      includeFunctions,
+      includeSequences,
+      includeViews,
+      rowLimit,
+    } = validation.data;
+    const response = await dbAdvanceService.exportDatabase(
+      tables,
+      format,
+      includeData,
+      includeFunctions,
+      includeSequences,
+      includeViews,
+      rowLimit
+    );
+
+    // Log audit for database export
+    await auditService.log({
+      actor: req.hasApiKey ? 'api-key' : req.user?.id,
+      action: 'EXPORT_DATABASE',
+      module: 'DATABASE',
+      details: {
+        format: response.format,
+      },
+      ip_address: req.ip,
+    });
+
+    successResponse(res, response);
+  } catch (error: unknown) {
+    logger.warn('Database export error:', error);
+    next(error);
+  }
+});
+
+/**
+ * Bulk upsert data from file upload (CSV/JSON)
+ * POST /api/database/advance/bulk-upsert
+ * Expects multipart/form-data with:
+ * - file: CSV or JSON file
+ * - table: Target table name
+ * - upsertKey: Optional column for upsert operations
+ */
+router.post(
+  '/bulk-upsert',
+  verifyAdmin,
+  upload.single('file'),
+  handleUploadError,
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      if (!req.file) {
+        throw new AppError('File is required', 400, ERROR_CODES.INVALID_INPUT);
+      }
+
+      // Validate request body
+      const validation = bulkUpsertRequestSchema.safeParse(req.body);
+      if (!validation.success) {
+        throw new AppError(
+          validation.error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', '),
+          400,
+          ERROR_CODES.INVALID_INPUT
+        );
+      }
+
+      const { schema, table, upsertKey } = validation.data;
+
+      const response = await dbAdvanceService.bulkUpsertFromFile(
+        schema,
+        table,
+        req.file.buffer,
+        req.file.originalname,
+        upsertKey
+      );
+
+      // Log audit
+      await auditService.log({
+        actor: req.hasApiKey ? 'api-key' : req.user?.id,
+        action: 'BULK_UPSERT',
+        module: 'DATABASE',
+        details: {
+          schemaName: schema,
+          table,
+          filename: req.file.originalname,
+          fileSize: req.file.size,
+          upsertKey: upsertKey || null,
+          rowsAffected: response.rowsAffected,
+          totalRecords: response.totalRecords,
+        },
+        ip_address: req.ip,
+      });
+
+      dashboardEventService.publishDataUpdate({
+        resource: 'database',
+        data: {
+          changes: [
+            { type: 'records', name: buildQualifiedTableKey(table, schema) },
+          ] as DatabaseResourceUpdate[],
+        },
+      });
+
+      successResponse(res, response);
+    } catch (error: unknown) {
+      logger.warn('Bulk upsert error:', error);
+
+      next(error);
+    }
+  }
+);
+
+/**
+ * Import database data from SQL file
+ * POST /api/database/advance/import
+ * Expects a SQL file upload via multipart/form-data
+ */
+router.post(
+  '/import',
+  verifyAdmin,
+  upload.single('file'),
+  handleUploadError,
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      // Validate request body
+      const validation = importRequestSchema.safeParse(req.body);
+      if (!validation.success) {
+        throw new AppError(
+          validation.error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', '),
+          400,
+          ERROR_CODES.INVALID_INPUT
+        );
+      }
+
+      const { truncate } = validation.data;
+
+      if (!req.file) {
+        throw new AppError('SQL file is required', 400, ERROR_CODES.INVALID_INPUT);
+      }
+
+      const response = await dbAdvanceService.importDatabase(
+        req.file.buffer,
+        req.file.originalname,
+        req.file.size,
+        truncate
+      );
+
+      // Log audit for database import
+      await auditService.log({
+        actor: req.hasApiKey ? 'api-key' : req.user?.id,
+        action: 'IMPORT_DATABASE',
+        module: 'DATABASE',
+        details: {
+          truncate,
+          filename: response.filename,
+          fileSize: response.fileSize,
+          tablesAffected: response.tables.length,
+          rowsImported: response.rowsImported,
+        },
+        ip_address: req.ip,
+      });
+
+      // Import may contain DDL — clear all column type caches
+      DatabaseManager.clearColumnTypeCache();
+
+      dashboardEventService.publishDataUpdate({ resource: 'database' });
+
+      successResponse(res, response);
+    } catch (error: unknown) {
+      logger.warn('Database import error:', error);
+      next(error);
+    }
+  }
+);
+
+export default router;
